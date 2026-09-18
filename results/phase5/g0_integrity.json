@@ -1,0 +1,972 @@
+{
+  "gate": "G0",
+  "title": "File integrity and Phase 4 conformance",
+  "env": {
+    "timestamp_utc": "2026-09-02T22:25:10+00:00",
+    "os": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "python": "3.13.15",
+    "python_build": "Aug  5 2026 13:05:39",
+    "wntr": "1.5.0",
+    "numpy": "2.5.2",
+    "pandas": "3.0.5",
+    "scipy": "1.18.1",
+    "networkx": "3.6.1",
+    "epanet_engine_wntr": {
+      "epanet2.dll": 20200,
+      "epanet20.dll": 20012,
+      "epanet22.dll": 20200
+    },
+    "epanet_engine_epyt": 20305,
+    "original_inp_sha256": "510af942ec643eb87adcf26e5a7df1cc4c23eb0c1e470a8a1257ed055f1956f1",
+    "working_inp_sha256": "53015ba9212e46bec731d190971819996233996b498bc269e828f992830a20a9",
+    "determinism": "EPANET's hydraulic solver is deterministic. No stochastic input is used anywhere in Phase 5; leak-node selection and leak-coefficient allocation are closed-form functions of pipe length, so no random seed is required. Recorded seed: none used."
+  },
+  "provenance": {
+    "file": "BWSN_Network_1.inp",
+    "benchmark": "BWSN Network 1 (Battle of the Water Sensor Networks, 2008)",
+    "size_bytes": 44402,
+    "sha256": "510af942ec643eb87adcf26e5a7df1cc4c23eb0c1e470a8a1257ed055f1956f1",
+    "md5": "09bf6a2879a045f5e7c5f0986ff78261",
+    "mirrors_verified_identical": [
+      "https://filedn.com/lumBFq2P9S74PNoLPWtzxG4/EPyT-Flow/Networks/BWSN_Network_1.inp",
+      "https://raw.githubusercontent.com/OpenWaterAnalytics/EPyT/dev/epyt/networks/asce-tf-wdst/BWSN_Network_1.inp"
+    ],
+    "mirror_not_found": [
+      "https://raw.githubusercontent.com/KIOS-Research/EPANET-Benchmarks/master/BWSN_Network_1.inp"
+    ],
+    "downloaded_utc": "2026-09-02"
+  },
+  "patches_applied": [
+    "P1-quality-units-token"
+  ],
+  "original_sha256": "510af942ec643eb87adcf26e5a7df1cc4c23eb0c1e470a8a1257ed055f1956f1",
+  "working_sha256": "53015ba9212e46bec731d190971819996233996b498bc269e828f992830a20a9",
+  "raw_profile": {
+    "sections_present": [
+      "BACKDROP",
+      "CONTROLS",
+      "COORDINATES",
+      "CURVES",
+      "DEMANDS",
+      "EMITTERS",
+      "END",
+      "ENERGY",
+      "JUNCTIONS",
+      "LABELS",
+      "MIXING",
+      "OPTIONS",
+      "PATTERNS",
+      "PIPES",
+      "PUMPS",
+      "QUALITY",
+      "REACTIONS",
+      "REPORT",
+      "RESERVOIRS",
+      "RULES",
+      "SOURCES",
+      "STATUS",
+      "TAGS",
+      "TANKS",
+      "TIMES",
+      "TITLE",
+      "VALVES",
+      "VERTICES"
+    ],
+    "sections_missing": [],
+    "n_junctions": 126,
+    "n_reservoirs": 1,
+    "n_tanks": 2,
+    "n_pipes": 168,
+    "n_pumps": 2,
+    "n_valves": 8,
+    "n_emitters": 0,
+    "n_status": 0,
+    "n_controls": 1,
+    "n_demands": 6,
+    "n_rules": 4,
+    "rule_ids": [
+      "RULE-0",
+      "RULE-1",
+      "RULE-3",
+      "RULE-4"
+    ],
+    "control_lines": [
+      "LINK VALVE-180 Closed At Time 0.000000"
+    ],
+    "valves": [
+      {
+        "id": "VALVE-173",
+        "from": "JUNCTION-111",
+        "to": "JUNCTION-112",
+        "diameter_in": 6.0,
+        "type": "PRV",
+        "setting": 70.0,
+        "minor_loss": 0.0
+      },
+      {
+        "id": "VALVE-174",
+        "from": "JUNCTION-113",
+        "to": "JUNCTION-114",
+        "diameter_in": 6.0,
+        "type": "PRV",
+        "setting": 80.0,
+        "minor_loss": 0.0
+      },
+      {
+        "id": "VALVE-175",
+        "from": "JUNCTION-115",
+        "to": "JUNCTION-116",
+        "diameter_in": 10.0,
+        "type": "PRV",
+        "setting": 55.0,
+        "minor_loss": 0.0
+      },
+      {
+        "id": "VALVE-176",
+        "from": "JUNCTION-117",
+        "to": "JUNCTION-118",
+        "diameter_in": 6.0,
+        "type": "PRV",
+        "setting": 29.762,
+        "minor_loss": 0.0
+      },
+      {
+        "id": "VALVE-177",
+        "from": "JUNCTION-119",
+        "to": "JUNCTION-120",
+        "diameter_in": 6.0,
+        "type": "PRV",
+        "setting": 45.0,
+        "minor_loss": 0.0
+      },
+      {
+        "id": "VALVE-178",
+        "from": "JUNCTION-121",
+        "to": "JUNCTION-122",
+        "diameter_in": 6.0,
+        "type": "PRV",
+        "setting": 37.0,
+        "minor_loss": 0.0
+      },
+      {
+        "id": "VALVE-179",
+        "from": "JUNCTION-123",
+        "to": "JUNCTION-124",
+        "diameter_in": 8.0,
+        "type": "PRV",
+        "setting": 40.0,
+        "minor_loss": 0.0
+      },
+      {
+        "id": "VALVE-180",
+        "from": "JUNCTION-125",
+        "to": "JUNCTION-126",
+        "diameter_in": 8.0,
+        "type": "PRV",
+        "setting": 16.45,
+        "minor_loss": 0.0
+      }
+    ],
+    "valve_types": [
+      "PRV"
+    ],
+    "pumps": [
+      {
+        "id": "PUMP-170",
+        "from": "JUNCTION-105",
+        "to": "JUNCTION-106",
+        "params": {
+          "HEAD": "CURVE-0"
+        }
+      },
+      {
+        "id": "PUMP-172",
+        "from": "JUNCTION-109",
+        "to": "JUNCTION-110",
+        "params": {
+          "HEAD": "CURVE-2"
+        }
+      }
+    ],
+    "pump_spec_modes": [
+      "HEAD"
+    ],
+    "curves": {
+      "CURVE-0": [
+        [
+          0.0,
+          445.0
+        ],
+        [
+          790.0,
+          365.0
+        ],
+        [
+          1460.0,
+          120.0
+        ]
+      ],
+      "CURVE-1": [
+        [
+          0.0,
+          730.0
+        ],
+        [
+          1000.0,
+          500.0
+        ],
+        [
+          1350.0,
+          260.0
+        ]
+      ],
+      "CURVE-2": [
+        [
+          0.0,
+          740.0
+        ],
+        [
+          2000.0,
+          530.0
+        ],
+        [
+          3240.0,
+          205.0
+        ]
+      ]
+    },
+    "n_curves": 3,
+    "curves_referenced_by_pumps": [
+      "CURVE-0",
+      "CURVE-2"
+    ],
+    "curves_unreferenced": [
+      "CURVE-1"
+    ],
+    "n_patterns": 4,
+    "pattern_line_counts": {
+      "PATTERN-0": 16,
+      "PATTERN-1": 16,
+      "PATTERN-2": 8,
+      "PATTERN-3": 16
+    },
+    "pattern_multiplier_counts": {
+      "PATTERN-0": 96,
+      "PATTERN-1": 96,
+      "PATTERN-2": 48,
+      "PATTERN-3": 96
+    },
+    "pattern_extremes": {
+      "PATTERN-0": [
+        0.03,
+        2.73
+      ],
+      "PATTERN-1": [
+        0.0,
+        80.0
+      ],
+      "PATTERN-2": [
+        0.69,
+        1.26
+      ],
+      "PATTERN-3": [
+        25.8,
+        884.5
+      ]
+    },
+    "patterns": {
+      "PATTERN-0": [
+        1.56,
+        1.36,
+        1.17,
+        1.13,
+        1.08,
+        1.04,
+        1.2,
+        0.64,
+        1.08,
+        0.53,
+        0.29,
+        0.9,
+        1.11,
+        1.06,
+        1.0,
+        1.65,
+        0.55,
+        0.74,
+        0.64,
+        0.46,
+        0.58,
+        0.64,
+        0.71,
+        0.66,
+        0.68,
+        0.43,
+        0.37,
+        0.33,
+        0.23,
+        0.21,
+        0.06,
+        0.1,
+        0.1,
+        0.14,
+        0.09,
+        0.1,
+        0.09,
+        0.09,
+        0.03,
+        0.23,
+        0.27,
+        0.72,
+        0.93,
+        1.13,
+        1.39,
+        1.94,
+        1.9,
+        1.83,
+        2.73,
+        1.74,
+        1.29,
+        1.41,
+        1.39,
+        1.35,
+        1.19,
+        1.34,
+        0.95,
+        1.27,
+        1.28,
+        1.09,
+        1.01,
+        1.13,
+        1.0,
+        0.77,
+        0.67,
+        0.76,
+        0.76,
+        0.71,
+        0.58,
+        0.86,
+        0.96,
+        0.97,
+        0.82,
+        0.71,
+        0.65,
+        0.62,
+        0.44,
+        0.48,
+        0.55,
+        0.56,
+        0.61,
+        0.6,
+        0.44,
+        0.46,
+        0.44,
+        0.4,
+        0.44,
+        0.69,
+        0.76,
+        1.19,
+        1.33,
+        1.73,
+        1.97,
+        2.37,
+        2.28,
+        2.1
+      ],
+      "PATTERN-1": [
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        80.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        80.0,
+        80.0,
+        80.0
+      ],
+      "PATTERN-2": [
+        0.8,
+        0.84,
+        0.88,
+        0.97,
+        1.07,
+        1.01,
+        0.96,
+        0.97,
+        0.99,
+        1.08,
+        1.18,
+        1.19,
+        1.19,
+        1.22,
+        1.25,
+        1.25,
+        1.26,
+        1.22,
+        1.19,
+        1.16,
+        1.14,
+        1.12,
+        1.11,
+        1.1,
+        1.1,
+        1.06,
+        1.02,
+        1.01,
+        1.01,
+        1.0,
+        1.0,
+        0.85,
+        0.71,
+        0.7,
+        0.69,
+        0.74,
+        0.79,
+        0.8,
+        0.8,
+        0.8,
+        0.81,
+        0.77,
+        0.74,
+        0.74,
+        0.75,
+        0.78,
+        0.81,
+        0.8
+      ],
+      "PATTERN-3": [
+        423.3,
+        225.0,
+        26.7,
+        26.7,
+        26.7,
+        26.7,
+        26.7,
+        26.7,
+        26.7,
+        202.1,
+        377.5,
+        202.1,
+        25.8,
+        25.9,
+        25.9,
+        26.0,
+        26.0,
+        26.1,
+        26.1,
+        26.1,
+        26.2,
+        26.3,
+        26.3,
+        26.3,
+        26.3,
+        26.3,
+        26.4,
+        239.9,
+        453.5,
+        240.5,
+        27.4,
+        267.8,
+        508.1,
+        462.1,
+        416.0,
+        327.5,
+        238.9,
+        133.0,
+        27.1,
+        27.1,
+        27.1,
+        27.1,
+        27.1,
+        248.0,
+        468.9,
+        360.7,
+        252.4,
+        449.5,
+        646.5,
+        336.6,
+        26.8,
+        198.9,
+        371.1,
+        198.4,
+        25.8,
+        25.8,
+        25.8,
+        25.8,
+        25.8,
+        25.9,
+        26.0,
+        26.0,
+        26.0,
+        26.1,
+        26.2,
+        26.2,
+        26.2,
+        26.2,
+        26.3,
+        26.3,
+        26.3,
+        26.3,
+        26.3,
+        228.3,
+        430.2,
+        657.2,
+        884.2,
+        884.2,
+        884.3,
+        884.4,
+        884.5,
+        884.5,
+        884.5,
+        663.3,
+        442.1,
+        234.2,
+        26.3,
+        47.2,
+        68.0,
+        352.2,
+        636.4,
+        331.2,
+        26.0,
+        26.1,
+        26.1,
+        224.7
+      ]
+    }
+  },
+  "options_and_times": {
+    "times_raw": {
+      "DURATION": "96:00",
+      "HYDRAULIC TIMESTEP": "0:30",
+      "QUALITY TIMESTEP": "0:05",
+      "PATTERN TIMESTEP": "0:30",
+      "PATTERN START": "0:00",
+      "REPORT TIMESTEP": "1:00",
+      "REPORT START": "0:00",
+      "START": "ClockTime 8:00 AM",
+      "STATISTIC": "NONE"
+    },
+    "options_raw": {
+      "UNITS": "GPM",
+      "HEADLOSS": "H-W",
+      "SPECIFIC": "Gravity 1.000000",
+      "VISCOSITY": "1.1e-005",
+      "TRIALS": "40",
+      "ACCURACY": "0.005",
+      "UNBALANCED": "Stop",
+      "PATTERN": "PATTERN-0",
+      "DEMAND MULTIPLIER": "1.000000",
+      "EMITTER EXPONENT": "0.500000",
+      "QUALITY": "Chemical TIME",
+      "DIFFUSIVITY": "100",
+      "TOLERANCE": "0.010000"
+    },
+    "duration_s": 345600,
+    "hydraulic_timestep_s": 1800,
+    "pattern_timestep_s": 1800,
+    "report_timestep_s": 3600,
+    "rule_timestep_declared": false,
+    "flow_units": "GPM",
+    "headloss": "H-W",
+    "demand_model_declared": null,
+    "emitter_exponent": 0.5,
+    "energy_global": {
+      "EFFICIENCY": "75.000000",
+      "PRICE": "0"
+    }
+  },
+  "demand_profile": {
+    "total_base_demand_gpm": 944.709999,
+    "n_zero_demand_junctions": 47,
+    "pattern_usage_junctions": {
+      "PATTERN-0": {
+        "n_junctions": 77,
+        "base_demand_gpm": 943.9099989999995
+      },
+      "<none>": {
+        "n_junctions": 47,
+        "base_demand_gpm": 0.0
+      },
+      "PATTERN-1": {
+        "n_junctions": 2,
+        "base_demand_gpm": 0.8
+      }
+    },
+    "n_demands_section_rows": 6,
+    "patterns_never_used": [
+      "PATTERN-2",
+      "PATTERN-3"
+    ]
+  },
+  "parse_checks": {
+    "epanet_native_original": {
+      "parsed": true,
+      "engine_version": 20305,
+      "n_nodes": 129,
+      "n_links": 178,
+      "rule_timestep_s": 180.0
+    },
+    "wntr_original": {
+      "parsed": false,
+      "error": "EpanetException: (Error 200) one or more errors in input file 'D:\\\\Thesis\\\\data\\\\networks\\\\BWSN_Network_1.inp'"
+    },
+    "wntr_working": {
+      "parsed": true,
+      "n_junctions": 126,
+      "n_pipes": 168,
+      "n_pumps": 2,
+      "n_valves": 8,
+      "n_tanks": 2,
+      "n_reservoirs": 1,
+      "rule_timestep_s_default": 360,
+      "warnings": [
+        "UserWarning: Not all curves were used in \"D:\\Thesis\\data\\networks\\working\\BWSN_Network_1_working.inp\"; added with type None, units conversion left to user"
+      ]
+    }
+  },
+  "phase4_structural_checks": [
+    {
+      "item": "junction count",
+      "phase4_claim": 126,
+      "observed": 126,
+      "match": true
+    },
+    {
+      "item": "reservoir count",
+      "phase4_claim": 1,
+      "observed": 1,
+      "match": true
+    },
+    {
+      "item": "tank count",
+      "phase4_claim": 2,
+      "observed": 2,
+      "match": true
+    },
+    {
+      "item": "pipe count",
+      "phase4_claim": 168,
+      "observed": 168,
+      "match": true
+    },
+    {
+      "item": "pump count",
+      "phase4_claim": 2,
+      "observed": 2,
+      "match": true
+    },
+    {
+      "item": "valve count",
+      "phase4_claim": 8,
+      "observed": 8,
+      "match": true
+    },
+    {
+      "item": "all valves are PRV",
+      "phase4_claim": true,
+      "observed": true,
+      "match": true
+    },
+    {
+      "item": "pump spec mode is HEAD",
+      "phase4_claim": [
+        "HEAD"
+      ],
+      "observed": [
+        "HEAD"
+      ],
+      "match": true
+    },
+    {
+      "item": "pump head curves present",
+      "phase4_claim": [
+        "CURVE-0",
+        "CURVE-2"
+      ],
+      "observed": [
+        "CURVE-0",
+        "CURVE-2"
+      ],
+      "match": true
+    },
+    {
+      "item": "curve count",
+      "phase4_claim": 3,
+      "observed": 3,
+      "match": true
+    },
+    {
+      "item": "unused curve",
+      "phase4_claim": [
+        "CURVE-1"
+      ],
+      "observed": [
+        "CURVE-1"
+      ],
+      "match": true
+    },
+    {
+      "item": "[RULES] count",
+      "phase4_claim": 4,
+      "observed": 4,
+      "match": true
+    },
+    {
+      "item": "[CONTROLS] count",
+      "phase4_claim": 1,
+      "observed": 1,
+      "match": true
+    },
+    {
+      "item": "duration (s)",
+      "phase4_claim": 345600,
+      "observed": 345600,
+      "match": true
+    },
+    {
+      "item": "hydraulic timestep (s)",
+      "phase4_claim": 1800,
+      "observed": 1800,
+      "match": true
+    },
+    {
+      "item": "flow units",
+      "phase4_claim": "GPM",
+      "observed": "GPM",
+      "match": true
+    },
+    {
+      "item": "headloss formula",
+      "phase4_claim": "H-W",
+      "observed": "H-W",
+      "match": true
+    },
+    {
+      "item": "[EMITTERS] empty",
+      "phase4_claim": true,
+      "observed": true,
+      "match": true
+    },
+    {
+      "item": "pattern count",
+      "phase4_claim": 4,
+      "observed": 4,
+      "match": true
+    },
+    {
+      "item": "PRV settings (psi)",
+      "phase4_claim": [
+        70.0,
+        80.0,
+        55.0,
+        29.762,
+        45.0,
+        37.0,
+        40.0,
+        16.45
+      ],
+      "observed": [
+        70.0,
+        80.0,
+        55.0,
+        29.762,
+        45.0,
+        37.0,
+        40.0,
+        16.45
+      ],
+      "match": true
+    },
+    {
+      "item": "global efficiency (%)",
+      "phase4_claim": 75.0,
+      "observed": 75.0,
+      "match": true
+    },
+    {
+      "item": "global price",
+      "phase4_claim": 0.0,
+      "observed": 0.0,
+      "match": true
+    }
+  ],
+  "documentation_discrepancies": [
+    {
+      "id": "D1-pattern-length",
+      "phase4_text": "'Demand patterns: 4 patterns, 16 / 16 / 8 / 16 entries at a 0:30 pattern step, i.e. an 8-hour cycle repeated over the 96 h horizon.'",
+      "observed": {
+        "lines_per_pattern": {
+          "PATTERN-0": 16,
+          "PATTERN-1": 16,
+          "PATTERN-2": 8,
+          "PATTERN-3": 16
+        },
+        "multipliers_per_pattern": {
+          "PATTERN-0": 96,
+          "PATTERN-1": 96,
+          "PATTERN-2": 48,
+          "PATTERN-3": 96
+        },
+        "pattern_timestep_h": 0.5,
+        "cycle_hours_per_pattern": {
+          "PATTERN-0": 48.0,
+          "PATTERN-1": 48.0,
+          "PATTERN-2": 24.0,
+          "PATTERN-3": 48.0
+        }
+      },
+      "explanation": "Phase 4 counted [PATTERNS] *lines*, not multipliers. Each line carries 6 multipliers, so the true lengths are 96/96/48/96 multipliers = 48 h / 48 h / 24 h / 48 h cycles, not 8 h.",
+      "consequence": "The Phase 4 inference 'BWSN-1's native demand patterns are unrealistically short-cycle' is not supported by the file and must be retracted. No file change is required.",
+      "silent_correction": false
+    },
+    {
+      "id": "D2-dead-patterns",
+      "phase4_text": "Phase 4 reports 4 demand patterns without noting that some are unused.",
+      "observed": {
+        "patterns_never_referenced_by_any_junction": [
+          "PATTERN-2",
+          "PATTERN-3"
+        ],
+        "pattern_usage": {
+          "PATTERN-0": {
+            "n_junctions": 77,
+            "base_demand_gpm": 943.9099989999995
+          },
+          "<none>": {
+            "n_junctions": 47,
+            "base_demand_gpm": 0.0
+          },
+          "PATTERN-1": {
+            "n_junctions": 2,
+            "base_demand_gpm": 0.8
+          }
+        }
+      },
+      "explanation": "Only PATTERN-0 and PATTERN-1 are referenced in [JUNCTIONS]. The remaining patterns are dead data, analogous to the unused CURVE-1 that Phase 4 did record.",
+      "consequence": "The effective native demand model is one 96-multiplier profile (PATTERN-0) driving nearly all demand. Relevant to how the thesis demand model replaces it.",
+      "silent_correction": false
+    },
+    {
+      "id": "D3-rule-timestep-engine-divergence",
+      "phase4_text": "Not mentioned in Phase 4.",
+      "observed": {
+        "rule_timestep_in_TIMES": null,
+        "epanet_native_default_s": 180.0,
+        "wntr_default_s": 360
+      },
+      "explanation": "[TIMES] declares no rule timestep. Native EPANET defaults to hydraulic/10 = 180 s; WNTR's WaterNetworkModel defaults to 360 s. An unmodified WNTR run therefore evaluates the tank-level pump rules at half the native frequency.",
+      "consequence": "Every Phase 5 run sets rule_timestep = 180 s explicitly so that WNTR reproduces native EPANET rule behaviour.",
+      "silent_correction": false
+    },
+    {
+      "id": "D4-report-vs-hydraulic-timestep",
+      "phase4_text": "Not mentioned in Phase 4.",
+      "observed": {
+        "hydraulic_timestep_s": 1800,
+        "report_timestep_s": 3600,
+        "reported_points_over_96h": 97,
+        "solved_points_over_96h": 193
+      },
+      "explanation": "The file solves every 0:30 but reports every 1:00, so half the solved states are never returned to the caller.",
+      "consequence": "Any RL environment reading results at the reporting resolution would silently see a 1 h control interval. Belongs in 'Exact Changes Required Before RL'.",
+      "silent_correction": false
+    }
+  ],
+  "sub_verdicts": {
+    "parseable_native_epanet": true,
+    "parseable_wntr_original": false,
+    "parseable_wntr_working": true,
+    "all_required_sections_present": true,
+    "all_phase4_structural_claims_match": true,
+    "phase4_documentation_conformance": "PARTIAL - see documentation_discrepancies"
+  },
+  "verdict": "G0 FILE INTEGRITY = PASS"
+}

@@ -1,0 +1,9 @@
+{
+  "v": 3,
+  "owners": {
+    "3p": [
+      "local:mcp-registry:search_mcp_registry",
+      "local:mcp-registry:suggest_connectors"
+    ]
+  }
+}

@@ -1,0 +1,1210 @@
+{
+  "gate": "G9+G10",
+  "title": "BWSN-1 system mass balance and full 96 h pre-flight extended period simulation",
+  "env": {
+    "timestamp_utc": "2026-09-02T22:25:33+00:00",
+    "os": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "python": "3.13.15",
+    "python_build": "Aug  5 2026 13:05:39",
+    "wntr": "1.5.0",
+    "numpy": "2.5.2",
+    "pandas": "3.0.5",
+    "scipy": "1.18.1",
+    "networkx": "3.6.1",
+    "epanet_engine_wntr": {
+      "epanet2.dll": 20200,
+      "epanet20.dll": 20012,
+      "epanet22.dll": 20200
+    },
+    "epanet_engine_epyt": 20305,
+    "original_inp_sha256": "510af942ec643eb87adcf26e5a7df1cc4c23eb0c1e470a8a1257ed055f1956f1",
+    "working_inp_sha256": "53015ba9212e46bec731d190971819996233996b498bc269e828f992830a20a9",
+    "determinism": "EPANET's hydraulic solver is deterministic. No stochastic input is used anywhere in Phase 5; leak-node selection and leak-coefficient allocation are closed-form functions of pipe length, so no random seed is required. Recorded seed: none used."
+  },
+  "method": {
+    "rule_timestep_s": 180,
+    "report_timestep_s": 1800,
+    "adopted_solver": {
+      "accuracy": 1e-05,
+      "trials": 2000
+    },
+    "file_solver_counter_test": {
+      "accuracy": 0.005,
+      "trials": 40
+    },
+    "leak_law": "q = sign(p) * C_j * |p|^0.5, p in psi, q in GPM",
+    "leak_sizing_target_fraction_of_inflow": 0.1,
+    "leak_instrument_status": "validation instrument only; imported unchanged from gate 6 and must not enter any thesis result",
+    "pda": {
+      "required_psi": 20.0,
+      "minimum_psi": 0.0,
+      "exponent": 0.5
+    },
+    "topology": "as distributed; no valve or pump added, removed or moved",
+    "random_seed": null
+  },
+  "leak_coefficients_gpm_per_psi_alpha": {
+    "JUNCTION-0": 0.08040598029606676,
+    "JUNCTION-1": 0.015881340981690948,
+    "JUNCTION-2": 0.051605436088820476,
+    "JUNCTION-3": 0.06470308134787796,
+    "JUNCTION-4": 0.10139076343591907,
+    "JUNCTION-5": 0.10353206783794482,
+    "JUNCTION-6": 0.040542030011687456,
+    "JUNCTION-7": 0.01791558016361541,
+    "JUNCTION-8": 0.05745833478769085,
+    "JUNCTION-9": 0.05431775499805309,
+    "JUNCTION-10": 0.07166232065446164,
+    "JUNCTION-11": 0.07423188593689253,
+    "JUNCTION-12": 0.05710145072068656,
+    "JUNCTION-13": 0.021305978800156174,
+    "JUNCTION-14": 0.04742989250487027,
+    "JUNCTION-15": 0.0783717411141423,
+    "JUNCTION-16": 0.0331188414179982,
+    "JUNCTION-17": 0.11698659716400658,
+    "JUNCTION-18": 0.08640163262173885,
+    "JUNCTION-19": 0.14917754000779362,
+    "JUNCTION-20": 0.2509965643241179,
+    "JUNCTION-21": 0.12394583647059026,
+    "JUNCTION-22": 0.10021304601480491,
+    "JUNCTION-23": 0.17986956977016266,
+    "JUNCTION-24": 0.036188044394235105,
+    "JUNCTION-25": 0.03333297185820078,
+    "JUNCTION-26": 0.034546377686015366,
+    "JUNCTION-27": 0.0999632271679019,
+    "JUNCTION-28": 0.08201195859758607,
+    "JUNCTION-29": 0.06470308134787796,
+    "JUNCTION-30": 0.44900598527335517,
+    "JUNCTION-31": 0.15092627193611466,
+    "JUNCTION-32": 0.1173791696377113,
+    "JUNCTION-33": 0.07251884241527193,
+    "JUNCTION-34": 0.37059855575251244,
+    "JUNCTION-35": 0.08629456740163756,
+    "JUNCTION-36": 0.018094022197117553,
+    "JUNCTION-37": 0.04757264613167199,
+    "JUNCTION-38": 0.019700000498636863,
+    "JUNCTION-39": 0.08608043696143498,
+    "JUNCTION-40": 0.07690851643942472,
+    "JUNCTION-41": 0.08397482096610967,
+    "JUNCTION-42": 0.135151996174525,
+    "JUNCTION-43": 0.047715399758473706,
+    "JUNCTION-44": 0.059992211663421315,
+    "JUNCTION-45": 0.0902559805453852,
+    "JUNCTION-46": 0.10149782865602036,
+    "JUNCTION-47": 0.05156974768212005,
+    "JUNCTION-48": 0.057636776821192996,
+    "JUNCTION-49": 0.04671612437086169,
+    "JUNCTION-50": 0.08372500211920667,
+    "JUNCTION-51": 0.03629510961433639,
+    "JUNCTION-52": 0.0829041687650968,
+    "JUNCTION-53": 0.05485308109855953,
+    "JUNCTION-54": 0.031013225422672888,
+    "JUNCTION-55": 0.05413931296455094,
+    "JUNCTION-56": 0.053354168017141504,
+    "JUNCTION-57": 0.06884293652512774,
+    "JUNCTION-58": 0.06955670465913631,
+    "JUNCTION-59": 0.055388407199065966,
+    "JUNCTION-60": 0.04539565332294582,
+    "JUNCTION-61": 0.01713043521620597,
+    "JUNCTION-62": 0.03704456615504541,
+    "JUNCTION-63": 0.03690181252824369,
+    "JUNCTION-64": 0.046609059150760405,
+    "JUNCTION-65": 0.05124855202181619,
+    "JUNCTION-66": 0.0315128631164789,
+    "JUNCTION-67": 0.036651993681340686,
+    "JUNCTION-68": 0.05977808122321874,
+    "JUNCTION-69": 0.08079855276977148,
+    "JUNCTION-70": 0.05189094334242391,
+    "JUNCTION-71": 0.10007029238800319,
+    "JUNCTION-72": 0.05799366088819729,
+    "JUNCTION-73": 0.06138405952473805,
+    "JUNCTION-74": 0.02255507303467119,
+    "JUNCTION-75": 0.07266159604207365,
+    "JUNCTION-76": 0.04839347948578186,
+    "JUNCTION-77": 0.04039927638488574,
+    "JUNCTION-78": 0.043932428648228224,
+    "JUNCTION-79": 0.021912681714063468,
+    "JUNCTION-80": 0.03211956603038619,
+    "JUNCTION-81": 0.01945018165173386,
+    "JUNCTION-82": 0.026801993432022254,
+    "JUNCTION-83": 0.07926395128165303,
+    "JUNCTION-84": 0.07737246572653028,
+    "JUNCTION-85": 0.040577718418387886,
+    "JUNCTION-86": 0.06149112474483934,
+    "JUNCTION-87": 0.037223008188547554,
+    "JUNCTION-88": 0.02269782666147291,
+    "JUNCTION-89": 0.05642337099337841,
+    "JUNCTION-90": 0.028015399259836843,
+    "JUNCTION-91": 0.02976413118815787,
+    "JUNCTION-92": 0.032262319657187906,
+    "JUNCTION-93": 0.08133387887027792,
+    "JUNCTION-94": 0.08183351656408393,
+    "JUNCTION-95": 0.06927119740553288,
+    "JUNCTION-96": 0.06730833503700928,
+    "JUNCTION-97": 0.0753025381379054,
+    "JUNCTION-98": 0.0648815233813801,
+    "JUNCTION-99": 0.05456757384495609,
+    "JUNCTION-100": 0.05638768258667798,
+    "JUNCTION-101": 0.056530436213479696,
+    "JUNCTION-102": 0.05314003757693893,
+    "JUNCTION-103": 0.2113110560732407,
+    "JUNCTION-104": 0.17344565656408542,
+    "JUNCTION-105": 0.006031340732372518,
+    "JUNCTION-106": 0.0029978261628360444,
+    "JUNCTION-109": 0.004461050837553638,
+    "JUNCTION-110": 0.0044253624308532085,
+    "JUNCTION-111": 0.0020342391819244583,
+    "JUNCTION-112": 0.002462500062329608,
+    "JUNCTION-113": 0.0019985507752240295,
+    "JUNCTION-114": 0.021377355613557032,
+    "JUNCTION-115": 0.1151664884222847,
+    "JUNCTION-116": 0.026088225298013672,
+    "JUNCTION-117": 0.05485308109855953,
+    "JUNCTION-118": 0.2641298979898758,
+    "JUNCTION-119": 0.0027123189092326115,
+    "JUNCTION-120": 0.011241848110635166,
+    "JUNCTION-121": 0.010385326349824867,
+    "JUNCTION-122": 0.086829893502144,
+    "JUNCTION-123": 0.086829893502144,
+    "JUNCTION-124": 0.0658451103622917,
+    "JUNCTION-125": 0.07583786423841184,
+    "JUNCTION-126": 0.2641298979898758,
+    "JUNCTION-128": 0.013240398885859195
+  },
+  "cases": {
+    "A_DDA_noleak": {
+      "label": "DDA, no leakage, adopted solver setting",
+      "demand_model": "DDA",
+      "leak_applied": false,
+      "accuracy_option": 1e-05,
+      "trials_option": 2000,
+      "echo_check": {
+        "echo_file": "D:\\Thesis\\results\\phase5\\_tmp\\g9_a_dda_noleak_echo.inp",
+        "n_emitter_lines": 0,
+        "emitter_total_coefficient_gpm_per_psi_alpha": 0.0,
+        "emitter_sample": {},
+        "options_relevant": {
+          "EMITTER EXPONENT": "0.5"
+        },
+        "valve_settings_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-174": 80.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0,
+          "VALVE-179": 40.0,
+          "VALVE-180": 16.45
+        }
+      },
+      "wntr_warnings": [],
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "instantaneous_balance": {
+        "n_reported_states": 193,
+        "max_abs_residual_gpm": 0.0028076171875,
+        "mean_abs_residual_gpm": 0.0007141390233300626,
+        "max_relative_residual": 1.4009815458848607e-05,
+        "mean_relative_residual": 1.3031648222749936e-06,
+        "n_states_above_threshold": 0,
+        "worst_state_index": "239400",
+        "normaliser": "total nodal withdrawal at the same timestep, in GPM",
+        "threshold_rel": 0.0001,
+        "passes": true
+      },
+      "volume_balance": {
+        "integration": "left-endpoint rectangle over each reporting interval, final state excluded; identical rule for every term",
+        "horizon_h": 96.0,
+        "volume_in_Mgal": 4.906653881072998,
+        "volume_served_Mgal": 5.199073314666748,
+        "volume_leaked_Mgal": 0.0,
+        "volume_storage_change_Mgal": -0.29242295026779175,
+        "closure_residual_Mgal": 3.516674041748047e-06,
+        "closure_relative": 7.167153271832193e-07,
+        "threshold_rel": 0.0001,
+        "passes": true
+      },
+      "geometric_storage": {
+        "gal_per_m3": 264.1720523581484,
+        "interval_h": 0.5,
+        "tanks": {
+          "TANK-130": {
+            "area_m2": 2524.327480347413,
+            "diameter_ft": 186.0,
+            "min_level_ft": 0.0,
+            "max_level_ft": 32.1,
+            "init_level_ft": 15.159,
+            "level_start_ft": 15.158966064453125,
+            "level_end_ft": 13.93395709991455,
+            "total_dV_geometric_Mgal": -0.2489926815032959,
+            "total_dV_from_flows_Mgal": -0.2531094551086426,
+            "total_dV_abs_difference_Mgal": 0.0041167656891047955,
+            "max_interval_error_gal": 65184.97265625,
+            "max_interval_error_relative": 0.7395655512809753,
+            "max_interval_error_no_switch_gal": 23.6630859375,
+            "max_interval_error_no_switch_relative": 0.0002684729697648436,
+            "max_interval_error_with_switch_gal": 65184.97265625
+          },
+          "TANK-131": {
+            "area_m2": 819.8445938600861,
+            "diameter_ft": 106.00000000000001,
+            "min_level_ft": 0.0,
+            "max_level_ft": 41.9,
+            "init_level_ft": 17.945,
+            "level_start_ft": 17.945096969604492,
+            "level_end_ft": 16.974401473999023,
+            "total_dV_geometric_Mgal": -0.06407908350229263,
+            "total_dV_from_flows_Mgal": -0.039313528686761856,
+            "total_dV_abs_difference_Mgal": 0.024765558540821075,
+            "max_interval_error_gal": 20704.3046875,
+            "max_interval_error_relative": 0.9835188984870911,
+            "max_interval_error_no_switch_gal": 12.5078125,
+            "max_interval_error_no_switch_relative": 0.0005941600538790226,
+            "max_interval_error_with_switch_gal": 20704.3046875
+          }
+        },
+        "n_intervals": 192,
+        "n_intervals_with_pump_switch": 14
+      },
+      "output_precision_floor": {
+        "float32_relative_eps": 5.960464477539063e-08,
+        "ft_per_m": 3.280839895013123,
+        "tanks": {
+          "TANK-130": {
+            "max_abs_head_ft": 859.9186401367188,
+            "level_difference_quantisation_ft": 0.00010251029016217217,
+            "storage_change_floor_gal": 20.836030806392795,
+            "max_abs_interval_dV_gal": 88139.546875,
+            "floor_relative_to_max_interval_dV": 0.00023639820653880342,
+            "geom_tolerance_rel": 0.005,
+            "tolerance_headroom_factor": 21.150752677894275
+          },
+          "TANK-131": {
+            "max_abs_head_ft": 1155.4874267578125,
+            "level_difference_quantisation_ft": 0.0001377448352286592,
+            "storage_change_floor_gal": 9.093031467427355,
+            "max_abs_interval_dV_gal": 21051.251953125,
+            "floor_relative_to_max_interval_dV": 0.0004319473011712028,
+            "geom_tolerance_rel": 0.005,
+            "tolerance_headroom_factor": 11.575486144820811
+          }
+        }
+      },
+      "geometric_storage_passes": true
+    },
+    "B_DDA_leak": {
+      "label": "DDA, validation leakage, adopted solver setting",
+      "demand_model": "DDA",
+      "leak_applied": true,
+      "accuracy_option": 1e-05,
+      "trials_option": 2000,
+      "echo_check": {
+        "echo_file": "D:\\Thesis\\results\\phase5\\_tmp\\g9_b_dda_leak_echo.inp",
+        "n_emitter_lines": 126,
+        "emitter_total_coefficient_gpm_per_psi_alpha": 8.7650929667759,
+        "emitter_sample": {
+          "JUNCTION-0": 0.08040598029606676,
+          "JUNCTION-1": 0.015881340981690948,
+          "JUNCTION-10": 0.07166232065446165
+        },
+        "options_relevant": {
+          "EMITTER EXPONENT": "0.5"
+        },
+        "valve_settings_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-174": 80.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0,
+          "VALVE-179": 40.0,
+          "VALVE-180": 16.45
+        }
+      },
+      "wntr_warnings": [],
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "instantaneous_balance": {
+        "n_reported_states": 193,
+        "max_abs_residual_gpm": 0.0005966126918792725,
+        "mean_abs_residual_gpm": 0.00012775221019417377,
+        "max_relative_residual": 4.501658725212502e-07,
+        "mean_relative_residual": 1.0375829360986548e-07,
+        "n_states_above_threshold": 0,
+        "worst_state_index": "70200",
+        "normaliser": "total nodal withdrawal at the same timestep, in GPM",
+        "threshold_rel": 0.0001,
+        "passes": true
+      },
+      "volume_balance": {
+        "integration": "left-endpoint rectangle over each reporting interval, final state excluded; identical rule for every term",
+        "horizon_h": 96.0,
+        "volume_in_Mgal": 5.344151020050049,
+        "volume_served_Mgal": 5.199073974359342,
+        "volume_leaked_Mgal": 0.4880301670285978,
+        "volume_storage_change_Mgal": -0.34295302629470825,
+        "closure_residual_Mgal": -9.504318265740608e-08,
+        "closure_relative": 1.7784524108848254e-08,
+        "threshold_rel": 0.0001,
+        "passes": true
+      },
+      "geometric_storage": {
+        "gal_per_m3": 264.1720523581484,
+        "interval_h": 0.5,
+        "tanks": {
+          "TANK-130": {
+            "area_m2": 2524.327480347413,
+            "diameter_ft": 186.0,
+            "min_level_ft": 0.0,
+            "max_level_ft": 32.1,
+            "init_level_ft": 15.159,
+            "level_start_ft": 15.158966064453125,
+            "level_end_ft": 13.750631332397461,
+            "total_dV_geometric_Mgal": -0.2862550914287567,
+            "total_dV_from_flows_Mgal": -0.262816846370697,
+            "total_dV_abs_difference_Mgal": 0.02343825064599514,
+            "max_interval_error_gal": 28770.3359375,
+            "max_interval_error_relative": 0.4125230312347412,
+            "max_interval_error_no_switch_gal": 22.404296875,
+            "max_interval_error_no_switch_relative": 0.00032124368590302765,
+            "max_interval_error_with_switch_gal": 28770.3359375
+          },
+          "TANK-131": {
+            "area_m2": 819.8445938600861,
+            "diameter_ft": 106.00000000000001,
+            "min_level_ft": 0.0,
+            "max_level_ft": 41.9,
+            "init_level_ft": 17.945,
+            "level_start_ft": 17.945096969604492,
+            "level_end_ft": 16.874177932739258,
+            "total_dV_geometric_Mgal": -0.0706951916217804,
+            "total_dV_from_flows_Mgal": -0.08013618737459183,
+            "total_dV_abs_difference_Mgal": 0.009440992027521133,
+            "max_interval_error_gal": 18364.94921875,
+            "max_interval_error_relative": 0.8983412384986877,
+            "max_interval_error_no_switch_gal": 9.8369140625,
+            "max_interval_error_no_switch_relative": 0.00048118323320522904,
+            "max_interval_error_with_switch_gal": 18364.94921875
+          }
+        },
+        "n_intervals": 192,
+        "n_intervals_with_pump_switch": 11
+      },
+      "output_precision_floor": {
+        "float32_relative_eps": 5.960464477539063e-08,
+        "ft_per_m": 3.280839895013123,
+        "tanks": {
+          "TANK-130": {
+            "max_abs_head_ft": 859.9119262695312,
+            "level_difference_quantisation_ft": 0.00010250948980683461,
+            "storage_change_floor_gal": 20.8358681278125,
+            "max_abs_interval_dV_gal": 69742.375,
+            "floor_relative_to_max_interval_dV": 0.000298754783269318,
+            "geom_tolerance_rel": 0.005,
+            "tolerance_headroom_factor": 16.73613371235184
+          },
+          "TANK-131": {
+            "max_abs_head_ft": 1155.51025390625,
+            "level_difference_quantisation_ft": 0.00013774755643680692,
+            "storage_change_floor_gal": 9.093211104154028,
+            "max_abs_interval_dV_gal": 20443.177734375,
+            "floor_relative_to_max_interval_dV": 0.0004448041895592329,
+            "geom_tolerance_rel": 0.005,
+            "tolerance_headroom_factor": 11.240901316497535
+          }
+        }
+      },
+      "geometric_storage_passes": true
+    },
+    "C_PDA_leak": {
+      "label": "PDA, validation leakage, adopted solver setting; this is also the gate 10 run, so the two gates cannot disagree about the same hydraulics",
+      "demand_model": "PDA",
+      "leak_applied": true,
+      "accuracy_option": 1e-05,
+      "trials_option": 2000,
+      "echo_check": {
+        "echo_file": "D:\\Thesis\\results\\phase5\\_tmp\\g9_c_pda_leak_echo.inp",
+        "n_emitter_lines": 126,
+        "emitter_total_coefficient_gpm_per_psi_alpha": 8.7650929667759,
+        "emitter_sample": {
+          "JUNCTION-0": 0.08040598029606676,
+          "JUNCTION-1": 0.015881340981690948,
+          "JUNCTION-10": 0.07166232065446165
+        },
+        "options_relevant": {
+          "DEMAND MODEL": "PDA",
+          "MINIMUM PRESSURE": "0.00",
+          "REQUIRED PRESSURE": "20.00",
+          "PRESSURE EXPONENT": "0.5",
+          "EMITTER EXPONENT": "0.5"
+        },
+        "valve_settings_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-174": 80.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0,
+          "VALVE-179": 40.0,
+          "VALVE-180": 16.45
+        }
+      },
+      "wntr_warnings": [],
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "instantaneous_balance": {
+        "n_reported_states": 193,
+        "max_abs_residual_gpm": 0.0008044242858886719,
+        "mean_abs_residual_gpm": 0.00011680564732426088,
+        "max_relative_residual": 5.180129418396946e-07,
+        "mean_relative_residual": 9.032358643069794e-08,
+        "n_states_above_threshold": 0,
+        "worst_state_index": "59400",
+        "normaliser": "total nodal withdrawal at the same timestep, in GPM",
+        "threshold_rel": 0.0001,
+        "passes": true
+      },
+      "volume_balance": {
+        "integration": "left-endpoint rectangle over each reporting interval, final state excluded; identical rule for every term",
+        "horizon_h": 96.0,
+        "volume_in_Mgal": 5.3439555168151855,
+        "volume_served_Mgal": 5.113104531937578,
+        "volume_leaked_Mgal": 0.48804914390470555,
+        "volume_storage_change_Mgal": -0.2571980953216553,
+        "closure_residual_Mgal": -6.370544303191394e-08,
+        "closure_relative": 1.192102794109338e-08,
+        "threshold_rel": 0.0001,
+        "passes": true
+      },
+      "geometric_storage": {
+        "gal_per_m3": 264.1720523581484,
+        "interval_h": 0.5,
+        "tanks": {
+          "TANK-130": {
+            "area_m2": 2524.327480347413,
+            "diameter_ft": 186.0,
+            "min_level_ft": 0.0,
+            "max_level_ft": 32.1,
+            "init_level_ft": 15.159,
+            "level_start_ft": 15.158966064453125,
+            "level_end_ft": 13.781970024108887,
+            "total_dV_geometric_Mgal": -0.27988532185554504,
+            "total_dV_from_flows_Mgal": -0.17705793678760529,
+            "total_dV_abs_difference_Mgal": 0.10282737761735916,
+            "max_interval_error_gal": 57493.53125,
+            "max_interval_error_relative": 0.841559886932373,
+            "max_interval_error_no_switch_gal": 24.703125,
+            "max_interval_error_no_switch_relative": 0.00036159128649160266,
+            "max_interval_error_with_switch_gal": 57493.53125
+          },
+          "TANK-131": {
+            "area_m2": 819.8445938600861,
+            "diameter_ft": 106.00000000000001,
+            "min_level_ft": 0.0,
+            "max_level_ft": 41.9,
+            "init_level_ft": 17.945,
+            "level_start_ft": 17.945096969604492,
+            "level_end_ft": 16.874177932739258,
+            "total_dV_geometric_Mgal": -0.0706951916217804,
+            "total_dV_from_flows_Mgal": -0.0801401436328888,
+            "total_dV_abs_difference_Mgal": 0.009444945491850376,
+            "max_interval_error_gal": 18371.673828125,
+            "max_interval_error_relative": 0.8989608287811279,
+            "max_interval_error_no_switch_gal": 12.6468505859375,
+            "max_interval_error_no_switch_relative": 0.0006188343395479023,
+            "max_interval_error_with_switch_gal": 18371.673828125
+          }
+        },
+        "n_intervals": 192,
+        "n_intervals_with_pump_switch": 11
+      },
+      "output_precision_floor": {
+        "float32_relative_eps": 5.960464477539063e-08,
+        "ft_per_m": 3.280839895013123,
+        "tanks": {
+          "TANK-130": {
+            "max_abs_head_ft": 859.9111328125,
+            "level_difference_quantisation_ft": 0.00010250939521938562,
+            "storage_change_floor_gal": 20.8358489021621,
+            "max_abs_interval_dV_gal": 68317.8125,
+            "floor_relative_to_max_interval_dV": 0.0003049841342938505,
+            "geom_tolerance_rel": 0.005,
+            "tolerance_headroom_factor": 16.394295433029075
+          },
+          "TANK-131": {
+            "max_abs_head_ft": 1155.5103759765625,
+            "level_difference_quantisation_ft": 0.00013774757098872215,
+            "storage_change_floor_gal": 9.093212064778236,
+            "max_abs_interval_dV_gal": 20436.568359375,
+            "floor_relative_to_max_interval_dV": 0.00044494809034839,
+            "geom_tolerance_rel": 0.005,
+            "tolerance_headroom_factor": 11.237265893387809
+          }
+        }
+      },
+      "geometric_storage_passes": true
+    },
+    "D_PDA_leak_file_solver": {
+      "label": "counter-test: identical to C but at the distributed file's own ACCURACY 0.005 / TRIALS 40, so discrepancy D6 is measured here rather than asserted",
+      "demand_model": "PDA",
+      "leak_applied": true,
+      "accuracy_option": 0.005,
+      "trials_option": 40,
+      "echo_check": {
+        "echo_file": "D:\\Thesis\\results\\phase5\\_tmp\\g9_d_pda_leak_file_solver_echo.inp",
+        "n_emitter_lines": 126,
+        "emitter_total_coefficient_gpm_per_psi_alpha": 8.7650929667759,
+        "emitter_sample": {
+          "JUNCTION-0": 0.08040598029606676,
+          "JUNCTION-1": 0.015881340981690948,
+          "JUNCTION-10": 0.07166232065446165
+        },
+        "options_relevant": {
+          "DEMAND MODEL": "PDA",
+          "MINIMUM PRESSURE": "0.00",
+          "REQUIRED PRESSURE": "20.00",
+          "PRESSURE EXPONENT": "0.5",
+          "EMITTER EXPONENT": "0.5"
+        },
+        "valve_settings_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-174": 80.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0,
+          "VALVE-179": 40.0,
+          "VALVE-180": 16.45
+        }
+      },
+      "wntr_warnings": [],
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "instantaneous_balance": {
+        "n_reported_states": 193,
+        "max_abs_residual_gpm": 25.66694211959839,
+        "mean_abs_residual_gpm": 2.1595822364246287,
+        "max_relative_residual": 0.017668881094204048,
+        "mean_relative_residual": 0.0010959104657400126,
+        "n_states_above_threshold": 58,
+        "worst_state_index": "277200",
+        "normaliser": "total nodal withdrawal at the same timestep, in GPM",
+        "threshold_rel": 0.0001,
+        "passes": false
+      },
+      "volume_balance": {
+        "integration": "left-endpoint rectangle over each reporting interval, final state excluded; identical rule for every term",
+        "horizon_h": 96.0,
+        "volume_in_Mgal": 5.343925952911377,
+        "volume_served_Mgal": 5.117373687019505,
+        "volume_leaked_Mgal": 0.48804945766433383,
+        "volume_storage_change_Mgal": -0.26479488611221313,
+        "closure_residual_Mgal": 0.003297694339751245,
+        "closure_relative": 0.0006170920721599178,
+        "threshold_rel": 0.0001,
+        "passes": false
+      },
+      "geometric_storage": {
+        "gal_per_m3": 264.1720523581484,
+        "interval_h": 0.5,
+        "tanks": {
+          "TANK-130": {
+            "area_m2": 2524.327480347413,
+            "diameter_ft": 186.0,
+            "min_level_ft": 0.0,
+            "max_level_ft": 32.1,
+            "init_level_ft": 15.159,
+            "level_start_ft": 15.158966064453125,
+            "level_end_ft": 13.781769752502441,
+            "total_dV_geometric_Mgal": -0.27992600202560425,
+            "total_dV_from_flows_Mgal": -0.18469491600990295,
+            "total_dV_abs_difference_Mgal": 0.0952310785651207,
+            "max_interval_error_gal": 50064.91015625,
+            "max_interval_error_relative": 0.7328236699104309,
+            "max_interval_error_no_switch_gal": 24.9345703125,
+            "max_interval_error_no_switch_relative": 0.00036497905966825783,
+            "max_interval_error_with_switch_gal": 50064.91015625
+          },
+          "TANK-131": {
+            "area_m2": 819.8445938600861,
+            "diameter_ft": 106.00000000000001,
+            "min_level_ft": 0.0,
+            "max_level_ft": 41.9,
+            "init_level_ft": 17.945,
+            "level_start_ft": 17.945096969604492,
+            "level_end_ft": 16.874778747558594,
+            "total_dV_geometric_Mgal": -0.07065553963184357,
+            "total_dV_from_flows_Mgal": -0.0800999104976654,
+            "total_dV_abs_difference_Mgal": 0.009444374591112137,
+            "max_interval_error_gal": 18371.673828125,
+            "max_interval_error_relative": 0.8983796834945679,
+            "max_interval_error_no_switch_gal": 11.81396484375,
+            "max_interval_error_no_switch_relative": 0.0005777060287073255,
+            "max_interval_error_with_switch_gal": 18371.673828125
+          }
+        },
+        "n_intervals": 192,
+        "n_intervals_with_pump_switch": 11
+      },
+      "output_precision_floor": {
+        "float32_relative_eps": 5.960464477539063e-08,
+        "ft_per_m": 3.280839895013123,
+        "tanks": {
+          "TANK-130": {
+            "max_abs_head_ft": 859.9000244140625,
+            "level_difference_quantisation_ft": 0.00010250807099509984,
+            "storage_change_floor_gal": 20.835579743056517,
+            "max_abs_interval_dV_gal": 68317.8125,
+            "floor_relative_to_max_interval_dV": 0.00030498019448524523,
+            "geom_tolerance_rel": 0.005,
+            "tolerance_headroom_factor": 16.39450721853972
+          },
+          "TANK-131": {
+            "max_abs_head_ft": 1155.5108642578125,
+            "level_difference_quantisation_ft": 0.00013774762919638306,
+            "storage_change_floor_gal": 9.093215907275065,
+            "max_abs_interval_dV_gal": 20449.787109375,
+            "floor_relative_to_max_interval_dV": 0.00044466066363626697,
+            "geom_tolerance_rel": 0.005,
+            "tolerance_headroom_factor": 11.244529613012963
+          }
+        }
+      },
+      "geometric_storage_passes": true
+    }
+  },
+  "gate9": {
+    "question": "does system inflow equal served demand + leakage + storage change, at every solved state and on the 96 h totals?",
+    "threshold_rel": 0.0001,
+    "threshold_declared": "before any run, in the module header; never relaxed",
+    "geom_tolerance_rel": 0.005,
+    "two_independent_routes": "route 1 uses the solver's own nodal flows; route 2 recovers the storage change from tank geometry (V = pi d^2/4 * level) and never touches the solver's storage bookkeeping. Agreement between them is what makes the closure evidence rather than a tautology.",
+    "cases_in_verdict": [
+      "A_DDA_noleak",
+      "B_DDA_leak",
+      "C_PDA_leak"
+    ],
+    "counter_test_excluded_from_verdict": "D_PDA_leak_file_solver",
+    "instantaneous_passes": true,
+    "geometric_passes": true
+  },
+  "gate10": {
+    "configuration": "full 96 h EPS: PDA with required 20 psi and minimum 0 psi, the gate 6 validation leakage on every junction, and the distributed [RULES] and [CONTROLS] exactly as shipped. Identical run to gate 9 case C.",
+    "solver": {
+      "accuracy": 1e-05,
+      "trials": 2000
+    },
+    "wntr_warnings": [],
+    "report_scan": {
+      "rpt_found": true,
+      "n_error_lines": 0,
+      "n_warning_lines": 0,
+      "flagged_lines": []
+    },
+    "n_reported_states": 193,
+    "horizon_h": 96.0,
+    "actuators": {
+      "n_reporting_intervals": 192,
+      "chatter_fraction_threshold": 0.25,
+      "elements": {
+        "PUMP-170": {
+          "type": "pump",
+          "states_observed": [
+            "Closed",
+            "Open"
+          ],
+          "n_status_changes": 7,
+          "change_fraction_of_intervals": 0.036458333333333336,
+          "mean_flow_gpm": 165.78318786621094,
+          "abs_flow_max_gpm": 766.2021484375,
+          "switch_times_h": [
+            1.5,
+            24.0,
+            31.5,
+            51.5,
+            58.0,
+            78.5,
+            84.0
+          ]
+        },
+        "PUMP-172": {
+          "type": "pump",
+          "states_observed": [
+            "Closed",
+            "Open"
+          ],
+          "n_status_changes": 7,
+          "change_fraction_of_intervals": 0.036458333333333336,
+          "mean_flow_gpm": 922.56640625,
+          "abs_flow_max_gpm": 2416.464599609375,
+          "switch_times_h": [
+            3.0,
+            24.0,
+            37.5,
+            51.5,
+            62.0,
+            78.5,
+            88.5
+          ]
+        },
+        "VALVE-173": {
+          "type": "valve",
+          "states_observed": [
+            "Active"
+          ],
+          "n_status_changes": 0,
+          "change_fraction_of_intervals": 0.0,
+          "mean_flow_gpm": 4.719008922576904,
+          "abs_flow_max_gpm": 7.903731346130371,
+          "switch_times_h": []
+        },
+        "VALVE-174": {
+          "type": "valve",
+          "states_observed": [
+            "Closed"
+          ],
+          "n_status_changes": 0,
+          "change_fraction_of_intervals": 0.0,
+          "mean_flow_gpm": 0.0,
+          "abs_flow_max_gpm": 0.0,
+          "switch_times_h": []
+        },
+        "VALVE-175": {
+          "type": "valve",
+          "states_observed": [
+            "Active"
+          ],
+          "n_status_changes": 0,
+          "change_fraction_of_intervals": 0.0,
+          "mean_flow_gpm": 362.9140930175781,
+          "abs_flow_max_gpm": 1082.3310546875,
+          "switch_times_h": []
+        },
+        "VALVE-176": {
+          "type": "valve",
+          "states_observed": [
+            "Active"
+          ],
+          "n_status_changes": 0,
+          "change_fraction_of_intervals": 0.0,
+          "mean_flow_gpm": 256.9053955078125,
+          "abs_flow_max_gpm": 782.033447265625,
+          "switch_times_h": []
+        },
+        "VALVE-177": {
+          "type": "valve",
+          "states_observed": [
+            "Active"
+          ],
+          "n_status_changes": 0,
+          "change_fraction_of_intervals": 0.0,
+          "mean_flow_gpm": 20.61138343811035,
+          "abs_flow_max_gpm": 55.153202056884766,
+          "switch_times_h": []
+        },
+        "VALVE-178": {
+          "type": "valve",
+          "states_observed": [
+            "Active"
+          ],
+          "n_status_changes": 0,
+          "change_fraction_of_intervals": 0.0,
+          "mean_flow_gpm": 39.23917770385742,
+          "abs_flow_max_gpm": 94.2977294921875,
+          "switch_times_h": []
+        },
+        "VALVE-179": {
+          "type": "valve",
+          "states_observed": [
+            "Closed"
+          ],
+          "n_status_changes": 0,
+          "change_fraction_of_intervals": 0.0,
+          "mean_flow_gpm": 0.0,
+          "abs_flow_max_gpm": 0.0,
+          "switch_times_h": []
+        },
+        "VALVE-180": {
+          "type": "valve",
+          "states_observed": [
+            "Closed"
+          ],
+          "n_status_changes": 0,
+          "change_fraction_of_intervals": 0.0,
+          "mean_flow_gpm": 0.0,
+          "abs_flow_max_gpm": 0.0,
+          "switch_times_h": []
+        }
+      },
+      "chattering": [],
+      "any_chattering": false,
+      "report_interval_h": 0.5
+    },
+    "rule_conformance": {
+      "bands": {
+        "PUMP-172": {
+          "tank": "TANK-130",
+          "open_at_or_below_ft": 12.1,
+          "close_at_or_above_ft": 16.0
+        },
+        "PUMP-170": {
+          "tank": "TANK-131",
+          "open_at_or_below_ft": 15.4,
+          "close_at_or_above_ft": 18.4
+        }
+      },
+      "pumps": {
+        "PUMP-172": {
+          "present": true,
+          "driving_tank": "TANK-130",
+          "n_switches": 7,
+          "events": [
+            {
+              "t_h": 3.0,
+              "new_status": "Closed",
+              "tank_level_ft": 15.964557647705078,
+              "consistent_with_rule": true
+            },
+            {
+              "t_h": 24.0,
+              "new_status": "Open",
+              "tank_level_ft": 12.082878112792969,
+              "consistent_with_rule": true
+            },
+            {
+              "t_h": 37.5,
+              "new_status": "Closed",
+              "tank_level_ft": 15.935922622680664,
+              "consistent_with_rule": true
+            },
+            {
+              "t_h": 51.5,
+              "new_status": "Open",
+              "tank_level_ft": 12.07476806640625,
+              "consistent_with_rule": true
+            },
+            {
+              "t_h": 62.0,
+              "new_status": "Closed",
+              "tank_level_ft": 16.01111602783203,
+              "consistent_with_rule": true
+            },
+            {
+              "t_h": 78.5,
+              "new_status": "Open",
+              "tank_level_ft": 12.101701736450195,
+              "consistent_with_rule": true
+            },
+            {
+              "t_h": 88.5,
+              "new_status": "Closed",
+              "tank_level_ft": 16.000202178955078,
+              "consistent_with_rule": true
+            }
+          ],
+          "n_inconsistent_switches": 0,
+          "all_switches_inside_declared_band": true
+        },
+        "PUMP-170": {
+          "present": true,
+          "driving_tank": "TANK-131",
+          "n_switches": 7,
+          "events": [
+            {
+              "t_h": 1.5,
+              "new_status": "Closed",
+              "tank_level_ft": 18.32826805114746,
+              "consistent_with_rule": true
+            },
+            {
+              "t_h": 24.0,
+              "new_status": "Open",
+              "tank_level_ft": 15.522212982177734,
+              "consistent_with_rule": true
+            },
+            {
+              "t_h": 31.5,
+              "new_status": "Closed",
+              "tank_level_ft": 18.3690185546875,
+              "consistent_with_rule": true
+            },
+            {
+              "t_h": 51.5,
+              "new_status": "Open",
+              "tank_level_ft": 15.551248550415039,
+              "consistent_with_rule": true
+            },
+            {
+              "t_h": 58.0,
+              "new_status": "Closed",
+              "tank_level_ft": 18.385337829589844,
+              "consistent_with_rule": true
+            },
+            {
+              "t_h": 78.5,
+              "new_status": "Open",
+              "tank_level_ft": 15.541236877441406,
+              "consistent_with_rule": true
+            },
+            {
+              "t_h": 84.0,
+              "new_status": "Closed",
+              "tank_level_ft": 18.410369873046875,
+              "consistent_with_rule": true
+            }
+          ],
+          "n_inconsistent_switches": 0,
+          "all_switches_inside_declared_band": true
+        }
+      },
+      "all_pumps_conform": true
+    },
+    "tanks": {
+      "tanks": {
+        "TANK-130": {
+          "area_m2": 2524.327480347413,
+          "diameter_ft": 186.0,
+          "min_level_ft": 0.0,
+          "max_level_ft": 32.1,
+          "init_level_ft": 15.159,
+          "level_min_ft": 11.990364074707031,
+          "level_max_ft": 16.01111602783203,
+          "level_start_ft": 15.158966064453125,
+          "level_end_ft": 13.781970024108887,
+          "net_change_ft": -1.3769960403442383,
+          "n_states_below_min_level": 0,
+          "n_states_above_max_level": 0,
+          "n_states_pinned_at_min_level": 0,
+          "n_states_pinned_at_max_level": 0,
+          "n_direction_reversals": 7,
+          "max_abs_level_change_per_interval_ft": 0.33611392974853516,
+          "within_declared_limits": true
+        },
+        "TANK-131": {
+          "area_m2": 819.8445938600861,
+          "diameter_ft": 106.00000000000001,
+          "min_level_ft": 0.0,
+          "max_level_ft": 41.9,
+          "init_level_ft": 17.945,
+          "level_min_ft": 15.414880752563477,
+          "level_max_ft": 18.410369873046875,
+          "level_start_ft": 17.945096969604492,
+          "level_end_ft": 16.874177932739258,
+          "net_change_ft": -1.0709190368652344,
+          "n_states_below_min_level": 0,
+          "n_states_above_max_level": 0,
+          "n_states_pinned_at_min_level": 0,
+          "n_states_pinned_at_max_level": 0,
+          "n_direction_reversals": 7,
+          "max_abs_level_change_per_interval_ft": 0.3095817565917969,
+          "within_declared_limits": true
+        }
+      },
+      "all_within_declared_limits": true,
+      "no_pinning_at_limits": true
+    },
+    "connector_nodes": {
+      "rule": "declared elevation exactly 0.0 ft AND zero total base demand; reported for transparency, applied only to the pressure statistic",
+      "n_junctions_total": 126,
+      "min_nonzero_elevation_ft": 192.0,
+      "max_elevation_ft": 1094.07,
+      "n_connector_nodes": 5,
+      "connector_nodes": [
+        "JUNCTION-105",
+        "JUNCTION-106",
+        "JUNCTION-109",
+        "JUNCTION-110",
+        "JUNCTION-128"
+      ],
+      "evidence": {
+        "JUNCTION-105": {
+          "elevation_ft": 0.0,
+          "base_demand_m3s": 0.0,
+          "degree": 2,
+          "incident_links": [
+            "LINK-166",
+            "PUMP-170"
+          ],
+          "incident_link_types": [
+            "Pipe",
+            "Pump"
+          ],
+          "touches_pump_or_reservoir": true
+        },
+        "JUNCTION-106": {
+          "elevation_ft": 0.0,
+          "base_demand_m3s": 0.0,
+          "degree": 2,
+          "incident_links": [
+            "LINK-167",
+            "PUMP-170"
+          ],
+          "incident_link_types": [
+            "Pipe",
+            "Pump"
+          ],
+          "touches_pump_or_reservoir": true
+        },
+        "JUNCTION-109": {
+          "elevation_ft": 0.0,
+          "base_demand_m3s": 0.0,
+          "degree": 2,
+          "incident_links": [
+            "LINK-15",
+            "PUMP-172"
+          ],
+          "incident_link_types": [
+            "Pipe",
+            "Pump"
+          ],
+          "touches_pump_or_reservoir": true
+        },
+        "JUNCTION-110": {
+          "elevation_ft": 0.0,
+          "base_demand_m3s": 0.0,
+          "degree": 2,
+          "incident_links": [
+            "LINK-17",
+            "PUMP-172"
+          ],
+          "incident_link_types": [
+            "Pipe",
+            "Pump"
+          ],
+          "touches_pump_or_reservoir": true
+        },
+        "JUNCTION-128": {
+          "elevation_ft": 0.0,
+          "base_demand_m3s": 0.0,
+          "degree": 2,
+          "incident_links": [
+            "LINK-18",
+            "LINK-19"
+          ],
+          "incident_link_types": [
+            "Pipe"
+          ],
+          "touches_pump_or_reservoir": true
+        }
+      },
+      "all_touch_pump_or_reservoir": true
+    },
+    "connector_leak_share": {
+      "leak_applied": true,
+      "mean_total_leak_gpm": 84.72988433677985,
+      "mean_connector_leak_gpm": 0.508205277584283,
+      "connector_share_of_leakage": 0.005997946079618091,
+      "coefficient_share": 0.0035545520358507775,
+      "per_node_mean_gpm": {
+        "JUNCTION-105": 0.1154164846365862,
+        "JUNCTION-106": 0.06713727969606091,
+        "JUNCTION-109": 0.06052666051267025,
+        "JUNCTION-110": 0.0854494799446645,
+        "JUNCTION-128": 0.17967537279430118
+      },
+      "per_node_mean_pressure_psi": {
+        "JUNCTION-105": 366.2728271484375,
+        "JUNCTION-106": 501.5541687011719,
+        "JUNCTION-109": 184.08529663085938,
+        "JUNCTION-110": 372.8400573730469,
+        "JUNCTION-128": 184.1513671875
+      }
+    },
+    "pressures_all_junctions": {
+      "n_junctions_evaluated": 126,
+      "n_junctions_excluded": 0,
+      "junctions_excluded": [],
+      "mean_psi": 103.79441833496094,
+      "min_psi": 4.16452169418335,
+      "max_psi": 507.748779296875,
+      "min_psi_junction": "JUNCTION-29",
+      "max_psi_junction": "JUNCTION-106",
+      "n_node_states_negative": 0,
+      "n_node_states_below_20psi": 386,
+      "n_junctions_ever_negative": 0,
+      "junctions_ever_negative": {},
+      "max_abs_change_between_reports_psi": 25.871185302734375,
+      "junction_of_max_change": "JUNCTION-105",
+      "n_node_states_change_above_25psi": 7,
+      "physically_sensible": false,
+      "sensible_criterion": "no negative pressure at any junction at any reported state, and no pressure above 300 psi, which is far above anything the 8 PRV settings (16.45-80 psi) or the pump curves can produce"
+    },
+    "pressures_service_junctions": {
+      "n_junctions_evaluated": 121,
+      "n_junctions_excluded": 5,
+      "junctions_excluded": [
+        "JUNCTION-105",
+        "JUNCTION-106",
+        "JUNCTION-109",
+        "JUNCTION-110",
+        "JUNCTION-128"
+      ],
+      "mean_psi": 94.78672790527344,
+      "min_psi": 4.16452169418335,
+      "max_psi": 288.2205810546875,
+      "min_psi_junction": "JUNCTION-29",
+      "max_psi_junction": "JUNCTION-34",
+      "n_node_states_negative": 0,
+      "n_node_states_below_20psi": 386,
+      "n_junctions_ever_negative": 0,
+      "junctions_ever_negative": {},
+      "max_abs_change_between_reports_psi": 6.725677490234375,
+      "junction_of_max_change": "JUNCTION-104",
+      "n_node_states_change_above_25psi": 0,
+      "physically_sensible": true,
+      "sensible_criterion": "no negative pressure at any junction at any reported state, and no pressure above 300 psi, which is far above anything the 8 PRV settings (16.45-80 psi) or the pump curves can produce"
+    },
+    "pressure_instrument_note": "The pre-declared criterion - no negative pressure anywhere and no pressure above 300 psi - was first evaluated over all 126 junctions and FAILED on the ceiling: 507.75 psi at JUNCTION-106. Investigation of the ORIGINAL file showed that value is not an unphysical hydraulic state but the head above datum at PUMP-170's discharge node, one of five junctions the file declares at elevation 0.0 ft with zero demand. The criterion is therefore evaluated a second time over the 121 demand-bearing junctions. Both results are reported; the verdict uses the service-junction set, and the reason for that choice is the declared elevation placeholder, not the outcome of the test.",
+    "mass_balance": {
+      "n_reported_states": 193,
+      "max_abs_residual_gpm": 0.0008044242858886719,
+      "mean_abs_residual_gpm": 0.00011680564732426088,
+      "max_relative_residual": 5.180129418396946e-07,
+      "mean_relative_residual": 9.032358643069794e-08,
+      "n_states_above_threshold": 0,
+      "worst_state_index": "59400",
+      "normaliser": "total nodal withdrawal at the same timestep, in GPM",
+      "threshold_rel": 0.0001,
+      "passes": true
+    },
+    "criteria": {
+      "no_solver_error": true,
+      "no_chattering": true,
+      "tanks_within_declared_limits": true,
+      "pumps_switch_inside_declared_rule_bands": true,
+      "pressures_sensible_on_service_junctions": true,
+      "pressures_sensible_on_all_junctions_including_connectors": false
+    }
+  },
+  "verdicts": {
+    "G9 MASS BALANCE": "PASS",
+    "G10 FULL PRE-FLIGHT EPS": "PASS"
+  },
+  "sizing": {
+    "global_scale_k_gpm_per_ft_per_psi_alpha": 7.13768134008582e-05,
+    "sum_w_p_alpha": 1187270.5037860267,
+    "target_leak_gpm": 84.74358520507813,
+    "n_junctions_with_emitter": 126,
+    "coefficient_min": 0.0019985507752240295,
+    "coefficient_max": 0.44900598527335517,
+    "alpha": 0.5,
+    "closed_form": "k = target / sum_j (w_j * p_baseline_j^alpha); single evaluation, no optimisation of any kind."
+  }
+}

@@ -1,0 +1,612 @@
+ssure control in water distribution networks using Deep Reinforcement Learning (PPO) integrated with EPANET to reduce leakage under uncertain demand", with coordinated PRV + VSP control, multi-objective reward, and robustness/generalisation evaluation.
+
+Current inherited methodology recommendation is approximately:
+
+* EPANET 2.2
+* WNTR + EpanetSimulator
+* PDA for main experiments; DDA only as controlled ablation
+* Emitter leakage model, N1 = 1.18
+* Net3 as primary network, with PRVs added
+* Jowitt & Xu as possible secondary PRV-only experiment
+* S2 observability-constrained state
+* Absolute continuous control + rate-limit projection
+* Weighted multi-objective reward
+* PPO as primary algorithm
+* SAC as comparator
+* Hu-style stochastic demand uncertainty
+* held-out OOD demand intensity / pattern testing
+* feasibility-first evaluation + Pareto reporting
+* PRV+Pump ablation
+* DDA vs PDA ablation
+* observability ablation
+* multiple seeds and reproducibility protocol
+
+Current critical unresolved decisions include:
+D1 = primary network
+E1 = PRV placement
+A3 = contribution / novelty statement
+B4 = service-pressure threshold
+G8 = completeness of 2025–2026 literature coverage
+
+The previous Phase 3 conclusion strongly favoured Net3, largely because:
+
+1. Jowitt & Xu has zero pumps and therefore cannot execute coordinated PRV + pump control.
+2. Hu et al. used Net3 for joint pump/valve control.
+3. Net3 is public and reproducible.
+4. Net3 contains pumps and tanks.
+5. Other alternatives were judged less convenient.
+
+DO NOT simply accept that conclusion.
+
+The purpose of this phase is to independently determine whether there is a BETTER benchmark/network or a more defensible experimental design.
+
+==================================================
+PHASE 3.5 — INDEPENDENT NOVELTY & BENCHMARK CHECK
+=================================================
+
+CORE PRINCIPLE
+
+Search independently and adversarially.
+
+The question is NOT:
+"Can Net3 be justified?"
+
+The question is:
+"Among publicly available or realistically reproducible WDN benchmarks and recent 2024–2026 literature, is Net3 actually the best scientific choice for this thesis?"
+
+A previous conclusion is not evidence.
+
+==================================================
+
+1. RESEARCH QUESTIONS FOR THIS PHASE
+   ==================================================
+
+Answer these explicitly:
+
+RQ-B1:
+What public WDN benchmark networks are available that contain some combination of:
+
+* pumps
+* tanks/reservoirs
+* PRVs or pressure-control elements
+* sufficient network size for DRL
+* public hydraulic data
+* published use in DRL / pressure management / optimisation
+
+RQ-B2:
+Which networks are suitable for:
+
+* coordinated pump + PRV control?
+* pressure-dependent demand / PDA?
+* emitter-based leakage?
+* stochastic demand?
+* hourly EPS?
+* multi-objective optimisation?
+
+RQ-B3:
+Is Net3 genuinely the strongest benchmark for this thesis, or merely the most convenient because Hu et al. used it?
+
+RQ-B4:
+Are there stronger alternatives such as:
+
+* D-Town
+* Anytown
+* Hanoi / Hanoi-related WDN benchmarks
+* Richmond
+* Modena
+* Bakhtiari
+* C-town / Net1 / Net2 / Net3
+* other public EPANET networks
+* benchmark networks introduced in 2020–2026 studies
+* any other public benchmark discovered during the search
+
+Do NOT restrict the search to the above examples.
+
+RQ-B5:
+Are there public WDNs that already contain:
+
+* PRVs + pumps
+* variable-speed pumps
+* multiple pressure zones
+* realistic leakage representation
+* suitable reservoir/tank dynamics
+
+RQ-B6:
+What did the newest 2024, 2025 and 2026 papers actually do?
+Especially search for:
+
+* DRL + WDN pressure control
+* PPO + WDN
+* SAC + WDN
+* pump scheduling + DRL
+* PRV control + DRL
+* pump + PRV coordinated control
+* leakage + DRL
+* PDA + DRL
+* pressure-driven leakage
+* stochastic demand + DRL
+* WDN generalisation
+* OOD evaluation
+* safe RL / constrained RL in WDN
+* multi-objective RL for WDN
+* observability / sensor-limited RL for WDN
+* benchmark comparisons in WDN RL
+
+==================================================
+2. SEARCH STRATEGY
+==================
+
+Use multiple independent search routes.
+
+A. Scholarly search
+Use Google Scholar-like web search, Crossref, OpenAlex, publisher pages, ASCE, Elsevier, Springer, MDPI, Wiley, IEEE, Water Research, Journal of Water Resources Planning and Management, Journal of Hydroinformatics, Advances in Water Resources, etc.
+
+B. Benchmark/network search
+Search for:
+
+* EPANET benchmark networks
+* public WDN datasets
+* Kentucky Hydraulic Model Database
+* EPANET sample networks
+* WDS benchmark datasets
+* pressure management benchmark networks
+* PRV benchmark networks
+* pump scheduling benchmark networks
+
+C. Reference chasing
+For every major 2024–2026 paper found:
+
+* inspect references
+* inspect papers citing it
+* inspect benchmark/network sources
+* inspect supplementary material where available
+
+D. Adversarial search
+Run searches designed to DISPROVE the current thesis novelty:
+
+* "PPO PRV pump leakage water distribution network"
+* "continuous action pressure control WDN DRL"
+* "pump valve joint control reinforcement learning WDN"
+* "multi objective reinforcement learning water distribution pressure leakage"
+* "pressure dependent demand reinforcement learning WDN"
+* "generalization reinforcement learning water distribution network"
+* "out of distribution demand reinforcement learning water distribution"
+* "sensor limited reinforcement learning water distribution"
+
+Repeat with 2024, 2025 and 2026 explicitly.
+
+==================================================
+3. TIME WINDOW
+==============
+
+Prioritise:
+2024
+2025
+2026
+
+But include older landmark work when necessary to determine whether a claimed contribution is actually new.
+
+Do NOT claim that a contribution is novel merely because no paper was found quickly.
+
+For every novelty statement distinguish:
+
+* VERIFIED ABSENCE FROM SEARCH
+* NOT FOUND IN SEARCH
+* FULL-TEXT VERIFIED ABSENCE
+* INFERENCE
+* UNKNOWN
+
+Never convert "not found" into "does not exist".
+
+==================================================
+4. BENCHMARK CANDIDATE TABLE
+============================
+
+Create a comprehensive benchmark matrix.
+
+Minimum columns:
+
+Network
+Source / publication
+Year
+Nodes
+Pipes
+Pumps
+Tanks / reservoirs
+PRVs
+Pressure zones / DMAs
+Public availability
+EPANET compatibility
+PDA compatibility
+Emitter compatibility
+Variable-speed pump compatibility
+Demand-pattern availability
+Stochastic-demand suitability
+Published DRL precedent
+Published pressure-management precedent
+Published leakage precedent
+Computational scale
+Reproducibility
+Modification burden
+DRL suitability
+Pump+PRV suitability
+Leakage-control suitability
+Demand-uncertainty suitability
+Expected implementation risk
+Expected scientific value
+Closest prior work
+Major weakness
+
+Include all credible candidates you find, not only Net3/Jowitt & Xu.
+
+At least 8–12 serious candidate networks if the evidence permits.
+If fewer genuinely suitable candidates exist, explain why.
+
+==================================================
+5. NET3 ADVERSARIAL AUDIT
+=========================
+
+Perform a specific adversarial audit of Net3.
+
+Questions:
+
+1. Is the original Net3 publicly obtainable?
+2. Is the exact version used by Hu reproducible?
+3. What modifications did Hu make?
+4. Were the PRV locations selected using leakage impact?
+5. Were any pump controls removed?
+6. Was pipe 330 closed?
+7. Does this modification introduce objective leakage bias?
+8. Does the resulting network still represent a neutral benchmark?
+9. Is Net3's use by Hu too close to the proposed thesis to provide novelty?
+10. Would using another network materially improve novelty?
+11. Is adding four PRVs defensible without co-optimising the research result?
+12. Is Net3 representative enough for the stated research question?
+
+Explicitly distinguish:
+
+* "public benchmark"
+  from
+* "public benchmark after substantial task-specific modification".
+
+==================================================
+6. JOWITT & XU ADVERSARIAL AUDIT
+================================
+
+Do NOT dismiss Jowitt & Xu only because it has zero pumps.
+
+Investigate:
+
+* whether it is still the strongest PRV/leakage reference benchmark
+* whether it should be primary for one subproblem
+* whether another public network can preserve both pump control and comparability
+* whether its optimised valve placement makes it scientifically problematic
+* whether it should remain only as a replication benchmark
+
+Determine whether there is a better way to preserve comparability than using J&X as a secondary network.
+
+==================================================
+7. SEARCH FOR BETTER NETWORKS
+=============================
+
+Search specifically for networks with:
+
+* ≥2 pumps or pump stations
+* tanks/reservoirs
+* pressure zones
+* existing PRVs or pressure-control valves
+* public EPANET file
+* enough complexity for DRL
+* documented demand patterns
+* suitability for pressure/leakage work
+
+Consider:
+
+* public research benchmark networks
+* university benchmark networks
+* government/open datasets
+* Kentucky database
+* EPANET repositories
+* GitHub repositories containing valid .inp files
+* supplementary materials of recent papers
+
+When a candidate is discovered:
+VERIFY the actual availability of the .inp/network wherever possible.
+
+Do not rely only on a paper saying "a benchmark network was used".
+
+==================================================
+8. NOVELTY MATRIX
+=================
+
+Create a claim-by-claim novelty matrix.
+
+Columns:
+
+Claim
+Current thesis claim
+Closest prior work
+Year
+Already done?
+How close?
+Direct evidence?
+Remaining difference
+Novelty strength
+Risk
+Recommended wording
+
+At minimum evaluate:
+
+1. coordinated PRV + VSP
+2. single-agent PPO
+3. continuous control
+4. multi-objective reward
+5. leakage + pressure trade-off
+6. pump attribution ablation
+7. PDA vs DDA
+8. uncertain demand
+9. held-out demand distribution
+10. OOD evaluation
+11. observability-constrained state
+12. time-pattern break test
+13. action realisation rate
+14. Pareto-front reporting
+15. equal tuning parity
+16. seed-based evaluation
+17. DDA-artifact quantification
+18. EPANET + PPO integration
+19. cross-network generalisation
+20. safe/constrained RL
+
+For each one classify as:
+
+GREEN = reasonably defensible novelty
+YELLOW = partial / protocol-level novelty
+ORANGE = mostly combination
+RED = already clearly done, must not be claimed
+
+==================================================
+9. 2024–2026 CLOSEST-PRIOR-WORK TABLE
+=====================================
+
+Find the closest papers from 2024–2026.
+
+For every important paper provide:
+
+Full citation
+DOI
+Year
+Network
+Network size
+Actuators
+Algorithm
+Action space
+Demand model
+Leakage model
+PDA/DDA
+Reward
+Objective
+Uncertainty
+Train/test separation
+OOD test
+Baselines
+Seeds
+Evaluation
+Main result
+What overlaps thesis
+What thesis would still add
+
+Do not include papers merely because "water distribution" appears in them.
+
+Prioritise actual methodological overlap.
+
+==================================================
+10. PEI / PEI? / CYRIAC / JEUNG FOLLOW-UP
+=========================================
+
+Specifically investigate the unresolved modern literature already discovered:
+
+* Cyriac & Chacko 2026
+* Pei, Hoang, Fu & Butler 2025
+* Jeung et al. 2026
+* Li et al. 2024
+* Joo / Jeong / Kang 2024
+* Monsef et al. 2017
+* Hu et al. 2023
+* Negm 2024
+* Belfadil et al. 2023
+* Tsiami et al. 2025
+
+Where full text is inaccessible:
+use publisher metadata, abstract, references, citations and other authoritative sources;
+label the evidence quality explicitly.
+
+Try hard to obtain the abstract/full text through alternative legitimate public sources before concluding anything.
+
+==================================================
+11. SEARCH FOR COUNTEREXAMPLES
+==============================
+
+Actively search for papers that would invalidate these current assumptions:
+
+A. "No public benchmark contains suitable pumps + pressure control"
+B. "No one has evaluated OOD demand in this domain"
+C. "No one has compared PPO against SAC fairly"
+D. "No one has studied PDA vs DDA in DRL pressure control"
+E. "No one has quantified observability cost"
+F. "No one has isolated pump contribution"
+G. "No one has used continuous control"
+H. "No one has jointly controlled pump and PRV"
+I. "No one has done multi-objective leakage-pressure RL"
+J. "No one has used constrained RL in this domain"
+
+If any assumption is disproved, mark it prominently.
+
+==================================================
+12. DECISION UPDATE
+===================
+
+At the end, provide one of these outcomes:
+
+OPTION A:
+Net3 remains best.
+
+OPTION B:
+Another network is scientifically superior.
+
+OPTION C:
+A two-network design is superior.
+
+OPTION D:
+The benchmark question itself should be reformulated.
+
+Do NOT force Option A.
+
+For the winner provide:
+
+Why it wins
+Why alternatives lose
+Evidence quality
+Reproducibility
+Novelty impact
+Implementation cost
+Impact on D1
+Impact on E1
+Impact on A3
+Impact on B4
+Impact on the 7-month schedule
+
+==================================================
+13. CONTRIBUTION RECOMMENDATION
+===============================
+
+After the novelty analysis, rewrite the proposed thesis contributions from scratch.
+
+Produce:
+
+A. Claims that MUST be removed
+B. Claims that MUST be weakened
+C. Claims that are defensible
+D. Claims that become stronger because of this search
+E. Claims that require experiments before being stated
+F. A conservative final contribution paragraph suitable for the thesis
+
+Do not use words like:
+"first"
+"novel"
+"unique"
+"unprecedented"
+unless supported by very strong evidence.
+
+Prefer formulations such as:
+"this study evaluates..."
+"this study quantifies..."
+"this study investigates..."
+"this study compares..."
+"this study provides evidence regarding..."
+
+==================================================
+14. IMPORTANT EVIDENCE DISCIPLINE
+=================================
+
+For every major conclusion include:
+
+Evidence type:
+
+* Primary full text
+* Publisher metadata
+* Abstract
+* Secondary citation
+* Inference
+
+Confidence:
+High / Medium / Low
+
+Do not mix verified facts and inference.
+
+Do not silently reuse old claims just because they appear in previous phase transcripts.
+
+If the web search system is unavailable:
+use legitimate fallback sources such as:
+
+* Crossref
+* OpenAlex
+* publisher APIs/pages
+* DOI resolution
+* institutional repositories
+* public supplementary files
+* GitHub/open datasets
+
+Do not fabricate missing evidence.
+
+==================================================
+15. FILE / REPOSITORY RULES
+===========================
+
+This is a READ-ONLY research phase.
+
+Do NOT:
+
+* write source code
+* install dependencies
+* create a Python environment
+* train models
+* run EPANET experiments
+* modify thesis files
+* modify source documents
+* alter the research question
+* lock advisor decisions
+
+You MAY:
+
+* read existing files
+* search the web
+* retrieve public metadata
+* create temporary scratch notes outside the repo
+* produce the final report
+
+At the end explicitly report:
+
+* files changed
+* files unchanged
+* whether code was written
+* whether dependencies were installed
+* whether experiments were run
+
+==================================================
+16. OUTPUT STRUCTURE
+====================
+
+Produce the final report in exactly this structure:
+
+1. Resume Check
+2. Search Coverage
+3. New Evidence
+4. Benchmark Landscape
+5. Net3 Adversarial Audit
+6. Jowitt & Xu Audit
+7. Alternative Networks
+8. 2024–2026 Closest Prior Work
+9. Novelty Matrix
+10. Counterexamples to Current Assumptions
+11. Revised Contribution Analysis
+12. Network Decision
+13. Impact on D1/E1/A3/B4
+14. Updated Decision Register
+15. Remaining Evidence Gaps
+16. Implementation Impact
+17. Final Recommendation
+
+The report must distinguish:
+FACT
+INFERENCE
+RECOMMENDATION
+UNRESOLVED
+
+Do not mark anything LOCKED unless the user explicitly approved it.
+
+==================================================
+17. FINAL SUCCESS CRITERION
+===========================
+
+This phase succeeds only if it can answe

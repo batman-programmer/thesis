@@ -1,0 +1,883 @@
+تو اکنون وارد Phase 1.5 پروژه می‌شوی: Deep Literature Review.
+
+قبل از شروع، CLAUDE.md و تمام Skillهای موجود در `.claude/skills/` را به‌عنوان قوانین و پروتکل‌های اجرایی این پروژه در نظر بگیر.
+
+اگر بین این دستور و CLAUDE.md یا Skillها تعارضی وجود دارد، تعارض را صریحاً گزارش کن و خودسرانه تصمیم نگیر.
+
+==================================================
+تنظیم سطح تلاش و Reasoning
+==================================================
+
+این Phase یک Deep Literature Review و تصمیم‌سازی پژوهشی با اهمیت بالا است.
+
+از بالاترین سطح تلاش و عمیق‌ترین سطح Reasoning موجود استفاده کن.
+
+اگر سیستم امکان انتخاب Effort / Reasoning دارد، آن را روی:
+
+Maximum / Highest
+
+قرار بده.
+
+در این Phase سرعت اولویت اصلی نیست.
+
+اولویت‌ها:
+
+1. دقت
+2. عمق تحلیل
+3. پوشش مناسب شواهد
+4. کشف Counter-Evidence
+5. کشف پژوهش‌های جدید
+6. مقایسه دقیق با کارهای پیشین
+7. شفافیت عدم‌قطعیت
+8. قابلیت دفاع علمی
+
+حتی اگر این کار مصرف Token یا زمان بیشتری داشته باشد.
+
+Maximum Effort فقط برای کیفیت تحلیل است و به هیچ‌وجه اجازه تغییر فایل، تغییر Scope، تغییر Methodology یا Implementation نمی‌دهد.
+
+==================================================
+قانون اصلی این Phase
+==================================================
+
+این Phase فقط برای:
+
+Deep Literature Review
++
+Evidence Synthesis
++
+Research Gap Analysis
++
+Novelty Risk Analysis
++
+Methodology Evidence Review
+
+است.
+
+در این Phase:
+
+- هیچ فایل پروژه را ایجاد، حذف یا ویرایش نکن.
+- هیچ کدی ایجاد یا اصلاح نکن.
+- هیچ آزمایشی اجرا نکن.
+- هیچ Dependency جدیدی نصب نکن، مگر اینکه بدون آن بررسی مشخصی واقعاً غیرممکن باشد؛ در آن صورت ابتدا فقط مشکل را گزارش کن.
+- Methodology را تغییر نده.
+- Research Question را تغییر نده.
+- Scope را تغییر نده.
+- Network را انتخاب یا نهایی نکن.
+- State/Observation را نهایی نکن.
+- Action Space را نهایی نکن.
+- Reward/Objective را نهایی نکن.
+- Baseline را انتخاب یا تثبیت نکن.
+- Proposal را بازنویسی نکن.
+- Seminar Report را بازنویسی نکن.
+- ادعای Novelty را قطعی اعلام نکن.
+- هیچ تصمیم مهمی را به‌جای پژوهشگر نهایی نکن.
+
+تنها خروجی این Phase باید یک گزارش عمیق، مستند، قابل ردیابی و evidence-based باشد.
+
+==================================================
+1. کنترل اولیه Repository
+==================================================
+
+ابتدا فقط وضعیت محیط را بررسی کن.
+
+بررسی کن:
+
+- `.claude/skills/research-review/SKILL.md` وجود دارد و نسخه فعلی آن در repository ثبت شده است.
+- وضعیت Git و working tree چیست.
+- Proposal قابل دسترسی است.
+- Seminar Report قابل دسترسی است.
+- Research Corpus قابل دسترسی است.
+- repository همان پروژه پایان‌نامه است.
+
+اگر working tree از قبل تغییراتی دارد:
+
+- فقط آن‌ها را گزارش کن.
+- آن‌ها را تغییر نده.
+
+در ابتدای گزارش نهایی وضعیت Git را هم اعلام کن.
+
+==================================================
+2. منابع پژوهش
+==================================================
+
+منابع اصلی:
+
+### اسناد مصوب
+- Proposal
+- Seminar Report
+
+### Research Corpus
+- تمام 42 فایل موجود در `papers/`
+- thesis/dissertationهای مرتبط
+- review/systematic review
+- reports
+- notes
+- research documents
+- experiment records
+- سایر منابع مرتبط داخل repository
+
+### External Literature
+هرجا لازم است:
+
+- مقالات 2025
+- مقالات 2026
+- مقالات بنیادی
+- نزدیک‌ترین prior works
+- روش‌های جایگزین
+- مقالات contradicting
+- مقالاتی که limitations یا failure modes روش‌های فعلی را نشان می‌دهند
+
+فرض نکن 42 منبع موجود کل ادبیات موضوع هستند.
+
+==================================================
+3. طبقه‌بندی منابع
+==================================================
+
+منابع موجود در `papers/` الزاماً همگی مقاله ژورنالی نیستند.
+
+هر منبع را تا حد امکان طبقه‌بندی کن:
+
+- Journal Paper
+- Conference Paper
+- Review
+- Systematic Review
+- Thesis
+- Dissertation
+- Technical Report
+- Policy/Government Report
+- Other
+
+در ارزیابی شواهد، نوع منبع را در نظر بگیر.
+
+برای ادعاهای مهم، تا حد امکان به primary research و منابع معتبر تکیه کن.
+
+==================================================
+4. هدف Review: Summarization نیست
+==================================================
+
+من نمی‌خواهم 42 PDF را فقط خلاصه کنی.
+
+هدف این است که از آن‌ها استخراج کنی:
+
+- Evidence
+- Methodology
+- Assumptions
+- Alternatives
+- Limitations
+- Contradictions
+- Research Gaps
+- Novelty Risks
+- Experimental Risks
+- Methodological Implications
+- Design Implications
+
+برای هر منبع مهم، در صورت امکان:
+
+- Citation
+- Year
+- Type
+- Problem
+- Method
+- Algorithm
+- Environment/Domain
+- Hydraulic Model
+- State/Observation
+- Action
+- Reward/Objective
+- Constraints
+- PRV/Pump/Actuator
+- Demand Uncertainty
+- PDA/DDA
+- Baseline
+- Metrics
+- Experiment Design
+- Findings
+- Limitations
+- Generalization
+- Relevance
+
+را استخراج کن.
+
+==================================================
+5. عمق بررسی تطبیقی
+==================================================
+
+همه منابع نیاز به Deep Reading یکسان ندارند.
+
+منابع را طبقه‌بندی کن:
+
+### Screening
+عنوان، metadata، abstract و بخش‌های کلیدی.
+
+### Targeted Review
+منابعی که به مسئله، روش، Algorithm یا Contribution پروژه نزدیک‌اند.
+
+### Deep Review
+منابعی که:
+
+- نزدیک‌ترین رقیب هستند.
+- ممکن است Novelty را رد کنند.
+- برای Methodology تصمیم مهمی دارند.
+- یافته متناقض دارند.
+- limitation مهمی درباره مسئله ما دارند.
+- یا برای Proposal/Seminar ادعای مهمی ارائه می‌کنند.
+
+در پایان دقیقاً بگو:
+
+- چند Screening
+- چند Targeted
+- چند Deep
+
+و محدودیت مطالعه هر دسته را شفاف کن.
+
+==================================================
+6. بررسی کامل PDFها و Evidence Extraction
+==================================================
+
+به text extraction صرفاً اعتماد نکن.
+
+اگر متن PDF ناقص، به‌هم‌ریخته یا ناقابل استفاده بود، بررسی کن آیا با مشاهده تصویری صفحه می‌توان اطلاعات را بازیابی کرد.
+
+این مورد مخصوصاً برای:
+
+- جدول‌ها
+- شکل‌ها
+- نمودارها
+- فرمول‌ها
+- architecture diagrams
+- network diagrams
+- captions
+- مقایسه‌های جدولی
+- متن فارسی/RTL
+- بخش‌هایی که extraction آن‌ها اشتباه است
+
+اهمیت دارد.
+
+### قانون قطعی:
+
+اگر چیزی از text extraction مشخص نیست:
+
+- حدس نزن.
+- آن را به‌عنوان fact معرفی نکن.
+- ابتدا صفحه مربوط را شناسایی کن.
+- در صورت امکان خود صفحه/تصویر را بررسی کن.
+- اطلاعات قابل مشاهده را استخراج کن.
+- اگر باز هم مشخص نیست، صریحاً بنویس «Evidence unavailable / incomplete».
+
+### مخصوص Proposal و Seminar
+
+اگر یک جدول، شکل، نمودار یا فرمول مهم در Proposal یا Seminar فقط به‌صورت ناقص استخراج شد:
+
+1. شماره صفحه را پیدا کن.
+2. caption را ثبت کن.
+3. خود صفحه/تصویر را بررسی کن، اگر امکانش هست.
+4. محتوای جدول/شکل را تا حد امکان دقیق استخراج کن.
+5. مشخص کن این مورد برای Literature / Methodology / Novelty / Research Gap یا تصمیم دیگری مهم است.
+6. اگر قابل مشاهده نیست، حدس نزن و آن را Pending Evidence علامت بزن.
+
+هیچ نتیجه مهمی را فقط بر اساس caption یک جدول یا شکل استخراج نکن.
+
+==================================================
+7. State of the Art
+==================================================
+
+تصویر واقعی وضعیت فعلی حوزه را بساز.
+
+به‌طور مشخص بررسی کن:
+
+- DRL در WDN
+- Pressure Management
+- Leakage Reduction
+- PRV Control
+- Pump/VSP Control
+- Joint PRV + Pump Control
+- PPO in WDN
+- Multi-objective RL
+- Safe RL
+- Constrained RL
+- Demand Uncertainty
+- PDA/DDA
+- Generalization
+- Robustness
+- Simulation-to-real gap
+
+بررسی کن کدام trends، methods و limitations در چند مطالعه تکرار می‌شوند.
+
+==================================================
+8. نزدیک‌ترین Prior Works
+==================================================
+
+نزدیک‌ترین کارهای قبلی را شناسایی کن.
+
+برای هرکدام:
+
+- Problem
+- Method
+- Algorithm
+- PRV
+- Pump/VSP
+- PPO
+- Reward
+- Demand Uncertainty
+- PDA/DDA
+- Network
+- Evaluation
+- Findings
+- Limitations
+- What was NOT done
+- Similarity to this thesis
+- Difference from this thesis
+
+جدول:
+
+| Prior Work | Problem | Method | PRV | Pump/VSP | PPO | Reward | Demand Uncertainty | PDA/DDA | Network | Evaluation | Main Difference |
+|---|---|---|---|---|---|---|---|---|---|---|---|
+
+اگر اطلاعات ستونی در منبع قابل تأیید نیست، بنویس:
+
+Not verified
+
+نه اینکه حدس بزنی.
+
+==================================================
+9. Proposal/Seminar در برابر Literature
+==================================================
+
+ادعاهای مهم Proposal و Seminar را با ادبیات مقایسه کن.
+
+به‌خصوص:
+
+- Novel
+- First
+- Unexplored
+- Gap
+- New Framework
+- Better Performance
+- Improvement
+- Missing Work
+
+اگر ادعایی:
+
+- خیلی قوی
+- قدیمی
+- ناقص
+- unsupported
+- یا متناقض با شواهد
+
+است:
+
+1. عبارت را مشخص کن.
+2. Evidence را ارائه کن.
+3. نوع مشکل را تعیین کن.
+4. شدت آن را تعیین کن.
+5. اگر لازم است formulation محافظه‌کارانه‌تر پیشنهاد بده.
+
+اما هیچ سندی را تغییر نده.
+
+==================================================
+10. Counter-Evidence
+==================================================
+
+این بخش اجباری است.
+
+برای هر contribution یا assumption مهم عمداً دنبال evidence مخالف بگرد.
+
+به‌خصوص بررسی کن:
+
+- آیا PRV + Pump + DRL قبلاً انجام شده؟
+- آیا PPO در شرایط تقریباً مشابه قبلاً استفاده شده؟
+- آیا Multi-objective Reward واقعاً contribution است؟
+- آیا Demand Uncertainty قبلاً با همین framing بررسی شده؟
+- آیا PDA یا DDA می‌تواند validity را تحت تأثیر قرار دهد؟
+- آیا baseline فعلی ضعیف است؟
+- آیا PPO نسبت به SAC/TD3/DDPG یا دیگر روش‌ها برتری اثبات‌شده دارد؟
+- آیا نتایج شبکه خاص بیش از حد به topology وابسته‌اند؟
+- آیا reward می‌تواند reward hacking ایجاد کند؟
+- آیا simulation assumptions باعث نتایج غیرواقعی می‌شوند؟
+- آیا generalization واقعاً وجود دارد؟
+
+اگر evidence مخالف وجود داشت، آن را برجسته کن.
+
+هدف، تایید پروژه نیست.
+
+هدف، شکست‌دادن فرضیات ضعیف قبل از Implementation است.
+
+==================================================
+11. Novelty Analysis
+==================================================
+
+Novelty را به اجزای مستقل تقسیم کن:
+
+- Problem Novelty
+- Method Novelty
+- Algorithm Novelty
+- PRV Novelty
+- Pump/VSP Novelty
+- Joint Actuator Novelty
+- Reward Novelty
+- Demand-Uncertainty Novelty
+- Generalization Novelty
+- Experimental Novelty
+- Combination Novelty
+
+برای هرکدام:
+
+- Already Established
+- Strong Overlap
+- Partial Overlap
+- Potentially Differentiated
+- Uncertain
+
+همراه با:
+
+- Closest Prior Work
+- Evidence
+- Difference
+- Confidence
+
+هرگز نگوی:
+
+«چون چیزی پیدا نکردم، پس حتماً جدید است.»
+
+بین:
+
+«در جست‌وجوی فعلی پیدا نشد»
+
+و
+
+«Evidence suggests it may be insufficiently studied»
+
+تفاوت بگذار.
+
+==================================================
+12. Methodology Evidence Review
+==================================================
+
+در این Phase Methodology را انتخاب نکن.
+
+فقط Evidence جمع کن.
+
+### PDA vs DDA
+بررسی کن:
+
+- مطالعات نزدیک چه کرده‌اند؟
+- چرا؟
+- مزایا و محدودیت‌ها
+- اثر بر pressure management
+- اثر بر leakage modelling
+- اثر بر validity
+
+### State
+بررسی کن:
+
+- Pressure
+- Flow
+- Demand
+- Leakage
+- Tank Level
+- Actuator State
+- Historical Data
+- Other observations
+
+### Action
+بررسی کن:
+
+- PRV setting
+- Pump speed
+- VSP
+- Continuous/Discrete
+- Single/Multi-Agent
+- Constraints
+
+### Reward
+بررسی کن:
+
+- Pressure
+- Leakage
+- Energy
+- Smoothness
+- Constraint violation
+- Multi-objective
+- Weighting
+- Normalization
+- Scaling
+- Reward shaping
+- Reward hacking
+
+### Baselines
+بررسی کن:
+
+- Fixed control
+- Rule-based
+- GA
+- PSO
+- DE
+- MPC
+- Classical optimization
+- RL alternatives
+- PPO alternatives
+
+### Demand Uncertainty
+بررسی کن:
+
+- Historical scenarios
+- Synthetic perturbation
+- Stochastic profiles
+- Monte Carlo
+- Scenario-based methods
+- Distribution shift
+
+### Generalization
+بررسی کن:
+
+- Multiple networks
+- Multiple demand scenarios
+- Unseen conditions
+- Cross-network testing
+- Robustness
+- Transfer Learning if relevant
+
+==================================================
+13. PPO Assessment
+==================================================
+
+PPO را صرفاً چون در Proposal آمده تأیید نکن.
+
+بررسی کن:
+
+- چرا PPO انتخاب شده؟
+- چه مزیت‌هایی دارد؟
+- چه محدودیت‌هایی دارد؟
+- در کارهای مشابه چطور عمل کرده؟
+- continuous control suitability
+- sample efficiency
+- stability
+- sensitivity
+- alternatives such as SAC, TD3, DDPG
+- آیا حداقل یک alternative برای مقایسه علمی لازم است؟
+
+اگر شواهد مشکل جدی درباره PPO نشان می‌دهند:
+
+- آن را گزارش کن.
+- خودسرانه الگوریتم را تغییر نده.
+
+==================================================
+14. Network and Generalization Evidence
+==================================================
+
+بررسی کن ادبیات چه Networkهایی استفاده کرده است.
+
+برای شبکه‌های مهم:
+
+- Size
+- Nodes
+- Pipes
+- Pumps
+- Valves
+- Reservoir/Tanks
+- EPANET availability
+- Leakage suitability
+- DRL suitability
+- Computational cost
+- Literature usage
+- Generalization potential
+
+Network نهایی انتخاب نکن.
+
+این Phase فقط Network Selection Evidence تولید می‌کند.
+
+==================================================
+15. Evaluation Design Evidence
+==================================================
+
+بررسی کن مطالعات معتبر چه metricهایی استفاده می‌کنند:
+
+- Leakage Reduction
+- Pressure Violation
+- Pressure Satisfaction
+- Energy
+- Stability
+- Robustness
+- Convergence
+- Training Performance
+- Generalization
+- Baseline Comparison
+- Multiple Seeds
+- Statistical Variation
+- Sensitivity Analysis
+- Ablation
+
+مشخص کن:
+
+- کدام metricها رایج‌اند.
+- کدام metricها برای مسئله ما مهم‌ترند.
+- کدام metricها فقط optional هستند.
+
+Metric نهایی انتخاب نکن.
+
+==================================================
+16. Recent Literature 2025–2026
+==================================================
+
+اگر Corpus فعلی کامل یا به‌روز نیست، جست‌وجوی خارجی انجام بده.
+
+به‌طور ویژه جست‌وجو کن:
+
+- DRL + WDN
+- PPO + WDN
+- Pressure Management
+- Leakage
+- PRV
+- Pump/VSP
+- Joint PRV + Pump
+- Multi-objective RL
+- Safe/Constrained RL
+- Demand Uncertainty
+- PDA/DDA
+- Generalization
+- Simulation-to-real
+- EPANET + RL
+
+اگر مقاله جدیدی Novelty پروژه را تهدید می‌کند، آن را برجسته کن.
+
+اگر انتشار یک paper خیلی جدید است، تاریخ دقیق آن را مشخص کن.
+
+==================================================
+17. Evidence Quality
+==================================================
+
+برای یافته‌های مهم مشخص کن Evidence از کجاست:
+
+- Proposal
+- Seminar
+- Local Corpus
+- External Paper
+- Review
+- Thesis
+- Dissertation
+- Report
+- Inference
+- Hypothesis
+
+همچنین depth را اعلام کن:
+
+- Screening
+- Targeted
+- Deep
+
+هیچ‌وقت:
+
+- citation جعل نکن.
+- title/author/year/DOI را حدس نزن.
+- عدد بدون source نده.
+- inference را fact معرفی نکن.
+- recommendation را scientific truth معرفی نکن.
+
+==================================================
+18. Confidence
+==================================================
+
+برای یافته‌های مهم:
+
+- High
+- Medium
+- Low
+
+بده.
+
+و علت confidence را توضیح بده.
+
+برای Novelty محافظه‌کار باش.
+
+==================================================
+19. Proposal/Seminar Conflict Protocol
+==================================================
+
+اگر Proposal/Seminar با شواهد تعارض داشت:
+
+1. Proposal/Seminar چه می‌گوید؟
+2. Evidence چه می‌گوید؟
+3. تعارض چیست؟
+4. نوع مشکل:
+   - wording
+   - interpretation
+   - implementation
+   - methodological
+   - experimental
+   - fundamental scientific
+5. شدت مشکل
+6. Minimum Scientifically Valid Correction
+7. آیا بدون تغییر Scope قابل اصلاح است؟
+8. آیا تغییر Scope لازم است؟
+9. آیا نیاز به تصمیم پژوهشگر/استاد دارد؟
+
+اصل:
+
+Scientific Validity
++
+Maximum Preservation of Approved Scope
++
+Minimum Necessary Correction
+
+هیچ تعارضی را مخفی نکن.
+
+==================================================
+20. Scope Creep Prevention
+==================================================
+
+اگر ایده جذابی در ادبیات دیدی، صرفاً به خاطر جذابیتش پیشنهاد تغییر پروژه نده.
+
+قبل از هر پیشنهاد توسعه بپرس:
+
+- ضروری است؟
+- مستقیماً به Research Question مربوط است؟
+- در Scope می‌گنجد؟
+- مشکل علمی فعلی را حل می‌کند؟
+- Alternative ساده‌تری وجود دارد؟
+- هزینه و ریسک آن چیست؟
+
+هدف:
+
+Maximum Scientific Quality
+با
+Minimum Unnecessary Complexity
+
+==================================================
+21. محدودیت‌های بررسی و Extraction
+==================================================
+
+اگر PDF یا منبعی به دلیل:
+
+- OCR
+- RTL
+- جدول
+- فرمول
+- شکل
+- نمودار
+- scan
+- extraction error
+
+کامل قابل بررسی نبود:
+
+آن را صریحاً گزارش کن.
+
+به هیچ عنوان اطلاعات گمشده را حدس نزن.
+
+اگر یک نتیجه مهم به اطلاعات یک جدول/شکل وابسته است و آن جدول/شکل قابل مشاهده نیست، آن نتیجه را به‌عنوان:
+
+Pending Verification
+
+علامت‌گذاری کن.
+
+==================================================
+22. خروجی نهایی
+==================================================
+
+گزارش نهایی دقیقاً با این ساختار ارائه شود:
+
+# 1. Executive Summary
+
+# 2. State of the Art
+
+# 3. Research Corpus Overview
+
+# 4. Literature Matrix
+
+# 5. Closest Prior Works
+
+# 6. What Has Already Been Done
+
+# 7. What Appears to Be Missing
+
+# 8. Proposal/Seminar Claims Review
+
+# 9. Counter-Evidence
+
+# 10. Novelty Assessment
+
+# 11. PDA vs DDA Evidence
+
+# 12. State Design Evidence
+
+# 13. Action Design Evidence
+
+# 14. Reward Design Evidence
+
+# 15. PPO Assessment
+
+# 16. Baseline Evidence
+
+# 17. Demand Uncertainty Evidence
+
+# 18. Network and Generalization Evidence
+
+# 19. Evaluation Design Evidence
+
+# 20. Major Methodological Risks
+
+# 21. Decisions That Must Be Resolved Before Coding
+
+# 22. Recommended Direction Within Approved Scope
+
+# 23. Evidence Quality and Review Depth
+
+# 24. Confidence and Limitations
+
+برای هر recommendation مشخص کن:
+
+- Evidence
+- Reasoning
+- Alternatives
+- Risk
+- Confidence
+
+==================================================
+23. Recommendation ≠ Decision
+==================================================
+
+در این Phase فقط Recommendation ارائه بده.
+
+هنوز:
+
+- Network انتخاب نکن.
+- State نهایی نکن.
+- Action نهایی نکن.
+- Reward نهایی نکن.
+- Baseline نهایی نکن.
+- Methodology را تغییر نده.
+- Scope را تغییر نده.
+
+این تصمیم‌ها در Phaseهای بعدی بررسی خواهند شد.
+
+==================================================
+24. پایان Phase
+==================================================
+
+بعد از پایان Deep Literature Review:
+
+- هیچ فایل پروژه را تغییر نده.
+- هیچ کدی ایجاد یا اصلاح نکن.
+- هیچ آزمایشی اجرا نکن.
+- هیچ شبکه‌ای انتخاب نکن.
+- هیچ State/Action/Reward را نهایی نکن.
+- Proposal یا Seminar را تغییر نده.
+- Scope را تغییر نده.
+- هیچ project decision جدیدی ثبت نکن.
+
+فقط گزارش نهایی را ارائه کن.
+
+بعد از گزارش، متوقف شو و منتظر دستور بعدی من بمان.
+
+هدف نهایی این Phase:
+
+«تبدیل Proposal + Seminar + Research Corpus + ادبیات به‌روز به یک نقشه شواهد علمی عمیق، قابل ردیابی و قابل دفاع برای طراحی روش‌شناسی پروژه.»
+
+اگر شواهد نشان دادند فرضی از من احتمالاً غلط است، واضح بگو.
+
+اگر شواهد کافی نیست، واضح بگو.
+
+اگر پژوهشی پیدا کردی که احتمالاً از چشم من یا پروژه دور مانده، برجسته کن.
+
+اگر چیزی در extraction قابل اعتماد نیست، حدس نزن.
+
+Scientific Integrity و Evidence همیشه بر سرعت، راحتی و توافق مقدم هستند.

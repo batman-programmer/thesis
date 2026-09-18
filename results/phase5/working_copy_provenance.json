@@ -1,0 +1,35 @@
+{
+  "original": "D:\\Thesis\\data\\networks\\BWSN_Network_1.inp",
+  "original_sha256": "510af942ec643eb87adcf26e5a7df1cc4c23eb0c1e470a8a1257ed055f1956f1",
+  "working": "D:\\Thesis\\data\\networks\\working\\BWSN_Network_1_working.inp",
+  "working_sha256": "53015ba9212e46bec731d190971819996233996b498bc269e828f992830a20a9",
+  "patches_applied": [
+    {
+      "id": "P1-quality-units-token",
+      "find": "Quality            \tChemical TIME",
+      "replace": "Quality            \tChemical mg/L",
+      "reason": "WNTR 1.5.0 cannot parse the non-standard chemical-unit token 'TIME'. Replaced with the EPANET default mass unit 'mg/L'. Water-quality analysis is not used anywhere in this thesis; hydraulics are unaffected.",
+      "hydraulically_neutral": true,
+      "matches": 1
+    }
+  ],
+  "provenance": {
+    "file": "BWSN_Network_1.inp",
+    "benchmark": "BWSN Network 1 (Battle of the Water Sensor Networks, 2008)",
+    "size_bytes": 44402,
+    "sha256": "510af942ec643eb87adcf26e5a7df1cc4c23eb0c1e470a8a1257ed055f1956f1",
+    "md5": "09bf6a2879a045f5e7c5f0986ff78261",
+    "mirrors_verified_identical": [
+      "https://filedn.com/lumBFq2P9S74PNoLPWtzxG4/EPyT-Flow/Networks/BWSN_Network_1.inp",
+      "https://raw.githubusercontent.com/OpenWaterAnalytics/EPyT/dev/epyt/networks/asce-tf-wdst/BWSN_Network_1.inp"
+    ],
+    "mirror_not_found": [
+      "https://raw.githubusercontent.com/KIOS-Research/EPANET-Benchmarks/master/BWSN_Network_1.inp"
+    ],
+    "downloaded_utc": "2026-09-02"
+  },
+  "runtime_notes": {
+    "rule_timestep": "The distributed [TIMES] section does not declare a rule timestep. Native EPANET then defaults to 1/10 of the hydraulic timestep = 180 s (confirmed via EPyT getTimeRuleControlStep). WNTR's own default is 360 s, so an unmodified WNTR run evaluates the tank-level pump rules at half the native frequency. Every run here sets 180 s explicitly.",
+    "report_timestep": "The distributed file reports every 1:00 while solving every 0:30. Tests that need half-hourly output set report_timestep = 1800 s in memory. This changes output resolution only, not the solution."
+  }
+}

@@ -1,0 +1,601 @@
+تو اکنون وارد Phase 1.5-B پروژه می‌شوی:
+
+Evidence Completion & Deep Verification
+
+Phase 1.5 قبلی یک مرور اولیه و نسبتاً عمیق از Research Corpus، Proposal، Seminar و بخشی از ادبیات خارجی انجام داده است.
+
+اما گزارش قبلی صریحاً نشان داد که Review هنوز کامل و نهایی نیست.
+
+بنابراین این Phase را «ادامه و تکمیل همان Review» در نظر بگیر، نه یک Literature Review جدید از صفر.
+
+==================================================
+تنظیم سطح تلاش و Reasoning
+==================================================
+
+این Phase برای تصمیم‌های علمی مهم است.
+
+از بالاترین سطح Effort / Reasoning موجود استفاده کن:
+
+Maximum / Highest
+
+سرعت اولویت اصلی نیست.
+
+تمرکز اصلی:
+
+- Verification
+- Counter-Evidence
+- رفع ابهام
+- تکمیل شواهد
+- بررسی نزدیک‌ترین رقبا
+- بررسی ادبیات جدید
+- کنترل ادعاهای Novelty
+- و کاهش عدم‌قطعیت
+
+Maximum Effort فقط برای کیفیت تحلیل است.
+
+هیچ اجازه‌ای برای تغییر فایل، تغییر Scope، تغییر Methodology یا Implementation ایجاد نمی‌کند.
+
+==================================================
+اصل اصلی
+==================================================
+
+مرور قبلی را دوباره از صفر انجام نده.
+
+همان گزارش Phase 1.5 را به‌عنوان working baseline در نظر بگیر و فقط:
+
+- شکاف‌های evidence
+- ادعاهای مشکوک
+- findings با confidence پایین/متوسط
+- موارد Pending Verification
+- مقالات جدید تأییدنشده
+- نزدیک‌ترین prior works
+- و ادعاهای Novelty
+
+را تکمیل و راستی‌آزمایی کن.
+
+اگر یک finding قبلی به اندازه کافی مستند و تأییدشده است، دوباره‌کاری نکن.
+
+==================================================
+1. ابتدا گزارش قبلی را مبنا قرار بده
+==================================================
+
+گزارش Phase 1.5 قبلی را بررسی کن و تمام موارد زیر را استخراج کن:
+
+- Pending Verification
+- NV
+- Confidence = Low
+- Confidence = Medium
+- External source not fully verified
+- Claims based on limited evidence
+- Novelty claims needing stronger evidence
+- Contradictions requiring resolution
+- Proposal/Seminar claims flagged as problematic
+- Critical methodological uncertainties
+
+یک فهرست «Evidence Gap List» بساز.
+
+در این مرحله هنوز هیچ فایلی را تغییر نده.
+
+==================================================
+2. اولویت‌بندی Evidence Gaps
+==================================================
+
+Evidence Gapها را بر اساس اهمیت دسته‌بندی کن:
+
+### Priority 1 — Critical
+مواردی که ممکن است:
+
+- Novelty را رد کنند.
+- Research Question را تحت تأثیر قرار دهند.
+- Methodology را تغییر دهند.
+- یک ادعای اصلی Proposal را غلط نشان دهند.
+- یک prior work بسیار نزدیک را آشکار کنند.
+
+### Priority 2 — Important
+مواردی که ممکن است:
+
+- طراحی آزمایش
+- Baseline
+- Evaluation
+- Reward
+- State
+- Action
+- Generalization
+
+را تحت تأثیر قرار دهند.
+
+### Priority 3 — Supporting
+مواردی که بیشتر برای کامل‌تر شدن Literature Review هستند و فعلاً تصمیم اصلی پروژه را تغییر نمی‌دهند.
+
+ابتدا Priority 1 را بررسی کن.
+
+==================================================
+3. Verify Near-Competitors First
+==================================================
+
+اول از همه نزدیک‌ترین prior workها را Verify کن.
+
+به‌خصوص کارهایی که مستقیماً روی این موارد اثر دارند:
+
+- PRV + Pump + DRL
+- PPO + EPANET
+- Pressure Management + DRL
+- Leakage Reduction + DRL
+- Demand Uncertainty + DRL
+- Joint Actuator Control
+- Generalization / Transferability
+
+برای هر near-competitor مشخص کن:
+
+- منبع اصلی چیست؟
+- publication type چیست؟
+- سال
+- عنوان دقیق
+- نویسندگان
+- DOI یا شناسه معتبر در صورت وجود
+- روش
+- Algorithm
+- PRV
+- Pump/VSP
+- Reward
+- Demand uncertainty
+- PDA/DDA
+- Network
+- Evaluation
+- دقیقاً چه چیزی انجام داده‌اند؟
+- دقیقاً چه چیزی انجام نداده‌اند؟
+
+هر نکته مهم را تا حد امکان با primary source تأیید کن.
+
+==================================================
+4. Novelty Verification
+==================================================
+
+تمام ادعاهای Novelty قبلی را دوباره بررسی کن.
+
+Novelty را جزءبه‌جزء بررسی کن:
+
+- Problem
+- Method
+- Algorithm
+- PRV
+- Pump/VSP
+- Joint actuator control
+- Reward
+- Demand uncertainty
+- Generalization
+- Experimental protocol
+- Combination of components
+
+برای هر مورد:
+
+### Status
+یکی از این موارد:
+
+- Already Established
+- Strong Overlap
+- Partial Overlap
+- Potentially Differentiated
+- Uncertain
+
+### Evidence
+منابع مشخص.
+
+### Closest Prior Work
+نزدیک‌ترین نمونه.
+
+### Remaining Uncertainty
+چه چیزی هنوز قطعی نیست.
+
+### Confidence
+High / Medium / Low
+
+قانون مهم:
+
+هرگز از «پیدا نشدن مقاله در جست‌وجوی فعلی» نتیجه نگیر که «هیچ‌کس قبلاً انجام نداده است».
+
+عبارت درست در چنین شرایطی:
+
+«در جست‌وجوی انجام‌شده، مورد تأییدشده‌ای پیدا نشد.»
+
+نه:
+
+«این کار قبلاً انجام نشده است.»
+
+==================================================
+5. Verify 2025–2026 Literature
+==================================================
+
+در Review قبلی چند منبع جدید 2025–2026 پیدا شد که به دلیل:
+
+- 429
+- محدودیت API
+- محدودیت ابزار
+- یا عدم استخراج کامل
+
+به‌طور کامل Verification نشده بودند.
+
+فقط همین منابع و موارد مشابه را دوباره بررسی کن.
+
+اولویت:
+
+1. آبجکت/عنوان دقیق
+2. صفحه رسمی ناشر
+3. DOI / شناسه معتبر
+4. Abstract
+5. در صورت امکان Full Text
+
+اگر یک API مثل Semantic Scholar rate-limited است:
+
+- چند بار بی‌فایده retry نکن.
+- منبع دیگری را امتحان کن.
+- در صورت نیاز از وب/ناشر/DOI/صفحه رسمی استفاده کن.
+- اگر باز هم قابل تأیید نیست، آن را Pending Verification نگه دار.
+
+هیچ نتیجه‌ای را فقط به دلیل وجود عنوان یا abstract ناقص قطعی نکن.
+
+==================================================
+6. Verify Proposal و Seminar Claims
+==================================================
+
+فقط ادعاهای مهمی را که در Review قبلی مشکل‌دار شناخته شده‌اند دوباره Verify کن.
+
+به‌خصوص:
+
+- ادعای «عدم وجود چارچوب PPO + EPANET»
+- ادعای Novelty
+- آمار جهانی NRW
+- ادعاهای مربوط به PPO و sim-to-real
+- ادعاهای مربوط به PDA/DDA
+- ادعای «یکپارچه‌سازی» یا «novel framework»
+- هر citation مشکوک
+- هر مرجع اشتباه یا ناقص
+
+برای هر مورد:
+
+1. متن ادعا
+2. منبع ادعا
+3. Evidence
+4. وضعیت:
+   - Correct
+   - Needs Clarification
+   - Scientifically Problematic
+   - Misattributed
+   - Outdated
+5. Minimum Scientifically Valid Correction
+
+فعلاً هیچ سندی را اصلاح نکن.
+
+==================================================
+7. Verify Counter-Evidence
+==================================================
+
+برای یافته‌های مهم قبلی، بررسی کن Counter-Evidence واقعاً از منبع می‌آید یا فقط inference بوده.
+
+به‌خصوص:
+
+- benchmark generalization
+- network dependence
+- PPO performance
+- DRL vs classical optimization
+- reward design
+- PDA vs DDA
+- leakage modelling
+- continuous action
+- reward hacking
+
+هرجا inference بوده، صریحاً آن را به‌عنوان Inference نگه دار.
+
+Inference را به‌عنوان Direct Evidence ارائه نکن.
+
+==================================================
+8. Verify PDA / DDA Evidence
+==================================================
+
+فقط شواهد مورد استفاده در Review قبلی را بررسی و تکمیل کن.
+
+بررسی کن:
+
+- مطالعات نزدیک دقیقاً چه نوع hydraulic analysis دارند.
+- PDA چگونه پیاده شده.
+- DDA چه فرضی دارد.
+- leakage model چیست.
+- emitter یا FAVAD/N1 چگونه استفاده شده.
+- آیا leakage و unmet demand قابل تفکیک هستند.
+- آیا DDA می‌تواند reward پروژه را مخدوش کند.
+- آیا PDA انتخاب روش‌شناختی مهمی برای مسئله است یا فقط یک implementation choice.
+
+فعلاً PDA یا DDA را انتخاب نکن.
+
+==================================================
+9. Verify Reward Evidence
+==================================================
+
+تمرکز فقط روی شواهد مربوط به:
+
+- pressure penalty
+- leakage objective
+- energy
+- smoothness
+- constraint violation
+- multi-objective reward
+- reward weights
+- scaling
+- normalization
+- sensitivity
+- reward hacking
+
+بررسی کن:
+
+- آیا multi-objective reward واقعاً contribution محسوب می‌شود؟
+- آیا weighting دستی روش متداول است؟
+- چه روش‌های دیگری در literature وجود دارد؟
+- آیا منابعی برای sensitivity / ablation وجود دارند؟
+- آیا rewardهای قبلی failure mode ایجاد کرده‌اند؟
+
+فعلاً Reward نهایی را طراحی نکن.
+
+==================================================
+10. Verify State / Action Evidence
+==================================================
+
+فقط شواهد مرتبط با:
+
+### State
+- pressure
+- flow
+- demand
+- tank
+- actuator
+- historical observations
+- time features
+
+### Action
+- PRV
+- pump speed
+- VSP
+- continuous/discrete
+- single-agent/multi-agent
+
+را بررسی کن.
+
+تمرکز روی این باشد که:
+
+- چه انتخاب‌هایی رایج‌اند؟
+- چرا؟
+- چه محدودیت‌هایی دارند؟
+- چه انتخاب‌هایی برای پروژه ما plausible هستند؟
+
+اما هنوز State یا Action نهایی نکن.
+
+==================================================
+11. Verify Baseline Evidence
+==================================================
+
+بررسی کن که baselineهای مناسب در کارهای نزدیک چه بوده‌اند:
+
+- Fixed control
+- Rule-based
+- GA
+- PSO
+- DE
+- MPC
+- Classical optimization
+- RL alternatives
+- PPO alternatives
+
+و مشخص کن:
+
+- کدام baselineها ضعیف‌اند.
+- کدام baselineها معتبرترند.
+- کدام baseline برای thesis من از نظر علمی قابل دفاع‌تر است.
+
+اما Baseline نهایی را انتخاب نکن.
+
+==================================================
+12. Verify Demand Uncertainty and Generalization
+==================================================
+
+بررسی کن:
+
+### Demand Uncertainty
+- historical
+- stochastic
+- synthetic
+- Monte Carlo
+- perturbation
+- distribution shift
+- scenario-based
+
+### Generalization
+- unseen demand
+- unseen topology
+- multiple networks
+- cross-network transfer
+- robustness
+- transfer learning
+
+مشخص کن:
+
+- کدام‌ها قبلاً انجام شده‌اند.
+- کدام‌ها محدودیت دارند.
+- کجا Evidence قوی است.
+- کجا gap واقعی‌تر است.
+
+فعلاً طراحی uncertainty protocol نکن.
+
+==================================================
+13. Verify Network Evidence
+==================================================
+
+نام شبکه‌هایی که در Review قبلی مطرح شدند را فقط در حد Evidence بررسی کن.
+
+برای هر شبکه مهم:
+
+- منبع اصلی
+- اندازه
+- topology
+- pump
+- valve
+- tank/reservoir
+- EPANET
+- leakage suitability
+- literature usage
+- computational complexity
+- relevance
+
+فعلاً هیچ شبکه‌ای را انتخاب نکن.
+
+==================================================
+14. جدول Evidence Status
+==================================================
+
+یک جدول نهایی از موارد مهم بساز:
+
+| Claim / Finding | Evidence Status | Best Source | Confidence | Remaining Gap |
+|---|---|---|---|---|
+
+Evidence Status:
+
+- Confirmed
+- Partially Confirmed
+- Unverified
+- Contradicted
+- Inference Only
+
+==================================================
+15. جدول Novelty Status
+==================================================
+
+یک جدول جدا بساز:
+
+| Candidate Contribution | Closest Prior Work | Overlap | Current Status | Confidence | What Must Be Verified |
+|---|---|---|---|---|---|
+
+==================================================
+16. PDF / Extraction Verification
+==================================================
+
+اگر جدول، شکل، فرمول یا صفحه‌ای برای یک conclusion مهم باشد و text extraction کافی نباشد:
+
+- شماره صفحه را ثبت کن.
+- نوع مورد را مشخص کن.
+- وضعیت را Pending Verification قرار بده.
+- حدس نزن.
+
+اگر ابزار تصویری در دسترس نیست، صریحاً بگو.
+
+ابزار جدید نصب نکن مگر اینکه قبلاً اجازه گرفته باشی.
+
+==================================================
+17. محدودیت External Search
+==================================================
+
+اگر web/API محدود شد:
+
+- retry نامحدود نکن.
+- از یک سرویس واحد وابسته نشو.
+- منبع رسمی/ناشر/DOI/صفحه علمی را بررسی کن.
+- اگر قابل تأیید نیست، Pending Verification ثبت کن.
+
+هرگز:
+
+API unavailable
+≠
+Paper does not exist
+
+این اصل الزامی است.
+
+==================================================
+18. خروجی نهایی
+==================================================
+
+خروجی فقط این بخش‌ها را داشته باشد:
+
+# 1. What Was Successfully Verified
+
+# 2. Findings That Changed From Phase 1.5
+
+# 3. Findings That Remain Confirmed
+
+# 4. Novelty Verification
+
+# 5. Closest Prior Works
+
+# 6. Proposal/Seminar Claims Requiring Correction
+
+# 7. Methodological Evidence Completed
+
+# 8. Remaining Evidence Gaps
+
+# 9. Pending Verification Items
+
+# 10. 2025–2026 Literature Status
+
+# 11. Final Confidence Map
+
+# 12. What We Can Safely Decide Next
+
+# 13. What We Still Must NOT Decide Yet
+
+برای هر مورد مهم source و confidence بده.
+
+==================================================
+19. مهم‌ترین محدودیت این Phase
+==================================================
+
+این Phase هنوز Methodology Design نیست.
+
+بنابراین:
+
+- Network انتخاب نکن.
+- State نهایی نکن.
+- Action نهایی نکن.
+- Reward نهایی نکن.
+- Baseline نهایی نکن.
+- PDA/DDA را انتخاب نکن.
+- Algorithm را تغییر نده.
+- Scope را تغییر نده.
+
+این Phase فقط باید uncertainty را کاهش دهد و evidence را تکمیل کند.
+
+==================================================
+20. Proposal/Seminar Conflict
+==================================================
+
+اگر شواهد نشان داد Proposal یا Seminar علمی مشکل دارد:
+
+- مشکل را گزارش کن.
+- Evidence را بده.
+- Minimum Scientifically Valid Correction را پیشنهاد کن.
+- بررسی کن آیا بدون تغییر Scope قابل اصلاح است.
+- اگر Scope تغییر می‌کند، فقط آن را گزارش کن.
+- خودت اصلاح را اجرا نکن.
+
+اصل:
+
+Scientific Validity
++
+Maximum Preservation of Approved Scope
++
+Minimum Necessary Correction
+
+==================================================
+21. پایان Phase
+==================================================
+
+پس از گزارش:
+
+- هیچ فایل پروژه را تغییر نده.
+- هیچ کدی ایجاد یا اصلاح نکن.
+- هیچ dependency نصب نکن.
+- هیچ experiment اجرا نکن.
+- هیچ Methodology یا Scope را تغییر نده.
+
+بعد از ارائه گزارش، متوقف شو و منتظر دستور بعدی من بمان.
+
+هدف این Phase فقط این است:
+
+«گزارش Phase 1.5 قبلی را از یک مرور اولیه به یک evidence base قابل اعتمادتر و قابل دفاع‌تر تبدیل کنیم.»
+
+این Phase باید مشخص کند چه چیزهایی را واقعاً می‌دانیم، چه چیزهایی هنوز نمی‌دانیم، و کدام ادعاها را نباید هنوز مطرح کنیم.

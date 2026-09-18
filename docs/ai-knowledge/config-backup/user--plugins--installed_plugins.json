@@ -1,0 +1,35 @@
+{
+  "version": 2,
+  "plugins": {
+    "academic-research-skills@academic-research-skills": [
+      {
+        "scope": "user",
+        "installPath": "C:\\Users\\ABN\\.claude\\plugins\\cache\\academic-research-skills\\academic-research-skills\\3.21.1",
+        "version": "3.21.1",
+        "installedAt": "2026-09-02T22:18:01.248Z",
+        "lastUpdated": "2026-09-02T22:18:01.248Z",
+        "gitCommitSha": "94436237913091d4739870159d241660527e8338"
+      }
+    ],
+    "document-skills@anthropic-agent-skills": [
+      {
+        "scope": "user",
+        "installPath": "C:\\Users\\ABN\\.claude\\plugins\\cache\\anthropic-agent-skills\\document-skills\\41bbe19d1a1a",
+        "version": "41bbe19d1a1a",
+        "installedAt": "2026-09-02T22:19:32.748Z",
+        "lastUpdated": "2026-09-06T19:41:29.516Z",
+        "gitCommitSha": "41bbe19d1a1a7eaab5e7bb9050a417e5c6cffc8f"
+      }
+    ],
+    "superpowers@superpowers-dev": [
+      {
+        "scope": "user",
+        "installPath": "C:\\Users\\ABN\\.claude\\plugins\\cache\\superpowers-dev\\superpowers\\6.3.0",
+        "version": "6.3.0",
+        "installedAt": "2026-09-02T22:20:07.505Z",
+        "lastUpdated": "2026-09-02T22:20:07.505Z",
+        "gitCommitSha": "b36e0829c6d0140e93cfef2ca599b1b07d4a7797"
+      }
+    ]
+  }
+}

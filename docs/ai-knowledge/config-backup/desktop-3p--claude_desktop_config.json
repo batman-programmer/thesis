@@ -1,0 +1,62 @@
+{
+  "deploymentMode": "3p",
+  "coworkUserFilesPath": "C:\\Users\\ABN\\Claude",
+  "preferences": {
+    "coworkBrowserToolsEnabled": true,
+    "launchPreviewPersistedWorkspaces": [],
+    "launchPreviewSessionScopedSessions": [],
+    "localAgentModeTrustedFolders": [
+      "D:\\Thesis"
+    ],
+    "coworkScheduledTasksEnabled": true,
+    "coworkHipaaRestricted": false,
+    "orgWorkAcrossAppsDisabled": false,
+    "ccdScheduledTasksEnabled": false,
+    "sidebarMode": "epitaxy",
+    "bypassPermissionsGateByAccount": {
+      "e9dacc82-0cfe-4352-ba92-d8df277d2a8d": false
+    },
+    "coworkWebSearchEnabled": true,
+    "coworkModelAutoFallbackByAccount": {
+      "e9dacc82-0cfe-4352-ba92-d8df277d2a8d": true
+    },
+    "remoteToolsDeviceName": "ali-y",
+    "epitaxyPrefs": {
+      "desktop-frame.paneStore.v1": {
+        "state": {
+          "extraPanesByMode": {},
+          "colWeightsByMode": {},
+          "rowSplit": 0.5,
+          "draftNonce": 0
+        },
+        "version": 4
+      },
+      "dframe-group-scopes": {},
+      "dframe-local-slice": {
+        "pinnedOrder": [],
+        "homeProjectsPinnedOrder": []
+      },
+      "starred-session-groups": [],
+      "starred-cowork-spaces": [],
+      "starred-local-code-sessions": [],
+      "ccd-sessions-filter": {
+        "state": {
+          "selectedProjects": []
+        },
+        "version": 0
+      },
+      "cc-landing-worktree-enabled": false,
+      "code-sessions-selected-environments.e9dacc82-0cfe-4352-ba92-d8df277d2a8d": [],
+      "code-sessions-status-filter.e9dacc82-0cfe-4352-ba92-d8df277d2a8d": "all",
+      "epitaxy-split-suggestion": {
+        "state": {
+          "shownCount": 1,
+          "accepted": false,
+          "dismissCount": 0,
+          "lastDismissedAt": 0
+        },
+        "version": 0
+      }
+    }
+  }
+}

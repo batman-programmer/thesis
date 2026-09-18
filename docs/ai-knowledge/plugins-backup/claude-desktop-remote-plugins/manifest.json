@@ -1,0 +1,27 @@
+{
+  "lastUpdated": 1788290081474,
+  "plugins": [
+    {
+      "id": "plugin_011v5h6QUzBZvas64y44XLhy",
+      "name": "pdf-viewer",
+      "updatedAt": "2026-09-01T14:06:57.189555Z",
+      "updatedAtVerified": true,
+      "displayName": "PDF Viewer",
+      "marketplaceId": "marketplace_01QRn9XAjzzeAokB5nPWVMxP",
+      "marketplaceName": "knowledge-work-plugins",
+      "installedBy": "user",
+      "installationPreference": "available"
+    },
+    {
+      "id": "plugin_01FTLa86dhbVJ3HB1LdHdhN7",
+      "name": "engineering",
+      "updatedAt": "2026-09-01T14:07:00.281513Z",
+      "updatedAtVerified": true,
+      "displayName": "Engineering",
+      "marketplaceId": "marketplace_01QRn9XAjzzeAokB5nPWVMxP",
+      "marketplaceName": "knowledge-work-plugins",
+      "installedBy": "user",
+      "installationPreference": "available"
+    }
+  ]
+}

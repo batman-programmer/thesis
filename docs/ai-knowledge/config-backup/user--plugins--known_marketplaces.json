@@ -1,0 +1,42 @@
+{
+  "claude-plugins-official": {
+    "source": {
+      "source": "github",
+      "repo": "anthropics/claude-plugins-official"
+    },
+    "installLocation": "C:\\Users\\ABN\\.claude\\plugins\\marketplaces\\claude-plugins-official",
+    "lastUpdated": "2026-09-06T19:57:20.318Z"
+  },
+  "academic-research-skills": {
+    "source": {
+      "source": "git",
+      "url": "https://github.com/Imbad0202/academic-research-skills.git"
+    },
+    "installLocation": "C:\\Users\\ABN\\.claude\\plugins\\marketplaces\\academic-research-skills",
+    "lastUpdated": "2026-09-02T22:16:02.466Z"
+  },
+  "anthropic-agent-skills": {
+    "source": {
+      "source": "git",
+      "url": "https://github.com/anthropics/skills.git"
+    },
+    "installLocation": "C:\\Users\\ABN\\.claude\\plugins\\marketplaces\\anthropic-agent-skills",
+    "lastUpdated": "2026-09-06T19:57:26.152Z"
+  },
+  "superpowers-dev": {
+    "source": {
+      "source": "git",
+      "url": "https://github.com/obra/superpowers.git"
+    },
+    "installLocation": "C:\\Users\\ABN\\.claude\\plugins\\marketplaces\\superpowers-dev",
+    "lastUpdated": "2026-09-02T22:19:57.246Z"
+  },
+  "ecc": {
+    "source": {
+      "source": "git",
+      "url": "https://github.com/affaan-m/ECC.git"
+    },
+    "installLocation": "C:\\Users\\ABN\\.claude\\plugins\\marketplaces\\ecc",
+    "lastUpdated": "2026-09-02T22:21:27.880Z"
+  }
+}

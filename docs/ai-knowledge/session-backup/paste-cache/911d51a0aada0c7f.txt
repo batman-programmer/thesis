@@ -1,0 +1,365 @@
+ادامه Phase 2 — Methodology Review را از آخرین وضعیت موجود ادامه بده.
+
+این session به‌دلیل قطع اینترنت متوقف شد. از ابتدا شروع نکن و کارهای قبلی را تکرار نکن.
+
+==================================================
+اصل مهم: Resume, NOT Restart
+==================================================
+
+قبل از انجام هر تحلیل جدید:
+
+1. بررسی کن آخرین کاری که در همین session واقعاً انجام شده چیست.
+2. آخرین findings، evidenceها، فایل‌های استخراج‌شده و نتایج قابل دسترسی را شناسایی کن.
+3. مشخص کن دقیقاً در کدام بخش از Phase 2 متوقف شدی.
+4. مشخص کن چه بخش‌هایی کامل شده‌اند و چه بخش‌هایی هنوز باقی مانده‌اند.
+5. از تکرار کارهای قبلی خودداری کن.
+
+اگر فایل‌های موقت استخراج‌شده در `tmp` یا محل دیگری هنوز وجود دارند، از آن‌ها استفاده کن.
+
+اگر نتیجه‌ای قبلاً با Evidence تأیید شده، دوباره از صفر بررسی نکن مگر اینکه دلیل مشخصی برای شک به آن وجود داشته باشد.
+
+==================================================
+وضعیت قبلی که باید حفظ شود
+==================================================
+
+Phase 1 — Project Audit ✅
+Phase 1.5 — Deep Literature Review ✅
+Phase 1.5-B — Evidence Completion ✅
+
+Phase 2 — Methodology Review ⏸ متوقف‌شده به‌علت قطع اینترنت
+
+تا این لحظه در Phase 2 موارد زیر بررسی شده‌اند:
+
+- CLAUDE.md
+- methodology-review/SKILL.md
+- research-review/SKILL.md
+- Proposal
+- Seminar
+- Research Corpus
+- استخراج متنی 42 منبع
+- بررسی شواهد مربوط به Jowitt & Xu
+- بررسی شواهد مربوط به Net3
+- بررسی Evidence مربوط به PDA/DDA
+- بررسی بخشی از Leakage Model
+- بررسی State/Action در ادبیات
+- بررسی برخی Baselineها
+- بررسی بخشی از Demand Uncertainty
+- و شواهد قبلی درباره Reward Hacking، Generalization و PPO
+
+اما گزارش نهایی Methodology Review هنوز تولید نشده است.
+
+==================================================
+قانون عدم تکرار
+==================================================
+
+کارهای زیر را دوباره از صفر انجام نده:
+
+- دوباره تمام 42 PDF را ingest نکن.
+- Proposal را از ابتدا دوباره تحلیل نکن، مگر برای یک سؤال مشخص که هنوز حل نشده.
+- یافته‌های Phase 1.5 و 1.5-B را دوباره تولید نکن.
+- دوباره همان جست‌وجوهای قبلی را تکرار نکن.
+
+ابتدا Evidence Gapهای مخصوص Methodology را شناسایی کن و فقط همان‌ها را ادامه بده.
+
+==================================================
+ادامه کار از نقطه توقف
+==================================================
+
+از آخرین بخش ناتمام Phase 2 ادامه بده.
+
+ترتیب بررسی:
+
+1. Problem Formulation
+2. Leakage Model
+3. PDA vs DDA
+4. Network Selection
+5. State / Observation
+6. Action
+7. Reward
+8. Reward-Hacking Risk
+9. PPO Justification
+10. Training Budget / Fairness
+11. Baselines
+12. Demand Uncertainty
+13. Generalization / Robustness
+14. Evaluation
+15. Ablation
+16. Sensitivity
+17. Reproducibility
+18. Scientific Validity
+19. Scope Compatibility
+
+هر بخشی که قبلاً به اندازه کافی بررسی شده را فقط به‌صورت خلاصه حفظ کن و جلو برو.
+
+==================================================
+External Search Policy
+==================================================
+
+اگر برای یک تصمیم Evidence کافی در Research Corpus وجود ندارد، جست‌وجوی خارجی انجام بده.
+
+اما Web Search نباید شرط ادامه کار باشد.
+
+اگر ابزار یا سرویس جست‌وجو در دسترس نبود:
+
+- از Research Corpus استفاده کن.
+- Publisher / DOI / Crossref / OpenAlex / University Repository / Author page را در صورت دسترسی بررسی کن.
+- اگر هنوز قابل تأیید نیست، Pending Verification ثبت کن.
+
+به یک سایت یا API وابسته نشو.
+
+اگر:
+
+403
+404
+429
+Rate Limit
+Paywall
+API unavailable
+Tool unavailable
+
+رخ داد:
+
+- retry بی‌نهایت نکن.
+- به منبع معتبر دیگری برو.
+- یا مورد را Pending Verification علامت بزن.
+
+هرگز:
+
+API unavailable = no paper
+
+فرض نکن.
+
+==================================================
+Maximum Effort
+==================================================
+
+Effort / Reasoning:
+
+Maximum / Highest
+
+را حفظ کن.
+
+اما Maximum Effort به معنی تکرار بی‌دلیل عملیات نیست.
+
+تمرکز روی:
+
+- unresolved questions
+- methodology-critical evidence
+- counter-evidence
+- alternatives
+- scientific validity
+- reproducibility
+
+باشد.
+
+==================================================
+عدم تغییر پروژه
+==================================================
+
+فعلاً:
+
+- هیچ کد جدیدی ننویس.
+- هیچ کد موجودی را تغییر نده.
+- هیچ فایل پروژه را حذف یا ویرایش نکن.
+- Proposal را تغییر نده.
+- Seminar را تغییر نده.
+- Scope را تغییر نده.
+- Network را در کد انتخاب نکن.
+- Reward را در کد implement نکن.
+- Experiment اجرا نکن.
+- Dependency جدید نصب نکن.
+
+این Phase همچنان Design/Review است.
+
+==================================================
+نکته مهم درباره Proposal و Seminar
+==================================================
+
+Proposal و Seminar را:
+
+- Scope/Constraint
+در نظر بگیر،
+
+اما:
+
+- Scientific Truth مطلق
+در نظر نگیر.
+
+اگر Evidence علمی با آن‌ها تعارض دارد:
+
+1. ادعا را مشخص کن.
+2. Evidence را ارائه کن.
+3. نوع مشکل را مشخص کن.
+4. Minimum Scientifically Valid Correction را پیشنهاد بده.
+5. بررسی کن آیا بدون تغییر Scope قابل اصلاح است.
+6. اگر Scope تغییر می‌کند، آن را Human/Advisor Decision علامت بزن.
+
+==================================================
+ساختار تصمیم‌گیری
+==================================================
+
+برای هر Design Decision مهم حداقل دو گزینه را مقایسه کن.
+
+برای هر گزینه:
+
+- Evidence
+- Reasoning
+- Advantages
+- Disadvantages
+- Risk
+- Complexity
+- Scope Impact
+- Confidence
+
+را بده.
+
+Recommendation ≠ Decision
+
+==================================================
+مواردی که هنوز نباید خودسرانه نهایی شوند
+==================================================
+
+تا پایان این Phase هیچ‌کدام را بدون چارچوب تصمیم‌گیری نهایی نکن:
+
+- PDA/DDA
+- Leakage Model
+- Network
+- State
+- Action
+- Reward
+- Baselines
+- Demand Uncertainty Protocol
+- Generalization Protocol
+- Evaluation Protocol
+
+می‌توانی Recommendation بدهی، اما تصمیم نهایی باید در Decision Gate گزارش شود.
+
+==================================================
+Evidence Quality
+==================================================
+
+برای شواهد مهم:
+
+- Source
+- Evidence Type
+- Review Depth
+- Confidence
+
+را مشخص کن.
+
+Evidence Type:
+
+- Primary Full Text
+- Primary Abstract
+- Publisher Metadata
+- Review
+- Thesis
+- Local Corpus
+- Inference
+- Recommendation
+
+Inference را Direct Evidence معرفی نکن.
+
+==================================================
+اگر به موردی رسیدی که Extraction ناقص است
+==================================================
+
+اگر جدول، شکل، فرمول یا بخش PDF قابل استخراج متنی نیست:
+
+- صفحه را مشخص کن.
+- مورد را Pending Verification علامت بزن.
+- حدس نزن.
+- نتیجه قطعی از آن استخراج نکن.
+
+==================================================
+گزارش وضعیت قبل از ادامه
+==================================================
+
+قبل از ادامه کار، فقط یک گزارش کوتاه بده:
+
+### Resume Check
+
+- Last Completed Section:
+- Current Section:
+- Sections Remaining:
+- Evidence Already Available:
+- Evidence Still Missing:
+- Any Lost/Unavailable Context:
+- Any External Verification Blocked:
+
+سپس بدون تکرار کار قبلی، از Current Section ادامه بده.
+
+==================================================
+خروجی نهایی
+==================================================
+
+پس از اتمام Phase 2، گزارش نهایی را با این ساختار ارائه کن:
+
+# 1. Methodology Executive Summary
+
+# 2. Current Approved Research Question
+
+# 3. Scientific Problems Found
+
+# 4. Problem Formulation
+
+# 5. Leakage Model Alternatives
+
+# 6. PDA vs DDA Analysis
+
+# 7. Network Selection Alternatives
+
+# 8. State Alternatives
+
+# 9. Action Alternatives
+
+# 10. Reward Alternatives
+
+# 11. Reward-Hacking Risk Analysis
+
+# 12. PPO Justification
+
+# 13. Training Budget and Fairness
+
+# 14. Baseline Alternatives
+
+# 15. Demand Uncertainty Design
+
+# 16. Generalization / Robustness Design
+
+# 17. Evaluation Protocol
+
+# 18. Ablation Plan
+
+# 19. Sensitivity Analysis
+
+# 20. Reproducibility Protocol
+
+# 21. Scientific Validity Risks
+
+# 22. Scope Compatibility
+
+# 23. Recommended Methodology
+
+# 24. Unresolved Decisions
+
+# 25. High-Impact Decisions Requiring Researcher/Advisor Approval
+
+# 26. Evidence Quality and Remaining Evidence Gaps
+
+# 27. Implementation Readiness
+
+==================================================
+پایان
+==================================================
+
+بعد از ارائه گزارش نهایی:
+
+- هیچ فایل را تغییر نده.
+- هیچ کد نزن.
+- هیچ آزمایشی اجرا نکن.
+- متوقف شو و منتظر دستور بعدی من بمان.
+
+اصل این Resume:
+
+«از آخرین وضعیت واقعی ادامه بده، هیچ کار معتبر قبلی را دوباره انجام نده، و فقط Evidence و Decisionهای باقی‌مانده را تکمیل کن.»

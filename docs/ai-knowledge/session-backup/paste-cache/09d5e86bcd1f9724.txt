@@ -1,0 +1,1112 @@
+تو اکنون وارد Phase 2 پروژه می‌شوی:
+
+# Methodology Review & Scientific Design
+
+هدف این Phase این است که بر اساس:
+
+- Proposal
+- Seminar Report
+- Research Corpus موجود
+- 42 منبع پژوهشی
+- یافته‌های Phase 1 Audit
+- یافته‌های Phase 1.5 Literature Review
+- یافته‌های Phase 1.5-B Evidence Completion
+- و ادبیات علمی معتبر و به‌روز در صورت نیاز
+
+یک روش‌شناسی دقیق، علمی، قابل اجرا، قابل تکرار و قابل دفاع برای پروژه طراحی و ارزیابی کنی.
+
+این Phase دیگر Literature Review عمومی نیست.
+
+ما اکنون می‌خواهیم مشخص کنیم:
+
+- مسئله دقیقاً چگونه فرموله شود.
+- Leakage چگونه مدل شود.
+- PDA یا DDA چه نقشی داشته باشد.
+- Network چگونه انتخاب شود.
+- State/Observation دقیقاً چه باشد.
+- Action دقیقاً چه باشد.
+- Reward چگونه طراحی شود.
+- PPO چگونه استفاده و ارزیابی شود.
+- Baselineها چه باشند.
+- Demand Uncertainty چگونه مدل و تولید شود.
+- Generalization و Robustness چگونه سنجیده شوند.
+- Evaluation Protocol چگونه طراحی شود.
+- چه آزمایش‌هایی برای دفاع از contribution ضروری هستند.
+
+==================================================
+0. سطح تلاش و Reasoning
+==================================================
+
+این Phase یک مرحله Research-Critical است.
+
+Effort / Reasoning را روی:
+
+Maximum / Highest
+
+قرار بده.
+
+در صورت وجود چند سطح Reasoning، بالاترین سطح موجود را انتخاب کن.
+
+در این Phase:
+
+- عمق تحلیل
+- مقایسه گزینه‌ها
+- کشف failure modeها
+- بررسی Counter-Evidence
+- scientific validity
+- و دقت تصمیم‌سازی
+
+از سرعت مهم‌تر هستند.
+
+Maximum Effort فقط برای کیفیت تحلیل است و به هیچ‌وجه اجازه تغییر فایل، تغییر Scope، اجرای کد یا Implementation ایجاد نمی‌کند.
+
+==================================================
+1. منابع الزام‌آور
+==================================================
+
+قبل از شروع، این موارد را بخوان و در Context این Phase قرار بده:
+
+1. CLAUDE.md
+2. تمام Skillهای `.claude/skills/`
+3. Proposal
+4. Seminar Report
+5. گزارش Phase 1 Audit
+6. گزارش Phase 1.5 Literature Review
+7. گزارش Phase 1.5-B Evidence Completion
+8. Research Corpus
+9. منابع خارجی مهمی که در Phaseهای قبلی شناسایی و تأیید شده‌اند.
+
+اگر گزارش‌های Phase 1.5 یا Phase 1.5-B به‌صورت فایل در repository موجود نیستند اما در conversation/context فعلی قابل دسترسی‌اند، از همان اطلاعات استفاده کن.
+
+اگر چیزی واقعاً در Context در دسترس نیست، ادعا نکن که آن را دیده‌ای.
+
+==================================================
+2. اصل اصلی پروژه
+==================================================
+
+Proposal و Seminar:
+
+- Scope مصوب پروژه‌اند.
+- Research Question و جهت اصلی پروژه را مشخص می‌کنند.
+- اما Scientific Truth مطلق نیستند.
+
+اگر Evidence علمی نشان دهد بخشی از Proposal یا Seminar مشکل دارد:
+
+1. مشکل را دقیق مشخص کن.
+2. Evidence ارائه کن.
+3. اثر آن بر Methodology را مشخص کن.
+4. Minimum Scientifically Valid Correction را پیشنهاد بده.
+5. تا جای ممکن Scope را حفظ کن.
+6. اگر اصلاح باعث تغییر Research Question یا Scope می‌شود، آن را به‌عنوان Scope-Impacting Decision گزارش کن.
+7. بدون تأیید انسانی آن را اجرا نکن.
+
+اصل:
+
+Scientific Validity
++
+Maximum Preservation of Approved Scope
++
+Minimum Necessary Correction
+
+==================================================
+3. وضعیت فعلی پروژه
+==================================================
+
+این پروژه هنوز در مرحله Pre-Implementation است.
+
+هنوز:
+
+- Network نهایی قفل نشده.
+- State نهایی قفل نشده.
+- Action نهایی قفل نشده.
+- Reward نهایی قفل نشده.
+- Baseline نهایی قفل نشده.
+- Demand Uncertainty Protocol نهایی نشده.
+- Evaluation Protocol نهایی نشده.
+
+بنابراین این Phase برای طراحی و مقایسه همین موارد است.
+
+==================================================
+4. استفاده اجباری از منابع
+==================================================
+
+روش‌شناسی را فقط بر اساس دانش داخلی مدل طراحی نکن.
+
+هر تصمیم مهم باید تا حد امکان با Evidence پشتیبانی شود.
+
+منابع را با این اولویت استفاده کن:
+
+### سطح اول
+- Proposal
+- Seminar
+- 42 منبع Research Corpus
+
+### سطح دوم
+- Primary papers خارج از corpus
+- Recent papers
+- Foundational literature
+
+### سطح سوم
+- Reviews
+- Systematic reviews
+- Theses
+- Dissertations
+- Technical reports
+
+برای تصمیم‌های مهم روش‌شناختی، Primary Evidence را بر Review ثانویه ترجیح بده.
+
+==================================================
+5. سیاست جست‌وجوی خارجی
+==================================================
+
+Corpus داخلی نقطه شروع اصلی است، اما کامل یا به‌روز فرض نمی‌شود.
+
+هرجا Evidence موجود برای یک تصمیم کافی نیست، جست‌وجوی خارجی و به‌روز انجام بده.
+
+به‌خصوص برای:
+
+- PDA/DDA
+- Leakage modelling
+- PPO justification
+- Reward design
+- Safe/Constrained RL
+- Baselines
+- Demand Uncertainty
+- Generalization
+- Network selection
+- 2025–2026 prior work
+
+### قانون حیاتی:
+
+به یک سایت، API یا موتور جست‌وجوی خاص وابسته نباش.
+
+اگر یک منبع یا سرویس:
+
+- 403
+- 404
+- 429
+- Rate Limit
+- Paywall
+- API unavailable
+- Tool unavailable
+- PDF unavailable
+- Extraction failure
+
+داد:
+
+1. چند بار بی‌فایده retry نکن.
+2. منبع یا مسیر جست‌وجوی دیگری انتخاب کن.
+3. تا جای ممکن از منابع مستقل استفاده کن.
+
+اولویت منابع خارجی:
+
+1. صفحه رسمی ناشر
+2. DOI / Crossref
+3. OpenAlex
+4. Semantic Scholar
+5. صفحه رسمی دانشگاه یا پژوهشگر
+6. Repository دانشگاهی
+7. Preprint معتبر
+8. داده/کد رسمی پژوهش
+9. سایر منابع علمی معتبر
+
+اگر یک سرویس در دسترس نیست:
+
+API unavailable
+≠
+Paper does not exist
+
+Search result not found
+≠
+No prior work exists
+
+اگر مقاله هنوز قابل تأیید نیست:
+
+- Pending Verification علامت بزن.
+- از نتیجه‌گیری قطعی استفاده نکن.
+- محدودیت را در گزارش ذکر کن.
+
+==================================================
+6. Citation Integrity
+==================================================
+
+هرگز:
+
+- عنوان را حدس نزن.
+- نویسنده را حدس نزن.
+- سال را حدس نزن.
+- DOI را حدس نزن.
+- نتیجه عددی را حدس نزن.
+- مقاله Paywalled را بدون دسترسی به متن، «Full Text Reviewed» معرفی نکن.
+- Abstract را جای Full Text جا نزن.
+
+برای Evidence مهم مشخص کن:
+
+Source
+Evidence Type
+Review Depth
+Confidence
+
+Evidence Type:
+
+- Primary Full Text
+- Primary Abstract
+- Publisher Metadata
+- Secondary Review
+- Thesis
+- Local Corpus
+- Inference
+- Recommendation
+
+==================================================
+7. Research Question
+==================================================
+
+Research Question موجود را بررسی کن.
+
+از نظر:
+
+- Testability
+- Measurability
+- Feasibility
+- Scientific clarity
+- Alignment with Proposal
+- Alignment with Seminar
+- Alignment with Literature
+- Alignment with planned methodology
+
+ارزیابی کن.
+
+اگر wording دقیق‌تر لازم است:
+
+- نسخه فعلی را نقل کن.
+- مشکل را توضیح بده.
+- نسخه پیشنهادی محافظه‌کارانه ارائه کن.
+
+Research Question را فقط در صورت ضرورت تغییر بده.
+
+==================================================
+8. Problem Formulation
+==================================================
+
+یک formulation دقیق بساز.
+
+مشخص کن:
+
+- سیستم
+- Controller
+- Actuators
+- Disturbances
+- State
+- Action
+- Objective
+- Constraints
+- Time horizon
+- Episode
+- Decision interval
+
+همچنین مشخص کن:
+
+Leakage minimization
+
+چگونه با:
+
+Pressure / Service Constraints
+
+هم‌زمان مدل می‌شود.
+
+تا حد امکان formulation ریاضی ارائه کن.
+
+==================================================
+9. Leakage Model
+==================================================
+
+این بخش Critical است.
+
+مقایسه کن:
+
+- Emitter model
+- FAVAD
+- Pressure exponent
+- N1
+- Node-level leakage
+- Pipe-level leakage
+
+برای هر گزینه:
+
+- فرضیات
+- مزایا
+- محدودیت‌ها
+- داده مورد نیاز
+- EPANET/WNTR compatibility
+- تعامل با PDA/DDA
+- قابلیت validation
+- خطر confounding leakage و unmet demand
+
+را بررسی کن.
+
+حداقل 2 یا 3 گزینه ارائه کن.
+
+Recommendation فقط بر اساس Evidence + feasibility + scope باشد.
+
+==================================================
+10. PDA vs DDA
+==================================================
+
+این یک تصمیم Research-Critical است.
+
+### DDA
+
+بررسی:
+
+- assumptions
+- pressure deficiency behavior
+- demand treatment
+- leakage consequences
+- risk of false improvement
+
+### PDA
+
+بررسی:
+
+- pressure-demand relation
+- physical realism
+- parameterization
+- leakage interaction
+- computational impact
+- validation requirements
+
+سپس مشخص کن:
+
+- آیا PDA ضروری است؟
+- آیا DDA در این پروژه خطر ایجاد می‌کند؟
+- آیا alternative یا hybrid formulation ارزش بررسی دارد؟
+
+حداقل 2 گزینه را مقایسه کن.
+
+هیچ‌کدام را بدون Evidence قطعی نکن.
+
+==================================================
+11. Network Selection
+==================================================
+
+Network هنوز انتخاب نشده.
+
+Network Selection را به‌عنوان یک Design Decision مستقل بررسی کن.
+
+برای candidateها:
+
+- topology
+- junctions
+- pipes
+- pumps
+- valves
+- tanks
+- reservoirs
+- PRV compatibility
+- VSP compatibility
+- leakage modelling
+- EPANET/WNTR compatibility
+- literature use
+- reproducibility
+- computational cost
+- DRL suitability
+- generalization value
+
+را بررسی کن.
+
+در صورت مرتبط بودن گزینه‌هایی مثل:
+
+- small benchmark
+- medium benchmark
+- large benchmark
+- real network
+- one-network design
+- two-network design
+
+را مقایسه کن.
+
+قید مهم:
+
+اگر یک benchmark مثل Jowitt & Xu Pump ندارد، این را به‌عنوان محدودیت واقعی در joint PRV+VSP لحاظ کن.
+
+حداقل 2 یا 3 Network Design Alternatives ارائه بده.
+
+هیچ Networkی را در کد implement نکن.
+
+==================================================
+12. State / Observation
+==================================================
+
+Candidate features را بررسی کن:
+
+- pressure
+- flow
+- demand
+- leakage
+- tank level
+- actuator state
+- previous action
+- time
+- observable demand information
+- historical observations
+
+برای هر feature مشخص کن:
+
+- observability
+- operational availability
+- leakage of future information
+- dimensionality
+- effect on learning
+- literature support
+- risk of policy shortcut
+
+سه گزینه ارائه کن:
+
+- Minimal
+- Balanced
+- Rich
+
+Trade-off هرکدام را توضیح بده.
+
+==================================================
+13. Action
+==================================================
+
+### PRV
+بررسی:
+
+- opening
+- setting
+- downstream pressure target
+- continuous/discrete
+- incremental/absolute
+
+### Pump/VSP
+
+بررسی:
+
+- speed
+- setpoint
+- continuous/discrete
+- incremental/absolute
+
+همچنین:
+
+- action bounds
+- rate limits
+- safety constraints
+- physical feasibility
+- smoothness
+
+را بررسی کن.
+
+حداقل 2 formulation مقایسه کن:
+
+A. Absolute control
+B. Incremental control
+
+==================================================
+14. Reward
+==================================================
+
+این بخش یکی از مهم‌ترین بخش‌های پروژه است.
+
+Evidence قبلی یک failure mode واقعی نشان داده:
+
+PPO می‌تواند leakage objective را به قیمت pressure violations بهینه کند.
+
+بنابراین Reward را از منظر:
+
+- objective conflict
+- reward hacking
+- pressure service violation
+- leakage
+- energy
+- smoothness
+- normalization
+- scaling
+- weighting
+- constraint handling
+
+بررسی کن.
+
+حداقل 3 طراحی Reward ارائه کن:
+
+### Option A
+Weighted multi-objective reward
+
+### Option B
+Constrained / hierarchical reward
+
+### Option C
+Alternative constrained architecture
+
+برای هرکدام:
+
+- formulation ریاضی
+- assumptions
+- normalization
+- scaling
+- weights
+- weight selection
+- sensitivity
+- failure modes
+- advantages
+- disadvantages
+- implementation complexity
+
+را بررسی کن.
+
+هیچ reward را صرفاً به‌دلیل رایج بودن انتخاب نکن.
+
+==================================================
+15. Reward Validation
+==================================================
+
+قبل از Implementation پیشنهاد بده Reward چگونه تست شود.
+
+حداقل بررسی:
+
+- leakage-only
+- pressure-only
+- high-demand
+- low-demand
+- extreme pressure
+- valve closure
+- pump limitation
+- conflicting-objective cases
+
+هدف:
+
+اطمینان از اینکه agent با بهبود leakage، service/pressure را قربانی نکند.
+
+==================================================
+16. PPO Justification
+==================================================
+
+PPO الگوریتم مصوب پروژه است.
+
+آن را خودسرانه تغییر نده.
+
+اما دلیل انتخابش را بررسی کن:
+
+- continuous control
+- stability
+- policy optimization
+- clipping
+- sample efficiency
+- training cost
+- suitability for this environment
+
+مقایسه مفهومی با:
+
+- SAC
+- TD3
+- DDPG
+- value-based alternatives
+
+ارائه کن.
+
+اگر comparator لازم است، پیشنهاد بده؛ اما Algorithm اصلی پروژه را بدون تأیید تغییر نده.
+
+==================================================
+17. Training Budget
+==================================================
+
+با توجه به Evidence قبلی درباره budget ناکافی:
+
+training budget را بررسی کن.
+
+مشخص کن:
+
+- timesteps
+- episodes
+- rollout length
+- seeds
+- tuning budget
+- stopping criteria
+- hyperparameter budget
+
+چگونه تعیین شوند.
+
+اگر الگوریتم‌های مختلف مقایسه می‌شوند:
+
+مقایسه باید fair باشد.
+
+نباید یک algorithm با بودجه بسیار متفاوت محک زده شود.
+
+==================================================
+18. Baseline Design
+==================================================
+
+Baselineها را در سه گروه بررسی کن:
+
+### Classical
+- GA
+- DE
+- PSO
+- سایر موارد مناسب
+
+### Existing Control
+- fixed
+- rule-based
+- PID
+- MPC / PID-MPC در صورت relevance
+
+### Learning
+- یک alternative RL در صورت توجیه
+
+برای هر baseline:
+
+- scientific purpose
+- computational cost
+- comparison fairness
+- what it isolates
+- literature support
+
+را بررسی کن.
+
+هنوز baseline نهایی را قفل نکن.
+
+==================================================
+19. Demand Uncertainty
+==================================================
+
+Demand Uncertainty را operational تعریف کن.
+
+گزینه‌ها:
+
+A. scalar perturbation
+B. stochastic scenarios
+C. historical profiles
+D. Monte Carlo
+E. distribution shift / unseen demand
+
+برای هرکدام:
+
+- realism
+- reproducibility
+- difficulty
+- generalization
+- coverage
+- computational cost
+
+را مقایسه کن.
+
+مشخص کن:
+
+Train distribution
+و
+Test distribution
+
+چگونه جدا شوند.
+
+هیچ test information نباید وارد training شود.
+
+==================================================
+20. Generalization / Robustness
+==================================================
+
+این یکی از candidate contributionهاست.
+
+حداقل این سطوح را بررسی کن:
+
+### Level 1
+Unseen demand scenarios
+
+### Level 2
+Different operating conditions
+
+### Level 3
+Different network topology
+
+برای هر سطح:
+
+- scope compatibility
+- feasibility
+- scientific value
+- computational cost
+- risk
+
+را بررسی کن.
+
+اگر Level 3 خارج از Scope می‌شود، آن را Optional / Scope-Expanding علامت بزن.
+
+==================================================
+21. Evaluation Protocol
+==================================================
+
+Evaluation باید چندبعدی باشد.
+
+Metrics:
+
+- leakage reduction
+- pressure violations
+- pressure satisfaction
+- energy
+- actuator variation
+- stability
+- convergence
+- robustness
+- generalization
+- inference time در صورت relevance
+
+همچنین:
+
+- mean
+- standard deviation
+- confidence interval
+- multiple random seeds
+- appropriate statistical analysis
+
+را بررسی کن.
+
+قانون:
+
+Leakage reduction به‌تنهایی evidence کافی برای بهتر بودن policy نیست.
+
+==================================================
+22. Ablation
+==================================================
+
+حداقل برای:
+
+- reward components
+- energy term
+- smoothness term
+- uncertainty training
+- state features
+- comparator algorithm
+
+Ablation options ارائه کن.
+
+هدف مشخص کن که:
+
+Performance improvement
+از کدام component می‌آید.
+
+==================================================
+23. Sensitivity Analysis
+==================================================
+
+پارامترهای حساس را مشخص کن:
+
+- reward weights
+- pressure targets/bounds
+- leakage parameters
+- demand perturbation
+- action bounds
+- PPO hyperparameters
+
+حداقل sensitivityهای ضروری را پیشنهاد بده.
+
+==================================================
+24. Reproducibility
+==================================================
+
+Methodology باید از ابتدا reproducible باشد.
+
+مشخص کن:
+
+- Python version
+- EPANET version
+- WNTR version
+- Stable-Baselines3 version
+- dependencies
+- random seeds
+- configuration
+- experiment naming
+- checkpoints
+- logging
+- result storage
+- Git commit tracking
+
+Traceability:
+
+Code Version
+→ Config
+→ Seed
+→ Run
+→ Result
+→ Figure/Table
+→ Conclusion
+
+==================================================
+25. Scientific Validity
+==================================================
+
+Methodology را از چهار منظر ارزیابی کن:
+
+### Construct Validity
+آیا metricها واقعاً construct موردنظر را می‌سنجند؟
+
+### Internal Validity
+آیا comparisonها fair هستند؟
+
+### External Validity
+آیا نتیجه‌ها قابل تعمیم‌اند؟
+
+### Reproducibility
+آیا experiment قابل تکرار است؟
+
+همچنین:
+
+### Operational / Physical Validity
+آیا actionهای agent از نظر سیستم واقعی قابل اجرا هستند؟
+
+==================================================
+26. Alternative Designs
+==================================================
+
+برای هر Design Decision مهم حداقل 2 گزینه ارائه کن:
+
+- PDA/DDA
+- leakage model
+- network
+- state
+- action
+- reward
+- baseline
+- demand uncertainty
+- generalization
+- evaluation
+
+برای هر گزینه:
+
+- Evidence
+- Reasoning
+- Pros
+- Cons
+- Complexity
+- Scope impact
+- Risk
+- Confidence
+
+را بده.
+
+از انتخاب تک‌گزینه‌ای بدون مقایسه خودداری کن.
+
+==================================================
+27. Research Corpus + External Literature Policy
+==================================================
+
+در تمام این Phase:
+
+اول Research Corpus داخلی را بررسی کن.
+
+اگر Evidence کافی بود:
+از همان استفاده کن.
+
+اگر Evidence ناقص بود:
+جست‌وجوی خارجی انجام بده.
+
+اگر research جدید پیدا کردی:
+آن را با corpus قدیمی مقایسه کن.
+
+اگر مقاله یا سایت محدودیت ایجاد کرد:
+مسیر را عوض کن.
+
+منابع جایگزین پیشنهادی:
+
+- Publisher
+- DOI/Crossref
+- OpenAlex
+- Semantic Scholar
+- University Repository
+- Author page
+- Preprint
+- Official code/data repository
+
+اما کیفیت منبع را فدای دسترسی آسان نکن.
+
+==================================================
+28. محدودیت ابزار
+==================================================
+
+اگر:
+
+- PDF extraction ناقص است
+- جدول یا شکل قابل مشاهده نیست
+- API rate-limited است
+- Paywall وجود دارد
+- publisher 403 می‌دهد
+- ابزار web در دسترس نیست
+
+حدس نزن.
+
+مورد را:
+
+Pending Verification
+
+علامت بزن.
+
+همچنین:
+
+API unavailable
+≠
+No evidence exists
+
+==================================================
+29. Scope Preservation
+==================================================
+
+در هر Recommendation بررسی کن:
+
+- آیا داخل Scope است؟
+- آیا Research Question را حفظ می‌کند؟
+- آیا Proposal/Seminar را حفظ می‌کند؟
+- آیا واقعاً لازم است؟
+- آیا alternative ساده‌تری دارد؟
+- آیا complexity اضافی ارزش علمی دارد؟
+
+اگر توسعه‌ای خارج از Scope است:
+
+OPTIONAL / SCOPE-EXPANDING
+
+علامت بزن.
+
+==================================================
+30. خروجی نهایی
+==================================================
+
+گزارش را دقیقاً با ساختار زیر ارائه کن:
+
+# 1. Methodology Executive Summary
+
+# 2. Current Approved Research Question
+
+# 3. Scientific Problems Found
+
+# 4. Problem Formulation
+
+# 5. Leakage Model Alternatives
+
+# 6. PDA vs DDA Analysis
+
+# 7. Network Selection Alternatives
+
+# 8. State Alternatives
+
+# 9. Action Alternatives
+
+# 10. Reward Alternatives
+
+# 11. Reward-Hacking Risk Analysis
+
+# 12. PPO Justification
+
+# 13. Training Budget and Fairness
+
+# 14. Baseline Alternatives
+
+# 15. Demand Uncertainty Design
+
+# 16. Generalization / Robustness Design
+
+# 17. Evaluation Protocol
+
+# 18. Ablation Plan
+
+# 19. Sensitivity Analysis
+
+# 20. Reproducibility Protocol
+
+# 21. Scientific Validity Risks
+
+# 22. Scope Compatibility
+
+# 23. Recommended Methodology
+
+# 24. Unresolved Decisions
+
+# 25. High-Impact Decisions Requiring Researcher/Advisor Approval
+
+# 26. Evidence Quality and Remaining Evidence Gaps
+
+# 27. Implementation Readiness
+
+==================================================
+31. Recommendation Format
+==================================================
+
+برای هر Recommendation:
+
+- Recommendation
+- Evidence
+- Reasoning
+- Alternatives Considered
+- Risks
+- Scope Impact
+- Confidence
+
+را ارائه کن.
+
+Recommendation ≠ Decision
+
+==================================================
+32. Decision Gate
+==================================================
+
+در انتهای گزارش هر تصمیم را در یکی از این دسته‌ها قرار بده:
+
+### READY TO LOCK
+Evidence کافی و ریسک قابل مدیریت.
+
+### NEEDS RESEARCHER DECISION
+چند گزینه علمی قابل دفاع وجود دارد.
+
+### NEEDS ADVISOR APPROVAL
+ممکن است با Proposal/Seminar یا Scope مصوب تعارض داشته باشد.
+
+### NEEDS MORE EVIDENCE
+شواهد کافی نیست.
+
+==================================================
+33. هیچ Implementation
+==================================================
+
+این Phase فقط Design و Review است.
+
+ممنوع:
+
+- نوشتن کد
+- ایجاد Environment
+- ساخت Reward در کد
+- انتخاب Network در فایل
+- نصب dependency
+- اجرای experiment
+- تغییر Proposal
+- تغییر Seminar
+- تغییر Scope
+- حذف یا اصلاح شواهد قبلی
+
+هیچ فایل پروژه را تغییر نده.
+
+==================================================
+34. پایان Phase
+==================================================
+
+بعد از ارائه گزارش:
+
+متوقف شو و منتظر دستور بعدی من بمان.
+
+هدف این Phase:
+
+«طراحی یک روش‌شناسی علمی، دقیق، قابل اجرا، reproducible و قابل دفاع، با استفاده از تمام شواهد موجود و با حفظ Scope مصوب پروژه.»
+
+اگر شواهد نشان دادند بخشی از Proposal یا Seminar علمی مشکل دارد، آن را پنهان نکن.
+
+اگر یک Recommendation خارج از Scope است، آن را صریحاً Scope-Expanding علامت بزن.
+
+اگر Evidence کافی نیست، عدم‌قطعیت را اعلام کن.
+
+اگر یک منبع محدودیت دسترسی دارد، از منبع معتبر دیگری استفاده کن یا Pending Verification ثبت کن.
+
+هرگز نبود دسترسی به یک منبع را با نبود خود آن منبع اشتباه نگیر.
+
+Scientific Integrity
+>
+Agreement
+>
+Implementation Convenience

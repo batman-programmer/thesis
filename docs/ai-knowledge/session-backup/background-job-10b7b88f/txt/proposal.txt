@@ -1,0 +1,1157 @@
+                            
+
+       
+
+402679917                
+            .                   
+
+                       :                                                                         :
+                     1404/11/18 :                                                                 :
+
+                                                    
+                
+
+                                                                                               
+
+Deep Reinforcement Learning-Based Intelligent Pressure Management in Water
+Distribution Networks for Leakage Mitigation under Uncertain Conditions
+
+                                                                                                 :
+                                                                                                  :
+                      
+
+                                                                                          
+
+Pressure Management, Water Distribution Network (WDN), Deep Reinforcement
+Learning (DRL), Proximal Policy Optimization (PPO), Pressure Reducing Valve (PRV),
+EPANET
+
+                  : 
+
+ 7 :             6 :   
+
+  .                   
+
+  :             :     
+
+                              
+
+              
+
+:      :                      :     
+                                                -1
+
+          (WDNs)   
+          .     
+                  
+            .  
+               
+
+                .          (Guo et al., 2013).
+
+         » «      
+                  .  »  «         
+
+    .             
+      .            
+
+                            :         
+
+ /             / 
+
+1    
+
+)18   ( 0  1  ) ( 
+
+)1   (        ) ( 
+
+0  0   
+
+(Lemberger & Wyatt, 2018)08 ) (   
+
+   .          
+              )188(  
+            .    
+     .           
+
+      .             
+.                 
+                 
+   .  )  (         
+.              
+       --       
+
+                                                    .        --
+
+   Vicente et al. (2016)     (PRVs)   
+            . »  «  
+    .      PRV       
+   .     »«     
+             .    
+
+                                        .        
+
+            
+  PPO           .  
+ »  «  PPO   .    EPANET   
+                
+          .     
+
+       .             (DRL) 
+
+                  
+                                                                      .    
+
+               
+             .(PRVs)
+
+                            .           
+
+    PPO    (DRL)        
+       .  EPANET    
+             . » «  
+                  
+
+  .         
+
+  :      
+
+    PRV      :     ·
+                                                                   .  
+
+          :     ·
+                                                                 .   
+
+          :     ·
+      .  » «      DRL    
+
+.               
+ 1       :  »1 «     
+ .      1        1     
+               
+
+                                                                            .    
+
+  :         
+
+         :    .1
+                                                            .    
+
+          :   .2
+                                               .      
+
+           :   .3
+                    .            
+
+         (IWA)       
+       .        (SDG 6)   
+.                
+               
+
+  .            
+
+                                .1 
+
+              )1 (   
+    )PRV(           
+                )VSP(
+               
+ )DRL(        .         
+  EPANET      )PPO(    
+
+                                          .  Python       
+
+                                                                :    
+
+    )      (       ·
+                                                  ·
+
+                                        ·
+                ·
+
+  .         
+
+                 
+   (             
+
+                                                                         .  )
+
+                                           -2
+
+               
+        .       
+                
+              .    
+                 
+         .      
+                
+               
+
+                                  .)04    00   (   
+.                
+                 
+             .      
+                   
+           .      
+       .         
+ (                
+
+                                 .)04    01    008 
+              
+             .  
+          .      
+                
+    .         
+   .            
+                  
+                  
+  (              
+
+                                                      .)01    1400  011
+               
+        .         
+ .              
+               
+                
+               .  
+                 
+  0    0    00    00   (
+
+                                                                                    .)04 
+  )0(    )0(    )00(      
+              )04(  
+        .        
+              
+  )00(      .       
+         )0(         
+.              )0(   
+        )04(        
+   EPANET        )04(    . 
+       A2C TRPO SAC  PPO     
+    .             
+                
+         .          
+                 
+
+                              .)04   (        
+             
+          .     
+       .          
+.              
+               
+                 . 
+    .            
+                 
+  (               
+
+                                                                    .)0    04
+                
+                
+         .       
+                
+    .              
+  PPO              
+         .    EPANET 
+               
+             . 
+     .           
+               
+
+                                                             .      
+            :1 
+
+                
+       .           
+             
+ )01(    )011(      .   
+       )1400(   )18(    )01(  
+     .             
+                 
+              .  
+
+                                                                                  .  
+
+              
+)0(    )00(      .      
+ )04(     )0(    )0(    )0(   
+             
+          .     
+
+  .        
+
+                 
+              .    
+         .        
+                
+
+                      .            
+
+     .         
+                 
+        .         
+               
+
+                                                                                 .  
+
+                
+      .           
+              
+
+                         .             
+
+                 
+                   
+             .   
+     .             
+               
+
+                                                                                     .  
+
+      PPO            
+               
+
+                                .          
+  )       (     -3
+
+ EPANET       )PPO(     
+           )PRV(       
+
+                                                             1
+
+(           PPO                                                                             
+       »        )                                                                           1 
+
+          (                                                                                 
+           )                                                                                2 
+
+                                                                 
+
+  )         (  -4
+
+      PPO  EPANET   -                                                                       1 
+                                                   .        
+
+                                                                                            2 
+                                                                                   . 
+
+                                                                                            3 
+                                                   .      
+
+           )       (         -5                                                             
+             PPO                                                                             
+
+                                                                                        .   
+                                                                                             
+                 
+                                                                          .    
+
+  .                                                                                         
+                                                                                             
+                           : 
+
+
+
+                
+        .       
+                
+             .   
+  .               
+                 
+              
+                .
+
+                                                                              .   
+
+                 : 
+
+                
+              .   
+           .   
+               
+    .              
+ .                 
+                
+
+                              .          
+
+                     : 
+
+                 
+             .   
+       .       
+               
+              .  
+       .           
+                 
+
+  .      
+
+          -6
+
+  .                                                                                              1 
+    .                                                                                            2 
+
+  .       3 
+
+  )         (      -7
+
+.             :                                                                                  1 
+                                                                                                  
+           :     
+                                                      .     
+
+              :                                                                                   
+                                                                                               
+
+             :                                                                                   4 
+                                                                                    .   
+
+             :                                                                                    
+                                                                    .    
+     -8
+
+               
+
+           .    
+
+                 
+
+  .       
+
+      EPANET            
+         .    
+               
+
+                                                                          .   
+
+               
+            .   Python
+                    
+          .    
+              
+
+                                                                   .     
+
+      PPO       
+             .   
+        .          
+
+                          .           
+
+    .          
+                  
+             .    
+                . 
+
+                                                                   .    
+
+              
+        .       
+              
+         .     
+
+  .              
+
+               
+             . 
+.                
+                
+
+          .              
+
+               
+          .      
+              
+            .   
+
+                   .            
+
+                                                    -9
+
+    .           
+                 
+       :          
+              
+                
+
+                                                                                                         EPANET.
+
+               
+       .       
+             
+          .   
+               
+
+                                                                                         . 
+
+EPANET                
+             . 
+         .     
+    .            
+.                 
+ : EPANET           
+           Python  
+        .      
+                
+
+                                      .          
+
+                
+              
+            .  
+
+                                                           .     
+
+                                              -11
+
+                
+       .         
+                
+                 
+           .  
+
+                                                       .      
+
+               
+           .  
+   .            
+                  
+         .         
+
+                                                                          .    
+
+      .      PPO    
+ .                
+                
+  .                
+                 
+
+           .    
+
+  .            
+                
+ .             
+                
+
+          .             
+
+               
+ .               
+                 
+
+          .               
+
+                
+                
+
+                                                                                 .  
+
+  )      (            -12
+
+             
+
+      
+
+                 
+
+              EPANET  
+
+         
+
+               
+
+                EPANET
+
+             PPO    PRV 
+
+         
+
+                 
+
+                 
+                                                     -13
+
+            .)18( .   . 
+                                                                 .    . 
+
+           .)140( .   . .  
+       .     .)     : (    
+
+              .)18( .  . 
+                                                                      .    . 
+
+               .)1400( . 
+                                     ...  .)  ( 
+
+Belfadil, A., Benlahmar, E., & El Alami, J. (0). Leveraging deep reinforcement learning for
+
+water distribution systems with large action spaces and uncertainties. Water Resources
+Management.
+
+Berardi, L., Laucelli, D., Simone, A., & Giustolisi, O. (01). Integrated pressure control
+
+strategies for sustainable management of water distribution networks. Water Resources
+
+Management, (), 6-14.
+
+Dai, P. D., Kim, Y., & Kim, J. H. (016). Optimal pressure regulation in water distribution systems
+based on an extended model for pressure reducing valves. Water Resources Management, 0(),
+1-14.
+
+Dai, P. D. (01). Optimal pressure management using an accurate PRV model based on
+
+complementarity constraints. Journal of Water Resources Planning and Management.
+
+Fan, X., Behzadan, V., & colleagues. (0). A graph convolution network-deep reinforcement
+
+learning model for resilient water distribution network repair decisions. Reliability Engineering &
+
+System Safety, 1, 10808.
+
+Hajgató, G., Bokányi, P., & Temesvári, A. (00). Deep reinforcement learning for real-time
+optimization of pumps in water distribution systems. Procedia Engineering, 11, 8-.
+
+Hu, C., Huang, J., & colleagues. (00). Deep reinforcement learning based valve scheduling for
+pollution isolation in water distribution network. Journal of Hydroinformatics, (6), 1460-14.
+
+
+Hu, S., Wang, X., & colleagues. (0). Multi-agent reinforcement learning framework for real-
+
+time scheduling of pump and valve in water distribution networks. Journal of Water Resources
+
+Planning and Management, 14(8).
+
+Hu, S., Wang, X., & colleagues. (0). Real-time scheduling of pumps in water distribution
+
+systems based on exploration-enhanced deep reinforcement learning. Journal of Water Resources
+
+Planning and Management, 14().
+
+Javed, M., Khan, Z., & colleagues. (0). Leakage management in water distribution networks
+
+through deep reinforcement learning: A review. Sustainable Water Resources Management.
+
+Kåge, M., Johansson, J., & colleagues. (0). Applications of reinforcement learning in water
+
+resources management: A systematic review. Environmental Modelling & Software.
+
+Khalifeh, S., Bani-Hani, A., & colleagues. (00). Optimization of water distribution network
+systems using the Harris Hawks optimization algorithm. Water Supply, 0(), 801-816.
+
+Ledesma, J., Puig, V., & Cembrano, G. (00). Optimal control for water distribution networks
+with unknown dynamics. Control Engineering Practice, , 10441.
+
+Ledesma, J., Puig, V., & Cembrano, G. (04). Water age control in water distribution networks
+
+through safe reinforcement learning. Journal of Hydroinformatics.
+
+Liu, P., Zhang, Y., & colleagues. (0). Improving water treatment operations using
+reinforcement learning. Water Research, 1, 11844.
+
+Ma, Y., Zhang, H., & colleagues. (04). Energy-efficient pump scheduling in urban water supply
+
+stations using a physics-informed multi-agent deep reinforcement learning approach. Applied
+
+Energy, , 10.
+
+Moghaddam, A., Afshar, A., & colleagues. (00). Optimization of water distribution networks
+using GA, SMPSO and SHGAPSO algorithms. Water Resources Management, 4(4), 11-
+188.
+
+
+Monsef, H., Naghashzadegan, M., & Jamali, A. (01). Pressure management in water
+
+distribution systems in order to reduce energy consumption and background leakage. Urban Water
+
+Journal, 14(8), 814-84.
+
+Mosetlhe, T. C., Hamam, Y., & Abu-Mahfouz, A. (00). Towards model-free pressure control
+in water distribution networks. Water, 1(10), 4.
+
+Mosetlhe, T. (01). Model-free pressure control in water distribution networks (Doctoral
+
+dissertation).
+
+Negm, A., & colleagues. (0). Water pressure optimisation for leakage management using Q-
+
+learning. Water Supply.
+
+Negm, A. (04). Water pressure optimisation for leakage management using deep reinforcement
+
+learning. Doctoral Thesis, University of Exeter.
+
+Nicolini, M. (011). Optimal pressure management in water networks: Increased efficiency and
+reduced energy costs. Water Science and Technology: Water Supply, 11(), 01-0.
+
+Olmutur, M. M., Aydin, M., & colleagues. (0). Investigation of water losses with real-time
+
+pressure management as a case study in Sakarya. Water Practice and Technology.
+
+Pei, S., Wang, Y., & colleagues. (04). Real-time multi-objective optimization of pump
+
+scheduling in water distribution systems using neuro-evolution. Journal of Water Resources
+Planning and Management.
+
+Salaorni, A. (0). Real-time optimal control of a water distribution system under cyber-attacks:
+
+A reinforcement learning approach. Master's Thesis.
+
+Samir, N., El-Tarabily, M., & colleagues. (01). Pressure control for minimizing leakage in water
+distribution systems. Alexandria Engineering Journal, 6(4), 601-611.
+
+Tian, Y., Kerkez, B., & colleagues. (0). Combined sewer overflow and flooding mitigation
+through reliable real-time control. Water Research, 0, 11864.
+
+Tsiami, L., Makropoulos, C., & Butler, D. (0). Rethinking urban water network design: A
+
+reinforcement learning framework for long-term flexible planning. Sustainable Cities and Society.
+
+
+Zaman, M., Ahmed, S., & colleagues. (0). Optimizing smart city water distribution systems
+using deep reinforcement learning. Sustainable Computing: Informatics and Systems, , .10014
+
+                                       :1 
+
+)(       /      /                                       / 
+
+                                                        
+
+                                          )KPI(
+
+ .  011                           EPANET      
+
+                                          0             
+
+         :                                              
+
+                                                    
+
+             PRV  PRV  )NSGA-II(                    
+
+                                               
+
+                                                        Real-(
+
+                                          (              )time
+
+                                          )4            
+
+    016                           EPANET        
+
+                                            (           
+
+                        )NLP(                      Physical (
+
+             PRV PRV                              )      model-
+                                                         )driven
+                       IPOPT                             
+                                                  
+                                                           
+                                                        
+                                                        
+
+         
+
+                                                        
+
+ .  01                            WaterCAD       
+
+                                  V8           
+
+                                                   
+
+                  PRV                     DMA       
+
+          PRV                             ILI            
+
+                                                        
+
+                                                 )DSS(  
+
+ .  01                MATLAB,                            
+
+               PRV     )DE(       EPANET  41.    
+
+               )VSP(                           
+
+                                          8.4    
+
+            PRV                                         
+
+                                                   
+
+          )VSP( 
+     01                                    EPANET,                       
+                                           MATLAB       1               
+                  PRV                                                 
+                  FCV            )PSO(     WDNetXL                       
+  .  01                                   (Excel/GIS)                    DRL
+                                                                        
+                                          WaterGEMS
+                 DMA                                                      
+     01                                      Python,    ).8 (    (     
+                                            EPANET                    /
+                  PRV                                                   
+                                  (         EPANET                      
+     00                   PRV  )PRV                                     
+                                             Python,              )     
+                                 Q          EPANET                     
+                                                                       )DRL(
+                               D-(                               
+                  PRV            ) DQN                                   
+                                                                       
+                                 Q                              
+                                                                        
+                                                                       
+                               Dueling (                               
+                                 ) DQN                                 
+                                                                       
+                                 Q                              
+                                                       (                
+                                                                         PRV
+                                )DDQN(                    )             
+                                                               )DE(     
+                                                                 
+          
+                                                                   
+             
+     00                                                                   
+                                                                        
+                                                                       
+                                                        
+     00                                                                   
+                                                                       
+                                                                        
+                                                                        
+                                                          
+                                                                         
+                                                                       
+                                                                
+                                                                        
+                                                                       
+                                                                        DQN
+          
+
+             
+          
+           
+                                                                                
+                                                                           
+     00                             Q                      
+                                              MATLAB/Si                      
+                                                mulink                        
+                                       Q-(    SWI                              
+     00                             Learning                                 
+                                     Table-    MATLAB,                       
+                                     based /    EPANET                      
+                                    Function                      Model-(    
+     00                            Approxim      Python,                       
+                                                EPANET              )free   
+                                      )ation                                 
+                                               MATLAB,                      
+  .  00                                         EPANET                      
+                                                                             )Static(
+                                   SHGAPS       MATLAB                      
+                                    ( O                           (        
+. .  00     GA                     )PSO  GA                                  
+          SMPSO                                                     )6      
+         SHGAPS                     Q                              
+                                                           1                
+              O                                                               
+                  Model-(                                          
+                    )Free     PRV   )CDQN(                                 ( 
+                                                                              
+                                                                           
+                                                                    
+                                                                             )
+                                                                              
+                                     ) HHO(               (                 
+                                                           )0.6    
+                                                                              
+                                   (                                          
+                                    +                                        
+                                    )                                        
+                                                                             
+                                                                             PRV
+                                                                 
+                                                                            
+                                                                             
+                                                                   
+                                                                              
+                                                                             
+                                                                            
+                                                                              
+                                                                            
+                                                                             
+                                                                  
+                                                                                
+    01                                      EPANET                            
+                                  (        MATLAB ,      (                   
+                         (        )       WaterGEMS     )%60
+                                                                              
+    01                     )                     -               )PDA(      )RL( 
+                                                       )% (                    
+    01                            (         EPANET,                          
+                                   )         IPOPT,                 
+   0           Model-(                                                         
+                                           CONOPT4,                            
+    0             free                        GAMS                 
+               pressure           )NLP(                                        
+               )control                                                        
+                           PRV                                   Model-(       
+    0                            )MPCC(                                        
+                                                                   )free      
+                                           )Emulator(                        
+                                   -                                          
+                                   DQN                  )SRI(                
+                                  GCN-(     Koopman                             
+                                  ) DQN                         ( PRV        Model-(
+                                             Python,     )PDW(   )            )based
+                                            EPANET                             
+                                  DQN                                           
+                                 DDQN                           smoothing     
+               )RTC(     /(                              )CSO(                
+                             )  CA PPO                                        
+           -                                                                  
+                                  Q                                
+                                                                Transfer (   
+                                  ) DQN(                        )Learning      
+                                                                  
+                                                         )DSR(               
+                                                                               
+                                                                              
+                                                                 
+                                                                              
+                                                                                
+
+                                                                             
+                                                                              
+                                                                  
+                                                                 )Voting(
+                                                                  
+                                                                   
+                                                                  
+                                                                 
+                                                                 
+                                                                   
+                                                                 
+                                                                  
+                                                                  
+                                                                  
+                                                                             
+         :                                                                
+                                                                
+                                                      MITM                   
+                                                                             
+                                                                          Anytown
+        
+    0                          DQN        SWMM                              
+                              DDQN                                         
+            CSO              CA PPO      Koopman
+                              +                                              
+                              )Voting(                          )Voting(    
+                                                                          )SCADA(
+                                                                  
+                                        Python/gRP(
+                                              ) C                 
+              )PAC(
+    0                         Double       Python,                          
+                      PAC      DQN        EPANET     permeate               
+                                                     TOC                   0( 
+                             Expected      Python,                           
+                             SARSA        EPANET                            )
+                                                                 
+    0                        Q             Python,                            
+       Q                                  EPANET                           
+                                                     )%(          
+                      )PRV(                                                   
+                                                                            
+    0                          PPO                    10                    
+                                                                              
+                                                                            
+                               E-(                   )%6.10(               
+                                )PPO                                       )DRL(
+                                                                            
+                                                                             
+                                                                             
+                                                                           
+                                                                
+                                                                              
+                                                                ) 0.4(     
+                                                                          
+                                                                            
+                                                                           
+                                                                            
+                                                                           
+                                                                            
+
+    0                                                                      
+                                                                           
+                     )PRV(                                     ) 1.4(      ( 
+                                                                          ) 1
+                                                        
+                                 MADDP(                                     
+                                     ) G                                    
+     0                                       Python,                        
+                                    PPO     EPANET                         
+                                                               PSO  GA
+                                             Python,                       
+                                 )E-PPO(    EPANET                         
+                                                                           
+                                  Q         MATLAB                        
+                                            Simulink                     Attention (
+                                                                         Mechanis
+                                   )BDQ(     Python,              11.14      )m
+                 )DRL(                      EPANET                         
+                                  BDQF                                       
+                                                                
+                                                               0.4 
+          
+                                                                   
+           
+  .  0                                                  6                    
+                                                                           
+                                                                          
+                                                                           
+                                                                1  (        
+                                                                           GNN
+                                                                  )        
+                                                                          
+                                                                           
+  .  0                            DQN                             
+                                  LSTM                                      
+                                                                          
+                        /                                                   
+                                                                          
+                 DRL      
+                                                                             
+                                                        (                )Attention(
+     04                                                 )% .4    
+                                                                             
+                          )PRV(                                           
+                 )DRL(                                                     
+                                   C A(                                    
+                                  DDPG                                     
+                                   SAC                (                    
+                                   ARS                                    
+                                   PPO                   m10                
+                                                      m00m/0               
+                                 Recurrent                       
+                                   PPO                      )    Real-(     
+                                                                  )time  
+                                                                
+                                                                  
+                                                                
+                                                               
+                                                                  
+                                                                
+  04                              TRPO       Python,                       
+                                   )TQC     EPANET                         
+                                                                    
+                (        )PRVs(            PI-LSTM                        
+                  )              NSGA-II                                   )DRL(
+                                                                           
+                                             )GP(                           
+            (                    TOPSIS                              
+            :                                                             
+           )                                  SWIL                           
+                                                                    
+     04                          MADDPG      Python,   Hybrid (          ( 
+                                            EPANET    Reliability         
+                                 PI-                                  
+                                           EPANET,          )               )
+                                   LSTM     SWMM,                   
+          :                               WaterGEMS                  (       
+                                                                     )     
+     04                                                                     
+                        Water (                        )1.8(               
+                        )Age                                               
+                                                                           
+                                                                          
+               )PRV(                                                      
+                                                                            
+                                    )GP(                              
+                                                                           
+  .  04                                               )Turnover(           
+                                 (                                       GP 
+                                                                            
+                                 NSGA-                                     
+                                                                          
+                                     )II                                    
+                                                                      
+     0                             DQN                  )MRI(               
+                                   DDPG                                    
+                                    PPO                                    
+                                 MADDPG                                  )Sparsity(
+                        )Valve(                       )RWS(                
+                                                                            
+                                                                           
+                                                                          
+                                                                           
+                                                        NRW
+                                                                            
+                                                                          
+                                                                      
+                                                                            
+                                                                          Sim-to-(
+                                                                         )Real Gap
+          :                                                              
+                                                                        
+                                                                         
+                                                                        
+                                                                 
+     0                           DQN                                       
+                                  PPO                                    
+                                 SAC      )Simulators(                  
+                                                                        
+            :                              EPANET                         
+            
+                                            Python,                       
+     0                                     EPANET                      Explainab(
+                                  
+                                            Python,                       )ility
+             :                     )PPO(   EPANET                       
+                                                         )NPC(          Sim-to-
+                                                                    
+                                                                          Real
+                                                         1               
+                                                                          
+                                                                         
+                                                          41              
+. .  0                                                                    
+                                 ( PID                                  
+          :                                                              
+                 )DMA(    PRV      )                                     )(
+                                                                          
+                                                                  (    
+                                                                   )
+     140                                                                   
+                          )PRV(                                          
+                                                                         
+                                   )PPO(                          
+                        )VSP(                                              
+                                                                   
+                                                                           
+                                                                       
+                                                                 
+                                                                           
+                                                                         
+                                                                        
+                                                                         
+                                                                        
+                                                                        
+                                                                         
+                                                                          
+                                                                        
+                                                                          
+                                                                        
+                                                                         
+                                                                          
+                                                                         
+                                                                          
+                                                                        
+        
+       
+
+
+

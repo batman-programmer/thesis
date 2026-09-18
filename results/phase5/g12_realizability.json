@@ -1,0 +1,2712 @@
+{
+  "gate": "G12",
+  "title": "BWSN-1 actuator realizability and action authority",
+  "env": {
+    "timestamp_utc": "2026-09-02T22:25:39+00:00",
+    "os": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "python": "3.13.15",
+    "python_build": "Aug  5 2026 13:05:39",
+    "wntr": "1.5.0",
+    "numpy": "2.5.2",
+    "pandas": "3.0.5",
+    "scipy": "1.18.1",
+    "networkx": "3.6.1",
+    "epanet_engine_wntr": {
+      "epanet2.dll": 20200,
+      "epanet20.dll": 20012,
+      "epanet22.dll": 20200
+    },
+    "epanet_engine_epyt": 20305,
+    "original_inp_sha256": "510af942ec643eb87adcf26e5a7df1cc4c23eb0c1e470a8a1257ed055f1956f1",
+    "working_inp_sha256": "53015ba9212e46bec731d190971819996233996b498bc269e828f992830a20a9",
+    "determinism": "EPANET's hydraulic solver is deterministic. No stochastic input is used anywhere in Phase 5; leak-node selection and leak-coefficient allocation are closed-form functions of pipe length, so no random seed is required. Recorded seed: none used."
+  },
+  "method": {
+    "configuration": "the gate 10 configuration: PDA required 20 psi / minimum 0 psi, gate 6 validation leakage on every junction, distributed [RULES] and [CONTROLS] intact",
+    "rule_timestep_s": 180,
+    "report_timestep_s": 1800,
+    "solver": {
+      "accuracy": 1e-05,
+      "trials": 2000
+    },
+    "one_command_per_run": true,
+    "prv_scales_of_nominal": [
+      0.75,
+      1.25
+    ],
+    "pump_speeds": [
+      0.7,
+      0.85,
+      1.1
+    ],
+    "pump_speed_justification": "inside the 0.50-1.10 range gate 3 swept; 0.70 straddles the feasible bounds gate 3 measured (PUMP-170 shut at 0.80, PUMP-172 shut at 0.70) so the override case is measured, not assumed",
+    "tolerances_declared_before_any_run": {
+      "cmd_tol_psi": 0.1,
+      "effect_tol_psi": 0.01,
+      "effect_tol_gpm": 0.01
+    },
+    "pressure_statistic_node_set": "121 demand-bearing junctions; the 5 junctions the file declares at elevation 0.0 ft are pump and reservoir connector nodes whose reported pressure is head above datum, per gate 10",
+    "leak_instrument_status": "validation instrument only; imported unchanged from gate 6 and must not enter any thesis result",
+    "no_optimisation": "fixed deterministic ladders; no PPO, SAC, GA or search",
+    "random_seed": null
+  },
+  "sizing": {
+    "global_scale_k_gpm_per_ft_per_psi_alpha": 7.13768134008582e-05,
+    "sum_w_p_alpha": 1187270.5037860267,
+    "target_leak_gpm": 84.74358520507813,
+    "n_junctions_with_emitter": 126,
+    "coefficient_min": 0.0019985507752240295,
+    "coefficient_max": 0.44900598527335517,
+    "alpha": 0.5,
+    "closed_form": "k = target / sum_j (w_j * p_baseline_j^alpha); single evaluation, no optimisation of any kind."
+  },
+  "connector_nodes": {
+    "rule": "declared elevation exactly 0.0 ft AND zero total base demand; reported for transparency, applied only to the pressure statistic",
+    "n_junctions_total": 126,
+    "min_nonzero_elevation_ft": 192.0,
+    "max_elevation_ft": 1094.07,
+    "n_connector_nodes": 5,
+    "connector_nodes": [
+      "JUNCTION-105",
+      "JUNCTION-106",
+      "JUNCTION-109",
+      "JUNCTION-110",
+      "JUNCTION-128"
+    ],
+    "evidence": {
+      "JUNCTION-105": {
+        "elevation_ft": 0.0,
+        "base_demand_m3s": 0.0,
+        "degree": 2,
+        "incident_links": [
+          "LINK-166",
+          "PUMP-170"
+        ],
+        "incident_link_types": [
+          "Pipe",
+          "Pump"
+        ],
+        "touches_pump_or_reservoir": true
+      },
+      "JUNCTION-106": {
+        "elevation_ft": 0.0,
+        "base_demand_m3s": 0.0,
+        "degree": 2,
+        "incident_links": [
+          "LINK-167",
+          "PUMP-170"
+        ],
+        "incident_link_types": [
+          "Pipe",
+          "Pump"
+        ],
+        "touches_pump_or_reservoir": true
+      },
+      "JUNCTION-109": {
+        "elevation_ft": 0.0,
+        "base_demand_m3s": 0.0,
+        "degree": 2,
+        "incident_links": [
+          "LINK-15",
+          "PUMP-172"
+        ],
+        "incident_link_types": [
+          "Pipe",
+          "Pump"
+        ],
+        "touches_pump_or_reservoir": true
+      },
+      "JUNCTION-110": {
+        "elevation_ft": 0.0,
+        "base_demand_m3s": 0.0,
+        "degree": 2,
+        "incident_links": [
+          "LINK-17",
+          "PUMP-172"
+        ],
+        "incident_link_types": [
+          "Pipe",
+          "Pump"
+        ],
+        "touches_pump_or_reservoir": true
+      },
+      "JUNCTION-128": {
+        "elevation_ft": 0.0,
+        "base_demand_m3s": 0.0,
+        "degree": 2,
+        "incident_links": [
+          "LINK-18",
+          "LINK-19"
+        ],
+        "incident_link_types": [
+          "Pipe"
+        ],
+        "touches_pump_or_reservoir": true
+      }
+    },
+    "all_touch_pump_or_reservoir": true
+  },
+  "nominal": {
+    "prv": {
+      "VALVE-173": {
+        "commanded_psi": 70.0,
+        "n_states": 193,
+        "status_counts": {
+          "Active": 193
+        },
+        "realised_setting_psi_min": 70.0,
+        "realised_setting_psi_max": 70.0,
+        "realised_setting_equals_command_states": 193,
+        "n_active": 193,
+        "n_active_and_holding_setting": 193,
+        "max_abs_downstream_error_psi_when_active": 7.62939453125e-06,
+        "realisation_rate_binding": 1.0,
+        "mean_flow_gpm": 4.719008922576904,
+        "abs_flow_max_gpm": 7.903731346130371,
+        "carries_flow": true
+      },
+      "VALVE-174": {
+        "commanded_psi": 80.0,
+        "n_states": 193,
+        "status_counts": {
+          "Closed": 193
+        },
+        "realised_setting_psi_min": 80.0,
+        "realised_setting_psi_max": 80.0,
+        "realised_setting_equals_command_states": 193,
+        "n_active": 0,
+        "n_active_and_holding_setting": 0,
+        "max_abs_downstream_error_psi_when_active": null,
+        "realisation_rate_binding": 0.0,
+        "mean_flow_gpm": 0.0,
+        "abs_flow_max_gpm": 0.0,
+        "carries_flow": false
+      },
+      "VALVE-175": {
+        "commanded_psi": 55.0,
+        "n_states": 193,
+        "status_counts": {
+          "Active": 193
+        },
+        "realised_setting_psi_min": 55.0,
+        "realised_setting_psi_max": 55.0,
+        "realised_setting_equals_command_states": 193,
+        "n_active": 193,
+        "n_active_and_holding_setting": 193,
+        "max_abs_downstream_error_psi_when_active": 7.62939453125e-06,
+        "realisation_rate_binding": 1.0,
+        "mean_flow_gpm": 362.9140930175781,
+        "abs_flow_max_gpm": 1082.3310546875,
+        "carries_flow": true
+      },
+      "VALVE-176": {
+        "commanded_psi": 29.762,
+        "n_states": 193,
+        "status_counts": {
+          "Active": 193
+        },
+        "realised_setting_psi_min": 29.761999130249023,
+        "realised_setting_psi_max": 29.761999130249023,
+        "realised_setting_equals_command_states": 193,
+        "n_active": 193,
+        "n_active_and_holding_setting": 193,
+        "max_abs_downstream_error_psi_when_active": 3.814697265625e-06,
+        "realisation_rate_binding": 1.0,
+        "mean_flow_gpm": 256.9053955078125,
+        "abs_flow_max_gpm": 782.033447265625,
+        "carries_flow": true
+      },
+      "VALVE-177": {
+        "commanded_psi": 45.0,
+        "n_states": 193,
+        "status_counts": {
+          "Active": 193
+        },
+        "realised_setting_psi_min": 45.0,
+        "realised_setting_psi_max": 45.0,
+        "realised_setting_equals_command_states": 193,
+        "n_active": 193,
+        "n_active_and_holding_setting": 193,
+        "max_abs_downstream_error_psi_when_active": 7.62939453125e-06,
+        "realisation_rate_binding": 1.0,
+        "mean_flow_gpm": 20.61138343811035,
+        "abs_flow_max_gpm": 55.153202056884766,
+        "carries_flow": true
+      },
+      "VALVE-178": {
+        "commanded_psi": 37.0,
+        "n_states": 193,
+        "status_counts": {
+          "Active": 193
+        },
+        "realised_setting_psi_min": 37.0,
+        "realised_setting_psi_max": 37.0,
+        "realised_setting_equals_command_states": 193,
+        "n_active": 193,
+        "n_active_and_holding_setting": 193,
+        "max_abs_downstream_error_psi_when_active": 2.288818359375e-05,
+        "realisation_rate_binding": 1.0,
+        "mean_flow_gpm": 39.23917770385742,
+        "abs_flow_max_gpm": 94.2977294921875,
+        "carries_flow": true
+      },
+      "VALVE-179": {
+        "commanded_psi": 40.0,
+        "n_states": 193,
+        "status_counts": {
+          "Closed": 193
+        },
+        "realised_setting_psi_min": 40.0,
+        "realised_setting_psi_max": 40.0,
+        "realised_setting_equals_command_states": 193,
+        "n_active": 0,
+        "n_active_and_holding_setting": 0,
+        "max_abs_downstream_error_psi_when_active": null,
+        "realisation_rate_binding": 0.0,
+        "mean_flow_gpm": 0.0,
+        "abs_flow_max_gpm": 0.0,
+        "carries_flow": false
+      },
+      "VALVE-180": {
+        "commanded_psi": 16.45,
+        "n_states": 193,
+        "status_counts": {
+          "Closed": 193
+        },
+        "realised_setting_psi_min": 0.0,
+        "realised_setting_psi_max": 0.0,
+        "realised_setting_equals_command_states": 0,
+        "n_active": 0,
+        "n_active_and_holding_setting": 0,
+        "max_abs_downstream_error_psi_when_active": null,
+        "realisation_rate_binding": 0.0,
+        "mean_flow_gpm": 0.0,
+        "abs_flow_max_gpm": 0.0,
+        "carries_flow": false
+      }
+    },
+    "pump": {
+      "PUMP-170": {
+        "commanded_speed": 1.0,
+        "n_states": 193,
+        "status_counts": {
+          "Closed": 151,
+          "Open": 42
+        },
+        "n_open": 42,
+        "open_fraction": 0.21761658031088082,
+        "realised_speed_values": [
+          0.0,
+          1.0
+        ],
+        "realised_equals_command_while_open": 42,
+        "realisation_rate_while_open": 1.0,
+        "realisation_rate_over_horizon": 0.21761658031088082,
+        "mean_flow_gpm": 165.78318786621094,
+        "max_flow_gpm": 766.2021484375,
+        "mean_head_gain_ft_when_open": 371.365478515625,
+        "overridden_by_hydraulics": false
+      },
+      "PUMP-172": {
+        "commanded_speed": 1.0,
+        "n_states": 193,
+        "status_counts": {
+          "Closed": 119,
+          "Open": 74
+        },
+        "n_open": 74,
+        "open_fraction": 0.38341968911917096,
+        "realised_speed_values": [
+          0.0,
+          1.0
+        ],
+        "realised_equals_command_while_open": 74,
+        "realisation_rate_while_open": 1.0,
+        "realisation_rate_over_horizon": 0.38341968911917096,
+        "mean_flow_gpm": 922.56640625,
+        "max_flow_gpm": 2416.464599609375,
+        "mean_head_gain_ft_when_open": 439.4852600097656,
+        "overridden_by_hydraulics": false
+      }
+    },
+    "echo": {
+      "echo_file": "D:\\Thesis\\results\\phase5\\_tmp\\g12_nominal_echo.inp",
+      "valves": {
+        "VALVE-173": {
+          "type": "PRV",
+          "setting_psi": 70.0
+        },
+        "VALVE-174": {
+          "type": "PRV",
+          "setting_psi": 80.0
+        },
+        "VALVE-175": {
+          "type": "PRV",
+          "setting_psi": 55.0
+        },
+        "VALVE-176": {
+          "type": "PRV",
+          "setting_psi": 29.762
+        },
+        "VALVE-177": {
+          "type": "PRV",
+          "setting_psi": 45.0
+        },
+        "VALVE-178": {
+          "type": "PRV",
+          "setting_psi": 37.0
+        },
+        "VALVE-179": {
+          "type": "PRV",
+          "setting_psi": 40.0
+        },
+        "VALVE-180": {
+          "type": "PRV",
+          "setting_psi": 16.45
+        }
+      },
+      "pumps": {
+        "PUMP-170": {
+          "keywords": {
+            "HEAD": "CURVE-0"
+          },
+          "speed_token": null,
+          "speed_effective": 1.0
+        },
+        "PUMP-172": {
+          "keywords": {
+            "HEAD": "CURVE-2"
+          },
+          "speed_token": null,
+          "speed_effective": 1.0
+        }
+      }
+    },
+    "report_scan": {
+      "rpt_found": true,
+      "n_error_lines": 0,
+      "n_warning_lines": 0,
+      "flagged_lines": []
+    }
+  },
+  "per_actuator": {
+    "VALVE-173": {
+      "kind": "prv",
+      "nominal_psi": 70.0,
+      "n_commands_tested": 2,
+      "all_reached_engine": true,
+      "mean_binding_realisation_rate": 0.5,
+      "n_commands_with_measurable_effect": 2,
+      "n_commands_inert": 0,
+      "n_commands_driving_negative_pressure": 0,
+      "nominal_status_counts": {
+        "Active": 193
+      },
+      "nominal_carries_flow": true,
+      "commands": {
+        "prv_VALVE-173_x0.75": {
+          "commanded_psi": 52.5,
+          "status_counts": {
+            "Closed": 193
+          },
+          "binding_rate": 0.0,
+          "max_abs_d_nodal_mean_pressure_psi": 15.56491470336914,
+          "d_mean_leakage_gpm": -0.27873038716255394,
+          "has_measurable_effect": true,
+          "min_service_pressure_psi": 4.1653947830200195
+        },
+        "prv_VALVE-173_x1.25": {
+          "commanded_psi": 87.5,
+          "status_counts": {
+            "Active": 193
+          },
+          "binding_rate": 1.0,
+          "max_abs_d_nodal_mean_pressure_psi": 17.500022888183594,
+          "d_mean_leakage_gpm": 0.2863540146405654,
+          "has_measurable_effect": true,
+          "min_service_pressure_psi": 4.163622856140137
+        }
+      }
+    },
+    "VALVE-174": {
+      "kind": "prv",
+      "nominal_psi": 80.0,
+      "n_commands_tested": 2,
+      "all_reached_engine": true,
+      "mean_binding_realisation_rate": 0.5,
+      "n_commands_with_measurable_effect": 1,
+      "n_commands_inert": 1,
+      "n_commands_driving_negative_pressure": 0,
+      "nominal_status_counts": {
+        "Closed": 193
+      },
+      "nominal_carries_flow": false,
+      "commands": {
+        "prv_VALVE-174_x0.75": {
+          "commanded_psi": 60.0,
+          "status_counts": {
+            "Closed": 193
+          },
+          "binding_rate": 0.0,
+          "max_abs_d_nodal_mean_pressure_psi": 0.0,
+          "d_mean_leakage_gpm": 0.0,
+          "has_measurable_effect": false,
+          "min_service_pressure_psi": 4.16452169418335
+        },
+        "prv_VALVE-174_x1.25": {
+          "commanded_psi": 100.0,
+          "status_counts": {
+            "Active": 193
+          },
+          "binding_rate": 1.0,
+          "max_abs_d_nodal_mean_pressure_psi": 4.435546875,
+          "d_mean_leakage_gpm": 0.07475139551387144,
+          "has_measurable_effect": true,
+          "min_service_pressure_psi": 4.164283752441406
+        }
+      }
+    },
+    "VALVE-175": {
+      "kind": "prv",
+      "nominal_psi": 55.0,
+      "n_commands_tested": 2,
+      "all_reached_engine": true,
+      "mean_binding_realisation_rate": 1.0,
+      "n_commands_with_measurable_effect": 2,
+      "n_commands_inert": 0,
+      "n_commands_driving_negative_pressure": 0,
+      "nominal_status_counts": {
+        "Active": 193
+      },
+      "nominal_carries_flow": true,
+      "commands": {
+        "prv_VALVE-175_x0.75": {
+          "commanded_psi": 41.25,
+          "status_counts": {
+            "Active": 193
+          },
+          "binding_rate": 1.0,
+          "max_abs_d_nodal_mean_pressure_psi": 13.75,
+          "d_mean_leakage_gpm": -0.7151145997931536,
+          "has_measurable_effect": true,
+          "min_service_pressure_psi": 4.166743278503418
+        },
+        "prv_VALVE-175_x1.25": {
+          "commanded_psi": 68.75,
+          "status_counts": {
+            "Active": 193
+          },
+          "binding_rate": 1.0,
+          "max_abs_d_nodal_mean_pressure_psi": 13.750003814697266,
+          "d_mean_leakage_gpm": 0.6591360930213597,
+          "has_measurable_effect": true,
+          "min_service_pressure_psi": 4.162432670593262
+        }
+      }
+    },
+    "VALVE-176": {
+      "kind": "prv",
+      "nominal_psi": 29.762,
+      "n_commands_tested": 2,
+      "all_reached_engine": true,
+      "mean_binding_realisation_rate": 1.0,
+      "n_commands_with_measurable_effect": 2,
+      "n_commands_inert": 0,
+      "n_commands_driving_negative_pressure": 0,
+      "nominal_status_counts": {
+        "Active": 193
+      },
+      "nominal_carries_flow": true,
+      "commands": {
+        "prv_VALVE-176_x0.75": {
+          "commanded_psi": 22.3215,
+          "status_counts": {
+            "Active": 193
+          },
+          "binding_rate": 1.0,
+          "max_abs_d_nodal_mean_pressure_psi": 7.4405059814453125,
+          "d_mean_leakage_gpm": -0.4607634113807393,
+          "has_measurable_effect": true,
+          "min_service_pressure_psi": 4.1850972175598145
+        },
+        "prv_VALVE-176_x1.25": {
+          "commanded_psi": 37.2025,
+          "status_counts": {
+            "Active": 193
+          },
+          "binding_rate": 1.0,
+          "max_abs_d_nodal_mean_pressure_psi": 7.440488815307617,
+          "d_mean_leakage_gpm": 0.3850252474696987,
+          "has_measurable_effect": true,
+          "min_service_pressure_psi": 4.16846227645874
+        }
+      }
+    },
+    "VALVE-177": {
+      "kind": "prv",
+      "nominal_psi": 45.0,
+      "n_commands_tested": 2,
+      "all_reached_engine": true,
+      "mean_binding_realisation_rate": 1.0,
+      "n_commands_with_measurable_effect": 2,
+      "n_commands_inert": 0,
+      "n_commands_driving_negative_pressure": 0,
+      "nominal_status_counts": {
+        "Active": 193
+      },
+      "nominal_carries_flow": true,
+      "commands": {
+        "prv_VALVE-177_x0.75": {
+          "commanded_psi": 33.75,
+          "status_counts": {
+            "Active": 193
+          },
+          "binding_rate": 1.0,
+          "max_abs_d_nodal_mean_pressure_psi": 11.249992370605469,
+          "d_mean_leakage_gpm": -0.14483965719888658,
+          "has_measurable_effect": true,
+          "min_service_pressure_psi": 4.16452169418335
+        },
+        "prv_VALVE-177_x1.25": {
+          "commanded_psi": 56.25,
+          "status_counts": {
+            "Active": 193
+          },
+          "binding_rate": 1.0,
+          "max_abs_d_nodal_mean_pressure_psi": 11.250003814697266,
+          "d_mean_leakage_gpm": 0.13384775554952455,
+          "has_measurable_effect": true,
+          "min_service_pressure_psi": 4.164495468139648
+        }
+      }
+    },
+    "VALVE-178": {
+      "kind": "prv",
+      "nominal_psi": 37.0,
+      "n_commands_tested": 2,
+      "all_reached_engine": true,
+      "mean_binding_realisation_rate": 1.0,
+      "n_commands_with_measurable_effect": 2,
+      "n_commands_inert": 0,
+      "n_commands_driving_negative_pressure": 0,
+      "nominal_status_counts": {
+        "Active": 193
+      },
+      "nominal_carries_flow": true,
+      "commands": {
+        "prv_VALVE-178_x0.75": {
+          "commanded_psi": 27.75,
+          "status_counts": {
+            "Active": 193
+          },
+          "binding_rate": 1.0,
+          "max_abs_d_nodal_mean_pressure_psi": 9.250024795532227,
+          "d_mean_leakage_gpm": -0.10744225741284197,
+          "has_measurable_effect": true,
+          "min_service_pressure_psi": 4.16452169418335
+        },
+        "prv_VALVE-178_x1.25": {
+          "commanded_psi": 46.25,
+          "status_counts": {
+            "Active": 193
+          },
+          "binding_rate": 1.0,
+          "max_abs_d_nodal_mean_pressure_psi": 9.249992370605469,
+          "d_mean_leakage_gpm": 0.09868714202701767,
+          "has_measurable_effect": true,
+          "min_service_pressure_psi": 4.16452169418335
+        }
+      }
+    },
+    "VALVE-179": {
+      "kind": "prv",
+      "nominal_psi": 40.0,
+      "n_commands_tested": 2,
+      "all_reached_engine": true,
+      "mean_binding_realisation_rate": 0.08549222797927461,
+      "n_commands_with_measurable_effect": 1,
+      "n_commands_inert": 1,
+      "n_commands_driving_negative_pressure": 1,
+      "nominal_status_counts": {
+        "Closed": 193
+      },
+      "nominal_carries_flow": false,
+      "commands": {
+        "prv_VALVE-179_x0.75": {
+          "commanded_psi": 30.0,
+          "status_counts": {
+            "Closed": 193
+          },
+          "binding_rate": 0.0,
+          "max_abs_d_nodal_mean_pressure_psi": 0.0,
+          "d_mean_leakage_gpm": 9.734435479913373e-11,
+          "has_measurable_effect": false,
+          "min_service_pressure_psi": 4.16452169418335
+        },
+        "prv_VALVE-179_x1.25": {
+          "commanded_psi": 50.0,
+          "status_counts": {
+            "Open": 160,
+            "Active": 33
+          },
+          "binding_rate": 0.17098445595854922,
+          "max_abs_d_nodal_mean_pressure_psi": 102.14826965332031,
+          "d_mean_leakage_gpm": -5.75939546009036,
+          "has_measurable_effect": true,
+          "min_service_pressure_psi": -97.08588409423828
+        }
+      }
+    },
+    "VALVE-180": {
+      "kind": "prv",
+      "nominal_psi": 16.45,
+      "n_commands_tested": 2,
+      "all_reached_engine": true,
+      "mean_binding_realisation_rate": 0.0,
+      "n_commands_with_measurable_effect": 0,
+      "n_commands_inert": 2,
+      "n_commands_driving_negative_pressure": 0,
+      "nominal_status_counts": {
+        "Closed": 193
+      },
+      "nominal_carries_flow": false,
+      "commands": {
+        "prv_VALVE-180_x0.75": {
+          "commanded_psi": 12.337499999999999,
+          "status_counts": {
+            "Closed": 193
+          },
+          "binding_rate": 0.0,
+          "max_abs_d_nodal_mean_pressure_psi": 0.0,
+          "d_mean_leakage_gpm": 0.0,
+          "has_measurable_effect": false,
+          "min_service_pressure_psi": 4.16452169418335
+        },
+        "prv_VALVE-180_x1.25": {
+          "commanded_psi": 20.5625,
+          "status_counts": {
+            "Closed": 193
+          },
+          "binding_rate": 0.0,
+          "max_abs_d_nodal_mean_pressure_psi": 0.0,
+          "d_mean_leakage_gpm": 0.0,
+          "has_measurable_effect": false,
+          "min_service_pressure_psi": 4.16452169418335
+        }
+      }
+    },
+    "PUMP-170": {
+      "kind": "pump_speed",
+      "n_commands_tested": 3,
+      "all_reached_engine": true,
+      "nominal_open_fraction": 0.21761658031088082,
+      "mean_realisation_rate_while_open": 0.13729874776386405,
+      "mean_realisation_rate_over_horizon": 0.07772020725388601,
+      "n_commands_overridden": 0,
+      "n_commands_inert": 0,
+      "mean_realisation_rate_while_open_before_first_reset": 1.0,
+      "n_commands_with_no_open_state_before_reset": 1,
+      "commands": {
+        "speed_PUMP-170_0.70": {
+          "commanded_speed": 0.7,
+          "status_counts": {
+            "Closed": 150,
+            "Open": 43
+          },
+          "open_fraction": 0.22279792746113988,
+          "realisation_rate_while_open": 0.0,
+          "realisation_rate_over_horizon": 0.12435233160621761,
+          "hours_to_first_reset": 12.0,
+          "realisation_rate_while_open_before_first_reset": null,
+          "overridden_by_hydraulics": false,
+          "max_abs_d_nodal_mean_pressure_psi": 0.1483001708984375,
+          "d_mean_leakage_gpm": -0.004360393281757524,
+          "has_measurable_effect": true,
+          "min_service_pressure_psi": 4.199140548706055
+        },
+        "speed_PUMP-170_0.85": {
+          "commanded_speed": 0.85,
+          "status_counts": {
+            "Closed": 141,
+            "Open": 52
+          },
+          "open_fraction": 0.2694300518134715,
+          "realisation_rate_while_open": 0.36538461538461536,
+          "realisation_rate_over_horizon": 0.09844559585492228,
+          "hours_to_first_reset": 30.5,
+          "realisation_rate_while_open_before_first_reset": 1.0,
+          "overridden_by_hydraulics": false,
+          "max_abs_d_nodal_mean_pressure_psi": 0.1372394561767578,
+          "d_mean_leakage_gpm": 0.008444147911689015,
+          "has_measurable_effect": true,
+          "min_service_pressure_psi": 4.228549003601074
+        },
+        "speed_PUMP-170_1.10": {
+          "commanded_speed": 1.1,
+          "status_counts": {
+            "Closed": 150,
+            "Open": 43
+          },
+          "open_fraction": 0.22279792746113988,
+          "realisation_rate_while_open": 0.046511627906976744,
+          "realisation_rate_over_horizon": 0.010362694300518135,
+          "hours_to_first_reset": 23.5,
+          "realisation_rate_while_open_before_first_reset": 1.0,
+          "overridden_by_hydraulics": false,
+          "max_abs_d_nodal_mean_pressure_psi": 0.061614990234375,
+          "d_mean_leakage_gpm": -0.0005185974532224691,
+          "has_measurable_effect": true,
+          "min_service_pressure_psi": 4.167906761169434
+        }
+      }
+    },
+    "PUMP-172": {
+      "kind": "pump_speed",
+      "n_commands_tested": 3,
+      "all_reached_engine": true,
+      "nominal_open_fraction": 0.38341968911917096,
+      "mean_realisation_rate_while_open": 0.09398148148148149,
+      "mean_realisation_rate_over_horizon": 0.07944732297063903,
+      "n_commands_overridden": 0,
+      "n_commands_inert": 0,
+      "mean_realisation_rate_while_open_before_first_reset": 1.0,
+      "n_commands_with_no_open_state_before_reset": 1,
+      "commands": {
+        "speed_PUMP-172_0.70": {
+          "commanded_speed": 0.7,
+          "status_counts": {
+            "Closed": 121,
+            "Open": 72
+          },
+          "open_fraction": 0.37305699481865284,
+          "realisation_rate_while_open": 0.0,
+          "realisation_rate_over_horizon": 0.12435233160621761,
+          "hours_to_first_reset": 12.0,
+          "realisation_rate_while_open_before_first_reset": null,
+          "overridden_by_hydraulics": false,
+          "max_abs_d_nodal_mean_pressure_psi": 0.01971435546875,
+          "d_mean_leakage_gpm": -0.0019320926045622855,
+          "has_measurable_effect": true,
+          "min_service_pressure_psi": 4.213712215423584
+        },
+        "speed_PUMP-172_0.85": {
+          "commanded_speed": 0.85,
+          "status_counts": {
+            "Closed": 113,
+            "Open": 80
+          },
+          "open_fraction": 0.41450777202072536,
+          "realisation_rate_while_open": 0.2125,
+          "realisation_rate_over_horizon": 0.08808290155440414,
+          "hours_to_first_reset": 26.0,
+          "realisation_rate_while_open_before_first_reset": 1.0,
+          "overridden_by_hydraulics": false,
+          "max_abs_d_nodal_mean_pressure_psi": 0.09828996658325195,
+          "d_mean_leakage_gpm": 0.027762910911917515,
+          "has_measurable_effect": true,
+          "min_service_pressure_psi": 4.198505401611328
+        },
+        "speed_PUMP-172_1.10": {
+          "commanded_speed": 1.1,
+          "status_counts": {
+            "Closed": 121,
+            "Open": 72
+          },
+          "open_fraction": 0.37305699481865284,
+          "realisation_rate_while_open": 0.06944444444444445,
+          "realisation_rate_over_horizon": 0.025906735751295335,
+          "hours_to_first_reset": 24.0,
+          "realisation_rate_while_open_before_first_reset": 1.0,
+          "overridden_by_hydraulics": false,
+          "max_abs_d_nodal_mean_pressure_psi": 0.013928890228271484,
+          "d_mean_leakage_gpm": -0.004112961062176623,
+          "has_measurable_effect": true,
+          "min_service_pressure_psi": 4.1614274978637695
+        }
+      }
+    }
+  },
+  "pump_speed_attribution": {
+    "design": {
+      "speed_tested": 0.85,
+      "runs": [
+        "R1_rules_intact_96h",
+        "R2_open_rule_removed_96h",
+        "R3_rules_intact_one_step"
+      ]
+    },
+    "pumps": {
+      "PUMP-170": {
+        "runs": {
+          "R1_rules_intact_96h": {
+            "controls_removed": [],
+            "duration_h": 96.0,
+            "realisation": {
+              "commanded_speed": 0.85,
+              "n_states": 193,
+              "status_counts": {
+                "Closed": 141,
+                "Open": 52
+              },
+              "n_open": 52,
+              "open_fraction": 0.2694300518134715,
+              "realised_speed_values": [
+                0.0,
+                0.85,
+                1.0
+              ],
+              "realised_equals_command_while_open": 19,
+              "realisation_rate_while_open": 0.36538461538461536,
+              "realisation_rate_over_horizon": 0.09844559585492228,
+              "mean_flow_gpm": 163.15518188476562,
+              "max_flow_gpm": 770.0234985351562,
+              "mean_head_gain_ft_when_open": 348.6737976074219,
+              "overridden_by_hydraulics": false
+            },
+            "persistence": {
+              "commanded_speed": 0.85,
+              "n_states": 193,
+              "first_reset_state_index": 61,
+              "hours_to_first_reset": 30.5,
+              "n_open_before_first_reset": 19,
+              "n_open_at_command_before_first_reset": 19,
+              "realisation_rate_while_open_before_first_reset": 1.0,
+              "n_open_after_first_reset": 33,
+              "n_open_at_command_after_first_reset": 0,
+              "n_open_at_speed_one_after_first_reset": 33,
+              "no_open_state_before_reset_hydraulically_shut": false,
+              "transition_window": [
+                {
+                  "hours": 29.0,
+                  "status": "Closed",
+                  "realised_speed": 0.0
+                },
+                {
+                  "hours": 29.5,
+                  "status": "Closed",
+                  "realised_speed": 0.0
+                },
+                {
+                  "hours": 30.0,
+                  "status": "Closed",
+                  "realised_speed": 0.0
+                },
+                {
+                  "hours": 30.5,
+                  "status": "Open",
+                  "realised_speed": 1.0
+                },
+                {
+                  "hours": 31.0,
+                  "status": "Open",
+                  "realised_speed": 1.0
+                },
+                {
+                  "hours": 31.5,
+                  "status": "Open",
+                  "realised_speed": 1.0
+                }
+              ]
+            },
+            "report_scan": {
+              "rpt_found": true,
+              "n_error_lines": 0,
+              "n_warning_lines": 0,
+              "flagged_lines": []
+            },
+            "wntr_warnings": []
+          },
+          "R2_open_rule_removed_96h": {
+            "controls_removed": [
+              "RULE-4"
+            ],
+            "duration_h": 96.0,
+            "realisation": {
+              "commanded_speed": 0.85,
+              "n_states": 193,
+              "status_counts": {
+                "Closed": 174,
+                "Open": 19
+              },
+              "n_open": 19,
+              "open_fraction": 0.09844559585492228,
+              "realised_speed_values": [
+                0.0,
+                0.85
+              ],
+              "realised_equals_command_while_open": 19,
+              "realisation_rate_while_open": 1.0,
+              "realisation_rate_over_horizon": 0.09844559585492228,
+              "mean_flow_gpm": 32.55388259887695,
+              "max_flow_gpm": 336.6236877441406,
+              "mean_head_gain_ft_when_open": 310.03399658203125,
+              "overridden_by_hydraulics": false
+            },
+            "persistence": {
+              "commanded_speed": 0.85,
+              "n_states": 193,
+              "first_reset_state_index": null,
+              "hours_to_first_reset": null,
+              "n_open_before_first_reset": 0,
+              "n_open_at_command_before_first_reset": 0,
+              "realisation_rate_while_open_before_first_reset": null,
+              "n_open_after_first_reset": 19,
+              "n_open_at_command_after_first_reset": 19,
+              "n_open_at_speed_one_after_first_reset": 0,
+              "no_open_state_before_reset_hydraulically_shut": true,
+              "transition_window": null
+            },
+            "report_scan": {
+              "rpt_found": true,
+              "n_error_lines": 0,
+              "n_warning_lines": 0,
+              "flagged_lines": []
+            },
+            "wntr_warnings": []
+          },
+          "R3_rules_intact_one_step": {
+            "controls_removed": [],
+            "duration_h": 0.5,
+            "realisation": {
+              "commanded_speed": 0.85,
+              "n_states": 2,
+              "status_counts": {
+                "Open": 2
+              },
+              "n_open": 2,
+              "open_fraction": 1.0,
+              "realised_speed_values": [
+                0.85
+              ],
+              "realised_equals_command_while_open": 2,
+              "realisation_rate_while_open": 1.0,
+              "realisation_rate_over_horizon": 1.0,
+              "mean_flow_gpm": 333.03778076171875,
+              "max_flow_gpm": 333.27142333984375,
+              "mean_head_gain_ft_when_open": 309.8498840332031,
+              "overridden_by_hydraulics": false
+            },
+            "persistence": {
+              "commanded_speed": 0.85,
+              "n_states": 2,
+              "first_reset_state_index": null,
+              "hours_to_first_reset": null,
+              "n_open_before_first_reset": 0,
+              "n_open_at_command_before_first_reset": 0,
+              "realisation_rate_while_open_before_first_reset": null,
+              "n_open_after_first_reset": 2,
+              "n_open_at_command_after_first_reset": 2,
+              "n_open_at_speed_one_after_first_reset": 0,
+              "no_open_state_before_reset_hydraulically_shut": true,
+              "transition_window": null
+            },
+            "report_scan": {
+              "rpt_found": true,
+              "n_error_lines": 0,
+              "n_warning_lines": 0,
+              "flagged_lines": []
+            },
+            "wntr_warnings": []
+          }
+        },
+        "reverts_to_speed_one_with_open_rule_present": true,
+        "holds_command_with_open_rule_removed": true,
+        "holds_command_within_one_control_step": true,
+        "mechanism_confirmed": true
+      },
+      "PUMP-172": {
+        "runs": {
+          "R1_rules_intact_96h": {
+            "controls_removed": [],
+            "duration_h": 96.0,
+            "realisation": {
+              "commanded_speed": 0.85,
+              "n_states": 193,
+              "status_counts": {
+                "Closed": 113,
+                "Open": 80
+              },
+              "n_open": 80,
+              "open_fraction": 0.41450777202072536,
+              "realised_speed_values": [
+                0.0,
+                0.85,
+                1.0
+              ],
+              "realised_equals_command_while_open": 17,
+              "realisation_rate_while_open": 0.2125,
+              "realisation_rate_over_horizon": 0.08808290155440414,
+              "mean_flow_gpm": 905.0487670898438,
+              "max_flow_gpm": 2414.0244140625,
+              "mean_head_gain_ft_when_open": 438.8447265625,
+              "overridden_by_hydraulics": false
+            },
+            "persistence": {
+              "commanded_speed": 0.85,
+              "n_states": 193,
+              "first_reset_state_index": 52,
+              "hours_to_first_reset": 26.0,
+              "n_open_before_first_reset": 17,
+              "n_open_at_command_before_first_reset": 17,
+              "realisation_rate_while_open_before_first_reset": 1.0,
+              "n_open_after_first_reset": 63,
+              "n_open_at_command_after_first_reset": 0,
+              "n_open_at_speed_one_after_first_reset": 63,
+              "no_open_state_before_reset_hydraulically_shut": false,
+              "transition_window": [
+                {
+                  "hours": 24.5,
+                  "status": "Closed",
+                  "realised_speed": 0.0
+                },
+                {
+                  "hours": 25.0,
+                  "status": "Closed",
+                  "realised_speed": 0.0
+                },
+                {
+                  "hours": 25.5,
+                  "status": "Closed",
+                  "realised_speed": 0.0
+                },
+                {
+                  "hours": 26.0,
+                  "status": "Open",
+                  "realised_speed": 1.0
+                },
+                {
+                  "hours": 26.5,
+                  "status": "Open",
+                  "realised_speed": 1.0
+                },
+                {
+                  "hours": 27.0,
+                  "status": "Open",
+                  "realised_speed": 1.0
+                }
+              ]
+            },
+            "report_scan": {
+              "rpt_found": true,
+              "n_error_lines": 0,
+              "n_warning_lines": 0,
+              "flagged_lines": []
+            },
+            "wntr_warnings": []
+          },
+          "R2_open_rule_removed_96h": {
+            "controls_removed": [
+              "RULE-1"
+            ],
+            "duration_h": 96.0,
+            "realisation": {
+              "commanded_speed": 0.85,
+              "n_states": 193,
+              "status_counts": {
+                "Closed": 176,
+                "Open": 17
+              },
+              "n_open": 17,
+              "open_fraction": 0.08808290155440414,
+              "realised_speed_values": [
+                0.0,
+                0.85
+              ],
+              "realised_equals_command_while_open": 17,
+              "realisation_rate_while_open": 1.0,
+              "realisation_rate_over_horizon": 0.08808290155440414,
+              "mean_flow_gpm": 119.61492156982422,
+              "max_flow_gpm": 1361.38525390625,
+              "mean_head_gain_ft_when_open": 436.48590087890625,
+              "overridden_by_hydraulics": false
+            },
+            "persistence": {
+              "commanded_speed": 0.85,
+              "n_states": 193,
+              "first_reset_state_index": null,
+              "hours_to_first_reset": null,
+              "n_open_before_first_reset": 0,
+              "n_open_at_command_before_first_reset": 0,
+              "realisation_rate_while_open_before_first_reset": null,
+              "n_open_after_first_reset": 17,
+              "n_open_at_command_after_first_reset": 17,
+              "n_open_at_speed_one_after_first_reset": 0,
+              "no_open_state_before_reset_hydraulically_shut": true,
+              "transition_window": null
+            },
+            "report_scan": {
+              "rpt_found": true,
+              "n_error_lines": 0,
+              "n_warning_lines": 0,
+              "flagged_lines": []
+            },
+            "wntr_warnings": []
+          },
+          "R3_rules_intact_one_step": {
+            "controls_removed": [],
+            "duration_h": 0.5,
+            "realisation": {
+              "commanded_speed": 0.85,
+              "n_states": 2,
+              "status_counts": {
+                "Open": 2
+              },
+              "n_open": 2,
+              "open_fraction": 1.0,
+              "realised_speed_values": [
+                0.85
+              ],
+              "realised_equals_command_while_open": 2,
+              "realisation_rate_while_open": 1.0,
+              "realisation_rate_over_horizon": 1.0,
+              "mean_flow_gpm": 1360.906494140625,
+              "max_flow_gpm": 1361.1357421875,
+              "mean_head_gain_ft_when_open": 436.075927734375,
+              "overridden_by_hydraulics": false
+            },
+            "persistence": {
+              "commanded_speed": 0.85,
+              "n_states": 2,
+              "first_reset_state_index": null,
+              "hours_to_first_reset": null,
+              "n_open_before_first_reset": 0,
+              "n_open_at_command_before_first_reset": 0,
+              "realisation_rate_while_open_before_first_reset": null,
+              "n_open_after_first_reset": 2,
+              "n_open_at_command_after_first_reset": 2,
+              "n_open_at_speed_one_after_first_reset": 0,
+              "no_open_state_before_reset_hydraulically_shut": true,
+              "transition_window": null
+            },
+            "report_scan": {
+              "rpt_found": true,
+              "n_error_lines": 0,
+              "n_warning_lines": 0,
+              "flagged_lines": []
+            },
+            "wntr_warnings": []
+          }
+        },
+        "reverts_to_speed_one_with_open_rule_present": true,
+        "holds_command_with_open_rule_removed": true,
+        "holds_command_within_one_control_step": true,
+        "mechanism_confirmed": true
+      }
+    },
+    "conclusion": {
+      "pumps_confirmed": [
+        "PUMP-170",
+        "PUMP-172"
+      ],
+      "n_pumps_confirmed": 2,
+      "all_confirmed": true,
+      "statement": "A rule action of the form THEN PUMP <p> STATUS IS OPEN restores the pump's relative speed to 1.0, discarding the commanded speed. The command itself is transmitted and realised exactly; it does not survive the next rule-driven reopening."
+    }
+  },
+  "cases": {
+    "prv_VALVE-173_x0.75": {
+      "command": {
+        "kind": "prv_setting",
+        "element": "VALVE-173",
+        "scale_of_nominal": 0.75,
+        "nominal_psi": 70.0,
+        "commanded_psi": 52.5
+      },
+      "transmission": {
+        "commanded_psi": 52.5,
+        "echoed_psi": 52.5,
+        "abs_difference_psi": 0.0,
+        "reached_engine": true
+      },
+      "realisation": {
+        "commanded_psi": 52.5,
+        "n_states": 193,
+        "status_counts": {
+          "Closed": 193
+        },
+        "realised_setting_psi_min": 52.5,
+        "realised_setting_psi_max": 52.5,
+        "realised_setting_equals_command_states": 193,
+        "n_active": 0,
+        "n_active_and_holding_setting": 0,
+        "max_abs_downstream_error_psi_when_active": null,
+        "realisation_rate_binding": 0.0,
+        "mean_flow_gpm": 0.0,
+        "abs_flow_max_gpm": 0.0,
+        "carries_flow": false
+      },
+      "effect": {
+        "d_mean_service_pressure_psi": -1.0296355485916138,
+        "max_abs_d_nodal_mean_pressure_psi": 15.56491470336914,
+        "junction_of_max_change": "JUNCTION-112",
+        "n_junctions_moved_above_tol": 8,
+        "n_junctions_moved_above_half_psi": 8,
+        "d_mean_leakage_gpm": -0.27873038716255394,
+        "d_mean_inflow_gpm": -0.00665283203125,
+        "d_mean_nodal_withdrawal_gpm": -0.279296875,
+        "min_service_pressure_psi": 4.1653947830200195,
+        "min_service_pressure_negative": false,
+        "has_measurable_effect": true
+      },
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "wntr_warnings": []
+    },
+    "prv_VALVE-173_x1.25": {
+      "command": {
+        "kind": "prv_setting",
+        "element": "VALVE-173",
+        "scale_of_nominal": 1.25,
+        "nominal_psi": 70.0,
+        "commanded_psi": 87.5
+      },
+      "transmission": {
+        "commanded_psi": 87.5,
+        "echoed_psi": 87.5,
+        "abs_difference_psi": 0.0,
+        "reached_engine": true
+      },
+      "realisation": {
+        "commanded_psi": 87.5,
+        "n_states": 193,
+        "status_counts": {
+          "Active": 193
+        },
+        "realised_setting_psi_min": 87.5,
+        "realised_setting_psi_max": 87.5,
+        "realised_setting_equals_command_states": 193,
+        "n_active": 193,
+        "n_active_and_holding_setting": 193,
+        "max_abs_downstream_error_psi_when_active": 7.62939453125e-06,
+        "realisation_rate_binding": 1.0,
+        "mean_flow_gpm": 5.005828380584717,
+        "abs_flow_max_gpm": 8.190550804138184,
+        "carries_flow": true
+      },
+      "effect": {
+        "d_mean_service_pressure_psi": 1.1579896211624146,
+        "max_abs_d_nodal_mean_pressure_psi": 17.500022888183594,
+        "junction_of_max_change": "JUNCTION-16",
+        "n_junctions_moved_above_tol": 8,
+        "n_junctions_moved_above_half_psi": 8,
+        "d_mean_leakage_gpm": 0.2863540146405654,
+        "d_mean_inflow_gpm": -0.02362060546875,
+        "d_mean_nodal_withdrawal_gpm": 0.2872314453125,
+        "min_service_pressure_psi": 4.163622856140137,
+        "min_service_pressure_negative": false,
+        "has_measurable_effect": true
+      },
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "wntr_warnings": []
+    },
+    "prv_VALVE-174_x0.75": {
+      "command": {
+        "kind": "prv_setting",
+        "element": "VALVE-174",
+        "scale_of_nominal": 0.75,
+        "nominal_psi": 80.0,
+        "commanded_psi": 60.0
+      },
+      "transmission": {
+        "commanded_psi": 60.0,
+        "echoed_psi": 60.0,
+        "abs_difference_psi": 0.0,
+        "reached_engine": true
+      },
+      "realisation": {
+        "commanded_psi": 60.0,
+        "n_states": 193,
+        "status_counts": {
+          "Closed": 193
+        },
+        "realised_setting_psi_min": 59.99999237060547,
+        "realised_setting_psi_max": 59.99999237060547,
+        "realised_setting_equals_command_states": 193,
+        "n_active": 0,
+        "n_active_and_holding_setting": 0,
+        "max_abs_downstream_error_psi_when_active": null,
+        "realisation_rate_binding": 0.0,
+        "mean_flow_gpm": 0.0,
+        "abs_flow_max_gpm": 0.0,
+        "carries_flow": false
+      },
+      "effect": {
+        "d_mean_service_pressure_psi": 0.0,
+        "max_abs_d_nodal_mean_pressure_psi": 0.0,
+        "junction_of_max_change": "JUNCTION-0",
+        "n_junctions_moved_above_tol": 0,
+        "n_junctions_moved_above_half_psi": 0,
+        "d_mean_leakage_gpm": 0.0,
+        "d_mean_inflow_gpm": 0.0,
+        "d_mean_nodal_withdrawal_gpm": 0.0,
+        "min_service_pressure_psi": 4.16452169418335,
+        "min_service_pressure_negative": false,
+        "has_measurable_effect": false
+      },
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "wntr_warnings": []
+    },
+    "prv_VALVE-174_x1.25": {
+      "command": {
+        "kind": "prv_setting",
+        "element": "VALVE-174",
+        "scale_of_nominal": 1.25,
+        "nominal_psi": 80.0,
+        "commanded_psi": 100.0
+      },
+      "transmission": {
+        "commanded_psi": 100.0,
+        "echoed_psi": 100.0,
+        "abs_difference_psi": 0.0,
+        "reached_engine": true
+      },
+      "realisation": {
+        "commanded_psi": 100.0,
+        "n_states": 193,
+        "status_counts": {
+          "Active": 193
+        },
+        "realised_setting_psi_min": 100.0,
+        "realised_setting_psi_max": 100.0,
+        "realised_setting_equals_command_states": 193,
+        "n_active": 193,
+        "n_active_and_holding_setting": 193,
+        "max_abs_downstream_error_psi_when_active": 0.0,
+        "realisation_rate_binding": 1.0,
+        "mean_flow_gpm": 4.794125556945801,
+        "abs_flow_max_gpm": 7.9788498878479,
+        "carries_flow": true
+      },
+      "effect": {
+        "d_mean_service_pressure_psi": 0.2929407060146332,
+        "max_abs_d_nodal_mean_pressure_psi": 4.435546875,
+        "junction_of_max_change": "JUNCTION-114",
+        "n_junctions_moved_above_tol": 8,
+        "n_junctions_moved_above_half_psi": 8,
+        "d_mean_leakage_gpm": 0.07475139551387144,
+        "d_mean_inflow_gpm": 0.00164794921875,
+        "d_mean_nodal_withdrawal_gpm": 0.07513427734375,
+        "min_service_pressure_psi": 4.164283752441406,
+        "min_service_pressure_negative": false,
+        "has_measurable_effect": true
+      },
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "wntr_warnings": []
+    },
+    "prv_VALVE-175_x0.75": {
+      "command": {
+        "kind": "prv_setting",
+        "element": "VALVE-175",
+        "scale_of_nominal": 0.75,
+        "nominal_psi": 55.0,
+        "commanded_psi": 41.25
+      },
+      "transmission": {
+        "commanded_psi": 41.25,
+        "echoed_psi": 41.25,
+        "abs_difference_psi": 0.0,
+        "reached_engine": true
+      },
+      "realisation": {
+        "commanded_psi": 41.25,
+        "n_states": 193,
+        "status_counts": {
+          "Active": 193
+        },
+        "realised_setting_psi_min": 41.25,
+        "realised_setting_psi_max": 41.25,
+        "realised_setting_equals_command_states": 193,
+        "n_active": 193,
+        "n_active_and_holding_setting": 193,
+        "max_abs_downstream_error_psi_when_active": 7.62939453125e-06,
+        "realisation_rate_binding": 1.0,
+        "mean_flow_gpm": 362.19671630859375,
+        "abs_flow_max_gpm": 1081.6121826171875,
+        "carries_flow": true
+      },
+      "effect": {
+        "d_mean_service_pressure_psi": -1.816872477531433,
+        "max_abs_d_nodal_mean_pressure_psi": 13.75,
+        "junction_of_max_change": "JUNCTION-116",
+        "n_junctions_moved_above_tol": 16,
+        "n_junctions_moved_above_half_psi": 16,
+        "d_mean_leakage_gpm": -0.7151145997931536,
+        "d_mean_inflow_gpm": -0.01666259765625,
+        "d_mean_nodal_withdrawal_gpm": -0.71661376953125,
+        "min_service_pressure_psi": 4.166743278503418,
+        "min_service_pressure_negative": false,
+        "has_measurable_effect": true
+      },
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "wntr_warnings": []
+    },
+    "prv_VALVE-175_x1.25": {
+      "command": {
+        "kind": "prv_setting",
+        "element": "VALVE-175",
+        "scale_of_nominal": 1.25,
+        "nominal_psi": 55.0,
+        "commanded_psi": 68.75
+      },
+      "transmission": {
+        "commanded_psi": 68.75,
+        "echoed_psi": 68.75,
+        "abs_difference_psi": 0.0,
+        "reached_engine": true
+      },
+      "realisation": {
+        "commanded_psi": 68.75,
+        "n_states": 193,
+        "status_counts": {
+          "Active": 193
+        },
+        "realised_setting_psi_min": 68.75,
+        "realised_setting_psi_max": 68.75,
+        "realised_setting_equals_command_states": 193,
+        "n_active": 193,
+        "n_active_and_holding_setting": 193,
+        "max_abs_downstream_error_psi_when_active": 7.62939453125e-06,
+        "realisation_rate_binding": 1.0,
+        "mean_flow_gpm": 363.575439453125,
+        "abs_flow_max_gpm": 1082.993408203125,
+        "carries_flow": true
+      },
+      "effect": {
+        "d_mean_service_pressure_psi": 1.8172141313552856,
+        "max_abs_d_nodal_mean_pressure_psi": 13.750003814697266,
+        "junction_of_max_change": "JUNCTION-116",
+        "n_junctions_moved_above_tol": 17,
+        "n_junctions_moved_above_half_psi": 16,
+        "d_mean_leakage_gpm": 0.6591360930213597,
+        "d_mean_inflow_gpm": -12.4970703125,
+        "d_mean_nodal_withdrawal_gpm": 0.66094970703125,
+        "min_service_pressure_psi": 4.162432670593262,
+        "min_service_pressure_negative": false,
+        "has_measurable_effect": true
+      },
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "wntr_warnings": []
+    },
+    "prv_VALVE-176_x0.75": {
+      "command": {
+        "kind": "prv_setting",
+        "element": "VALVE-176",
+        "scale_of_nominal": 0.75,
+        "nominal_psi": 29.762,
+        "commanded_psi": 22.3215
+      },
+      "transmission": {
+        "commanded_psi": 22.3215,
+        "echoed_psi": 22.3215,
+        "abs_difference_psi": 0.0,
+        "reached_engine": true
+      },
+      "realisation": {
+        "commanded_psi": 22.3215,
+        "n_states": 193,
+        "status_counts": {
+          "Active": 193
+        },
+        "realised_setting_psi_min": 22.321500778198242,
+        "realised_setting_psi_max": 22.321500778198242,
+        "realised_setting_equals_command_states": 193,
+        "n_active": 193,
+        "n_active_and_holding_setting": 193,
+        "max_abs_downstream_error_psi_when_active": 5.7220458984375e-06,
+        "realisation_rate_binding": 1.0,
+        "mean_flow_gpm": 215.57150268554688,
+        "abs_flow_max_gpm": 656.4352416992188,
+        "carries_flow": true
+      },
+      "effect": {
+        "d_mean_service_pressure_psi": -0.10697317868471146,
+        "max_abs_d_nodal_mean_pressure_psi": 7.4405059814453125,
+        "junction_of_max_change": "JUNCTION-118",
+        "n_junctions_moved_above_tol": 98,
+        "n_junctions_moved_above_half_psi": 2,
+        "d_mean_leakage_gpm": -0.4607634113807393,
+        "d_mean_inflow_gpm": -50.013427734375,
+        "d_mean_nodal_withdrawal_gpm": -41.32659912109375,
+        "min_service_pressure_psi": 4.1850972175598145,
+        "min_service_pressure_negative": false,
+        "has_measurable_effect": true
+      },
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "wntr_warnings": []
+    },
+    "prv_VALVE-176_x1.25": {
+      "command": {
+        "kind": "prv_setting",
+        "element": "VALVE-176",
+        "scale_of_nominal": 1.25,
+        "nominal_psi": 29.762,
+        "commanded_psi": 37.2025
+      },
+      "transmission": {
+        "commanded_psi": 37.2025,
+        "echoed_psi": 37.2025,
+        "abs_difference_psi": 0.0,
+        "reached_engine": true
+      },
+      "realisation": {
+        "commanded_psi": 37.2025,
+        "n_states": 193,
+        "status_counts": {
+          "Active": 193
+        },
+        "realised_setting_psi_min": 37.20249938964844,
+        "realised_setting_psi_max": 37.20249938964844,
+        "realised_setting_equals_command_states": 193,
+        "n_active": 193,
+        "n_active_and_holding_setting": 193,
+        "max_abs_downstream_error_psi_when_active": 3.814697265625e-06,
+        "realisation_rate_binding": 1.0,
+        "mean_flow_gpm": 272.3380432128906,
+        "abs_flow_max_gpm": 830.17626953125,
+        "carries_flow": true
+      },
+      "effect": {
+        "d_mean_service_pressure_psi": 0.1161109209060669,
+        "max_abs_d_nodal_mean_pressure_psi": 7.440488815307617,
+        "junction_of_max_change": "JUNCTION-118",
+        "n_junctions_moved_above_tol": 15,
+        "n_junctions_moved_above_half_psi": 2,
+        "d_mean_leakage_gpm": 0.3850252474696987,
+        "d_mean_inflow_gpm": -0.005859375,
+        "d_mean_nodal_withdrawal_gpm": 15.4295654296875,
+        "min_service_pressure_psi": 4.16846227645874,
+        "min_service_pressure_negative": false,
+        "has_measurable_effect": true
+      },
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "wntr_warnings": []
+    },
+    "prv_VALVE-177_x0.75": {
+      "command": {
+        "kind": "prv_setting",
+        "element": "VALVE-177",
+        "scale_of_nominal": 0.75,
+        "nominal_psi": 45.0,
+        "commanded_psi": 33.75
+      },
+      "transmission": {
+        "commanded_psi": 33.75,
+        "echoed_psi": 33.75,
+        "abs_difference_psi": 0.0,
+        "reached_engine": true
+      },
+      "realisation": {
+        "commanded_psi": 33.75,
+        "n_states": 193,
+        "status_counts": {
+          "Active": 193
+        },
+        "realised_setting_psi_min": 33.75,
+        "realised_setting_psi_max": 33.75,
+        "realised_setting_equals_command_states": 193,
+        "n_active": 193,
+        "n_active_and_holding_setting": 193,
+        "max_abs_downstream_error_psi_when_active": 7.62939453125e-06,
+        "realisation_rate_binding": 1.0,
+        "mean_flow_gpm": 20.466020584106445,
+        "abs_flow_max_gpm": 55.00783157348633,
+        "carries_flow": true
+      },
+      "effect": {
+        "d_mean_service_pressure_psi": -0.27828049659729004,
+        "max_abs_d_nodal_mean_pressure_psi": 11.249992370605469,
+        "junction_of_max_change": "JUNCTION-45",
+        "n_junctions_moved_above_tol": 3,
+        "n_junctions_moved_above_half_psi": 3,
+        "d_mean_leakage_gpm": -0.14483965719888658,
+        "d_mean_inflow_gpm": -0.0047607421875,
+        "d_mean_nodal_withdrawal_gpm": -0.1448974609375,
+        "min_service_pressure_psi": 4.16452169418335,
+        "min_service_pressure_negative": false,
+        "has_measurable_effect": true
+      },
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "wntr_warnings": []
+    },
+    "prv_VALVE-177_x1.25": {
+      "command": {
+        "kind": "prv_setting",
+        "element": "VALVE-177",
+        "scale_of_nominal": 1.25,
+        "nominal_psi": 45.0,
+        "commanded_psi": 56.25
+      },
+      "transmission": {
+        "commanded_psi": 56.25,
+        "echoed_psi": 56.25,
+        "abs_difference_psi": 0.0,
+        "reached_engine": true
+      },
+      "realisation": {
+        "commanded_psi": 56.25,
+        "n_states": 193,
+        "status_counts": {
+          "Active": 193
+        },
+        "realised_setting_psi_min": 56.249996185302734,
+        "realised_setting_psi_max": 56.249996185302734,
+        "realised_setting_equals_command_states": 193,
+        "n_active": 193,
+        "n_active_and_holding_setting": 193,
+        "max_abs_downstream_error_psi_when_active": 0.0,
+        "realisation_rate_binding": 1.0,
+        "mean_flow_gpm": 20.74466896057129,
+        "abs_flow_max_gpm": 55.2864875793457,
+        "carries_flow": true
+      },
+      "effect": {
+        "d_mean_service_pressure_psi": 0.28069019317626953,
+        "max_abs_d_nodal_mean_pressure_psi": 11.250003814697266,
+        "junction_of_max_change": "JUNCTION-120",
+        "n_junctions_moved_above_tol": 3,
+        "n_junctions_moved_above_half_psi": 3,
+        "d_mean_leakage_gpm": 0.13384775554952455,
+        "d_mean_inflow_gpm": -0.02459716796875,
+        "d_mean_nodal_withdrawal_gpm": 0.1341552734375,
+        "min_service_pressure_psi": 4.164495468139648,
+        "min_service_pressure_negative": false,
+        "has_measurable_effect": true
+      },
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "wntr_warnings": []
+    },
+    "prv_VALVE-178_x0.75": {
+      "command": {
+        "kind": "prv_setting",
+        "element": "VALVE-178",
+        "scale_of_nominal": 0.75,
+        "nominal_psi": 37.0,
+        "commanded_psi": 27.75
+      },
+      "transmission": {
+        "commanded_psi": 27.75,
+        "echoed_psi": 27.75,
+        "abs_difference_psi": 0.0,
+        "reached_engine": true
+      },
+      "realisation": {
+        "commanded_psi": 27.75,
+        "n_states": 193,
+        "status_counts": {
+          "Active": 193
+        },
+        "realised_setting_psi_min": 27.75,
+        "realised_setting_psi_max": 27.75,
+        "realised_setting_equals_command_states": 193,
+        "n_active": 193,
+        "n_active_and_holding_setting": 193,
+        "max_abs_downstream_error_psi_when_active": 1.9073486328125e-06,
+        "realisation_rate_binding": 1.0,
+        "mean_flow_gpm": 39.13124465942383,
+        "abs_flow_max_gpm": 94.1897964477539,
+        "carries_flow": true
+      },
+      "effect": {
+        "d_mean_service_pressure_psi": -0.15244778990745544,
+        "max_abs_d_nodal_mean_pressure_psi": 9.250024795532227,
+        "junction_of_max_change": "JUNCTION-122",
+        "n_junctions_moved_above_tol": 2,
+        "n_junctions_moved_above_half_psi": 2,
+        "d_mean_leakage_gpm": -0.10744225741284197,
+        "d_mean_inflow_gpm": -0.00225830078125,
+        "d_mean_nodal_withdrawal_gpm": -0.10748291015625,
+        "min_service_pressure_psi": 4.16452169418335,
+        "min_service_pressure_negative": false,
+        "has_measurable_effect": true
+      },
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "wntr_warnings": []
+    },
+    "prv_VALVE-178_x1.25": {
+      "command": {
+        "kind": "prv_setting",
+        "element": "VALVE-178",
+        "scale_of_nominal": 1.25,
+        "nominal_psi": 37.0,
+        "commanded_psi": 46.25
+      },
+      "transmission": {
+        "commanded_psi": 46.25,
+        "echoed_psi": 46.25,
+        "abs_difference_psi": 0.0,
+        "reached_engine": true
+      },
+      "realisation": {
+        "commanded_psi": 46.25,
+        "n_states": 193,
+        "status_counts": {
+          "Active": 193
+        },
+        "realised_setting_psi_min": 46.25,
+        "realised_setting_psi_max": 46.25,
+        "realised_setting_equals_command_states": 193,
+        "n_active": 193,
+        "n_active_and_holding_setting": 193,
+        "max_abs_downstream_error_psi_when_active": 1.52587890625e-05,
+        "realisation_rate_binding": 1.0,
+        "mean_flow_gpm": 39.33732986450195,
+        "abs_flow_max_gpm": 94.39588928222656,
+        "carries_flow": true
+      },
+      "effect": {
+        "d_mean_service_pressure_psi": 0.154702290892601,
+        "max_abs_d_nodal_mean_pressure_psi": 9.249992370605469,
+        "junction_of_max_change": "JUNCTION-123",
+        "n_junctions_moved_above_tol": 2,
+        "n_junctions_moved_above_half_psi": 2,
+        "d_mean_leakage_gpm": 0.09868714202701767,
+        "d_mean_inflow_gpm": -0.02471923828125,
+        "d_mean_nodal_withdrawal_gpm": 0.0989990234375,
+        "min_service_pressure_psi": 4.16452169418335,
+        "min_service_pressure_negative": false,
+        "has_measurable_effect": true
+      },
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "wntr_warnings": []
+    },
+    "prv_VALVE-179_x0.75": {
+      "command": {
+        "kind": "prv_setting",
+        "element": "VALVE-179",
+        "scale_of_nominal": 0.75,
+        "nominal_psi": 40.0,
+        "commanded_psi": 30.0
+      },
+      "transmission": {
+        "commanded_psi": 30.0,
+        "echoed_psi": 30.0,
+        "abs_difference_psi": 0.0,
+        "reached_engine": true
+      },
+      "realisation": {
+        "commanded_psi": 30.0,
+        "n_states": 193,
+        "status_counts": {
+          "Closed": 193
+        },
+        "realised_setting_psi_min": 29.999996185302734,
+        "realised_setting_psi_max": 29.999996185302734,
+        "realised_setting_equals_command_states": 193,
+        "n_active": 0,
+        "n_active_and_holding_setting": 0,
+        "max_abs_downstream_error_psi_when_active": null,
+        "realisation_rate_binding": 0.0,
+        "mean_flow_gpm": 0.0,
+        "abs_flow_max_gpm": 0.0,
+        "carries_flow": false
+      },
+      "effect": {
+        "d_mean_service_pressure_psi": 0.0,
+        "max_abs_d_nodal_mean_pressure_psi": 0.0,
+        "junction_of_max_change": "JUNCTION-0",
+        "n_junctions_moved_above_tol": 0,
+        "n_junctions_moved_above_half_psi": 0,
+        "d_mean_leakage_gpm": 9.734435479913373e-11,
+        "d_mean_inflow_gpm": 0.0,
+        "d_mean_nodal_withdrawal_gpm": 0.0,
+        "min_service_pressure_psi": 4.16452169418335,
+        "min_service_pressure_negative": false,
+        "has_measurable_effect": false
+      },
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "wntr_warnings": []
+    },
+    "prv_VALVE-179_x1.25": {
+      "command": {
+        "kind": "prv_setting",
+        "element": "VALVE-179",
+        "scale_of_nominal": 1.25,
+        "nominal_psi": 40.0,
+        "commanded_psi": 50.0
+      },
+      "transmission": {
+        "commanded_psi": 50.0,
+        "echoed_psi": 50.0,
+        "abs_difference_psi": 0.0,
+        "reached_engine": true
+      },
+      "realisation": {
+        "commanded_psi": 50.0,
+        "n_states": 193,
+        "status_counts": {
+          "Open": 160,
+          "Active": 33
+        },
+        "realised_setting_psi_min": 50.0,
+        "realised_setting_psi_max": 50.0,
+        "realised_setting_equals_command_states": 193,
+        "n_active": 33,
+        "n_active_and_holding_setting": 33,
+        "max_abs_downstream_error_psi_when_active": 0.0,
+        "realisation_rate_binding": 0.17098445595854922,
+        "mean_flow_gpm": 1309.6092529296875,
+        "abs_flow_max_gpm": 1882.00048828125,
+        "carries_flow": true
+      },
+      "effect": {
+        "d_mean_service_pressure_psi": -5.058530807495117,
+        "max_abs_d_nodal_mean_pressure_psi": 102.14826965332031,
+        "junction_of_max_change": "JUNCTION-121",
+        "n_junctions_moved_above_tol": 94,
+        "n_junctions_moved_above_half_psi": 64,
+        "d_mean_leakage_gpm": -5.75939546009036,
+        "d_mean_inflow_gpm": -326.05633544921875,
+        "d_mean_nodal_withdrawal_gpm": -106.55828857421875,
+        "min_service_pressure_psi": -97.08588409423828,
+        "min_service_pressure_negative": true,
+        "has_measurable_effect": true
+      },
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "wntr_warnings": []
+    },
+    "prv_VALVE-180_x0.75": {
+      "command": {
+        "kind": "prv_setting",
+        "element": "VALVE-180",
+        "scale_of_nominal": 0.75,
+        "nominal_psi": 16.45,
+        "commanded_psi": 12.337499999999999
+      },
+      "transmission": {
+        "commanded_psi": 12.337499999999999,
+        "echoed_psi": 12.3375,
+        "abs_difference_psi": 1.7763568394002505e-15,
+        "reached_engine": true
+      },
+      "realisation": {
+        "commanded_psi": 12.337499999999999,
+        "n_states": 193,
+        "status_counts": {
+          "Closed": 193
+        },
+        "realised_setting_psi_min": 0.0,
+        "realised_setting_psi_max": 0.0,
+        "realised_setting_equals_command_states": 0,
+        "n_active": 0,
+        "n_active_and_holding_setting": 0,
+        "max_abs_downstream_error_psi_when_active": null,
+        "realisation_rate_binding": 0.0,
+        "mean_flow_gpm": 0.0,
+        "abs_flow_max_gpm": 0.0,
+        "carries_flow": false
+      },
+      "effect": {
+        "d_mean_service_pressure_psi": 0.0,
+        "max_abs_d_nodal_mean_pressure_psi": 0.0,
+        "junction_of_max_change": "JUNCTION-0",
+        "n_junctions_moved_above_tol": 0,
+        "n_junctions_moved_above_half_psi": 0,
+        "d_mean_leakage_gpm": 0.0,
+        "d_mean_inflow_gpm": 0.0,
+        "d_mean_nodal_withdrawal_gpm": 0.0,
+        "min_service_pressure_psi": 4.16452169418335,
+        "min_service_pressure_negative": false,
+        "has_measurable_effect": false
+      },
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "wntr_warnings": []
+    },
+    "prv_VALVE-180_x1.25": {
+      "command": {
+        "kind": "prv_setting",
+        "element": "VALVE-180",
+        "scale_of_nominal": 1.25,
+        "nominal_psi": 16.45,
+        "commanded_psi": 20.5625
+      },
+      "transmission": {
+        "commanded_psi": 20.5625,
+        "echoed_psi": 20.5625,
+        "abs_difference_psi": 0.0,
+        "reached_engine": true
+      },
+      "realisation": {
+        "commanded_psi": 20.5625,
+        "n_states": 193,
+        "status_counts": {
+          "Closed": 193
+        },
+        "realised_setting_psi_min": 0.0,
+        "realised_setting_psi_max": 0.0,
+        "realised_setting_equals_command_states": 0,
+        "n_active": 0,
+        "n_active_and_holding_setting": 0,
+        "max_abs_downstream_error_psi_when_active": null,
+        "realisation_rate_binding": 0.0,
+        "mean_flow_gpm": 0.0,
+        "abs_flow_max_gpm": 0.0,
+        "carries_flow": false
+      },
+      "effect": {
+        "d_mean_service_pressure_psi": 0.0,
+        "max_abs_d_nodal_mean_pressure_psi": 0.0,
+        "junction_of_max_change": "JUNCTION-0",
+        "n_junctions_moved_above_tol": 0,
+        "n_junctions_moved_above_half_psi": 0,
+        "d_mean_leakage_gpm": 0.0,
+        "d_mean_inflow_gpm": 0.0,
+        "d_mean_nodal_withdrawal_gpm": 0.0,
+        "min_service_pressure_psi": 4.16452169418335,
+        "min_service_pressure_negative": false,
+        "has_measurable_effect": false
+      },
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "wntr_warnings": []
+    },
+    "speed_PUMP-170_0.70": {
+      "command": {
+        "kind": "pump_speed",
+        "element": "PUMP-170",
+        "commanded_speed": 0.7
+      },
+      "transmission": {
+        "commanded_speed": 0.7,
+        "echoed_speed": 0.7,
+        "speed_token_present": true,
+        "reached_engine": true
+      },
+      "realisation": {
+        "commanded_speed": 0.7,
+        "n_states": 193,
+        "status_counts": {
+          "Closed": 150,
+          "Open": 43
+        },
+        "n_open": 43,
+        "open_fraction": 0.22279792746113988,
+        "realised_speed_values": [
+          0.0,
+          0.7,
+          1.0
+        ],
+        "realised_equals_command_while_open": 0,
+        "realisation_rate_while_open": 0.0,
+        "realisation_rate_over_horizon": 0.12435233160621761,
+        "mean_flow_gpm": 170.27542114257812,
+        "max_flow_gpm": 772.65234375,
+        "mean_head_gain_ft_when_open": 370.8218994140625,
+        "overridden_by_hydraulics": false
+      },
+      "persistence": {
+        "commanded_speed": 0.7,
+        "n_states": 193,
+        "first_reset_state_index": 24,
+        "hours_to_first_reset": 12.0,
+        "n_open_before_first_reset": 0,
+        "n_open_at_command_before_first_reset": 0,
+        "realisation_rate_while_open_before_first_reset": null,
+        "n_open_after_first_reset": 43,
+        "n_open_at_command_after_first_reset": 0,
+        "n_open_at_speed_one_after_first_reset": 43,
+        "no_open_state_before_reset_hydraulically_shut": true,
+        "transition_window": [
+          {
+            "hours": 10.5,
+            "status": "Closed",
+            "realised_speed": 0.7
+          },
+          {
+            "hours": 11.0,
+            "status": "Closed",
+            "realised_speed": 0.7
+          },
+          {
+            "hours": 11.5,
+            "status": "Closed",
+            "realised_speed": 0.7
+          },
+          {
+            "hours": 12.0,
+            "status": "Open",
+            "realised_speed": 1.0
+          },
+          {
+            "hours": 12.5,
+            "status": "Open",
+            "realised_speed": 1.0
+          },
+          {
+            "hours": 13.0,
+            "status": "Open",
+            "realised_speed": 1.0
+          }
+        ]
+      },
+      "effect": {
+        "d_mean_service_pressure_psi": -0.010896923020482063,
+        "max_abs_d_nodal_mean_pressure_psi": 0.1483001708984375,
+        "junction_of_max_change": "JUNCTION-104",
+        "n_junctions_moved_above_tol": 89,
+        "n_junctions_moved_above_half_psi": 0,
+        "d_mean_leakage_gpm": -0.004360393281757524,
+        "d_mean_inflow_gpm": -25.3575439453125,
+        "d_mean_nodal_withdrawal_gpm": -0.00421142578125,
+        "min_service_pressure_psi": 4.199140548706055,
+        "min_service_pressure_negative": false,
+        "has_measurable_effect": true
+      },
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 25,
+        "flagged_lines": [
+          "WARNING: Pump PUMP-170 closed because cannot deliver head at 0:00:00 hrs.",
+          "WARNING: Pump PUMP-170 closed because cannot deliver head at 0:30:00 hrs.",
+          "WARNING: Pump PUMP-170 closed because cannot deliver head at 1:00:00 hrs.",
+          "WARNING: Pump PUMP-170 closed because cannot deliver head at 1:30:00 hrs.",
+          "WARNING: Pump PUMP-170 closed because cannot deliver head at 2:00:00 hrs.",
+          "WARNING: Pump PUMP-170 closed because cannot deliver head at 2:15:00 hrs.",
+          "WARNING: Pump PUMP-170 closed because cannot deliver head at 2:30:00 hrs.",
+          "WARNING: Pump PUMP-170 closed because cannot deliver head at 3:00:00 hrs.",
+          "WARNING: Pump PUMP-170 closed because cannot deliver head at 3:30:00 hrs.",
+          "WARNING: Pump PUMP-170 closed because cannot deliver head at 4:00:00 hrs.",
+          "WARNING: Pump PUMP-170 closed because cannot deliver head at 4:30:00 hrs.",
+          "WARNING: Pump PUMP-170 closed because cannot deliver head at 5:00:00 hrs."
+        ]
+      },
+      "wntr_warnings": []
+    },
+    "speed_PUMP-170_0.85": {
+      "command": {
+        "kind": "pump_speed",
+        "element": "PUMP-170",
+        "commanded_speed": 0.85
+      },
+      "transmission": {
+        "commanded_speed": 0.85,
+        "echoed_speed": 0.85,
+        "speed_token_present": true,
+        "reached_engine": true
+      },
+      "realisation": {
+        "commanded_speed": 0.85,
+        "n_states": 193,
+        "status_counts": {
+          "Closed": 141,
+          "Open": 52
+        },
+        "n_open": 52,
+        "open_fraction": 0.2694300518134715,
+        "realised_speed_values": [
+          0.0,
+          0.85,
+          1.0
+        ],
+        "realised_equals_command_while_open": 19,
+        "realisation_rate_while_open": 0.36538461538461536,
+        "realisation_rate_over_horizon": 0.09844559585492228,
+        "mean_flow_gpm": 163.15518188476562,
+        "max_flow_gpm": 770.0234985351562,
+        "mean_head_gain_ft_when_open": 348.6737976074219,
+        "overridden_by_hydraulics": false
+      },
+      "persistence": {
+        "commanded_speed": 0.85,
+        "n_states": 193,
+        "first_reset_state_index": 61,
+        "hours_to_first_reset": 30.5,
+        "n_open_before_first_reset": 19,
+        "n_open_at_command_before_first_reset": 19,
+        "realisation_rate_while_open_before_first_reset": 1.0,
+        "n_open_after_first_reset": 33,
+        "n_open_at_command_after_first_reset": 0,
+        "n_open_at_speed_one_after_first_reset": 33,
+        "no_open_state_before_reset_hydraulically_shut": false,
+        "transition_window": [
+          {
+            "hours": 29.0,
+            "status": "Closed",
+            "realised_speed": 0.0
+          },
+          {
+            "hours": 29.5,
+            "status": "Closed",
+            "realised_speed": 0.0
+          },
+          {
+            "hours": 30.0,
+            "status": "Closed",
+            "realised_speed": 0.0
+          },
+          {
+            "hours": 30.5,
+            "status": "Open",
+            "realised_speed": 1.0
+          },
+          {
+            "hours": 31.0,
+            "status": "Open",
+            "realised_speed": 1.0
+          },
+          {
+            "hours": 31.5,
+            "status": "Open",
+            "realised_speed": 1.0
+          }
+        ]
+      },
+      "effect": {
+        "d_mean_service_pressure_psi": 0.015667004510760307,
+        "max_abs_d_nodal_mean_pressure_psi": 0.1372394561767578,
+        "junction_of_max_change": "JUNCTION-102",
+        "n_junctions_moved_above_tol": 86,
+        "n_junctions_moved_above_half_psi": 0,
+        "d_mean_leakage_gpm": 0.008444147911689015,
+        "d_mean_inflow_gpm": -12.979736328125,
+        "d_mean_nodal_withdrawal_gpm": 0.00848388671875,
+        "min_service_pressure_psi": 4.228549003601074,
+        "min_service_pressure_negative": false,
+        "has_measurable_effect": true
+      },
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "wntr_warnings": []
+    },
+    "speed_PUMP-170_1.10": {
+      "command": {
+        "kind": "pump_speed",
+        "element": "PUMP-170",
+        "commanded_speed": 1.1
+      },
+      "transmission": {
+        "commanded_speed": 1.1,
+        "echoed_speed": 1.1,
+        "speed_token_present": true,
+        "reached_engine": true
+      },
+      "realisation": {
+        "commanded_speed": 1.1,
+        "n_states": 193,
+        "status_counts": {
+          "Closed": 150,
+          "Open": 43
+        },
+        "n_open": 43,
+        "open_fraction": 0.22279792746113988,
+        "realised_speed_values": [
+          0.0,
+          1.0,
+          1.1
+        ],
+        "realised_equals_command_while_open": 2,
+        "realisation_rate_while_open": 0.046511627906976744,
+        "realisation_rate_over_horizon": 0.010362694300518135,
+        "mean_flow_gpm": 171.82118225097656,
+        "max_flow_gpm": 968.0366821289062,
+        "mean_head_gain_ft_when_open": 373.42401123046875,
+        "overridden_by_hydraulics": false
+      },
+      "persistence": {
+        "commanded_speed": 1.1,
+        "n_states": 193,
+        "first_reset_state_index": 47,
+        "hours_to_first_reset": 23.5,
+        "n_open_before_first_reset": 2,
+        "n_open_at_command_before_first_reset": 2,
+        "realisation_rate_while_open_before_first_reset": 1.0,
+        "n_open_after_first_reset": 41,
+        "n_open_at_command_after_first_reset": 0,
+        "n_open_at_speed_one_after_first_reset": 41,
+        "no_open_state_before_reset_hydraulically_shut": false,
+        "transition_window": [
+          {
+            "hours": 22.0,
+            "status": "Closed",
+            "realised_speed": 0.0
+          },
+          {
+            "hours": 22.5,
+            "status": "Closed",
+            "realised_speed": 0.0
+          },
+          {
+            "hours": 23.0,
+            "status": "Closed",
+            "realised_speed": 0.0
+          },
+          {
+            "hours": 23.5,
+            "status": "Open",
+            "realised_speed": 1.0
+          },
+          {
+            "hours": 24.0,
+            "status": "Open",
+            "realised_speed": 1.0
+          },
+          {
+            "hours": 24.5,
+            "status": "Open",
+            "realised_speed": 1.0
+          }
+        ]
+      },
+      "effect": {
+        "d_mean_service_pressure_psi": -0.0009295605705119669,
+        "max_abs_d_nodal_mean_pressure_psi": 0.061614990234375,
+        "junction_of_max_change": "JUNCTION-104",
+        "n_junctions_moved_above_tol": 3,
+        "n_junctions_moved_above_half_psi": 0,
+        "d_mean_leakage_gpm": -0.0005185974532224691,
+        "d_mean_inflow_gpm": -12.457275390625,
+        "d_mean_nodal_withdrawal_gpm": -0.00042724609375,
+        "min_service_pressure_psi": 4.167906761169434,
+        "min_service_pressure_negative": false,
+        "has_measurable_effect": true
+      },
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "wntr_warnings": []
+    },
+    "speed_PUMP-172_0.70": {
+      "command": {
+        "kind": "pump_speed",
+        "element": "PUMP-172",
+        "commanded_speed": 0.7
+      },
+      "transmission": {
+        "commanded_speed": 0.7,
+        "echoed_speed": 0.7,
+        "speed_token_present": true,
+        "reached_engine": true
+      },
+      "realisation": {
+        "commanded_speed": 0.7,
+        "n_states": 193,
+        "status_counts": {
+          "Closed": 121,
+          "Open": 72
+        },
+        "n_open": 72,
+        "open_fraction": 0.37305699481865284,
+        "realised_speed_values": [
+          0.0,
+          0.7,
+          1.0
+        ],
+        "realised_equals_command_while_open": 0,
+        "realisation_rate_while_open": 0.0,
+        "realisation_rate_over_horizon": 0.12435233160621761,
+        "mean_flow_gpm": 897.376953125,
+        "max_flow_gpm": 2413.1962890625,
+        "mean_head_gain_ft_when_open": 439.6510009765625,
+        "overridden_by_hydraulics": false
+      },
+      "persistence": {
+        "commanded_speed": 0.7,
+        "n_states": 193,
+        "first_reset_state_index": 24,
+        "hours_to_first_reset": 12.0,
+        "n_open_before_first_reset": 0,
+        "n_open_at_command_before_first_reset": 0,
+        "realisation_rate_while_open_before_first_reset": null,
+        "n_open_after_first_reset": 72,
+        "n_open_at_command_after_first_reset": 0,
+        "n_open_at_speed_one_after_first_reset": 72,
+        "no_open_state_before_reset_hydraulically_shut": true,
+        "transition_window": [
+          {
+            "hours": 10.5,
+            "status": "Closed",
+            "realised_speed": 0.7
+          },
+          {
+            "hours": 11.0,
+            "status": "Closed",
+            "realised_speed": 0.7
+          },
+          {
+            "hours": 11.5,
+            "status": "Closed",
+            "realised_speed": 0.7
+          },
+          {
+            "hours": 12.0,
+            "status": "Open",
+            "realised_speed": 1.0
+          },
+          {
+            "hours": 12.5,
+            "status": "Open",
+            "realised_speed": 1.0
+          },
+          {
+            "hours": 13.0,
+            "status": "Open",
+            "realised_speed": 1.0
+          }
+        ]
+      },
+      "effect": {
+        "d_mean_service_pressure_psi": -0.003582840086892247,
+        "max_abs_d_nodal_mean_pressure_psi": 0.01971435546875,
+        "junction_of_max_change": "JUNCTION-34",
+        "n_junctions_moved_above_tol": 2,
+        "n_junctions_moved_above_half_psi": 0,
+        "d_mean_leakage_gpm": -0.0019320926045622855,
+        "d_mean_inflow_gpm": -25.189453125,
+        "d_mean_nodal_withdrawal_gpm": -0.0018310546875,
+        "min_service_pressure_psi": 4.213712215423584,
+        "min_service_pressure_negative": false,
+        "has_measurable_effect": true
+      },
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 25,
+        "flagged_lines": [
+          "WARNING: Pump PUMP-172 closed because cannot deliver head at 0:00:00 hrs.",
+          "WARNING: Pump PUMP-172 closed because cannot deliver head at 0:30:00 hrs.",
+          "WARNING: Pump PUMP-172 closed because cannot deliver head at 1:00:00 hrs.",
+          "WARNING: Pump PUMP-172 closed because cannot deliver head at 1:12:00 hrs.",
+          "WARNING: Pump PUMP-172 closed because cannot deliver head at 1:30:00 hrs.",
+          "WARNING: Pump PUMP-172 closed because cannot deliver head at 2:00:00 hrs.",
+          "WARNING: Pump PUMP-172 closed because cannot deliver head at 2:30:00 hrs.",
+          "WARNING: Pump PUMP-172 closed because cannot deliver head at 3:00:00 hrs.",
+          "WARNING: Pump PUMP-172 closed because cannot deliver head at 3:30:00 hrs.",
+          "WARNING: Pump PUMP-172 closed because cannot deliver head at 4:00:00 hrs.",
+          "WARNING: Pump PUMP-172 closed because cannot deliver head at 4:30:00 hrs.",
+          "WARNING: Pump PUMP-172 closed because cannot deliver head at 5:00:00 hrs."
+        ]
+      },
+      "wntr_warnings": []
+    },
+    "speed_PUMP-172_0.85": {
+      "command": {
+        "kind": "pump_speed",
+        "element": "PUMP-172",
+        "commanded_speed": 0.85
+      },
+      "transmission": {
+        "commanded_speed": 0.85,
+        "echoed_speed": 0.85,
+        "speed_token_present": true,
+        "reached_engine": true
+      },
+      "realisation": {
+        "commanded_speed": 0.85,
+        "n_states": 193,
+        "status_counts": {
+          "Closed": 113,
+          "Open": 80
+        },
+        "n_open": 80,
+        "open_fraction": 0.41450777202072536,
+        "realised_speed_values": [
+          0.0,
+          0.85,
+          1.0
+        ],
+        "realised_equals_command_while_open": 17,
+        "realisation_rate_while_open": 0.2125,
+        "realisation_rate_over_horizon": 0.08808290155440414,
+        "mean_flow_gpm": 905.0487670898438,
+        "max_flow_gpm": 2414.0244140625,
+        "mean_head_gain_ft_when_open": 438.8447265625,
+        "overridden_by_hydraulics": false
+      },
+      "persistence": {
+        "commanded_speed": 0.85,
+        "n_states": 193,
+        "first_reset_state_index": 52,
+        "hours_to_first_reset": 26.0,
+        "n_open_before_first_reset": 17,
+        "n_open_at_command_before_first_reset": 17,
+        "realisation_rate_while_open_before_first_reset": 1.0,
+        "n_open_after_first_reset": 63,
+        "n_open_at_command_after_first_reset": 0,
+        "n_open_at_speed_one_after_first_reset": 63,
+        "no_open_state_before_reset_hydraulically_shut": false,
+        "transition_window": [
+          {
+            "hours": 24.5,
+            "status": "Closed",
+            "realised_speed": 0.0
+          },
+          {
+            "hours": 25.0,
+            "status": "Closed",
+            "realised_speed": 0.0
+          },
+          {
+            "hours": 25.5,
+            "status": "Closed",
+            "realised_speed": 0.0
+          },
+          {
+            "hours": 26.0,
+            "status": "Open",
+            "realised_speed": 1.0
+          },
+          {
+            "hours": 26.5,
+            "status": "Open",
+            "realised_speed": 1.0
+          },
+          {
+            "hours": 27.0,
+            "status": "Open",
+            "realised_speed": 1.0
+          }
+        ]
+      },
+      "effect": {
+        "d_mean_service_pressure_psi": 0.061636827886104584,
+        "max_abs_d_nodal_mean_pressure_psi": 0.09828996658325195,
+        "junction_of_max_change": "JUNCTION-29",
+        "n_junctions_moved_above_tol": 84,
+        "n_junctions_moved_above_half_psi": 0,
+        "d_mean_leakage_gpm": 0.027762910911917515,
+        "d_mean_inflow_gpm": -17.51776123046875,
+        "d_mean_nodal_withdrawal_gpm": 0.02783203125,
+        "min_service_pressure_psi": 4.198505401611328,
+        "min_service_pressure_negative": false,
+        "has_measurable_effect": true
+      },
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "wntr_warnings": []
+    },
+    "speed_PUMP-172_1.10": {
+      "command": {
+        "kind": "pump_speed",
+        "element": "PUMP-172",
+        "commanded_speed": 1.1
+      },
+      "transmission": {
+        "commanded_speed": 1.1,
+        "echoed_speed": 1.1,
+        "speed_token_present": true,
+        "reached_engine": true
+      },
+      "realisation": {
+        "commanded_speed": 1.1,
+        "n_states": 193,
+        "status_counts": {
+          "Closed": 121,
+          "Open": 72
+        },
+        "n_open": 72,
+        "open_fraction": 0.37305699481865284,
+        "realised_speed_values": [
+          0.0,
+          1.0,
+          1.1
+        ],
+        "realised_equals_command_while_open": 5,
+        "realisation_rate_while_open": 0.06944444444444445,
+        "realisation_rate_over_horizon": 0.025906735751295335,
+        "mean_flow_gpm": 912.078369140625,
+        "max_flow_gpm": 2959.7626953125,
+        "mean_head_gain_ft_when_open": 439.72552490234375,
+        "overridden_by_hydraulics": false
+      },
+      "persistence": {
+        "commanded_speed": 1.1,
+        "n_states": 193,
+        "first_reset_state_index": 48,
+        "hours_to_first_reset": 24.0,
+        "n_open_before_first_reset": 5,
+        "n_open_at_command_before_first_reset": 5,
+        "realisation_rate_while_open_before_first_reset": 1.0,
+        "n_open_after_first_reset": 67,
+        "n_open_at_command_after_first_reset": 0,
+        "n_open_at_speed_one_after_first_reset": 67,
+        "no_open_state_before_reset_hydraulically_shut": false,
+        "transition_window": [
+          {
+            "hours": 22.5,
+            "status": "Closed",
+            "realised_speed": 0.0
+          },
+          {
+            "hours": 23.0,
+            "status": "Closed",
+            "realised_speed": 0.0
+          },
+          {
+            "hours": 23.5,
+            "status": "Closed",
+            "realised_speed": 0.0
+          },
+          {
+            "hours": 24.0,
+            "status": "Open",
+            "realised_speed": 1.0
+          },
+          {
+            "hours": 24.5,
+            "status": "Open",
+            "realised_speed": 1.0
+          },
+          {
+            "hours": 25.0,
+            "status": "Open",
+            "realised_speed": 1.0
+          }
+        ]
+      },
+      "effect": {
+        "d_mean_service_pressure_psi": -0.009035437367856503,
+        "max_abs_d_nodal_mean_pressure_psi": 0.013928890228271484,
+        "junction_of_max_change": "JUNCTION-29",
+        "n_junctions_moved_above_tol": 83,
+        "n_junctions_moved_above_half_psi": 0,
+        "d_mean_leakage_gpm": -0.004112961062176623,
+        "d_mean_inflow_gpm": -10.48809814453125,
+        "d_mean_nodal_withdrawal_gpm": -0.0040283203125,
+        "min_service_pressure_psi": 4.1614274978637695,
+        "min_service_pressure_negative": false,
+        "has_measurable_effect": true
+      },
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "wntr_warnings": []
+    }
+  },
+  "assessment": {
+    "transmission_ok": true,
+    "prv_binding_ok": true,
+    "pump_speed_realised_at_issue": true,
+    "pump_speed_persists_over_horizon": false,
+    "n_commands_tested": 22,
+    "inert_commands": [
+      "prv_VALVE-174_x0.75",
+      "prv_VALVE-179_x0.75",
+      "prv_VALVE-180_x0.75",
+      "prv_VALVE-180_x1.25"
+    ],
+    "overridden_commands": [],
+    "speed_commands_reset_by_native_rule": [
+      "speed_PUMP-170_0.70",
+      "speed_PUMP-170_0.85",
+      "speed_PUMP-170_1.10",
+      "speed_PUMP-172_0.70",
+      "speed_PUMP-172_0.85",
+      "speed_PUMP-172_1.10"
+    ],
+    "commands_driving_negative_service_pressure": [
+      "prv_VALVE-179_x1.25"
+    ],
+    "prvs_never_active_at_nominal": [
+      "VALVE-174",
+      "VALVE-179",
+      "VALVE-180"
+    ],
+    "speed_reset_mechanism_confirmed": true,
+    "criterion_history": {
+      "first_declared_criterion": "pump_speed_realised_while_open: the realised relative speed must equal the command at every reported state at which the pump is open, over the whole 96 h horizon.",
+      "result_under_first_criterion": "FAIL",
+      "why_changed": "The criterion conflated realisation with persistence. The engine does apply the commanded speed; a native rule action then replaces it. The run that produced FAIL issued the command once at t=0 and never reissued it, so it measured how long a command survives, not whether it is applied. The attribution test isolates the cause.",
+      "revised_criterion": "pump_speed_realised_at_issue: the realised speed must equal the command at every open state before the first rule-driven reopening, and within a single 30 min control step. Persistence is reported separately and, because it fails, forces CONDITIONAL, not PASS.",
+      "result_under_revised_criterion": "CONDITIONAL",
+      "both_numbers_reported": true
+    },
+    "decision_rule": "PASS requires that every command reach the engine unchanged, that every Active PRV hold its setting within 0.1 psi, that every open pump run at the commanded speed at the moment it is issued, and that no command be inert, overridden, or overwritten. CONDITIONAL is returned when transmission and realisation are exact but part of the action space has no authority or does not persist. FAIL is reserved for the engine failing to apply a command it received.",
+    "verdict": "CONDITIONAL"
+  },
+  "verdicts": {
+    "G12 ACTUATOR REALIZABILITY": "CONDITIONAL"
+  }
+}

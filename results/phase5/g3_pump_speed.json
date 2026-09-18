@@ -1,0 +1,1529 @@
+{
+  "gate": "G3",
+  "title": "Pump speed response",
+  "env": {
+    "timestamp_utc": "2026-09-02T22:25:17+00:00",
+    "os": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "python": "3.13.15",
+    "python_build": "Aug  5 2026 13:05:39",
+    "wntr": "1.5.0",
+    "numpy": "2.5.2",
+    "pandas": "3.0.5",
+    "scipy": "1.18.1",
+    "networkx": "3.6.1",
+    "epanet_engine_wntr": {
+      "epanet2.dll": 20200,
+      "epanet20.dll": 20012,
+      "epanet22.dll": 20200
+    },
+    "epanet_engine_epyt": 20305,
+    "original_inp_sha256": "510af942ec643eb87adcf26e5a7df1cc4c23eb0c1e470a8a1257ed055f1956f1",
+    "working_inp_sha256": "53015ba9212e46bec731d190971819996233996b498bc269e828f992830a20a9",
+    "determinism": "EPANET's hydraulic solver is deterministic. No stochastic input is used anywhere in Phase 5; leak-node selection and leak-coefficient allocation are closed-form functions of pipe length, so no random seed is required. Recorded seed: none used."
+  },
+  "method": {
+    "primary": "Single-period snapshot, Duration = 0, so tanks act as fixed-head boundaries at their initial levels and the tank-level rules cannot fire. One pump varied at a time; the other held at speed 1.0.",
+    "secondary": "96 h EPS at a uniform fixed speed with the native rules active, to record the rule/speed feedback that the snapshot removes.",
+    "speeds_tested": [
+      0.5,
+      0.6,
+      0.7,
+      0.8,
+      0.85,
+      0.9,
+      1.0,
+      1.05,
+      1.1
+    ],
+    "curve_model": "EPANET fits a 3-point pump curve with H = h0 - r*Q^n and scales it as H(Q,s) = s^2 * (h0 - r*(Q/s)^n). The fitted coefficients are reported so the residual check is auditable.",
+    "speed_range_justification": "Both pumps carry real 3-point head curves, so EPANET admits any speed s > 0. The sweep spans 0.50-1.10 and each row records (a) whether the operating flow exceeds s * Qmax of the curve, and (b) whether the engine shut the pump because s^2 * h0 fell below the static head.",
+    "no_optimisation": "Speeds are a fixed deterministic list. No PPO, SAC or search."
+  },
+  "pump_curves_gpm_ft": {
+    "PUMP-170": [
+      [
+        0.0,
+        444.99999999999994
+      ],
+      [
+        790.0,
+        365.0
+      ],
+      [
+        1460.0,
+        120.0
+      ]
+    ],
+    "PUMP-172": [
+      [
+        0.0,
+        740.0
+      ],
+      [
+        2000.0,
+        530.0
+      ],
+      [
+        3240.0,
+        205.0
+      ]
+    ]
+  },
+  "pump_curve_fits": {
+    "PUMP-170": {
+      "fitted": true,
+      "h0_ft": 444.99999999999994,
+      "r": 1.9469063151813995e-05,
+      "n": 2.282469318784672
+    },
+    "PUMP-172": {
+      "fitted": true,
+      "h0_ft": 740.0,
+      "r": 8.381775190112609e-05,
+      "n": 1.9384505123601592
+    }
+  },
+  "reference_snapshot_speed_1": {
+    "speeds_commanded": {},
+    "inp_pump_lines": [
+      "PUMP-170             JUNCTION-105         JUNCTION-106         HEAD     CURVE-0                ;",
+      "PUMP-172             JUNCTION-109         JUNCTION-110         HEAD     CURVE-2                ;"
+    ],
+    "wntr_warnings": [],
+    "pumps": {
+      "PUMP-170": {
+        "speed_commanded": 1.0,
+        "speed_in_model": 1.0,
+        "status": 1.0,
+        "status_label": "Open",
+        "flow_gpm": 765.8873291015625,
+        "head_gain_ft": 370.4646301269531,
+        "head_gain_expected_from_curve_ft": 370.4645439243814,
+        "head_residual_ft": 8.620257170832701e-05,
+        "shutoff_head_ft": 444.99999999999994,
+        "static_head_when_shut_ft": null,
+        "curve_qmax_at_speed_gpm": 1460.0,
+        "beyond_curve_qmax": false,
+        "power_kW": 71.36680184374794,
+        "inlet_head_ft": 799.6917724609375,
+        "outlet_head_ft": 1170.1563720703125
+      },
+      "PUMP-172": {
+        "speed_commanded": 1.0,
+        "speed_in_model": 1.0,
+        "status": 1.0,
+        "status_label": "Open",
+        "flow_gpm": 2401.7587890625,
+        "head_gain_ft": 440.54962158203125,
+        "head_gain_expected_from_curve_ft": 440.54957500580093,
+        "head_residual_ft": 4.657623031789626e-05,
+        "shutoff_head_ft": 740.0,
+        "static_head_when_shut_ft": null,
+        "curve_qmax_at_speed_gpm": 3240.0,
+        "beyond_curve_qmax": false,
+        "power_kW": 266.1391792866805,
+        "inlet_head_ft": 424.59686279296875,
+        "outlet_head_ft": 865.146484375
+      }
+    },
+    "network": {
+      "min_junction_pressure_psi": 5.538313388824463,
+      "min_at_node": "JUNCTION-29",
+      "max_junction_pressure_psi": 507.02874755859375,
+      "mean_junction_pressure_psi": 104.12940979003906,
+      "n_negative_pressure": 0,
+      "report_scan_errors": 0
+    }
+  },
+  "sweep": {
+    "PUMP-170": [
+      {
+        "speed_commanded": 0.5,
+        "speed_in_model": 0.5,
+        "status": 0.0,
+        "status_label": "Closed",
+        "flow_gpm": 0.0,
+        "head_gain_ft": 295.760498046875,
+        "head_gain_expected_from_curve_ft": null,
+        "head_residual_ft": null,
+        "shutoff_head_ft": 111.24999999999999,
+        "static_head_when_shut_ft": 295.760498046875,
+        "curve_qmax_at_speed_gpm": 730.0,
+        "beyond_curve_qmax": false,
+        "power_kW": 0.0,
+        "inlet_head_ft": 859.08203125,
+        "outlet_head_ft": 1154.842529296875,
+        "other_pump_flow_gpm": 2401.676513671875,
+        "network": {
+          "min_junction_pressure_psi": 5.547120094299316,
+          "min_at_node": "JUNCTION-29",
+          "max_junction_pressure_psi": 500.3932800292969,
+          "mean_junction_pressure_psi": 104.18054962158203,
+          "n_negative_pressure": 0,
+          "report_scan_errors": 0
+        },
+        "inp_pump_lines": [
+          "PUMP-170             JUNCTION-105         JUNCTION-106         HEAD     CURVE-0              SPEED                0.5   ;",
+          "PUMP-172             JUNCTION-109         JUNCTION-110         HEAD     CURVE-2                ;"
+        ],
+        "pressure_influence_vs_speed1": {
+          "max_abs_dP_psi": 25.7337646484375,
+          "max_abs_dP_node": "JUNCTION-105",
+          "n_junctions_moved_gt_0p5psi": 4,
+          "n_junctions_moved_gt_2psi": 4,
+          "mean_abs_dP_psi": 0.36920322312249076
+        }
+      },
+      {
+        "speed_commanded": 0.6,
+        "speed_in_model": 0.6,
+        "status": 0.0,
+        "status_label": "Closed",
+        "flow_gpm": 0.0,
+        "head_gain_ft": 295.760498046875,
+        "head_gain_expected_from_curve_ft": null,
+        "head_residual_ft": null,
+        "shutoff_head_ft": 160.19999999999996,
+        "static_head_when_shut_ft": 295.760498046875,
+        "curve_qmax_at_speed_gpm": 876.0,
+        "beyond_curve_qmax": false,
+        "power_kW": 0.0,
+        "inlet_head_ft": 859.08203125,
+        "outlet_head_ft": 1154.842529296875,
+        "other_pump_flow_gpm": 2401.676513671875,
+        "network": {
+          "min_junction_pressure_psi": 5.547120094299316,
+          "min_at_node": "JUNCTION-29",
+          "max_junction_pressure_psi": 500.3932800292969,
+          "mean_junction_pressure_psi": 104.18054962158203,
+          "n_negative_pressure": 0,
+          "report_scan_errors": 0
+        },
+        "inp_pump_lines": [
+          "PUMP-170             JUNCTION-105         JUNCTION-106         HEAD     CURVE-0              SPEED                0.6   ;",
+          "PUMP-172             JUNCTION-109         JUNCTION-110         HEAD     CURVE-2                ;"
+        ],
+        "pressure_influence_vs_speed1": {
+          "max_abs_dP_psi": 25.7337646484375,
+          "max_abs_dP_node": "JUNCTION-105",
+          "n_junctions_moved_gt_0p5psi": 4,
+          "n_junctions_moved_gt_2psi": 4,
+          "mean_abs_dP_psi": 0.369203525876242
+        }
+      },
+      {
+        "speed_commanded": 0.7,
+        "speed_in_model": 0.7,
+        "status": 0.0,
+        "status_label": "Closed",
+        "flow_gpm": 0.0,
+        "head_gain_ft": 295.760498046875,
+        "head_gain_expected_from_curve_ft": null,
+        "head_residual_ft": null,
+        "shutoff_head_ft": 218.04999999999995,
+        "static_head_when_shut_ft": 295.760498046875,
+        "curve_qmax_at_speed_gpm": 1021.9999999999999,
+        "beyond_curve_qmax": false,
+        "power_kW": 0.0,
+        "inlet_head_ft": 859.08203125,
+        "outlet_head_ft": 1154.842529296875,
+        "other_pump_flow_gpm": 2401.676513671875,
+        "network": {
+          "min_junction_pressure_psi": 5.547120094299316,
+          "min_at_node": "JUNCTION-29",
+          "max_junction_pressure_psi": 500.3932800292969,
+          "mean_junction_pressure_psi": 104.18054962158203,
+          "n_negative_pressure": 0,
+          "report_scan_errors": 0
+        },
+        "inp_pump_lines": [
+          "PUMP-170             JUNCTION-105         JUNCTION-106         HEAD     CURVE-0              SPEED                0.7   ;",
+          "PUMP-172             JUNCTION-109         JUNCTION-110         HEAD     CURVE-2                ;"
+        ],
+        "pressure_influence_vs_speed1": {
+          "max_abs_dP_psi": 25.7337646484375,
+          "max_abs_dP_node": "JUNCTION-105",
+          "n_junctions_moved_gt_0p5psi": 4,
+          "n_junctions_moved_gt_2psi": 4,
+          "mean_abs_dP_psi": 0.36920322312249076
+        }
+      },
+      {
+        "speed_commanded": 0.8,
+        "speed_in_model": 0.8,
+        "status": 0.0,
+        "status_label": "Closed",
+        "flow_gpm": 0.0,
+        "head_gain_ft": 295.760498046875,
+        "head_gain_expected_from_curve_ft": null,
+        "head_residual_ft": null,
+        "shutoff_head_ft": 284.8,
+        "static_head_when_shut_ft": 295.760498046875,
+        "curve_qmax_at_speed_gpm": 1168.0,
+        "beyond_curve_qmax": false,
+        "power_kW": 0.0,
+        "inlet_head_ft": 859.08203125,
+        "outlet_head_ft": 1154.842529296875,
+        "other_pump_flow_gpm": 2401.676513671875,
+        "network": {
+          "min_junction_pressure_psi": 5.547120094299316,
+          "min_at_node": "JUNCTION-29",
+          "max_junction_pressure_psi": 500.3932800292969,
+          "mean_junction_pressure_psi": 104.18054962158203,
+          "n_negative_pressure": 0,
+          "report_scan_errors": 0
+        },
+        "inp_pump_lines": [
+          "PUMP-170             JUNCTION-105         JUNCTION-106         HEAD     CURVE-0              SPEED                0.8   ;",
+          "PUMP-172             JUNCTION-109         JUNCTION-110         HEAD     CURVE-2                ;"
+        ],
+        "pressure_influence_vs_speed1": {
+          "max_abs_dP_psi": 25.7337646484375,
+          "max_abs_dP_node": "JUNCTION-105",
+          "n_junctions_moved_gt_0p5psi": 4,
+          "n_junctions_moved_gt_2psi": 4,
+          "mean_abs_dP_psi": 0.369203525876242
+        }
+      },
+      {
+        "speed_commanded": 0.85,
+        "speed_in_model": 0.85,
+        "status": 1.0,
+        "status_label": "Open",
+        "flow_gpm": 332.4685363769531,
+        "head_gain_ft": 309.8952941894531,
+        "head_gain_expected_from_curve_ft": 309.8953310530888,
+        "head_residual_ft": -3.686363567112494e-05,
+        "shutoff_head_ft": 321.51249999999993,
+        "static_head_when_shut_ft": null,
+        "curve_qmax_at_speed_gpm": 1241.0,
+        "beyond_curve_qmax": false,
+        "power_kW": 25.914935417406607,
+        "inlet_head_ft": 847.8776245117188,
+        "outlet_head_ft": 1157.77294921875,
+        "other_pump_flow_gpm": 2401.721435546875,
+        "network": {
+          "min_junction_pressure_psi": 5.542333126068115,
+          "min_at_node": "JUNCTION-29",
+          "max_junction_pressure_psi": 501.66302490234375,
+          "mean_junction_pressure_psi": 104.16926574707031,
+          "n_negative_pressure": 0,
+          "report_scan_errors": 0
+        },
+        "inp_pump_lines": [
+          "PUMP-170             JUNCTION-105         JUNCTION-106         HEAD     CURVE-0              SPEED               0.85   ;",
+          "PUMP-172             JUNCTION-109         JUNCTION-110         HEAD     CURVE-2                ;"
+        ],
+        "pressure_influence_vs_speed1": {
+          "max_abs_dP_psi": 20.87896728515625,
+          "max_abs_dP_node": "JUNCTION-105",
+          "n_junctions_moved_gt_0p5psi": 4,
+          "n_junctions_moved_gt_2psi": 4,
+          "mean_abs_dP_psi": 0.29697196445767843
+        }
+      },
+      {
+        "speed_commanded": 0.9,
+        "speed_in_model": 0.9,
+        "status": 1.0,
+        "status_label": "Open",
+        "flow_gpm": 514.17431640625,
+        "head_gain_ft": 329.5259094238281,
+        "head_gain_expected_from_curve_ft": 329.5259475130457,
+        "head_residual_ft": -3.80892175826375e-05,
+        "shutoff_head_ft": 360.45,
+        "static_head_when_shut_ft": null,
+        "curve_qmax_at_speed_gpm": 1314.0,
+        "beyond_curve_qmax": false,
+        "power_kW": 42.61716333708044,
+        "inlet_head_ft": 832.3018188476562,
+        "outlet_head_ft": 1161.8277587890625,
+        "other_pump_flow_gpm": 2401.739990234375,
+        "network": {
+          "min_junction_pressure_psi": 5.540323257446289,
+          "min_at_node": "JUNCTION-29",
+          "max_junction_pressure_psi": 503.41998291015625,
+          "mean_junction_pressure_psi": 104.15616607666016,
+          "n_negative_pressure": 0,
+          "report_scan_errors": 0
+        },
+        "inp_pump_lines": [
+          "PUMP-170             JUNCTION-105         JUNCTION-106         HEAD     CURVE-0              SPEED                0.9   ;",
+          "PUMP-172             JUNCTION-109         JUNCTION-110         HEAD     CURVE-2                ;"
+        ],
+        "pressure_influence_vs_speed1": {
+          "max_abs_dP_psi": 14.12994384765625,
+          "max_abs_dP_node": "JUNCTION-105",
+          "n_junctions_moved_gt_0p5psi": 4,
+          "n_junctions_moved_gt_2psi": 4,
+          "mean_abs_dP_psi": 0.20026141499716138
+        }
+      },
+      {
+        "speed_commanded": 1.0,
+        "speed_in_model": 1.0,
+        "status": 1.0,
+        "status_label": "Open",
+        "flow_gpm": 765.8873291015625,
+        "head_gain_ft": 370.4646301269531,
+        "head_gain_expected_from_curve_ft": 370.4645439243814,
+        "head_residual_ft": 8.620257170832701e-05,
+        "shutoff_head_ft": 444.99999999999994,
+        "static_head_when_shut_ft": null,
+        "curve_qmax_at_speed_gpm": 1460.0,
+        "beyond_curve_qmax": false,
+        "power_kW": 71.36680184374794,
+        "inlet_head_ft": 799.6917724609375,
+        "outlet_head_ft": 1170.1563720703125,
+        "other_pump_flow_gpm": 2401.7587890625,
+        "network": {
+          "min_junction_pressure_psi": 5.538313388824463,
+          "min_at_node": "JUNCTION-29",
+          "max_junction_pressure_psi": 507.02874755859375,
+          "mean_junction_pressure_psi": 104.12940979003906,
+          "n_negative_pressure": 0,
+          "report_scan_errors": 0
+        },
+        "inp_pump_lines": [
+          "PUMP-170             JUNCTION-105         JUNCTION-106         HEAD     CURVE-0                ;",
+          "PUMP-172             JUNCTION-109         JUNCTION-110         HEAD     CURVE-2                ;"
+        ],
+        "pressure_influence_vs_speed1": {
+          "max_abs_dP_psi": 0.0,
+          "max_abs_dP_node": "JUNCTION-0",
+          "n_junctions_moved_gt_0p5psi": 0,
+          "n_junctions_moved_gt_2psi": 0,
+          "mean_abs_dP_psi": 0.0
+        }
+      },
+      {
+        "speed_commanded": 1.05,
+        "speed_in_model": 1.05,
+        "status": 1.0,
+        "status_label": "Open",
+        "flow_gpm": 870.5322265625,
+        "head_gain_ft": 392.1369934082031,
+        "head_gain_expected_from_curve_ft": 392.13694028881577,
+        "head_residual_ft": 5.3119387359856773e-05,
+        "shutoff_head_ft": 490.61249999999995,
+        "static_head_when_shut_ft": null,
+        "curve_qmax_at_speed_gpm": 1533.0,
+        "beyond_curve_qmax": false,
+        "power_kW": 85.86324440701598,
+        "inlet_head_ft": 782.364013671875,
+        "outlet_head_ft": 1174.5009765625,
+        "other_pump_flow_gpm": 2401.76416015625,
+        "network": {
+          "min_junction_pressure_psi": 5.537757873535156,
+          "min_at_node": "JUNCTION-29",
+          "max_junction_pressure_psi": 508.9112854003906,
+          "mean_junction_pressure_psi": 104.11489868164062,
+          "n_negative_pressure": 0,
+          "report_scan_errors": 0
+        },
+        "inp_pump_lines": [
+          "PUMP-170             JUNCTION-105         JUNCTION-106         HEAD     CURVE-0              SPEED               1.05   ;",
+          "PUMP-172             JUNCTION-109         JUNCTION-110         HEAD     CURVE-2                ;"
+        ],
+        "pressure_influence_vs_speed1": {
+          "max_abs_dP_psi": 7.50811767578125,
+          "max_abs_dP_node": "JUNCTION-105",
+          "n_junctions_moved_gt_0p5psi": 4,
+          "n_junctions_moved_gt_2psi": 1,
+          "mean_abs_dP_psi": 0.10541133653549921
+        }
+      },
+      {
+        "speed_commanded": 1.1,
+        "speed_in_model": 1.1,
+        "status": 1.0,
+        "status_label": "Open",
+        "flow_gpm": 967.7293701171875,
+        "head_gain_ft": 414.7001037597656,
+        "head_gain_expected_from_curve_ft": 414.7001701739098,
+        "head_residual_ft": -6.641414415753388e-05,
+        "shutoff_head_ft": 538.45,
+        "static_head_when_shut_ft": null,
+        "curve_qmax_at_speed_gpm": 1606.0000000000002,
+        "beyond_curve_qmax": false,
+        "power_kW": 100.94217951164947,
+        "inlet_head_ft": 764.2859497070312,
+        "outlet_head_ft": 1178.986083984375,
+        "other_pump_flow_gpm": 2401.767578125,
+        "network": {
+          "min_junction_pressure_psi": 5.537387847900391,
+          "min_at_node": "JUNCTION-29",
+          "max_junction_pressure_psi": 510.85467529296875,
+          "mean_junction_pressure_psi": 104.09947967529297,
+          "n_negative_pressure": 0,
+          "report_scan_errors": 0
+        },
+        "inp_pump_lines": [
+          "PUMP-170             JUNCTION-105         JUNCTION-106         HEAD     CURVE-0              SPEED                1.1   ;",
+          "PUMP-172             JUNCTION-109         JUNCTION-110         HEAD     CURVE-2                ;"
+        ],
+        "pressure_influence_vs_speed1": {
+          "max_abs_dP_psi": 15.341339111328125,
+          "max_abs_dP_node": "JUNCTION-105",
+          "n_junctions_moved_gt_0p5psi": 4,
+          "n_junctions_moved_gt_2psi": 4,
+          "mean_abs_dP_psi": 0.21481257014804417
+        }
+      }
+    ],
+    "PUMP-172": [
+      {
+        "speed_commanded": 0.5,
+        "speed_in_model": 0.5,
+        "status": 0.0,
+        "status_label": "Closed",
+        "flow_gpm": 0.0,
+        "head_gain_ft": 433.6654968261719,
+        "head_gain_expected_from_curve_ft": null,
+        "head_residual_ft": null,
+        "shutoff_head_ft": 185.0,
+        "static_head_when_shut_ft": 433.6654968261719,
+        "curve_qmax_at_speed_gpm": 1620.0,
+        "beyond_curve_qmax": false,
+        "power_kW": 0.0,
+        "inlet_head_ft": 425.0000305175781,
+        "outlet_head_ft": 858.66552734375,
+        "other_pump_flow_gpm": 765.7103881835938,
+        "network": {
+          "min_junction_pressure_psi": 5.506418704986572,
+          "min_at_node": "JUNCTION-29",
+          "max_junction_pressure_psi": 507.0257568359375,
+          "mean_junction_pressure_psi": 103.84953308105469,
+          "n_negative_pressure": 0,
+          "report_scan_errors": 0
+        },
+        "inp_pump_lines": [
+          "PUMP-170             JUNCTION-105         JUNCTION-106         HEAD     CURVE-0                ;",
+          "PUMP-172             JUNCTION-109         JUNCTION-110         HEAD     CURVE-2              SPEED                0.5   ;"
+        ],
+        "pressure_influence_vs_speed1": {
+          "max_abs_dP_psi": 2.8082275390625,
+          "max_abs_dP_node": "JUNCTION-110",
+          "n_junctions_moved_gt_0p5psi": 3,
+          "n_junctions_moved_gt_2psi": 2,
+          "mean_abs_dP_psi": 0.28304906875368147
+        }
+      },
+      {
+        "speed_commanded": 0.6,
+        "speed_in_model": 0.6,
+        "status": 0.0,
+        "status_label": "Closed",
+        "flow_gpm": 0.0,
+        "head_gain_ft": 433.6654968261719,
+        "head_gain_expected_from_curve_ft": null,
+        "head_residual_ft": null,
+        "shutoff_head_ft": 266.4,
+        "static_head_when_shut_ft": 433.6654968261719,
+        "curve_qmax_at_speed_gpm": 1944.0,
+        "beyond_curve_qmax": false,
+        "power_kW": 0.0,
+        "inlet_head_ft": 425.0000305175781,
+        "outlet_head_ft": 858.66552734375,
+        "other_pump_flow_gpm": 765.7103881835938,
+        "network": {
+          "min_junction_pressure_psi": 5.506418704986572,
+          "min_at_node": "JUNCTION-29",
+          "max_junction_pressure_psi": 507.0257568359375,
+          "mean_junction_pressure_psi": 103.84953308105469,
+          "n_negative_pressure": 0,
+          "report_scan_errors": 0
+        },
+        "inp_pump_lines": [
+          "PUMP-170             JUNCTION-105         JUNCTION-106         HEAD     CURVE-0                ;",
+          "PUMP-172             JUNCTION-109         JUNCTION-110         HEAD     CURVE-2              SPEED                0.6   ;"
+        ],
+        "pressure_influence_vs_speed1": {
+          "max_abs_dP_psi": 2.8082275390625,
+          "max_abs_dP_node": "JUNCTION-110",
+          "n_junctions_moved_gt_0p5psi": 3,
+          "n_junctions_moved_gt_2psi": 2,
+          "mean_abs_dP_psi": 0.28304961371043375
+        }
+      },
+      {
+        "speed_commanded": 0.7,
+        "speed_in_model": 0.7,
+        "status": 0.0,
+        "status_label": "Closed",
+        "flow_gpm": 0.0,
+        "head_gain_ft": 433.6654968261719,
+        "head_gain_expected_from_curve_ft": null,
+        "head_residual_ft": null,
+        "shutoff_head_ft": 362.59999999999997,
+        "static_head_when_shut_ft": 433.6654968261719,
+        "curve_qmax_at_speed_gpm": 2268.0,
+        "beyond_curve_qmax": false,
+        "power_kW": 0.0,
+        "inlet_head_ft": 425.0000305175781,
+        "outlet_head_ft": 858.66552734375,
+        "other_pump_flow_gpm": 765.7103881835938,
+        "network": {
+          "min_junction_pressure_psi": 5.506418704986572,
+          "min_at_node": "JUNCTION-29",
+          "max_junction_pressure_psi": 507.0257568359375,
+          "mean_junction_pressure_psi": 103.84952545166016,
+          "n_negative_pressure": 0,
+          "report_scan_errors": 0
+        },
+        "inp_pump_lines": [
+          "PUMP-170             JUNCTION-105         JUNCTION-106         HEAD     CURVE-0                ;",
+          "PUMP-172             JUNCTION-109         JUNCTION-110         HEAD     CURVE-2              SPEED                0.7   ;"
+        ],
+        "pressure_influence_vs_speed1": {
+          "max_abs_dP_psi": 2.8082275390625,
+          "max_abs_dP_node": "JUNCTION-110",
+          "n_junctions_moved_gt_0p5psi": 3,
+          "n_junctions_moved_gt_2psi": 2,
+          "mean_abs_dP_psi": 0.2830776184324234
+        }
+      },
+      {
+        "speed_commanded": 0.8,
+        "speed_in_model": 0.8,
+        "status": 1.0,
+        "status_label": "Open",
+        "flow_gpm": 842.9006958007812,
+        "head_gain_ft": 434.7989501953125,
+        "head_gain_expected_from_curve_ft": 434.7989005061751,
+        "head_residual_ft": 4.968913742686709e-05,
+        "shutoff_head_ft": 473.6000000000001,
+        "static_head_when_shut_ft": null,
+        "curve_qmax_at_speed_gpm": 2592.0,
+        "beyond_curve_qmax": false,
+        "power_kW": 92.18271488489555,
+        "inlet_head_ft": 424.9419860839844,
+        "outlet_head_ft": 859.740966796875,
+        "other_pump_flow_gpm": 765.8168334960938,
+        "network": {
+          "min_junction_pressure_psi": 5.525619029998779,
+          "min_at_node": "JUNCTION-29",
+          "max_junction_pressure_psi": 507.02752685546875,
+          "mean_junction_pressure_psi": 103.94611358642578,
+          "n_negative_pressure": 0,
+          "report_scan_errors": 0
+        },
+        "inp_pump_lines": [
+          "PUMP-170             JUNCTION-105         JUNCTION-106         HEAD     CURVE-0                ;",
+          "PUMP-172             JUNCTION-109         JUNCTION-110         HEAD     CURVE-2              SPEED                0.8   ;"
+        ],
+        "pressure_influence_vs_speed1": {
+          "max_abs_dP_psi": 2.342254638671875,
+          "max_abs_dP_node": "JUNCTION-110",
+          "n_junctions_moved_gt_0p5psi": 2,
+          "n_junctions_moved_gt_2psi": 1,
+          "mean_abs_dP_psi": 0.18601819447108678
+        }
+      },
+      {
+        "speed_commanded": 0.85,
+        "speed_in_model": 0.85,
+        "status": 1.0,
+        "status_label": "Open",
+        "flow_gpm": 1360.5057373046875,
+        "head_gain_ft": 436.1321716308594,
+        "head_gain_expected_from_curve_ft": 436.13215990035604,
+        "head_residual_ft": 1.1730503331364162e-05,
+        "shutoff_head_ft": 534.65,
+        "static_head_when_shut_ft": null,
+        "curve_qmax_at_speed_gpm": 2754.0,
+        "beyond_curve_qmax": false,
+        "power_kW": 149.24614400429473,
+        "inlet_head_ft": 424.85931396484375,
+        "outlet_head_ft": 860.991455078125,
+        "other_pump_flow_gpm": 765.858154296875,
+        "network": {
+          "min_junction_pressure_psi": 5.533050537109375,
+          "min_at_node": "JUNCTION-29",
+          "max_junction_pressure_psi": 507.0282287597656,
+          "mean_junction_pressure_psi": 103.98507690429688,
+          "n_negative_pressure": 0,
+          "report_scan_errors": 0
+        },
+        "inp_pump_lines": [
+          "PUMP-170             JUNCTION-105         JUNCTION-106         HEAD     CURVE-0                ;",
+          "PUMP-172             JUNCTION-109         JUNCTION-110         HEAD     CURVE-2              SPEED               0.85   ;"
+        ],
+        "pressure_influence_vs_speed1": {
+          "max_abs_dP_psi": 1.800384521484375,
+          "max_abs_dP_node": "JUNCTION-110",
+          "n_junctions_moved_gt_0p5psi": 2,
+          "n_junctions_moved_gt_2psi": 0,
+          "mean_abs_dP_psi": 0.14641021925305564
+        }
+      },
+      {
+        "speed_commanded": 0.9,
+        "speed_in_model": 0.9,
+        "status": 1.0,
+        "status_label": "Open",
+        "flow_gpm": 1754.5660400390625,
+        "head_gain_ft": 437.5241394042969,
+        "head_gain_expected_from_curve_ft": 437.52413106353094,
+        "head_residual_ft": 8.340765930370253e-06,
+        "shutoff_head_ft": 599.4000000000001,
+        "static_head_when_shut_ft": null,
+        "curve_qmax_at_speed_gpm": 2916.0,
+        "beyond_curve_qmax": false,
+        "power_kW": 193.08847551299178,
+        "inlet_head_ft": 424.774658203125,
+        "outlet_head_ft": 862.2987670898438,
+        "other_pump_flow_gpm": 765.8760986328125,
+        "network": {
+          "min_junction_pressure_psi": 5.5362772941589355,
+          "min_at_node": "JUNCTION-29",
+          "max_junction_pressure_psi": 507.0285339355469,
+          "mean_junction_pressure_psi": 104.02596282958984,
+          "n_negative_pressure": 0,
+          "report_scan_errors": 0
+        },
+        "inp_pump_lines": [
+          "PUMP-170             JUNCTION-105         JUNCTION-106         HEAD     CURVE-0                ;",
+          "PUMP-172             JUNCTION-109         JUNCTION-110         HEAD     CURVE-2              SPEED                0.9   ;"
+        ],
+        "pressure_influence_vs_speed1": {
+          "max_abs_dP_psi": 1.23388671875,
+          "max_abs_dP_node": "JUNCTION-110",
+          "n_junctions_moved_gt_0p5psi": 2,
+          "n_junctions_moved_gt_2psi": 0,
+          "mean_abs_dP_psi": 0.10486268997192383
+        }
+      },
+      {
+        "speed_commanded": 1.0,
+        "speed_in_model": 1.0,
+        "status": 1.0,
+        "status_label": "Open",
+        "flow_gpm": 2401.7587890625,
+        "head_gain_ft": 440.54962158203125,
+        "head_gain_expected_from_curve_ft": 440.54957500580093,
+        "head_residual_ft": 4.657623031789626e-05,
+        "shutoff_head_ft": 740.0,
+        "static_head_when_shut_ft": null,
+        "curve_qmax_at_speed_gpm": 3240.0,
+        "beyond_curve_qmax": false,
+        "power_kW": 266.1391792866805,
+        "inlet_head_ft": 424.59686279296875,
+        "outlet_head_ft": 865.146484375,
+        "other_pump_flow_gpm": 765.8873291015625,
+        "network": {
+          "min_junction_pressure_psi": 5.538313388824463,
+          "min_at_node": "JUNCTION-29",
+          "max_junction_pressure_psi": 507.02874755859375,
+          "mean_junction_pressure_psi": 104.12940979003906,
+          "n_negative_pressure": 0,
+          "report_scan_errors": 0
+        },
+        "inp_pump_lines": [
+          "PUMP-170             JUNCTION-105         JUNCTION-106         HEAD     CURVE-0                ;",
+          "PUMP-172             JUNCTION-109         JUNCTION-110         HEAD     CURVE-2                ;"
+        ],
+        "pressure_influence_vs_speed1": {
+          "max_abs_dP_psi": 0.0,
+          "max_abs_dP_node": "JUNCTION-0",
+          "n_junctions_moved_gt_0p5psi": 0,
+          "n_junctions_moved_gt_2psi": 0,
+          "mean_abs_dP_psi": 0.0
+        }
+      },
+      {
+        "speed_commanded": 1.05,
+        "speed_in_model": 1.05,
+        "status": 1.0,
+        "status_label": "Open",
+        "flow_gpm": 2688.224609375,
+        "head_gain_ft": 442.1789855957031,
+        "head_gain_expected_from_curve_ft": 442.1789466753227,
+        "head_residual_ft": 3.892038040476109e-05,
+        "shutoff_head_ft": 815.85,
+        "static_head_when_shut_ft": null,
+        "curve_qmax_at_speed_gpm": 3402.0,
+        "beyond_curve_qmax": false,
+        "power_kW": 298.98420073749685,
+        "inlet_head_ft": 424.5033264160156,
+        "outlet_head_ft": 866.6823120117188,
+        "other_pump_flow_gpm": 765.9004516601562,
+        "network": {
+          "min_junction_pressure_psi": 5.5406670570373535,
+          "min_at_node": "JUNCTION-29",
+          "max_junction_pressure_psi": 507.0289611816406,
+          "mean_junction_pressure_psi": 104.1941146850586,
+          "n_negative_pressure": 0,
+          "report_scan_errors": 0
+        },
+        "inp_pump_lines": [
+          "PUMP-170             JUNCTION-105         JUNCTION-106         HEAD     CURVE-0                ;",
+          "PUMP-172             JUNCTION-109         JUNCTION-110         HEAD     CURVE-2              SPEED               1.05   ;"
+        ],
+        "pressure_influence_vs_speed1": {
+          "max_abs_dP_psi": 0.665435791015625,
+          "max_abs_dP_node": "JUNCTION-110",
+          "n_junctions_moved_gt_0p5psi": 2,
+          "n_junctions_moved_gt_2psi": 0,
+          "mean_abs_dP_psi": 0.06545660230848524
+        }
+      },
+      {
+        "speed_commanded": 1.1,
+        "speed_in_model": 1.1,
+        "status": 1.0,
+        "status_label": "Open",
+        "flow_gpm": 2959.522705078125,
+        "head_gain_ft": 443.8819274902344,
+        "head_gain_expected_from_curve_ft": 443.8819218095498,
+        "head_residual_ft": 5.680684580511297e-06,
+        "shutoff_head_ft": 895.4000000000001,
+        "static_head_when_shut_ft": null,
+        "curve_qmax_at_speed_gpm": 3564.0000000000005,
+        "beyond_curve_qmax": false,
+        "power_kW": 330.4256574491925,
+        "inlet_head_ft": 424.40655517578125,
+        "outlet_head_ft": 868.2884521484375,
+        "other_pump_flow_gpm": 765.9186401367188,
+        "network": {
+          "min_junction_pressure_psi": 5.543946743011475,
+          "min_at_node": "JUNCTION-29",
+          "max_junction_pressure_psi": 507.029296875,
+          "mean_junction_pressure_psi": 104.26588439941406,
+          "n_negative_pressure": 0,
+          "report_scan_errors": 0
+        },
+        "inp_pump_lines": [
+          "PUMP-170             JUNCTION-105         JUNCTION-106         HEAD     CURVE-0                ;",
+          "PUMP-172             JUNCTION-109         JUNCTION-110         HEAD     CURVE-2              SPEED                1.1   ;"
+        ],
+        "pressure_influence_vs_speed1": {
+          "max_abs_dP_psi": 1.361419677734375,
+          "max_abs_dP_node": "JUNCTION-110",
+          "n_junctions_moved_gt_0p5psi": 2,
+          "n_junctions_moved_gt_2psi": 0,
+          "mean_abs_dP_psi": 0.13794822541494217
+        }
+      }
+    ]
+  },
+  "feasible_speed_bounds": {
+    "PUMP-170": {
+      "static_head_across_shut_pump_ft": 295.760498046875,
+      "shutoff_head_at_speed1_ft": 444.99999999999994,
+      "min_feasible_speed_snapshot": 0.8152486324365144,
+      "highest_speed_that_shut_the_pump": 0.8,
+      "lowest_speed_that_ran": 0.85,
+      "note": "The pump shuts when n^2 * h0 falls below the static head it must lift. The static head depends on tank level, so this bound moves during an EPS and is not a fixed constant."
+    },
+    "PUMP-172": {
+      "static_head_across_shut_pump_ft": 433.6654968261719,
+      "shutoff_head_at_speed1_ft": 740.0,
+      "min_feasible_speed_snapshot": 0.7655288728522932,
+      "highest_speed_that_shut_the_pump": 0.7,
+      "lowest_speed_that_ran": 0.8,
+      "note": "The pump shuts when n^2 * h0 falls below the static head it must lift. The static head depends on tank level, so this bound moves during an EPS and is not a fixed constant."
+    }
+  },
+  "affinity_law_check": {
+    "PUMP-170": {
+      "epanet_3point_fit_h0_r_n": {
+        "fitted": true,
+        "h0_ft": 444.99999999999994,
+        "r": 1.9469063151813995e-05,
+        "n": 2.282469318784672
+      },
+      "shutoff_scales_as_speed_squared": [
+        {
+          "speed": 0.5,
+          "shutoff_ft": 111.24999999999999,
+          "ratio_to_speed1": 0.25,
+          "speed_squared": 0.25,
+          "match": true
+        },
+        {
+          "speed": 0.6,
+          "shutoff_ft": 160.19999999999996,
+          "ratio_to_speed1": 0.35999999999999993,
+          "speed_squared": 0.36,
+          "match": true
+        },
+        {
+          "speed": 0.7,
+          "shutoff_ft": 218.04999999999995,
+          "ratio_to_speed1": 0.48999999999999994,
+          "speed_squared": 0.48999999999999994,
+          "match": true
+        },
+        {
+          "speed": 0.8,
+          "shutoff_ft": 284.8,
+          "ratio_to_speed1": 0.6400000000000001,
+          "speed_squared": 0.6400000000000001,
+          "match": true
+        },
+        {
+          "speed": 0.85,
+          "shutoff_ft": 321.51249999999993,
+          "ratio_to_speed1": 0.7224999999999999,
+          "speed_squared": 0.7224999999999999,
+          "match": true
+        },
+        {
+          "speed": 0.9,
+          "shutoff_ft": 360.45,
+          "ratio_to_speed1": 0.81,
+          "speed_squared": 0.81,
+          "match": true
+        },
+        {
+          "speed": 1.0,
+          "shutoff_ft": 444.99999999999994,
+          "ratio_to_speed1": 1.0,
+          "speed_squared": 1.0,
+          "match": true
+        },
+        {
+          "speed": 1.05,
+          "shutoff_ft": 490.61249999999995,
+          "ratio_to_speed1": 1.1025,
+          "speed_squared": 1.1025,
+          "match": true
+        },
+        {
+          "speed": 1.1,
+          "shutoff_ft": 538.45,
+          "ratio_to_speed1": 1.2100000000000002,
+          "speed_squared": 1.2100000000000002,
+          "match": true
+        }
+      ],
+      "operating_point_on_fitted_curve": [
+        {
+          "speed": 0.85,
+          "flow_gpm": 332.4685363769531,
+          "head_observed_ft": 309.8952941894531,
+          "head_from_fit_ft": 309.8953310530888,
+          "residual_ft": -3.686363567112494e-05
+        },
+        {
+          "speed": 0.9,
+          "flow_gpm": 514.17431640625,
+          "head_observed_ft": 329.5259094238281,
+          "head_from_fit_ft": 329.5259475130457,
+          "residual_ft": -3.80892175826375e-05
+        },
+        {
+          "speed": 1.0,
+          "flow_gpm": 765.8873291015625,
+          "head_observed_ft": 370.4646301269531,
+          "head_from_fit_ft": 370.4645439243814,
+          "residual_ft": 8.620257170832701e-05
+        },
+        {
+          "speed": 1.05,
+          "flow_gpm": 870.5322265625,
+          "head_observed_ft": 392.1369934082031,
+          "head_from_fit_ft": 392.13694028881577,
+          "residual_ft": 5.3119387359856773e-05
+        },
+        {
+          "speed": 1.1,
+          "flow_gpm": 967.7293701171875,
+          "head_observed_ft": 414.7001037597656,
+          "head_from_fit_ft": 414.7001701739098,
+          "residual_ft": -6.641414415753388e-05
+        }
+      ],
+      "max_abs_residual_running_ft": 8.620257170832701e-05
+    },
+    "PUMP-172": {
+      "epanet_3point_fit_h0_r_n": {
+        "fitted": true,
+        "h0_ft": 740.0,
+        "r": 8.381775190112609e-05,
+        "n": 1.9384505123601592
+      },
+      "shutoff_scales_as_speed_squared": [
+        {
+          "speed": 0.5,
+          "shutoff_ft": 185.0,
+          "ratio_to_speed1": 0.25,
+          "speed_squared": 0.25,
+          "match": true
+        },
+        {
+          "speed": 0.6,
+          "shutoff_ft": 266.4,
+          "ratio_to_speed1": 0.36,
+          "speed_squared": 0.36,
+          "match": true
+        },
+        {
+          "speed": 0.7,
+          "shutoff_ft": 362.59999999999997,
+          "ratio_to_speed1": 0.48999999999999994,
+          "speed_squared": 0.48999999999999994,
+          "match": true
+        },
+        {
+          "speed": 0.8,
+          "shutoff_ft": 473.6000000000001,
+          "ratio_to_speed1": 0.6400000000000001,
+          "speed_squared": 0.6400000000000001,
+          "match": true
+        },
+        {
+          "speed": 0.85,
+          "shutoff_ft": 534.65,
+          "ratio_to_speed1": 0.7224999999999999,
+          "speed_squared": 0.7224999999999999,
+          "match": true
+        },
+        {
+          "speed": 0.9,
+          "shutoff_ft": 599.4000000000001,
+          "ratio_to_speed1": 0.8100000000000002,
+          "speed_squared": 0.81,
+          "match": true
+        },
+        {
+          "speed": 1.0,
+          "shutoff_ft": 740.0,
+          "ratio_to_speed1": 1.0,
+          "speed_squared": 1.0,
+          "match": true
+        },
+        {
+          "speed": 1.05,
+          "shutoff_ft": 815.85,
+          "ratio_to_speed1": 1.1025,
+          "speed_squared": 1.1025,
+          "match": true
+        },
+        {
+          "speed": 1.1,
+          "shutoff_ft": 895.4000000000001,
+          "ratio_to_speed1": 1.2100000000000002,
+          "speed_squared": 1.2100000000000002,
+          "match": true
+        }
+      ],
+      "operating_point_on_fitted_curve": [
+        {
+          "speed": 0.8,
+          "flow_gpm": 842.9006958007812,
+          "head_observed_ft": 434.7989501953125,
+          "head_from_fit_ft": 434.7989005061751,
+          "residual_ft": 4.968913742686709e-05
+        },
+        {
+          "speed": 0.85,
+          "flow_gpm": 1360.5057373046875,
+          "head_observed_ft": 436.1321716308594,
+          "head_from_fit_ft": 436.13215990035604,
+          "residual_ft": 1.1730503331364162e-05
+        },
+        {
+          "speed": 0.9,
+          "flow_gpm": 1754.5660400390625,
+          "head_observed_ft": 437.5241394042969,
+          "head_from_fit_ft": 437.52413106353094,
+          "residual_ft": 8.340765930370253e-06
+        },
+        {
+          "speed": 1.0,
+          "flow_gpm": 2401.7587890625,
+          "head_observed_ft": 440.54962158203125,
+          "head_from_fit_ft": 440.54957500580093,
+          "residual_ft": 4.657623031789626e-05
+        },
+        {
+          "speed": 1.05,
+          "flow_gpm": 2688.224609375,
+          "head_observed_ft": 442.1789855957031,
+          "head_from_fit_ft": 442.1789466753227,
+          "residual_ft": 3.892038040476109e-05
+        },
+        {
+          "speed": 1.1,
+          "flow_gpm": 2959.522705078125,
+          "head_observed_ft": 443.8819274902344,
+          "head_from_fit_ft": 443.8819218095498,
+          "residual_ft": 5.680684580511297e-06
+        }
+      ],
+      "max_abs_residual_running_ft": 4.968913742686709e-05
+    }
+  },
+  "response_summary": {
+    "PUMP-170": {
+      "flow_monotone_increasing_in_speed": true,
+      "flow_range_gpm": [
+        332.4685363769531,
+        967.7293701171875
+      ],
+      "head_range_ft": [
+        309.8952941894531,
+        414.7001037597656
+      ],
+      "flow_span_gpm": 635.2608337402344,
+      "head_span_ft": 104.8048095703125,
+      "n_speeds_with_pump_shut": 4,
+      "n_speeds_beyond_curve_qmax": 0,
+      "speeds_beyond_curve_qmax": []
+    },
+    "PUMP-172": {
+      "flow_monotone_increasing_in_speed": true,
+      "flow_range_gpm": [
+        842.9006958007812,
+        2959.522705078125
+      ],
+      "head_range_ft": [
+        434.7989501953125,
+        443.8819274902344
+      ],
+      "flow_span_gpm": 2116.6220092773438,
+      "head_span_ft": 9.082977294921875,
+      "n_speeds_with_pump_shut": 3,
+      "n_speeds_beyond_curve_qmax": 0,
+      "speeds_beyond_curve_qmax": []
+    }
+  },
+  "eps_fixed_speed": {
+    "speed_85": {
+      "speeds_commanded": {
+        "PUMP-170": 0.85,
+        "PUMP-172": 0.85
+      },
+      "wntr_warnings": [],
+      "pumps": {
+        "PUMP-170": {
+          "frac_time_open": 0.2694300518134715,
+          "n_status_changes": 7,
+          "flow_mean_gpm_when_open": 603.5576171875,
+          "flow_max_gpm": 764.5399169921875,
+          "volume_pumped_Mgal": 0.9415500164031982,
+          "energy_total_kWh": 1418.3019170039436,
+          "power_mean_when_open_kW": 54.55007373092091
+        },
+        "PUMP-172": {
+          "frac_time_open": 0.39896373056994816,
+          "n_status_changes": 7,
+          "flow_mean_gpm_when_open": 2119.314697265625,
+          "flow_max_gpm": 2413.486083984375,
+          "volume_pumped_Mgal": 4.8956170082092285,
+          "energy_total_kWh": 9013.776848597108,
+          "power_mean_when_open_kW": 234.12407398953536
+        }
+      },
+      "tanks": {
+        "TANK-130": {
+          "level_min_ft": 12.140449523925781,
+          "level_max_ft": 16.017623901367188,
+          "net_change_ft": -1.1587268114089966,
+          "hit_min_level": false
+        },
+        "TANK-131": {
+          "level_min_ft": 15.404268264770508,
+          "level_max_ft": 18.39835548400879,
+          "net_change_ft": -0.9497694969177246,
+          "hit_min_level": false
+        }
+      },
+      "network": {
+        "min_junction_pressure_psi": 4.208951950073242,
+        "mean_junction_pressure_psi": 103.87483978271484,
+        "n_negative_node_timesteps": 0,
+        "report_scan_errors": 0
+      }
+    },
+    "speed_100": {
+      "speeds_commanded": {
+        "PUMP-170": 1.0,
+        "PUMP-172": 1.0
+      },
+      "wntr_warnings": [],
+      "pumps": {
+        "PUMP-170": {
+          "frac_time_open": 0.21761658031088082,
+          "n_status_changes": 7,
+          "flow_mean_gpm_when_open": 761.425048828125,
+          "flow_max_gpm": 765.8873291015625,
+          "volume_pumped_Mgal": 0.9593956470489502,
+          "energy_total_kWh": 1493.9320185409483,
+          "power_mean_when_open_kW": 71.13961993052133
+        },
+        "PUMP-172": {
+          "frac_time_open": 0.35751295336787564,
+          "n_status_changes": 7,
+          "flow_mean_gpm_when_open": 2405.137451171875,
+          "flow_max_gpm": 2413.36328125,
+          "volume_pumped_Mgal": 4.978634834289551,
+          "energy_total_kWh": 9177.5757366695,
+          "power_mean_when_open_kW": 266.0166880194057
+        }
+      },
+      "tanks": {
+        "TANK-130": {
+          "level_min_ft": 12.109811782836914,
+          "level_max_ft": 15.981779098510742,
+          "net_change_ft": -1.199476957321167,
+          "hit_min_level": false
+        },
+        "TANK-131": {
+          "level_min_ft": 15.399561882019043,
+          "level_max_ft": 18.38724136352539,
+          "net_change_ft": -0.9711958765983582,
+          "hit_min_level": false
+        }
+      },
+      "network": {
+        "min_junction_pressure_psi": 4.187530517578125,
+        "mean_junction_pressure_psi": 103.82630920410156,
+        "n_negative_node_timesteps": 0,
+        "report_scan_errors": 0
+      }
+    }
+  },
+  "eps_rules_disabled_diagnostic": {
+    "runs": {
+      "speed_85": {
+        "speed": 0.85,
+        "controls_removed": [
+          "RULE-0",
+          "RULE-1",
+          "RULE-3",
+          "RULE-4"
+        ],
+        "wntr_warnings": [],
+        "report_scan_errors": 0,
+        "min_junction_pressure_psi": 5.514961242675781,
+        "mean_junction_pressure_psi": 105.53067016601562,
+        "max_junction_pressure_psi": 507.12908935546875,
+        "n_negative_node_timesteps": 0,
+        "pressure_vector_mean_psi": {
+          "JUNCTION-0": 122.91812896728516,
+          "JUNCTION-1": 100.95178985595703,
+          "JUNCTION-2": 128.5218505859375,
+          "JUNCTION-3": 100.391845703125,
+          "JUNCTION-4": 78.8403091430664,
+          "JUNCTION-5": 71.73178100585938,
+          "JUNCTION-6": 67.07167053222656,
+          "JUNCTION-7": 53.973018646240234,
+          "JUNCTION-8": 72.10093688964844,
+          "JUNCTION-9": 74.3283920288086,
+          "JUNCTION-10": 106.56179809570312,
+          "JUNCTION-11": 102.02080535888672,
+          "JUNCTION-12": 86.68202209472656,
+          "JUNCTION-13": 109.88523864746094,
+          "JUNCTION-14": 70.4983139038086,
+          "JUNCTION-15": 102.37645721435547,
+          "JUNCTION-16": 85.1655044555664,
+          "JUNCTION-17": 119.0181655883789,
+          "JUNCTION-18": 78.73165130615234,
+          "JUNCTION-19": 131.9343719482422,
+          "JUNCTION-20": 106.45634460449219,
+          "JUNCTION-21": 91.46151733398438,
+          "JUNCTION-22": 102.94427490234375,
+          "JUNCTION-23": 112.35285949707031,
+          "JUNCTION-24": 98.32402801513672,
+          "JUNCTION-25": 90.81605529785156,
+          "JUNCTION-26": 78.02786254882812,
+          "JUNCTION-27": 74.89808654785156,
+          "JUNCTION-28": 70.11199951171875,
+          "JUNCTION-29": 7.436012268066406,
+          "JUNCTION-30": 98.67679595947266,
+          "JUNCTION-31": 114.04991149902344,
+          "JUNCTION-32": 103.01847839355469,
+          "JUNCTION-33": 104.34514617919922,
+          "JUNCTION-34": 288.1522216796875,
+          "JUNCTION-35": 91.61933135986328,
+          "JUNCTION-36": 99.35807800292969,
+          "JUNCTION-37": 80.75228881835938,
+          "JUNCTION-38": 93.98515319824219,
+          "JUNCTION-39": 69.42597198486328,
+          "JUNCTION-40": 52.770606994628906,
+          "JUNCTION-41": 70.71355438232422,
+          "JUNCTION-42": 58.65585708618164,
+          "JUNCTION-43": 91.17937469482422,
+          "JUNCTION-44": 80.16455078125,
+          "JUNCTION-45": 89.056640625,
+          "JUNCTION-46": 57.461021423339844,
+          "JUNCTION-47": 96.64136505126953,
+          "JUNCTION-48": 97.95462799072266,
+          "JUNCTION-49": 103.8314437866211,
+          "JUNCTION-50": 109.38138580322266,
+          "JUNCTION-51": 103.9209976196289,
+          "JUNCTION-52": 108.4303207397461,
+          "JUNCTION-53": 110.9285659790039,
+          "JUNCTION-54": 113.3209228515625,
+          "JUNCTION-55": 112.78759002685547,
+          "JUNCTION-56": 111.22764587402344,
+          "JUNCTION-57": 106.42963409423828,
+          "JUNCTION-58": 109.78902435302734,
+          "JUNCTION-59": 105.1343994140625,
+          "JUNCTION-60": 103.8169174194336,
+          "JUNCTION-61": 103.21432495117188,
+          "JUNCTION-62": 103.20557403564453,
+          "JUNCTION-63": 103.83380889892578,
+          "JUNCTION-64": 104.18901824951172,
+          "JUNCTION-65": 105.81816101074219,
+          "JUNCTION-66": 105.66656494140625,
+          "JUNCTION-67": 103.595458984375,
+          "JUNCTION-68": 106.80992889404297,
+          "JUNCTION-69": 102.94047546386719,
+          "JUNCTION-70": 105.92523193359375,
+          "JUNCTION-71": 100.2618637084961,
+          "JUNCTION-72": 104.52113342285156,
+          "JUNCTION-73": 105.37908172607422,
+          "JUNCTION-74": 104.52545928955078,
+          "JUNCTION-75": 101.57029724121094,
+          "JUNCTION-76": 104.43434143066406,
+          "JUNCTION-77": 103.52869415283203,
+          "JUNCTION-78": 106.397216796875,
+          "JUNCTION-79": 106.45353698730469,
+          "JUNCTION-80": 106.88676452636719,
+          "JUNCTION-81": 103.98798370361328,
+          "JUNCTION-82": 106.0763168334961,
+          "JUNCTION-83": 106.53125,
+          "JUNCTION-84": 105.56939697265625,
+          "JUNCTION-85": 105.43084716796875,
+          "JUNCTION-86": 104.03141021728516,
+          "JUNCTION-87": 104.56002044677734,
+          "JUNCTION-88": 104.80706787109375,
+          "JUNCTION-89": 102.58869171142578,
+          "JUNCTION-90": 95.10228729248047,
+          "JUNCTION-91": 97.98409271240234,
+          "JUNCTION-92": 101.97128295898438,
+          "JUNCTION-93": 95.25394439697266,
+          "JUNCTION-94": 99.7001724243164,
+          "JUNCTION-95": 100.8349609375,
+          "JUNCTION-96": 101.57947540283203,
+          "JUNCTION-97": 101.6441879272461,
+          "JUNCTION-98": 95.550537109375,
+          "JUNCTION-99": 96.05299377441406,
+          "JUNCTION-100": 97.7818603515625,
+          "JUNCTION-101": 94.66651916503906,
+          "JUNCTION-102": 29.166927337646484,
+          "JUNCTION-103": 56.24530029296875,
+          "JUNCTION-104": 131.49891662597656,
+          "JUNCTION-105": 369.7060546875,
+          "JUNCTION-106": 504.4853515625,
+          "JUNCTION-109": 184.09420776367188,
+          "JUNCTION-110": 375.0184020996094,
+          "JUNCTION-111": 104.75527954101562,
+          "JUNCTION-112": 70.00001525878906,
+          "JUNCTION-113": 130.3157196044922,
+          "JUNCTION-114": 95.56463623046875,
+          "JUNCTION-115": 143.01271057128906,
+          "JUNCTION-116": 55.00001525878906,
+          "JUNCTION-117": 110.75457000732422,
+          "JUNCTION-118": 29.76200294494629,
+          "JUNCTION-119": 136.54237365722656,
+          "JUNCTION-120": 44.9999885559082,
+          "JUNCTION-121": 88.62456512451172,
+          "JUNCTION-122": 37.00002670288086,
+          "JUNCTION-123": 123.21803283691406,
+          "JUNCTION-124": 45.771976470947266,
+          "JUNCTION-125": 186.0665283203125,
+          "JUNCTION-126": 16.734596252441406,
+          "JUNCTION-128": 184.15151977539062
+        },
+        "tanks": {
+          "TANK-130": {
+            "level_min_ft": 15.10770320892334,
+            "level_max_ft": 23.681459426879883,
+            "max_level_ft": 32.1,
+            "overflowed": false,
+            "emptied": false
+          },
+          "TANK-131": {
+            "level_min_ft": 17.93798828125,
+            "level_max_ft": 30.68668556213379,
+            "max_level_ft": 41.9,
+            "overflowed": false,
+            "emptied": false
+          }
+        }
+      },
+      "speed_100": {
+        "speed": 1.0,
+        "controls_removed": [
+          "RULE-0",
+          "RULE-1",
+          "RULE-3",
+          "RULE-4"
+        ],
+        "wntr_warnings": [],
+        "report_scan_errors": 0,
+        "min_junction_pressure_psi": 5.538313388824463,
+        "mean_junction_pressure_psi": 137.48033142089844,
+        "max_junction_pressure_psi": 697.587890625,
+        "n_negative_node_timesteps": 0,
+        "pressure_vector_mean_psi": {
+          "JUNCTION-0": 122.91812896728516,
+          "JUNCTION-1": 100.94450378417969,
+          "JUNCTION-2": 128.5218505859375,
+          "JUNCTION-3": 100.391845703125,
+          "JUNCTION-4": 78.84030151367188,
+          "JUNCTION-5": 71.73178100585938,
+          "JUNCTION-6": 67.07167053222656,
+          "JUNCTION-7": 53.9730110168457,
+          "JUNCTION-8": 72.10093688964844,
+          "JUNCTION-9": 74.3283920288086,
+          "JUNCTION-10": 106.56179809570312,
+          "JUNCTION-11": 102.02080535888672,
+          "JUNCTION-12": 86.68202209472656,
+          "JUNCTION-13": 109.88523864746094,
+          "JUNCTION-14": 70.4983139038086,
+          "JUNCTION-15": 102.37645721435547,
+          "JUNCTION-16": 85.1655044555664,
+          "JUNCTION-17": 119.01815795898438,
+          "JUNCTION-18": 78.73164367675781,
+          "JUNCTION-19": 173.56349182128906,
+          "JUNCTION-20": 148.08551025390625,
+          "JUNCTION-21": 133.09255981445312,
+          "JUNCTION-22": 144.57620239257812,
+          "JUNCTION-23": 154.0391387939453,
+          "JUNCTION-24": 139.94554138183594,
+          "JUNCTION-25": 132.43157958984375,
+          "JUNCTION-26": 119.6324462890625,
+          "JUNCTION-27": 116.50010681152344,
+          "JUNCTION-28": 111.70914459228516,
+          "JUNCTION-29": 48.982666015625,
+          "JUNCTION-30": 140.4152069091797,
+          "JUNCTION-31": 155.76358032226562,
+          "JUNCTION-32": 144.73216247558594,
+          "JUNCTION-33": 146.058837890625,
+          "JUNCTION-34": 330.47772216796875,
+          "JUNCTION-35": 133.24647521972656,
+          "JUNCTION-36": 140.9852294921875,
+          "JUNCTION-37": 122.37910461425781,
+          "JUNCTION-38": 135.61228942871094,
+          "JUNCTION-39": 111.0501937866211,
+          "JUNCTION-40": 94.39295959472656,
+          "JUNCTION-41": 112.3359146118164,
+          "JUNCTION-42": 100.27701568603516,
+          "JUNCTION-43": 132.79383850097656,
+          "JUNCTION-44": 121.77033233642578,
+          "JUNCTION-45": 89.056640625,
+          "JUNCTION-46": 57.461021423339844,
+          "JUNCTION-47": 138.2725067138672,
+          "JUNCTION-48": 139.5860595703125,
+          "JUNCTION-49": 145.463134765625,
+          "JUNCTION-50": 151.01283264160156,
+          "JUNCTION-51": 145.55242919921875,
+          "JUNCTION-52": 150.06167602539062,
+          "JUNCTION-53": 152.63336181640625,
+          "JUNCTION-54": 155.0298309326172,
+          "JUNCTION-55": 154.4948272705078,
+          "JUNCTION-56": 152.9339141845703,
+          "JUNCTION-57": 148.143310546875,
+          "JUNCTION-58": 151.50271606445312,
+          "JUNCTION-59": 146.84808349609375,
+          "JUNCTION-60": 145.53060913085938,
+          "JUNCTION-61": 144.92800903320312,
+          "JUNCTION-62": 144.91925048828125,
+          "JUNCTION-63": 145.5474853515625,
+          "JUNCTION-64": 145.90272521972656,
+          "JUNCTION-65": 147.53182983398438,
+          "JUNCTION-66": 147.3802490234375,
+          "JUNCTION-67": 145.30914306640625,
+          "JUNCTION-68": 148.52362060546875,
+          "JUNCTION-69": 144.65414428710938,
+          "JUNCTION-70": 147.63893127441406,
+          "JUNCTION-71": 141.9755401611328,
+          "JUNCTION-72": 146.2348175048828,
+          "JUNCTION-73": 147.09278869628906,
+          "JUNCTION-74": 146.2391357421875,
+          "JUNCTION-75": 143.28396606445312,
+          "JUNCTION-76": 146.1480255126953,
+          "JUNCTION-77": 145.2423858642578,
+          "JUNCTION-78": 148.11090087890625,
+          "JUNCTION-79": 148.16722106933594,
+          "JUNCTION-80": 148.60044860839844,
+          "JUNCTION-81": 145.70166015625,
+          "JUNCTION-82": 147.7899932861328,
+          "JUNCTION-83": 148.24493408203125,
+          "JUNCTION-84": 147.2830810546875,
+          "JUNCTION-85": 147.14450073242188,
+          "JUNCTION-86": 145.7450714111328,
+          "JUNCTION-87": 146.27371215820312,
+          "JUNCTION-88": 146.52073669433594,
+          "JUNCTION-89": 144.3023681640625,
+          "JUNCTION-90": 136.81597900390625,
+          "JUNCTION-91": 139.69776916503906,
+          "JUNCTION-92": 143.68496704101562,
+          "JUNCTION-93": 136.96763610839844,
+          "JUNCTION-94": 141.41384887695312,
+          "JUNCTION-95": 142.5486297607422,
+          "JUNCTION-96": 143.29315185546875,
+          "JUNCTION-97": 143.35789489746094,
+          "JUNCTION-98": 137.26422119140625,
+          "JUNCTION-99": 137.7666778564453,
+          "JUNCTION-100": 139.4955596923828,
+          "JUNCTION-101": 136.38021850585938,
+          "JUNCTION-102": 102.74402618408203,
+          "JUNCTION-103": 129.9640350341797,
+          "JUNCTION-104": 207.1368408203125,
+          "JUNCTION-105": 402.9601135253906,
+          "JUNCTION-106": 580.2346801757812,
+          "JUNCTION-109": 184.03445434570312,
+          "JUNCTION-110": 417.5552062988281,
+          "JUNCTION-111": 104.75527954101562,
+          "JUNCTION-112": 70.00001525878906,
+          "JUNCTION-113": 130.3157196044922,
+          "JUNCTION-114": 95.56463623046875,
+          "JUNCTION-115": 184.64154052734375,
+          "JUNCTION-116": 55.00001525878906,
+          "JUNCTION-117": 110.75457000732422,
+          "JUNCTION-118": 29.76200294494629,
+          "JUNCTION-119": 212.18026733398438,
+          "JUNCTION-120": 44.9999885559082,
+          "JUNCTION-121": 162.34327697753906,
+          "JUNCTION-122": 37.00002670288086,
+          "JUNCTION-123": 123.21803283691406,
+          "JUNCTION-124": 87.458251953125,
+          "JUNCTION-125": 227.69566345214844,
+          "JUNCTION-126": 16.734596252441406,
+          "JUNCTION-128": 184.15052795410156
+        },
+        "tanks": {
+          "TANK-130": {
+            "level_min_ft": 15.158966064453125,
+            "level_max_ft": 32.09992599487305,
+            "max_level_ft": 32.1,
+            "overflowed": false,
+            "emptied": false
+          },
+          "TANK-131": {
+            "level_min_ft": 17.945096969604492,
+            "level_max_ft": 41.899993896484375,
+            "max_level_ft": 41.9,
+            "overflowed": false,
+            "emptied": false
+          }
+        }
+      }
+    },
+    "authority": {
+      "max_abs_mean_dP_psi": 75.74932861328125,
+      "max_abs_mean_dP_node": "JUNCTION-106",
+      "n_junctions_mean_moved_gt_1psi": 92,
+      "n_junctions_mean_moved_gt_5psi": 92
+    }
+  },
+  "pump_pressure_authority": {
+    "rule_driven_mean_dP_psi_0p85_vs_1p00": 0.04853057861328125,
+    "rule_driven_min_dP_psi_0p85_vs_1p00": 0.021421432495117188,
+    "rule_driven_energy_change_pct": {
+      "PUMP-170": -5.062486150532408,
+      "PUMP-172": -1.7847729375626287
+    },
+    "interpretation": "Under the native rules a speed change mainly redistributes pump run time and energy; the pressure field is anchored by the two tanks, whose level the rules confine to a narrow band. This is an observation about actuator authority, not a verdict on the thesis."
+  },
+  "speed_really_applied": true,
+  "verdict": "G3 PUMP SPEED RESPONSE = PASS"
+}

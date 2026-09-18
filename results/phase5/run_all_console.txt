@@ -1,0 +1,85 @@
+========================================================================================
+PHASE 5 - BWSN-1 PRE-FLIGHT VALIDATION: full gate sequence
+========================================================================================
+
+>>> g0_integrity.py  (gates G0)
+    ok in 2.8 s
+    G0 FILE INTEGRITY = PASS
+
+>>> g1_baseline.py  (gates G1, G2, G11)
+    ok in 2.7 s
+    G1 BASELINE EPANET/WNTR CONVERGENCE = PASS
+    G11 TANK DYNAMICS = PASS
+    stderr:   warnings.warn('Not all curves were used in "{}"; added with type None, units conversion left to user'.format(self.wn.name))
+    stderr: D:\Thesis\.venv\Lib\site-packages\wntr\epanet\io.py:2082: UserWarning: Not all curves were used in "D:\Thesis\data\networks\working\BWSN_Network_1_working.inp"; added with type None, units conversion left to user
+    stderr:   warnings.warn('Not all curves were used in "{}"; added with type None, units conversion left to user'.format(self.wn.name))
+    stderr: D:\Thesis\.venv\Lib\site-packages\wntr\epanet\io.py:2082: UserWarning: Not all curves were used in "D:\Thesis\data\networks\working\BWSN_Network_1_working.inp"; added with type None, units conversion left to user
+    stderr:   warnings.warn('Not all curves were used in "{}"; added with type None, units conversion left to user'.format(self.wn.name))
+
+>>> g3_pump_speed.py  (gates G3)
+    ok in 3.6 s
+    G3 PUMP SPEED RESPONSE = PASS
+    stderr:   warnings.warn('Not all curves were used in "{}"; added with type None, units conversion left to user'.format(self.wn.name))
+    stderr: D:\Thesis\.venv\Lib\site-packages\wntr\epanet\io.py:2082: UserWarning: Not all curves were used in "D:\Thesis\data\networks\working\BWSN_Network_1_working.inp"; added with type None, units conversion left to user
+    stderr:   warnings.warn('Not all curves were used in "{}"; added with type None, units conversion left to user'.format(self.wn.name))
+    stderr: D:\Thesis\.venv\Lib\site-packages\wntr\epanet\io.py:2082: UserWarning: Not all curves were used in "D:\Thesis\data\networks\working\BWSN_Network_1_working.inp"; added with type None, units conversion left to user
+    stderr:   warnings.warn('Not all curves were used in "{}"; added with type None, units conversion left to user'.format(self.wn.name))
+
+>>> g4_g5_prv.py  (gates G4, G5)
+    ok in 7.8 s
+    G4 PRV ACTUATOR RESPONSIVENESS = PASS
+    G5 PRV ACTION-DIMENSION AUDIT = CONDITIONAL
+    stderr:   warnings.warn('Not all curves were used in "{}"; added with type None, units conversion left to user'.format(self.wn.name))
+    stderr: D:\Thesis\.venv\Lib\site-packages\wntr\epanet\io.py:2082: UserWarning: Not all curves were used in "D:\Thesis\data\networks\working\BWSN_Network_1_working.inp"; added with type None, units conversion left to user
+    stderr:   warnings.warn('Not all curves were used in "{}"; added with type None, units conversion left to user'.format(self.wn.name))
+    stderr: D:\Thesis\.venv\Lib\site-packages\wntr\epanet\io.py:2082: UserWarning: Not all curves were used in "D:\Thesis\data\networks\working\BWSN_Network_1_working.inp"; added with type None, units conversion left to user
+    stderr:   warnings.warn('Not all curves were used in "{}"; added with type None, units conversion left to user'.format(self.wn.name))
+
+>>> g6_g7_g8_leak_pda.py  (gates G6, G7, G8)
+    ok in 5.5 s
+    G6 LEAKAGE MODEL VALIDATION = PASS
+    G7 PDA RESPONSE = PASS
+    G8 LEAKAGE/SERVICE SEPARATION = PASS
+    stderr:   warnings.warn('Not all curves were used in "{}"; added with type None, units conversion left to user'.format(self.wn.name))
+    stderr: D:\Thesis\.venv\Lib\site-packages\wntr\epanet\io.py:2082: UserWarning: Not all curves were used in "D:\Thesis\data\networks\working\BWSN_Network_1_working.inp"; added with type None, units conversion left to user
+    stderr:   warnings.warn('Not all curves were used in "{}"; added with type None, units conversion left to user'.format(self.wn.name))
+    stderr: D:\Thesis\.venv\Lib\site-packages\wntr\epanet\io.py:2082: UserWarning: Not all curves were used in "D:\Thesis\data\networks\working\BWSN_Network_1_working.inp"; added with type None, units conversion left to user
+    stderr:   warnings.warn('Not all curves were used in "{}"; added with type None, units conversion left to user'.format(self.wn.name))
+
+>>> g9_g10_full.py  (gates G9, G10)
+    ok in 3.2 s
+    G9 MASS BALANCE = PASS
+    G10 FULL PRE-FLIGHT EPS = PASS
+    stderr:   warnings.warn('Not all curves were used in "{}"; added with type None, units conversion left to user'.format(self.wn.name))
+    stderr: D:\Thesis\.venv\Lib\site-packages\wntr\epanet\io.py:2082: UserWarning: Not all curves were used in "D:\Thesis\data\networks\working\BWSN_Network_1_working.inp"; added with type None, units conversion left to user
+    stderr:   warnings.warn('Not all curves were used in "{}"; added with type None, units conversion left to user'.format(self.wn.name))
+    stderr: D:\Thesis\.venv\Lib\site-packages\wntr\epanet\io.py:2082: UserWarning: Not all curves were used in "D:\Thesis\data\networks\working\BWSN_Network_1_working.inp"; added with type None, units conversion left to user
+    stderr:   warnings.warn('Not all curves were used in "{}"; added with type None, units conversion left to user'.format(self.wn.name))
+
+>>> g12_realizability.py  (gates G12)
+    ok in 5.6 s
+    G12 ACTUATOR REALIZABILITY = CONDITIONAL
+    stderr:   warnings.warn('Not all curves were used in "{}"; added with type None, units conversion left to user'.format(self.wn.name))
+    stderr: D:\Thesis\.venv\Lib\site-packages\wntr\epanet\io.py:2082: UserWarning: Not all curves were used in "D:\Thesis\data\networks\working\BWSN_Network_1_working.inp"; added with type None, units conversion left to user
+    stderr:   warnings.warn('Not all curves were used in "{}"; added with type None, units conversion left to user'.format(self.wn.name))
+    stderr: D:\Thesis\.venv\Lib\site-packages\wntr\epanet\io.py:2082: UserWarning: Not all curves were used in "D:\Thesis\data\networks\working\BWSN_Network_1_working.inp"; added with type None, units conversion left to user
+    stderr:   warnings.warn('Not all curves were used in "{}"; added with type None, units conversion left to user'.format(self.wn.name))
+
+========================================================================================
+CONSOLIDATED VERDICTS
+========================================================================================
+  G0                                                   G0 FILE INTEGRITY = PASS
+  g1                                                   G1 BASELINE EPANET/WNTR CONVERGENCE = PASS
+  g11                                                  G11 TANK DYNAMICS = PASS
+  g2                                                   G2 NATIVE CONTROL LOGIC = CHARACTERISED (descriptive gate, no pass/fail)
+  G3                                                   G3 PUMP SPEED RESPONSE = PASS
+  g4                                                   G4 PRV ACTUATOR RESPONSIVENESS = PASS
+  g5                                                   G5 PRV ACTION-DIMENSION AUDIT = CONDITIONAL
+  g6                                                   G6 LEAKAGE MODEL VALIDATION = PASS
+  g7                                                   G7 PDA RESPONSE = PASS
+  g8                                                   G8 LEAKAGE/SERVICE SEPARATION = PASS
+  G9 MASS BALANCE                                      PASS
+  G10 FULL PRE-FLIGHT EPS                              PASS
+  G12 ACTUATOR REALIZABILITY                           CONDITIONAL
+
+  modules run: 7, non-zero exit: 0

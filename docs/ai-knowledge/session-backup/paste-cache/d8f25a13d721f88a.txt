@@ -1,0 +1,718 @@
+حمایت نکن.
+
+هدف این فاز این است که قبل از نوشتن کد و اجرای آزمایش، یک بار دیگر مشخص شود:
+
+1. بهترین شبکه برای پایان‌نامه واقعاً کدام است؟
+2. آیا می‌توان از همان شبکه‌ی Negm به‌عنوان پایه استفاده کرد و اجزای جدید مثل پمپ و PRV اضافه کرد؟
+3. آیا چنین تغییری علمی و قابل‌دفاع است یا benchmark را خراب می‌کند؟
+4. آیا Net3 واقعاً بهترین انتخاب است یا شبکه‌ی عمومی دیگری بهتر است؟
+5. اگر قرار باشد شبکه‌ای را اصلاح کنیم، دقیقاً چه اصلاحاتی مجاز و قابل‌دفاع‌اند؟
+6. این انتخاب چه اثری بر RQ، novelty، fairness، reproducibility، computation و طراحی آزمایش دارد؟
+7. در نهایت، **یک تصمیم روشن و قابل اجرا** بده که بتوانم بر اساس آن وارد implementation شوم.
+
+---
+
+# CONTEXT پروژه
+
+پایان‌نامه درباره‌ی کنترل فشار در Water Distribution Network با استفاده از Deep Reinforcement Learning است.
+
+هسته‌ی روش:
+
+* EPANET
+* WNTR
+* PPO
+* continuous action space
+* PRV control
+* Variable-Speed Pump (VSP)
+* leakage minimization
+* pressure/service constraints
+* stochastic demand
+* uncertainty/generalization
+* multi-objective reward
+* مقایسه با baselineهای کلاسیک و RL
+
+Research Question اصلی تقریباً حول این ایده است:
+
+> آیا PPO می‌تواند با کنترل هماهنگ PRV و پمپ، در شرایط تقاضای متغیر و نامطمئن، فشار را تنظیم کرده و leakage را کاهش دهد، بدون اینکه کیفیت سرویس/pressure constraints به شکل غیرقابل‌قبول نقض شوند؟
+
+Proposal چند innovation دارد، اما بعد از مرور ادبیات مشخص شده که بسیاری از ادعاهای اولیه novelty بیش از حد بوده‌اند.
+
+بنابراین novelty نباید با ادعاهای زیر تعریف شود:
+
+* continuous action برای اولین بار
+* EPANET + PPO برای اولین بار
+* PRV + pump coordination برای اولین بار
+* multi-objective reward برای اولین بار
+
+چون شواهدی علیه این ادعاها پیدا شده است.
+
+به‌جای آن، نوآوری احتمالی بیشتر در **طراحی آزمایش، attribution، observability، PDA/DDA، uncertainty separation، Pareto evaluation و robustness analysis** قرار دارد.
+
+---
+
+# PRIOR WORK مهم
+
+## Negm 2024
+
+کار بسیار نزدیک به پروژه است.
+
+در Jowitt & Xu:
+
+* 25 junction
+* 37 pipe
+* 3 valves
+* 0 pumps
+* 3 tanks/reservoirs
+* 1 DMA
+
+Negm از DRL برای pressure/leakage control استفاده کرده است.
+
+PPO، Recurrent PPO و الگوریتم‌های دیگر را بررسی کرده است.
+
+در نتایج معروف:
+
+* PPO حدود 73.4% water saving نشان داده
+* ولی حدود 304 pressure violations داشته
+* DE حدود 65.9% water saving و فقط 46 violations داشته
+
+Negm همچنین در بخش future work پیشنهاد اضافه‌کردن pressure-influencing elements مانند pumps را مطرح می‌کند.
+
+نکته‌ی بسیار مهم:
+
+Jowitt & Xu **پمپ ندارد**.
+
+بنابراین شبکه‌ی اصلی Negm برای یک پایان‌نامه که innovation اصلی آن coordinated PRV + VSP است، به‌طور مستقیم مناسب نیست.
+
+---
+
+# Hu et al. 2023
+
+Hu روی Net3 کار کرده است.
+
+Net3 شامل تقریباً:
+
+* 92 nodes
+* 117 pipes
+* 2 pump stations
+* 3 elevated tanks
+* 2 raw water sources
+
+و برای pump + valve control استفاده شده است.
+
+Hu برای این شبکه PRV اضافه کرده و از RL/optimization برای کنترل استفاده کرده است.
+
+بنابراین Net3 از نظر ساختار، بسیار مناسب مسئله‌ی ماست.
+
+اما باید توجه کنی که:
+
+**Net3 دیگر یک مسئله‌ی کاملاً جدید نیست.**
+
+کارهای قبلی روی Net3 انجام شده‌اند.
+
+---
+
+# مسئله‌ای که باید از نو بررسی کنی
+
+ما تا اینجا بیش از حد روی دو شبکه متمرکز شده‌ایم:
+
+1. Jowitt & Xu
+2. Net3
+
+اما واقعیت این است که شبکه‌های بسیار بیشتری وجود دارند.
+
+شبکه‌هایی مانند:
+
+* Jowitt & Xu
+* Net3
+* D-Town
+* Anytown
+* D-Town variants
+* EXNET
+* EX2 / Exmoor
+* Ky1 / Louisville
+* Hanoi / Net4
+* Richmond
+* Modena
+* Wolf-Cordera
+* WNTR example networks
+* Kentucky hydraulic benchmark networks
+* Exeter benchmark networks
+* و هر benchmark عمومی دیگری که در منابع علمی معتبر پیدا می‌کنی
+
+باید بررسی شوند.
+
+**ممنوع است که فقط بین Jowitt & Xu و Net3 انتخاب کنی.**
+
+---
+
+# سؤال اصلی این فاز
+
+## آیا می‌توان از شبکه‌ی Negm استفاده کرد و پمپ/شیر اضافه کرد؟
+
+این موضوع را دقیقاً بررسی کن.
+
+سه سناریو را از هم جدا کن:
+
+### سناریو A
+
+Jowitt & Xu را همان‌طور که هست استفاده کنیم.
+
+### سناریو B
+
+Jowitt & Xu را اصلاح کنیم:
+
+* اضافه‌کردن pump
+* اضافه‌کردن/تغییر PRV
+* تعیین pump curve
+* تعیین tank/source behaviour
+* تعیین control rules
+* تعیین pump speed range
+* احتمالاً اصلاح topology
+
+### سناریو C
+
+یک benchmark عمومی دیگر مثل Net3 را انتخاب کنیم و تغییرات حداقلی لازم را انجام دهیم.
+
+برای هر سناریو بررسی کن:
+
+* آیا benchmark هنوز همان benchmark اصلی محسوب می‌شود؟
+* آیا comparison با Negm حفظ می‌شود؟
+* آیا comparison با literature خراب می‌شود؟
+* آیا topology modification باعث می‌شود دیگر نتایج را نتوان به benchmark اصلی نسبت داد؟
+* آیا modification scientifically justified است؟
+* آیا این تغییرات arbitrary هستند؟
+* آیا pump addition باعث ایجاد degrees of freedom جدید می‌شود؟
+* آیا نتایج قابل reproducibility هستند؟
+* آیا این کار novelty واقعی ایجاد می‌کند یا صرفاً یک شبکه مصنوعی جدید می‌سازد؟
+* آیا یک داور می‌تواند بگوید «این دیگر Jowitt & Xu نیست»؟
+* آیا fair comparison با Negm ممکن می‌ماند؟
+
+**این سؤال را جدی بررسی کن؛ جواب سطحی نمی‌خواهم.**
+
+---
+
+# الزام مهم: جست‌وجوی واقعی وب
+
+در این فاز نباید فقط از memory یا corpus فعلی استفاده کنی.
+
+باید یک **Deep / Adversarial Literature + Benchmark Search** واقعی انجام دهی.
+
+بازه‌ی زمانی اصلی برای novelty:
+
+**2024–2026**
+
+اما برای benchmark networks و کارهای پایه، منابع قدیمی‌تر هم مجازند.
+
+حداقل این دسته‌ها را جست‌وجو کن:
+
+### 1. Public WDN benchmarks
+
+شبکه‌هایی که:
+
+* EPANET-compatible باشند
+* فایل مدل در دسترس باشد
+* node/pipe/pump/tank/valve مشخص داشته باشند
+* قابلیت reproducibility داشته باشند
+
+### 2. WDN + DRL
+
+جست‌وجو برای:
+
+* reinforcement learning
+* deep reinforcement learning
+* PPO
+* SAC
+* TD3
+* pump control
+* PRV control
+* pressure management
+* leakage reduction
+* demand uncertainty
+
+### 3. Joint pump + PRV control
+
+به‌صورت خاص:
+
+* pump + PRV
+* pump + valve coordination
+* continuous control
+* pressure management
+* leakage reduction
+
+### 4. Benchmark papers
+
+به دنبال papersی باش که network را explicitly معرفی کرده‌اند و بگویند:
+
+* چرا این شبکه انتخاب شده
+* network size
+* pump count
+* tank count
+* PRV count
+* public/private بودن
+* availability
+
+### 5. جدیدترین کارهای 2024، 2025 و 2026
+
+این بخش باید adversarial باشد.
+
+به‌خصوص بررسی کن آیا بعد از Cyriac & Chacko 2026، مقاله‌ای آمده که:
+
+* continuous-action pressure control
+* pump + PRV
+* Net3
+* D-Town
+* public benchmark
+* uncertainty
+* leakage
+* PPO/SAC
+
+را ترکیب کرده باشد.
+
+**هیچ novelty claim را بدون search کامل قبول نکن.**
+
+---
+
+# قانون FACT / INFERENCE
+
+برای تمام نتیجه‌گیری‌ها این تفکیک را رعایت کن:
+
+### FACT
+
+چیزی که مستقیماً از paper/database/model file قابل مشاهده است.
+
+### INFERENCE
+
+نتیجه‌ای که از facts استنباط می‌کنی.
+
+هیچ inference را به شکل citation مستقیم ارائه نکن.
+
+مثلاً:
+
+FACT:
+
+> Net3 دارای 92 node و 2 pump است.
+
+INFERENCE:
+
+> بنابراین برای controlled pump+PRV RL نسبت به Jowitt & Xu مناسب‌تر است.
+
+این دو را از هم جدا کن.
+
+---
+
+# خروجی مورد انتظار
+
+## بخش 1 — Executive Decision
+
+در همان ابتدای گزارش بگو:
+
+### آیا Net3 واقعاً بهترین انتخاب است؟
+
+یکی از این چهار حکم را بده:
+
+* YES
+* PROBABLY YES
+* UNCERTAIN
+* NO
+
+و دلیل را در حداکثر 1 صفحه توضیح بده.
+
+---
+
+# بخش 2 — Full Benchmark Landscape
+
+حداقل **15 شبکه** را بررسی کن.
+
+برای هر شبکه:
+
+| Network | Nodes | Pipes | Pumps | Tanks | PRVs | Public? | EPANET? | RL precedent? | Leakage suitability | Pump+PRV suitability | Compute | Reproducibility | Notes |
+
+اگر عددی را نمی‌توانی تأیید کنی:
+
+**UNKNOWN**
+
+بنویس.
+
+هیچ عددی را حدس نزن.
+
+---
+
+# بخش 3 — Weighted Network Ranking
+
+یک scoring framework بساز.
+
+معیارها:
+
+1. Pump availability
+2. PRV availability
+3. Tank dynamics
+4. Leakage modelling
+5. Demand uncertainty compatibility
+6. Public availability
+7. Reproducibility
+8. RL computational feasibility
+9. Existing RL precedent
+10. Existing pump+PRV precedent
+11. Benchmark comparability
+12. Network realism
+13. External validity
+14. Ability to isolate pump contribution
+15. Ability to study PDA vs DDA
+16. PRV-placement transparency
+17. availability of official .inp
+18. number of researchers already using it
+
+برای هر معیار:
+
+0–5
+
+و سپس یک score نهایی بساز.
+
+اما:
+
+**وزن معیارها را از خودت قایم نکن.**
+
+صریحاً بگو چرا مثلاً computational feasibility وزن بیشتری از network size دارد.
+
+---
+
+# بخش 4 — Jowitt & Xu Modification Audit
+
+این بخش خیلی مهم است.
+
+سؤال:
+
+## «آیا می‌توان Jowitt & Xu را تبدیل به شبکه‌ی اصلی کرد؟»
+
+سه سطح modification را بررسی کن:
+
+### Level 0
+
+فقط استفاده از شبکه اصلی.
+
+### Level 1
+
+تغییر کم:
+
+* اضافه کردن pump
+* اضافه کردن PRV
+* بدون تغییر اساسی topology
+
+### Level 2
+
+تغییر اساسی:
+
+* pumps
+* tanks
+* curves
+* controls
+* topology
+* source behaviour
+
+برای هر سطح بگو:
+
+* علمی؟
+* reproducible؟
+* comparable؟
+* defensible؟
+* خطر artificiality؟
+* خطر novelty inflation؟
+* چه چیزهایی باید فرض شوند؟
+
+و پاسخ صریح بده:
+
+### «آیا بعد از این modification هنوز می‌توان گفت این Jowitt & Xu benchmark است؟»
+
+---
+
+# بخش 5 — Jowitt & Xu vs Net3
+
+یک مقایسه‌ی عمیق انجام بده.
+
+نه فقط از نظر size.
+
+از نظر:
+
+* research question compatibility
+* objective 1
+* innovation 1
+* innovation 2
+* innovation 3
+* pump-control feasibility
+* PRV control
+* leakage
+* demand uncertainty
+* tanks
+* stochastic dynamics
+* observation design
+* action dimension
+* reward design
+* baseline comparability
+* novelty
+* external validity
+* reproducibility
+* computational cost
+* advisor defensibility
+
+در پایان:
+
+**یک Winner انتخاب کن.**
+
+---
+
+# بخش 6 — آیا Jowitt & Xu باید اصلاً وارد Main Experiment شود؟
+
+سه مدل پیشنهاد بده:
+
+### Model A
+
+Net3 فقط
+
+### Model B
+
+Net3 main + Jowitt & Xu secondary
+
+### Model C
+
+Jowitt & Xu modified main + Net3 secondary
+
+و با معیارهای:
+
+* scientific validity
+* novelty
+* fairness
+* computation
+* schedule
+* reproducibility
+* viva defensibility
+
+امتیاز بده.
+
+---
+
+# بخش 7 — PRV Placement Problem
+
+این موضوع قبلاً در Phaseهای قبلی مهم تشخیص داده شده است.
+
+اما آن را دوباره بررسی کن.
+
+به‌خصوص:
+
+* PRV placement by GA
+* operational placement
+* pressure-zone boundary
+* critical node
+* leakage-based placement
+* optimized placement bias
+
+بررسی کن آیا استفاده از Hu's four-valve GA placement باعث:
+
+**objective leakage co-optimization bias**
+
+می‌شود یا خیر.
+
+سه طراحی پیشنهاد بده:
+
+1. Hu replication
+2. operational placement
+3. dual-placement experiment
+
+و بگو کدام scientifically strongest است.
+
+---
+
+# بخش 8 — Network + PRV Placement Joint Decision
+
+در نهایت تصمیم را مستقل از هم نگیر.
+
+ممکن است یک شبکه خوب باشد ولی placement آن بد باشد.
+
+بنابراین:
+
+> network × PRV placement
+
+را به‌صورت یک design problem مشترک ارزیابی کن.
+
+مثلاً:
+
+Net3 + Hu placement
+
+در مقابل:
+
+Net3 + operational placement
+
+در مقابل:
+
+J&X original
+
+در مقابل:
+
+J&X modified
+
+و مشخص کن کدام ترکیب از نظر thesis strongest است.
+
+---
+
+# بخش 9 — Novelty Re-audit
+
+تمام noveltyهای قبلی را دوباره بررسی کن.
+
+برای هر ادعا بنویس:
+
+* Claim
+* Closest paper
+* Year
+* Exact overlap
+* Remaining difference
+* Novelty level
+* Confidence
+* Search gap
+
+حداقل این claims:
+
+1. PRV + VSP
+2. PPO continuous action
+3. multi-objective reward
+4. leakage + pressure
+5. demand uncertainty
+6. OOD testing
+7. observability constraint
+8. PDA vs DDA
+9. pump contribution ablation
+10. Pareto front
+11. Action Realization Rate
+12. equal tuning budget
+13. multi-seed evaluation
+
+هیچ claim سبز یا «novel» را بدون evidence قوی اعلام نکن.
+
+---
+
+# بخش 10 — Red-Team Questions
+
+خودت را جای داور بگذار و حداقل 15 سؤال سخت مطرح کن.
+
+مثلاً:
+
+* چرا Net3؟
+* چرا Jowitt & Xu نیست؟
+* چرا شبکه‌ی خودت را تغییر داده‌ای؟
+* آیا بعد از اضافه کردن pump، هنوز benchmark استاندارد است؟
+* چرا این PRV locations؟
+* چرا چهار PRV؟
+* چرا PPO؟
+* چرا SAC فقط comparator است؟
+* چرا DDA؟
+* چرا PDA؟
+* leakage reduction واقعاً saving است یا service curtailment؟
+* اگر DE بهتر شد چه؟
+* اگر PPO شکست خورد چه؟
+* اگر cross-network generalization نداری چرا می‌گویی generalization؟
+* آیا reward خودش leakage را manufacture می‌کند؟
+* آیا time encoding باعث learned TMPC نشده؟
+* آیا sensor subset واقعاً deployable است؟
+* آیا stochastic demand واقعاً uncertainty است؟
+* آیا Net3 به اندازه کافی realistic است؟
+* آیا results فقط benchmark-specific هستند؟
+
+برای هر سؤال یک پاسخ دفاعی کوتاه بنویس.
+
+---
+
+# بخش 11 — Final Recommendation
+
+در نهایت فقط یکی از این ساختارها را پیشنهاد بده:
+
+### OPTION 1
+
+Net3 primary + Jowitt & Xu secondary
+
+### OPTION 2
+
+Net3 primary only
+
+### OPTION 3
+
+Modified Jowitt & Xu primary + Net3 secondary
+
+### OPTION 4
+
+یک network جدید که در search پیدا کرده‌ای
+
+اما فقط با evidence انتخاب کن.
+
+همچنین دقیقاً بگو:
+
+* چرا گزینه‌های دیگر رد شدند؟
+* چه چیزی scientifically lost می‌شود؟
+* چه چیزی به‌دست می‌آید؟
+
+---
+
+# بخش 12 — Implementation Gate
+
+در پایان، مشخص کن آیا بعد از این فاز می‌توان وارد implementation شد یا نه.
+
+اگر NO:
+
+دقیقاً بگو چه decisionهایی هنوز باید قفل شوند.
+
+اگر YES:
+
+دقیقاً configuration پیشنهادی را ارائه کن:
+
+```text
+NETWORK =
+LEAKAGE MODEL =
+DEMAND MODEL =
+PDA/DDA =
+PRV PLACEMENT =
+PUMP MODEL =
+STATE =
+ACTION =
+REWARD =
+UNCERTAINTY =
+PPO =
+BASELINES =
+TEST PROTOCOL =
+SEEDS =
+```
+
+---
+
+# قوانین سخت این فاز
+
+1. از نتیجه قبلی درباره Net3 دفاع نکن.
+2. از Jowitt & Xu هم صرفاً به خاطر اینکه Negm استفاده کرده دفاع نکن.
+3. حداقل 15 network بررسی کن.
+4. هرجا داده نداری UNKNOWN بنویس.
+5. هیچ عددی را حدس نزن.
+6. source را برای هر claim مهم مشخص کن.
+7. 2024–2026 را به‌صورت adversarial جست‌وجو کن.
+8. novelty را conservative ارزیابی کن.
+9. «public» را با evidence تأیید کن.
+10. اگر .inp در دسترس است، availability آن را بررسی کن.
+11. اگر network modification لازم است، modification را دقیقاً مستند کن.
+12. مشخص کن آیا modification هنوز benchmark را معتبر نگه می‌دارد.
+13. distinction بین FACT و INFERENCE را در کل گزارش حفظ کن.
+14. هیچ تصمیمی را به خاطر Phaseهای قبلی «locked» فرض نکن.
+15. هیچ کدی ننویس.
+16. هیچ dependency نصب نکن.
+17. هیچ experiment اجرا نکن.
+18. فقط research, evidence, decision analysis انجام بده.
+
+---
+
+# مهم‌ترین دستور
+
+من نمی‌خواهم تو به من بگویی:
+
+> «Net3 قبلاً انتخاب شده، پس همان را نگه می‌داریم.»
+
+این پاسخ قابل قبول نیست.
+
+می‌خواهم مستقل بررسی کنی:
+
+> **اگر امروز، بدون هیچ تصمیم قبلی، از صفر بخواهیم یک benchmark عمومی برای پایان‌نامه‌ی PPO + PRV + VSP + leakage + demand uncertainty انتخاب کنیم، دقیقاً کدام شبکه را انتخاب می‌کنیم و چرا؟**
+
+و سپس یک سؤال دوم

@@ -1,0 +1,1259 @@
+============================================================
+PHASE 3 — DECISION REVIEW, METHODOLOGY LOCK & IMPLEMENTATION GATE
+============================================================
+
+ROLE
+You are the research and engineering partner for my Master's thesis.
+
+This is NOT a new research project.
+This is a direct continuation of:
+
+- Phase 1 — Audit
+- Phase 1.5 — Deep Literature Review
+- Phase 1.5-B — Evidence Completion & Verification
+- Phase 2 — Methodology Review
+
+These phases have already been completed.
+
+Your job now is to convert the existing evidence into:
+1. a rigorous Decision Register,
+2. explicit human decisions,
+3. an internally consistent methodology specification,
+4. and a final Implementation Readiness Gate.
+
+============================================================
+0. ABSOLUTE CONTINUITY RULE
+============================================================
+
+DO NOT restart the research from scratch.
+
+DO NOT repeat the full 42-paper literature review.
+
+DO NOT re-read every PDF unless a specific unresolved decision requires
+direct verification.
+
+DO NOT reconstruct old findings from memory if a transcript or prior
+phase output is available on disk.
+
+First inspect the current repository and available previous-session
+transcripts/reports.
+
+Use the previous Phase 1/1.5/1.5-B/2 work as the starting point.
+
+If previous reports are not persisted in docs/, search for the prior
+session transcript(s) and recover the relevant prior conclusions.
+
+If any previous conclusion cannot be recovered reliably:
+mark it as [NOT RECOVERED]
+instead of inventing it.
+
+============================================================
+1. FIRST ACTION — ORIENTATION
+============================================================
+
+Before making any decision:
+
+1. Read CLAUDE.md.
+2. Inspect git status.
+3. Inspect the current repository tree.
+4. Identify all available prior-phase artifacts.
+5. Locate the previous session transcript if necessary.
+6. Determine which decisions are already locked and which remain open.
+7. Produce a short Resume Check.
+
+The Resume Check must contain:
+
+- Previous phases completed
+- Last known completed section
+- Current phase
+- Available evidence
+- Missing evidence
+- Locked decisions
+- Unresolved decisions
+- External verification limitations
+- Current git status
+- Whether any files have changed
+
+DO NOT begin methodology redesign before this orientation is complete.
+
+============================================================
+2. HARD RULES
+============================================================
+
+During this phase:
+
+- DO NOT write implementation code.
+- DO NOT create the RL environment.
+- DO NOT train PPO.
+- DO NOT train SAC.
+- DO NOT run experiments.
+- DO NOT modify Proposal PDF.
+- DO NOT modify Seminar PDF.
+- DO NOT change the approved research scope silently.
+- DO NOT replace PPO.
+- DO NOT choose a network silently.
+- DO NOT silently finalize reward weights.
+- DO NOT silently finalize state features.
+- DO NOT silently finalize PRV placement.
+- DO NOT install dependencies.
+- DO NOT fabricate evidence.
+- DO NOT treat lack of search results as proof of absence.
+- DO NOT treat API failure as proof of absence.
+- DO NOT turn a recommendation into a decision.
+
+If something remains unresolved:
+mark it UNRESOLVED.
+
+If something requires my approval:
+mark it NEEDS RESEARCHER DECISION.
+
+If something requires advisor approval:
+mark it NEEDS ADVISOR APPROVAL.
+
+If something needs more evidence:
+mark it NEEDS MORE EVIDENCE.
+
+============================================================
+3. SOURCE HIERARCHY
+============================================================
+
+Use this evidence hierarchy:
+
+Tier 1:
+Primary full-text peer-reviewed paper / thesis
+
+Tier 2:
+Approved Proposal and Seminar
+
+Tier 3:
+Other research sources in repository
+
+Tier 4:
+Official technical documentation / standards / publisher sources
+
+Tier 5:
+External peer-reviewed literature
+
+Tier 6:
+Inference
+
+Tier 7:
+Recommendation
+
+Never present Tier 6 or Tier 7 as direct evidence.
+
+For each important claim state:
+
+- Source
+- Evidence type
+- Exact section/page if available
+- Confidence
+- Whether the claim is direct evidence or inference
+
+============================================================
+4. EXTERNAL SEARCH POLICY
+============================================================
+
+When external literature verification is necessary:
+
+Use multiple independent sources.
+
+Preferred order:
+
+1. Official publisher page
+2. DOI / Crossref
+3. OpenAlex
+4. Semantic Scholar
+5. Official repository
+6. University repository
+7. Other reputable scholarly sources
+
+If one website blocks access, rate-limits, returns 403/429,
+or is otherwise unavailable:
+
+DO NOT STOP.
+
+Use another independent source.
+
+For example:
+
+Crossref → OpenAlex → publisher → university repository
+→ institutional copy → accepted manuscript → reputable index
+
+Never write:
+
+"paper does not exist"
+
+when the actual situation is:
+
+"source unavailable"
+
+Write:
+
+"Not verified because source X was inaccessible; alternative sources
+were checked as far as possible."
+
+Keep unresolved items explicit.
+
+============================================================
+5. CENTRAL TASK — DECISION REGISTER
+============================================================
+
+Build a complete Decision Register from the existing Phase 2 work.
+
+At minimum review:
+
+AD1–AD6
+RS1–RS6
+U1–U10
+
+Also add any new research-critical decisions discovered during review.
+
+For EVERY decision provide:
+
+ID
+Decision
+Current Status
+Question
+Evidence
+Source
+Evidence Type
+Confidence
+Options
+Scientific Advantages
+Scientific Disadvantages
+Experimental Consequences
+Scope Consequences
+Reproducibility Consequences
+Implementation Consequences
+Risk
+What Becomes Invalid If Changed Later?
+Recommendation
+Decision Owner
+Approval Required
+Can It Be Locked Now? YES/NO
+Reason
+
+============================================================
+6. STRICT DISTINCTION BETWEEN FOUR LEVELS
+============================================================
+
+For every important issue explicitly separate:
+
+A. FACT / EVIDENCE
+What the literature or project documents actually establish.
+
+B. INFERENCE
+What logically follows from those facts.
+
+C. RECOMMENDATION
+What you recommend.
+
+D. DECISION
+What has actually been approved and locked.
+
+Example:
+
+Evidence:
+Hu et al. used Net3 with pump and PRV control.
+
+Inference:
+Net3 is highly relevant to our project.
+
+Recommendation:
+Use Net3 as the primary benchmark.
+
+Decision:
+NOT LOCKED until researcher/advisor approval.
+
+Never collapse these four levels.
+
+============================================================
+7. DECISION GROUP A — RESEARCH QUESTION & SCOPE
+============================================================
+
+Verify that the current methodology still answers the approved RQ.
+
+Current core direction:
+
+PPO + EPANET
+for adaptive pressure management
+with coordinated PRV + VSP
+under uncertain demand
+with leakage and pressure constraints.
+
+DO NOT rewrite the RQ.
+
+Instead determine:
+
+- Does every proposed methodological component serve the RQ?
+- Which components are essential?
+- Which are optional?
+- Which accidentally expand the scope?
+- Which are future-work only?
+
+Perform a scope-drift check.
+
+============================================================
+8. DECISION GROUP B — HYDRAULIC SIMULATION
+============================================================
+
+Review:
+
+- EPANET version
+- WNTR version
+- EpanetSimulator
+- demand model
+- hydraulic solver
+- PDA/DDA
+- leakage representation
+- hydraulic constraints
+
+Pay special attention to:
+
+PDA vs DDA.
+
+Determine:
+
+- What exactly is the scientific reason for using PDA?
+- What information is lost under DDA?
+- Does DDA create a false improvement mechanism?
+- Should PDA be primary?
+- Should DDA exist only as an ablation?
+- What validation tests are mandatory before training?
+
+Do not lock the answer unless approved.
+
+============================================================
+9. DECISION GROUP C — LEAKAGE MODEL
+============================================================
+
+Review:
+
+Option A:
+Emitter-based node leakage
+
+Option B:
+Pipe-level FAVAD-like leakage
+
+Option C:
+Alternative simulator-native leakage
+
+Evaluate:
+
+- physical meaning
+- relation to pressure
+- calibration
+- comparability with prior work
+- implementation complexity
+- sensitivity to N1
+- sensitivity to leakage coefficient
+- effect on generalization
+- reproducibility
+
+Specifically review:
+
+N1
+k_j
+emitter formulation
+FAVAD
+leakage calibration
+
+Do NOT silently choose the model.
+
+============================================================
+10. DECISION GROUP D — NETWORK
+============================================================
+
+Evaluate all serious candidates already identified:
+
+- Net3
+- Jowitt & Xu
+- Anytown
+- D-Town
+- any other high-value benchmark identified earlier
+
+For each evaluate:
+
+- number of nodes
+- pipes
+- pumps
+- tanks
+- PRVs
+- data availability
+- reproducibility
+- leakage suitability
+- demand uncertainty suitability
+- comparability with literature
+- computational cost
+- suitability for PRV + VSP
+- internal validity
+- external validity
+
+Critically review the fact that Jowitt & Xu has no pumps.
+
+Do NOT silently select the network.
+
+Clearly separate:
+
+Primary-network candidate
+Secondary-network candidate
+Optional network
+Rejected network
+
+============================================================
+11. DECISION GROUP E — PRV PLACEMENT
+============================================================
+
+Investigate:
+
+- Which PRVs already exist?
+- Which PRVs must be introduced?
+- How were locations selected in previous literature?
+- Could placement introduce bias?
+- Is placement optimization inside scope?
+- Should placement remain fixed?
+- Should multiple placement scenarios be tested?
+
+Do NOT optimize PRV placement in this phase.
+
+Define a defensible selection rule.
+
+============================================================
+12. DECISION GROUP F — STATE / OBSERVATION
+============================================================
+
+Review:
+
+S1
+S2
+S3
+
+and all previously identified features:
+
+- pressure
+- tank level
+- actuator state
+- previous action
+- time encoding
+- demand information
+- leakage information
+- historical observation window
+
+For every feature ask:
+
+1. Is it physically observable?
+2. Is it available at decision time?
+3. Does it leak future information?
+4. Does it create shortcut learning?
+5. Is it available in the real-world interpretation of the study?
+6. Does it support the RQ?
+
+Especially investigate whether:
+
+- actual future demand
+- actual leakage rate
+
+would constitute information leakage or unrealistically strong observation.
+
+Do NOT finalize the state without approval.
+
+============================================================
+13. DECISION GROUP G — ACTION
+============================================================
+
+Review:
+
+- absolute control
+- incremental control
+- absolute + rate limit
+- physical PRV behavior
+- VSP constraints
+- actuator saturation
+- fully-open/closed cases
+- control realization
+
+For PRV examine:
+
+- setpoint interpretation
+- valid action range
+- operational state behavior
+
+For VSP examine:
+
+- speed ratio limits
+- mechanical feasibility
+
+Define the concept:
+
+Action Realization Rate
+
+and determine how it will be validated.
+
+Do NOT assume a mathematically valid action is physically executable.
+
+============================================================
+14. DECISION GROUP H — REWARD
+============================================================
+
+Review the existing reward alternatives:
+
+A. Weighted multi-objective
+B. Constrained formulation
+C. Safety-filter / shielded policy
+
+For each evaluate:
+
+- leakage
+- pressure violation
+- pressure deficit severity
+- smoothness
+- energy
+- normalization
+- scaling
+- reward hacking
+- interpretability
+- weight sensitivity
+- feasibility
+- implementation complexity
+
+Explicitly address the evidence that PPO can exploit leakage reduction
+at the expense of pressure constraints.
+
+Review all failure modes F1–F11.
+
+Determine which are:
+
+- solved by reward design
+- solved by evaluation
+- solved by simulator choice
+- still unresolved
+
+DO NOT choose final weights without explicit approval.
+
+============================================================
+15. REWARD VALIDATION
+============================================================
+
+Review the reward validation battery T1–T10.
+
+Determine:
+
+- Which tests are mandatory?
+- Which are optional?
+- Which test assumptions are questionable?
+- What should the expected reward direction be?
+
+The reward function must be validated independently
+before interpreting training results.
+
+============================================================
+16. DECISION GROUP I — PPO
+============================================================
+
+PPO is the approved primary algorithm.
+
+Do not replace it.
+
+Review only the justification:
+
+- continuous action
+- stochastic policy
+- on-policy learning
+- implementation maturity
+- stability
+- suitability for uncertain demand
+
+Explicitly reject the invalid argument:
+
+"on-policy automatically means better sim-to-real."
+
+This may be listed as an unsupported claim unless verified.
+
+Potential comparator:
+
+SAC
+
+Potential architectural ablation:
+
+Recurrent PPO
+
+MADDPG:
+
+Do NOT put it into the primary methodology unless explicitly approved.
+
+============================================================
+17. DECISION GROUP J — TRAINING BUDGET
+============================================================
+
+Review:
+
+- total timesteps
+- n_steps
+- batch size
+- epochs
+- gamma
+- learning rate
+- seeds
+- hyperparameter trials
+- checkpointing
+- validation split
+- early stopping
+- randomization
+
+Critical principle:
+
+Do not compare algorithms under unequal computational budgets
+unless the inequality itself is part of the experimental question.
+
+Separate:
+
+A. training time
+B. inference/decision time
+C. number of environment interactions
+D. number of optimization evaluations
+
+Do not conflate them.
+
+============================================================
+18. DECISION GROUP K — DEMAND UNCERTAINTY
+============================================================
+
+Review the existing Hu-inspired design:
+
+- spatial uncertainty
+- temporal uncertainty
+- truncated-normal demand factor
+- Delta
+- training levels
+- validation levels
+- OOD testing
+- initial tank levels
+
+Evaluate:
+
+Option A — scalar perturbation
+Option B — Hu-style stochastic scenarios
+Option C — historical profiles
+Option D — Monte Carlo
+Option E — distribution shift
+
+Determine which is:
+
+- mandatory
+- recommended
+- optional
+- scope-expanding
+
+No silent choice.
+
+============================================================
+19. DECISION GROUP L — GENERALIZATION
+============================================================
+
+Preserve the three levels:
+
+Level 1:
+unseen demand scenarios
+
+Level 2:
+OOD operational conditions
+
+Level 3:
+different network topology
+
+For each state:
+
+- scientific value
+- evidence
+- feasibility
+- scope impact
+- test design
+
+Do not claim cross-network generalization without actually testing it.
+
+============================================================
+20. DECISION GROUP M — BASELINES
+============================================================
+
+Review:
+
+1. Fixed PRV
+2. Time-modulated PRV
+3. DE
+4. Single-objective PPO
+5. SAC
+
+Also assess:
+
+- GA
+- PSO
+- Nelder-Mead
+- PID/P-controller
+- MPC
+
+Classify each:
+
+MANDATORY
+RECOMMENDED
+OPTIONAL
+REJECTED
+
+For every baseline examine:
+
+- fair budget
+- same network
+- same demand scenarios
+- same simulator
+- same leakage model
+- same constraints
+- same test set
+
+Do not create an artificially weak baseline.
+
+============================================================
+21. DECISION GROUP N — EVALUATION
+============================================================
+
+Review and finalize the structure of evaluation metrics.
+
+Primary:
+
+- leakage volume
+- pressure violation
+- maximum violation
+- DSR
+
+Secondary:
+
+- mean pressure
+- pressure variability
+- energy
+- tank recovery
+- actuator movement
+- action realization rate
+- computational/decision time
+
+Learning diagnostics:
+
+- episodic return
+- value loss
+- policy loss
+- entropy
+- explained variance
+- clip fraction
+- learning curves
+
+For every metric answer:
+
+- What scientific construct does it measure?
+- Why is it needed?
+- Can it be gamed?
+- Is it primary or secondary?
+
+============================================================
+22. DECISION GROUP O — STATISTICS
+============================================================
+
+Review:
+
+- minimum seed count
+- test episodes
+- confidence intervals
+- bootstrap
+- standard deviation
+- effect size
+- Mann–Whitney or appropriate test
+- multiple-comparison correction
+- cherry-picking prevention
+
+Specify a protocol that is realistic for a Master's thesis.
+
+Do not demand a statistically impossible design.
+
+Clearly distinguish:
+
+minimum defensible protocol
+vs
+ideal protocol.
+
+============================================================
+23. DECISION GROUP P — ABLATION
+============================================================
+
+Prioritize the ablations.
+
+Tier 1 — Critical:
+
+A14:
+PRV-only vs PRV+Pump
+
+A5:
+single-objective vs multi-objective reward
+
+A7:
+DDA vs PDA
+
+A12:
+uncertainty training vs no-uncertainty training
+
+Tier 2:
+
+State variants
+Absolute vs incremental
+beta=1 vs beta=2
+PPO vs SAC
+
+Tier 3:
+
+Recurrent PPO
+other optional variants
+
+For every ablation state:
+
+- research question answered
+- cost
+- value
+- required budget
+- whether it belongs in thesis core
+
+============================================================
+24. DECISION GROUP Q — REPRODUCIBILITY
+============================================================
+
+Design the reproducibility requirements.
+
+Each experiment should be traceable:
+
+Git SHA
+→ config
+→ network
+→ simulator
+→ reward
+→ demand protocol
+→ seed
+→ run
+→ model
+→ evaluation
+→ figure/table
+
+Review:
+
+- Python version
+- EPANET
+- WNTR
+- Stable-Baselines3
+- Gymnasium
+- PyTorch
+- NumPy
+- SciPy
+- Pandas
+- Matplotlib
+- hardware
+- CPU/GPU
+- random seeds
+- deterministic behavior
+- config files
+- logs
+- checkpoints
+
+Do NOT install anything.
+
+============================================================
+25. CHANGE-IMPACT MATRIX
+============================================================
+
+Create a complete matrix:
+
+"If X changes, what becomes invalid?"
+
+Minimum rows:
+
+Network
+PRV placement
+PDA/DDA
+Leakage model
+N1
+State
+Action
+Reward
+Reward weights
+PPO hyperparameters
+SAC comparator
+Demand uncertainty
+Seeds
+Baselines
+Evaluation metrics
+
+For each:
+
+Impact:
+Low / Medium / High / Critical
+
+and:
+
+Previously invalidated outputs:
+[explicit list]
+
+This is essential for preventing silent methodology drift.
+
+============================================================
+26. FINAL DECISION GATE
+============================================================
+
+At the end, classify every research-critical item into exactly one category:
+
+1. READY TO LOCK
+2. NEEDS RESEARCHER DECISION
+3. NEEDS ADVISOR APPROVAL
+4. NEEDS MORE EVIDENCE
+
+Do not use any fifth category.
+
+============================================================
+27. MINIMUM IMPLEMENTATION GATE
+============================================================
+
+Define the exact minimum set of decisions required before coding can begin.
+
+At minimum:
+
+- Network
+- PRV placement
+- EPANET version
+- WNTR configuration
+- PDA/DDA
+- Leakage model
+- State
+- Action
+- Reward
+- Reward-weight protocol
+- PPO
+- Comparator
+- Demand uncertainty
+- Baselines
+- Evaluation
+- Seed protocol
+- Reproducibility
+
+For every item:
+
+LOCKED / OPEN
+
+If any research-critical item remains OPEN,
+state:
+
+IMPLEMENTATION BLOCKED
+
+Otherwise:
+
+IMPLEMENTATION MAY BEGIN
+
+Do not write code in either case.
+
+============================================================
+28. DRAFT METHODOLOGY SPECIFICATION
+============================================================
+
+After the Decision Register, produce:
+
+# Draft Methodology Specification
+
+This is NOT implementation code.
+
+It should describe:
+
+1. Problem formulation
+2. Hydraulic simulation
+3. Network
+4. Leakage model
+5. Demand model
+6. State
+7. Action
+8. Reward
+9. PPO
+10. Comparator
+11. Training
+12. Demand uncertainty
+13. Evaluation
+14. Baselines
+15. Ablation
+16. Sensitivity
+17. Statistics
+18. Reproducibility
+
+For every unresolved component write:
+
+[UNRESOLVED]
+
+For every recommendation not yet approved write:
+
+[RECOMMENDATION — NOT LOCKED]
+
+Only truly approved decisions may be written as:
+
+[LOCKED]
+
+============================================================
+29. METHODOLOGY CONSISTENCY CHECK
+============================================================
+
+Perform a consistency audit.
+
+Check for contradictions such as:
+
+- PDA but DDA-only assumptions
+- leakage metric without leakage model
+- future demand inside state
+- pressure violation threshold inconsistent with PDA
+- reward objective inconsistent with evaluation metric
+- PRV action range inconsistent with physics
+- baseline using a different simulator
+- demand uncertainty in training but not testing
+- claims of generalization without cross-network testing
+- "real-time" claims without decision-time measurement
+- energy metric without pump model
+- smoothness metric without previous action
+
+Report every contradiction.
+
+============================================================
+30. NOVELTY CONSISTENCY CHECK
+============================================================
+
+Do NOT try to prove that the thesis is "novel" in a vague sense.
+
+Instead build:
+
+Contribution Claim
+→ Closest Prior Work
+→ Evidence
+→ Remaining Difference
+→ Strength
+→ Confidence
+→ Risk
+
+Especially compare against:
+
+Negm 2024
+Hu et al. 2023
+Belfadil et al. 2023
+Cyriac & Chacko 2026
+Javed 2025
+Kåge 2025
+
+Use conservative language.
+
+If a contribution is only a combination of known components,
+say so.
+
+If the novelty depends on the experimental protocol,
+say so.
+
+============================================================
+31. CLAIM REVISION LIST
+============================================================
+
+Produce a final table:
+
+Claim in Proposal/Seminar
+Problem
+Evidence
+Minimum Correction
+Scope Impact
+Advisor Approval Required?
+
+Do NOT modify Proposal/Seminar.
+
+============================================================
+32. FINAL REPORT STRUCTURE
+============================================================
+
+The final report must use exactly this structure:
+
+# Phase 3 — Decision Review & Methodology Lock
+
+## 1. Resume Check
+
+## 2. Executive Summary
+
+## 3. Decisions Inherited From Previous Phases
+
+## 4. Decision Register
+
+## 5. Researcher Decisions Required
+
+## 6. Advisor Approvals Required
+
+## 7. Remaining Evidence Gaps
+
+## 8. Network Decision Analysis
+
+## 9. Hydraulic / PDA-DDA Decision Analysis
+
+## 10. Leakage Model Decision Analysis
+
+## 11. State Decision Analysis
+
+## 12. Action Decision Analysis
+
+## 13. Reward Decision Analysis
+
+## 14. PPO / Comparator Decision Analysis
+
+## 15. Demand Uncertainty Decision Analysis
+
+## 16. Baseline Decision Analysis
+
+## 17. Evaluation Decision Analysis
+
+## 18. Ablation and Sensitivity Decision Analysis
+
+## 19. Reproducibility Decision Analysis
+
+## 20. Change-Impact Matrix
+
+## 21. Novelty Consistency Check
+
+## 22. Proposal/Seminar Claim Corrections
+
+## 23. Draft Methodology Specification
+
+## 24. Methodology Consistency Audit
+
+## 25. Implementation Readiness Gate
+
+## 26. Final Decision Table
+
+## 27. Confidence & Uncertainty
+
+## 28. Recommended Immediate Next Action
+
+============================================================
+33. FINAL DECISION TABLE
+============================================================
+
+End with a very simple table:
+
+| ID | Decision | Recommendation | Status |
+|----|----------|----------------|--------|
+| ... | ... | ... | Researcher / Advisor / Locked / More Evidence |
+
+Only decisions that genuinely require human input should appear here.
+
+============================================================
+34. HUMAN DECISION PROTECTION
+============================================================
+
+Very important:
+
+You are not the final decision-maker.
+
+Your role:
+
+Evidence → analysis → recommendation.
+
+My role:
+
+researcher decision.
+
+Advisor's role:
+
+advisor approval where necessary.
+
+Do not hide uncertainty by choosing the easiest implementation.
+
+Do not optimize the methodology merely for convenience.
+
+Prefer scientific defensibility over coding convenience.
+
+============================================================
+35. NO IMPLEMENTATION YET
+============================================================
+
+Even if the methodology appears ready:
+
+STOP AFTER THE REPORT.
+
+Do not:
+
+- create Python files
+- create environment classes
+- run EPANET
+- run PPO
+- run SAC
+- run experiments
+- create result files
+- install packages
+
+The purpose of this phase is methodological lock,
+not implementation.
+
+============================================================
+36. RESUME / INTERRUPTION PROTOCOL
+============================================================
+
+If interrupted for any reason:
+
+Before stopping, output:
+
+Resume Check
+
+- Last completed section
+- Current section
+- Remaining sections
+- Decisions already locked
+- Decisions still open
+- Evidence already verified
+- Evidence still missing
+- External tools unavailable
+- Files changed
+- Files unchanged
+
+Never restart automatically after interruption.
+
+============================================================
+37. FINAL PRINCIPLE
+============================================================
+
+This phase must transform:
+
+Literature
+↓
+Evidence
+↓
+Scientific reasoning
+↓
+Decision Register
+↓
+Human approval
+↓
+Locked methodology
+↓
+Implementation gate
+
+Do not skip the human-decision layer.
+
+Do not silently change the approved thesis.
+
+Do not confuse "recommended" with "approved".
+
+Do not confuse "not found" with "does not exist".
+
+Do not confuse "works in simulation" with "works in reality".
+
+Do not confuse "lower leakage" with "better system performance".
+
+Do not confuse "PPO is chosen" with "PPO is proven superior".
+
+The final output should tell me, in a very unambiguous way:
+
+1. What is already decided?
+2. What should I decide?
+3. What should I ask my advisor?
+4. What still needs evidence?
+5. What methodology is actually ready?
+6. Exactly what blocks implementation?
+
+END PHASE 3
+============================================================

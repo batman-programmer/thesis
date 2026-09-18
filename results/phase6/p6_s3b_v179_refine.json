@@ -1,0 +1,2305 @@
+{
+  "phase": 6,
+  "step": "3b",
+  "title": "Sub-psi refinement of the VALVE-179 safety cliff and its physical mechanism",
+  "env": {
+    "timestamp_utc": "2026-09-06T23:20:00+00:00",
+    "os": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "python": "3.13.15",
+    "python_build": "Aug  5 2026 13:05:39",
+    "wntr": "1.5.0",
+    "numpy": "2.5.2",
+    "pandas": "3.0.5",
+    "scipy": "1.18.1",
+    "networkx": "3.6.1",
+    "epanet_engine_wntr": {
+      "epanet2.dll": 20200,
+      "epanet20.dll": 20012,
+      "epanet22.dll": 20200
+    },
+    "epanet_engine_epyt": 20305,
+    "original_inp_sha256": "510af942ec643eb87adcf26e5a7df1cc4c23eb0c1e470a8a1257ed055f1956f1",
+    "working_inp_sha256": "53015ba9212e46bec731d190971819996233996b498bc269e828f992830a20a9",
+    "determinism": "EPANET's hydraulic solver is deterministic. No stochastic input is used anywhere in Phase 5; leak-node selection and leak-coefficient allocation are closed-form functions of pipe length, so no random seed is required. Recorded seed: none used."
+  },
+  "scope_statement": "Characterisation only. The grid was fixed before execution. No optimisation, no search, no reward, no RL. Native controls, rules and topology untouched in every run.",
+  "solver_policy": {
+    "accuracy": 1e-05,
+    "trials": 2000,
+    "rule_timestep_s": 180,
+    "report_timestep_s": 1800
+  },
+  "refine_grid_psi": [
+    44.0,
+    44.1,
+    44.2,
+    44.3,
+    44.4,
+    44.5,
+    44.6,
+    44.7,
+    44.8,
+    44.9,
+    45.0
+  ],
+  "mechanism_grid_psi": [
+    44.0,
+    45.0,
+    46.0
+  ],
+  "nominal_setting_psi": 40.0,
+  "highest_setting_with_no_negative_pressure_psi": 44.8,
+  "lowest_setting_with_negative_pressure_psi": 44.9,
+  "cases": {
+    "VALVE-179@44psi": {
+      "label": "VALVE-179 setting 44 psi, other PRVs nominal",
+      "swept_valve_name": "VALVE-179",
+      "setting_psi": 44.0,
+      "setting_ratio_of_nominal": 1.1,
+      "valve180_control_released": false,
+      "solver": {
+        "accuracy": 1e-05,
+        "trials": 2000,
+        "rule_timestep_s": 180.0,
+        "report_timestep_s": 1800.0,
+        "demand_model": "PDA",
+        "required_pressure_psi": 20.0,
+        "minimum_pressure_psi": 0.0,
+        "pressure_exponent": 0.5
+      },
+      "echo_check": {
+        "echo_file": "D:\\Thesis\\results\\phase5\\_tmp\\p6s3b_44_echo.inp",
+        "n_emitter_lines": 126,
+        "emitter_total_coefficient_gpm_per_psi_alpha": 8.7650929667759,
+        "emitter_sample": {
+          "JUNCTION-0": 0.08040598029606676,
+          "JUNCTION-1": 0.015881340981690948,
+          "JUNCTION-10": 0.07166232065446165
+        },
+        "options_relevant": {
+          "DEMAND MODEL": "PDA",
+          "MINIMUM PRESSURE": "0.00",
+          "REQUIRED PRESSURE": "20.00",
+          "PRESSURE EXPONENT": "0.5",
+          "EMITTER EXPONENT": "0.5"
+        },
+        "valve_settings_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-174": 80.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0,
+          "VALVE-179": 44.0,
+          "VALVE-180": 16.45
+        }
+      },
+      "wntr_warnings": [],
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "leak_applied": true,
+      "n_service_junctions": 121,
+      "n_connector_junctions_excluded": 5,
+      "mean_service_pressure_psi": 94.87696838378906,
+      "min_service_pressure_psi": 4.202789783477783,
+      "max_service_pressure_psi": 288.3429260253906,
+      "n_node_timesteps_below_20psi": 386,
+      "n_node_timesteps_negative": 0,
+      "pressure_deficit_mean_psi": 18.115312576293945,
+      "argmin_service_node": "JUNCTION-29",
+      "mean_pressure_all_126_psi": 101.48336029052734,
+      "leakage_mean_gpm": 84.76358443893827,
+      "leakage_max_gpm": 85.16782791699052,
+      "served_demand_mean_gpm": 891.4139330715105,
+      "requested_demand_mean_gpm": 906.3987348621764,
+      "unserved_demand_mean_gpm": 14.984801790665724,
+      "unserved_demand_max_gpm": 47.69393166951022,
+      "dsr_mean": 0.9833370563133561,
+      "dsr_min": 0.9818778754258826,
+      "leakage_share_of_served_pct": 9.508891581587879,
+      "continuity_residual_rel_max": 1.6087600670289248e-05,
+      "n_timesteps": 193,
+      "valves": {
+        "VALVE-173": {
+          "commanded_setting_psi": 70.0,
+          "nominal_setting_psi": 70.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 4.719008922576904,
+          "flow_max_abs_gpm": 7.903731346130371
+        },
+        "VALVE-174": {
+          "commanded_setting_psi": 80.0,
+          "nominal_setting_psi": 80.0,
+          "frac_time_closed": 1.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.0,
+          "ever_active": false,
+          "max_abs_realisation_error_when_active_psi": null,
+          "flow_mean_gpm": 0.0,
+          "flow_max_abs_gpm": 0.0
+        },
+        "VALVE-175": {
+          "commanded_setting_psi": 55.0,
+          "nominal_setting_psi": 55.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 362.9140930175781,
+          "flow_max_abs_gpm": 1082.3310546875
+        },
+        "VALVE-176": {
+          "commanded_setting_psi": 29.762,
+          "nominal_setting_psi": 29.762,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 256.9053955078125,
+          "flow_max_abs_gpm": 782.033447265625
+        },
+        "VALVE-177": {
+          "commanded_setting_psi": 45.0,
+          "nominal_setting_psi": 45.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 20.61138343811035,
+          "flow_max_abs_gpm": 55.153202056884766
+        },
+        "VALVE-178": {
+          "commanded_setting_psi": 37.0,
+          "nominal_setting_psi": 37.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 456.9065856933594,
+          "flow_max_abs_gpm": 1013.075439453125
+        },
+        "VALVE-179": {
+          "commanded_setting_psi": 44.0,
+          "nominal_setting_psi": 40.0,
+          "frac_time_closed": 0.19170984455958548,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.8082901554404145,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 417.67083740234375,
+          "flow_max_abs_gpm": 926.6199951171875
+        },
+        "VALVE-180": {
+          "commanded_setting_psi": 16.45,
+          "nominal_setting_psi": 16.45,
+          "frac_time_closed": 1.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.0,
+          "ever_active": false,
+          "max_abs_realisation_error_when_active_psi": null,
+          "flow_mean_gpm": 0.0,
+          "flow_max_abs_gpm": 0.0
+        }
+      },
+      "swept_valve": {
+        "commanded_setting_psi": 44.0,
+        "nominal_setting_psi": 40.0,
+        "frac_time_closed": 0.19170984455958548,
+        "frac_time_open": 0.0,
+        "frac_time_active": 0.8082901554404145,
+        "ever_active": true,
+        "max_abs_realisation_error_when_active_psi": 0.0,
+        "flow_mean_gpm": 417.67083740234375,
+        "flow_max_abs_gpm": 926.6199951171875
+      },
+      "tank_level_range_ft": {
+        "TANK-130": [
+          12.078372955322266,
+          15.964557647705078
+        ],
+        "TANK-131": [
+          12.685420036315918,
+          18.387540817260742
+        ]
+      }
+    },
+    "VALVE-179@44.1psi": {
+      "label": "VALVE-179 setting 44.1 psi, other PRVs nominal",
+      "swept_valve_name": "VALVE-179",
+      "setting_psi": 44.1,
+      "setting_ratio_of_nominal": 1.1025,
+      "valve180_control_released": false,
+      "solver": {
+        "accuracy": 1e-05,
+        "trials": 2000,
+        "rule_timestep_s": 180.0,
+        "report_timestep_s": 1800.0,
+        "demand_model": "PDA",
+        "required_pressure_psi": 20.0,
+        "minimum_pressure_psi": 0.0,
+        "pressure_exponent": 0.5
+      },
+      "echo_check": {
+        "echo_file": "D:\\Thesis\\results\\phase5\\_tmp\\p6s3b_44p1_echo.inp",
+        "n_emitter_lines": 126,
+        "emitter_total_coefficient_gpm_per_psi_alpha": 8.7650929667759,
+        "emitter_sample": {
+          "JUNCTION-0": 0.08040598029606676,
+          "JUNCTION-1": 0.015881340981690948,
+          "JUNCTION-10": 0.07166232065446165
+        },
+        "options_relevant": {
+          "DEMAND MODEL": "PDA",
+          "MINIMUM PRESSURE": "0.00",
+          "REQUIRED PRESSURE": "20.00",
+          "PRESSURE EXPONENT": "0.5",
+          "EMITTER EXPONENT": "0.5"
+        },
+        "valve_settings_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-174": 80.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0,
+          "VALVE-179": 44.1,
+          "VALVE-180": 16.45
+        }
+      },
+      "wntr_warnings": [],
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "leak_applied": true,
+      "n_service_junctions": 121,
+      "n_connector_junctions_excluded": 5,
+      "mean_service_pressure_psi": 94.90030670166016,
+      "min_service_pressure_psi": 4.226777076721191,
+      "max_service_pressure_psi": 288.2988586425781,
+      "n_node_timesteps_below_20psi": 386,
+      "n_node_timesteps_negative": 0,
+      "pressure_deficit_mean_psi": 18.090476989746094,
+      "argmin_service_node": "JUNCTION-29",
+      "mean_pressure_all_126_psi": 101.50017547607422,
+      "leakage_mean_gpm": 84.77456345421948,
+      "leakage_max_gpm": 85.14242077623351,
+      "served_demand_mean_gpm": 891.4139706252187,
+      "requested_demand_mean_gpm": 906.3987348621764,
+      "unserved_demand_mean_gpm": 14.984764236957602,
+      "unserved_demand_max_gpm": 47.69486951560111,
+      "dsr_mean": 0.9833370725699078,
+      "dsr_min": 0.9818776549591594,
+      "leakage_share_of_served_pct": 9.510122821472095,
+      "continuity_residual_rel_max": 6.069021310395328e-06,
+      "n_timesteps": 193,
+      "valves": {
+        "VALVE-173": {
+          "commanded_setting_psi": 70.0,
+          "nominal_setting_psi": 70.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 4.719008922576904,
+          "flow_max_abs_gpm": 7.903731346130371
+        },
+        "VALVE-174": {
+          "commanded_setting_psi": 80.0,
+          "nominal_setting_psi": 80.0,
+          "frac_time_closed": 1.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.0,
+          "ever_active": false,
+          "max_abs_realisation_error_when_active_psi": null,
+          "flow_mean_gpm": 0.0,
+          "flow_max_abs_gpm": 0.0
+        },
+        "VALVE-175": {
+          "commanded_setting_psi": 55.0,
+          "nominal_setting_psi": 55.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 362.9140930175781,
+          "flow_max_abs_gpm": 1082.3310546875
+        },
+        "VALVE-176": {
+          "commanded_setting_psi": 29.762,
+          "nominal_setting_psi": 29.762,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 256.9053649902344,
+          "flow_max_abs_gpm": 782.033447265625
+        },
+        "VALVE-177": {
+          "commanded_setting_psi": 45.0,
+          "nominal_setting_psi": 45.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 20.61138343811035,
+          "flow_max_abs_gpm": 55.153202056884766
+        },
+        "VALVE-178": {
+          "commanded_setting_psi": 37.0,
+          "nominal_setting_psi": 37.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 494.5693664550781,
+          "flow_max_abs_gpm": 1087.0604248046875
+        },
+        "VALVE-179": {
+          "commanded_setting_psi": 44.1,
+          "nominal_setting_psi": 40.0,
+          "frac_time_closed": 0.13471502590673576,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.8652849740932642,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 3.814697265625e-06,
+          "flow_mean_gpm": 455.333984375,
+          "flow_max_abs_gpm": 992.773681640625
+        },
+        "VALVE-180": {
+          "commanded_setting_psi": 16.45,
+          "nominal_setting_psi": 16.45,
+          "frac_time_closed": 1.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.0,
+          "ever_active": false,
+          "max_abs_realisation_error_when_active_psi": null,
+          "flow_mean_gpm": 0.0,
+          "flow_max_abs_gpm": 0.0
+        }
+      },
+      "swept_valve": {
+        "commanded_setting_psi": 44.1,
+        "nominal_setting_psi": 40.0,
+        "frac_time_closed": 0.13471502590673576,
+        "frac_time_open": 0.0,
+        "frac_time_active": 0.8652849740932642,
+        "ever_active": true,
+        "max_abs_realisation_error_when_active_psi": 3.814697265625e-06,
+        "flow_mean_gpm": 455.333984375,
+        "flow_max_abs_gpm": 992.773681640625
+      },
+      "tank_level_range_ft": {
+        "TANK-130": [
+          12.098897933959961,
+          16.022329330444336
+        ],
+        "TANK-131": [
+          12.303349494934082,
+          18.419281005859375
+        ]
+      }
+    },
+    "VALVE-179@44.2psi": {
+      "label": "VALVE-179 setting 44.2 psi, other PRVs nominal",
+      "swept_valve_name": "VALVE-179",
+      "setting_psi": 44.2,
+      "setting_ratio_of_nominal": 1.105,
+      "valve180_control_released": false,
+      "solver": {
+        "accuracy": 1e-05,
+        "trials": 2000,
+        "rule_timestep_s": 180.0,
+        "report_timestep_s": 1800.0,
+        "demand_model": "PDA",
+        "required_pressure_psi": 20.0,
+        "minimum_pressure_psi": 0.0,
+        "pressure_exponent": 0.5
+      },
+      "echo_check": {
+        "echo_file": "D:\\Thesis\\results\\phase5\\_tmp\\p6s3b_44p2_echo.inp",
+        "n_emitter_lines": 126,
+        "emitter_total_coefficient_gpm_per_psi_alpha": 8.7650929667759,
+        "emitter_sample": {
+          "JUNCTION-0": 0.08040598029606676,
+          "JUNCTION-1": 0.015881340981690948,
+          "JUNCTION-10": 0.07166232065446165
+        },
+        "options_relevant": {
+          "DEMAND MODEL": "PDA",
+          "MINIMUM PRESSURE": "0.00",
+          "REQUIRED PRESSURE": "20.00",
+          "PRESSURE EXPONENT": "0.5",
+          "EMITTER EXPONENT": "0.5"
+        },
+        "valve_settings_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-174": 80.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0,
+          "VALVE-179": 44.2,
+          "VALVE-180": 16.45
+        }
+      },
+      "wntr_warnings": [],
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "leak_applied": true,
+      "n_service_junctions": 121,
+      "n_connector_junctions_excluded": 5,
+      "mean_service_pressure_psi": 94.92045593261719,
+      "min_service_pressure_psi": 4.20643949508667,
+      "max_service_pressure_psi": 288.1871643066406,
+      "n_node_timesteps_below_20psi": 386,
+      "n_node_timesteps_negative": 0,
+      "pressure_deficit_mean_psi": 18.06589698791504,
+      "argmin_service_node": "JUNCTION-29",
+      "mean_pressure_all_126_psi": 101.50718688964844,
+      "leakage_mean_gpm": 84.78240377417937,
+      "leakage_max_gpm": 85.127252142093,
+      "served_demand_mean_gpm": 891.413977868849,
+      "requested_demand_mean_gpm": 906.3987348621764,
+      "unserved_demand_mean_gpm": 14.984756993327087,
+      "unserved_demand_max_gpm": 47.694365161952646,
+      "dsr_mean": 0.9833370917997847,
+      "dsr_min": 0.981877623483583,
+      "leakage_share_of_served_pct": 9.511002281664148,
+      "continuity_residual_rel_max": 6.580346052942332e-06,
+      "n_timesteps": 193,
+      "valves": {
+        "VALVE-173": {
+          "commanded_setting_psi": 70.0,
+          "nominal_setting_psi": 70.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 4.719008922576904,
+          "flow_max_abs_gpm": 7.903731346130371
+        },
+        "VALVE-174": {
+          "commanded_setting_psi": 80.0,
+          "nominal_setting_psi": 80.0,
+          "frac_time_closed": 1.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.0,
+          "ever_active": false,
+          "max_abs_realisation_error_when_active_psi": null,
+          "flow_mean_gpm": 0.0,
+          "flow_max_abs_gpm": 0.0
+        },
+        "VALVE-175": {
+          "commanded_setting_psi": 55.0,
+          "nominal_setting_psi": 55.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 362.9140930175781,
+          "flow_max_abs_gpm": 1082.3310546875
+        },
+        "VALVE-176": {
+          "commanded_setting_psi": 29.762,
+          "nominal_setting_psi": 29.762,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 256.9053955078125,
+          "flow_max_abs_gpm": 782.033447265625
+        },
+        "VALVE-177": {
+          "commanded_setting_psi": 45.0,
+          "nominal_setting_psi": 45.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 20.61138343811035,
+          "flow_max_abs_gpm": 55.153202056884766
+        },
+        "VALVE-178": {
+          "commanded_setting_psi": 37.0,
+          "nominal_setting_psi": 37.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 535.7329711914062,
+          "flow_max_abs_gpm": 1096.69775390625
+        },
+        "VALVE-179": {
+          "commanded_setting_psi": 44.2,
+          "nominal_setting_psi": 40.0,
+          "frac_time_closed": 0.10362694300518134,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.8963730569948186,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 3.814697265625e-06,
+          "flow_mean_gpm": 496.49798583984375,
+          "flow_max_abs_gpm": 1002.4111938476562
+        },
+        "VALVE-180": {
+          "commanded_setting_psi": 16.45,
+          "nominal_setting_psi": 16.45,
+          "frac_time_closed": 1.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.0,
+          "ever_active": false,
+          "max_abs_realisation_error_when_active_psi": null,
+          "flow_mean_gpm": 0.0,
+          "flow_max_abs_gpm": 0.0
+        }
+      },
+      "swept_valve": {
+        "commanded_setting_psi": 44.2,
+        "nominal_setting_psi": 40.0,
+        "frac_time_closed": 0.10362694300518134,
+        "frac_time_open": 0.0,
+        "frac_time_active": 0.8963730569948186,
+        "ever_active": true,
+        "max_abs_realisation_error_when_active_psi": 3.814697265625e-06,
+        "flow_mean_gpm": 496.49798583984375,
+        "flow_max_abs_gpm": 1002.4111938476562
+      },
+      "tank_level_range_ft": {
+        "TANK-130": [
+          12.068961143493652,
+          16.021928787231445
+        ],
+        "TANK-131": [
+          12.276016235351562,
+          18.349594116210938
+        ]
+      }
+    },
+    "VALVE-179@44.3psi": {
+      "label": "VALVE-179 setting 44.3 psi, other PRVs nominal",
+      "swept_valve_name": "VALVE-179",
+      "setting_psi": 44.3,
+      "setting_ratio_of_nominal": 1.1075,
+      "valve180_control_released": false,
+      "solver": {
+        "accuracy": 1e-05,
+        "trials": 2000,
+        "rule_timestep_s": 180.0,
+        "report_timestep_s": 1800.0,
+        "demand_model": "PDA",
+        "required_pressure_psi": 20.0,
+        "minimum_pressure_psi": 0.0,
+        "pressure_exponent": 0.5
+      },
+      "echo_check": {
+        "echo_file": "D:\\Thesis\\results\\phase5\\_tmp\\p6s3b_44p3_echo.inp",
+        "n_emitter_lines": 126,
+        "emitter_total_coefficient_gpm_per_psi_alpha": 8.7650929667759,
+        "emitter_sample": {
+          "JUNCTION-0": 0.08040598029606676,
+          "JUNCTION-1": 0.015881340981690948,
+          "JUNCTION-10": 0.07166232065446165
+        },
+        "options_relevant": {
+          "DEMAND MODEL": "PDA",
+          "MINIMUM PRESSURE": "0.00",
+          "REQUIRED PRESSURE": "20.00",
+          "PRESSURE EXPONENT": "0.5",
+          "EMITTER EXPONENT": "0.5"
+        },
+        "valve_settings_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-174": 80.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0,
+          "VALVE-179": 44.3,
+          "VALVE-180": 16.45
+        }
+      },
+      "wntr_warnings": [],
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "leak_applied": true,
+      "n_service_junctions": 121,
+      "n_connector_junctions_excluded": 5,
+      "mean_service_pressure_psi": 94.92762756347656,
+      "min_service_pressure_psi": 4.235054969787598,
+      "max_service_pressure_psi": 288.21209716796875,
+      "n_node_timesteps_below_20psi": 386,
+      "n_node_timesteps_negative": 0,
+      "pressure_deficit_mean_psi": 18.0788631439209,
+      "argmin_service_node": "JUNCTION-29",
+      "mean_pressure_all_126_psi": 101.50045776367188,
+      "leakage_mean_gpm": 84.78584354232446,
+      "leakage_max_gpm": 85.13701347786275,
+      "served_demand_mean_gpm": 891.4139638569707,
+      "requested_demand_mean_gpm": 906.3987348621764,
+      "unserved_demand_mean_gpm": 14.984771005205483,
+      "unserved_demand_max_gpm": 47.69497441259591,
+      "dsr_mean": 0.9833370119998885,
+      "dsr_min": 0.9818776549951983,
+      "leakage_share_of_served_pct": 9.511388308914636,
+      "continuity_residual_rel_max": 1.514265295554651e-05,
+      "n_timesteps": 193,
+      "valves": {
+        "VALVE-173": {
+          "commanded_setting_psi": 70.0,
+          "nominal_setting_psi": 70.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 4.719008922576904,
+          "flow_max_abs_gpm": 7.903731346130371
+        },
+        "VALVE-174": {
+          "commanded_setting_psi": 80.0,
+          "nominal_setting_psi": 80.0,
+          "frac_time_closed": 1.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.0,
+          "ever_active": false,
+          "max_abs_realisation_error_when_active_psi": null,
+          "flow_mean_gpm": 0.0,
+          "flow_max_abs_gpm": 0.0
+        },
+        "VALVE-175": {
+          "commanded_setting_psi": 55.0,
+          "nominal_setting_psi": 55.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 362.9140930175781,
+          "flow_max_abs_gpm": 1082.3310546875
+        },
+        "VALVE-176": {
+          "commanded_setting_psi": 29.762,
+          "nominal_setting_psi": 29.762,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 256.9053649902344,
+          "flow_max_abs_gpm": 782.033447265625
+        },
+        "VALVE-177": {
+          "commanded_setting_psi": 45.0,
+          "nominal_setting_psi": 45.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 20.61138343811035,
+          "flow_max_abs_gpm": 55.153202056884766
+        },
+        "VALVE-178": {
+          "commanded_setting_psi": 37.0,
+          "nominal_setting_psi": 37.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 592.0840454101562,
+          "flow_max_abs_gpm": 1107.2213134765625
+        },
+        "VALVE-179": {
+          "commanded_setting_psi": 44.3,
+          "nominal_setting_psi": 40.0,
+          "frac_time_closed": 0.07772020725388601,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.9222797927461139,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 552.8494873046875,
+          "flow_max_abs_gpm": 1014.7939453125
+        },
+        "VALVE-180": {
+          "commanded_setting_psi": 16.45,
+          "nominal_setting_psi": 16.45,
+          "frac_time_closed": 1.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.0,
+          "ever_active": false,
+          "max_abs_realisation_error_when_active_psi": null,
+          "flow_mean_gpm": 0.0,
+          "flow_max_abs_gpm": 0.0
+        }
+      },
+      "swept_valve": {
+        "commanded_setting_psi": 44.3,
+        "nominal_setting_psi": 40.0,
+        "frac_time_closed": 0.07772020725388601,
+        "frac_time_open": 0.0,
+        "frac_time_active": 0.9222797927461139,
+        "ever_active": true,
+        "max_abs_realisation_error_when_active_psi": 0.0,
+        "flow_mean_gpm": 552.8494873046875,
+        "flow_max_abs_gpm": 1014.7939453125
+      },
+      "tank_level_range_ft": {
+        "TANK-130": [
+          12.1343412399292,
+          15.988286972045898
+        ],
+        "TANK-131": [
+          12.885366439819336,
+          18.34568977355957
+        ]
+      }
+    },
+    "VALVE-179@44.4psi": {
+      "label": "VALVE-179 setting 44.4 psi, other PRVs nominal",
+      "swept_valve_name": "VALVE-179",
+      "setting_psi": 44.4,
+      "setting_ratio_of_nominal": 1.1099999999999999,
+      "valve180_control_released": false,
+      "solver": {
+        "accuracy": 1e-05,
+        "trials": 2000,
+        "rule_timestep_s": 180.0,
+        "report_timestep_s": 1800.0,
+        "demand_model": "PDA",
+        "required_pressure_psi": 20.0,
+        "minimum_pressure_psi": 0.0,
+        "pressure_exponent": 0.5
+      },
+      "echo_check": {
+        "echo_file": "D:\\Thesis\\results\\phase5\\_tmp\\p6s3b_44p4_echo.inp",
+        "n_emitter_lines": 126,
+        "emitter_total_coefficient_gpm_per_psi_alpha": 8.7650929667759,
+        "emitter_sample": {
+          "JUNCTION-0": 0.08040598029606676,
+          "JUNCTION-1": 0.015881340981690948,
+          "JUNCTION-10": 0.07166232065446165
+        },
+        "options_relevant": {
+          "DEMAND MODEL": "PDA",
+          "MINIMUM PRESSURE": "0.00",
+          "REQUIRED PRESSURE": "20.00",
+          "PRESSURE EXPONENT": "0.5",
+          "EMITTER EXPONENT": "0.5"
+        },
+        "valve_settings_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-174": 80.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0,
+          "VALVE-179": 44.4,
+          "VALVE-180": 16.45
+        }
+      },
+      "wntr_warnings": [],
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "leak_applied": true,
+      "n_service_junctions": 121,
+      "n_connector_junctions_excluded": 5,
+      "mean_service_pressure_psi": 94.90538787841797,
+      "min_service_pressure_psi": 4.233785152435303,
+      "max_service_pressure_psi": 288.1849060058594,
+      "n_node_timesteps_below_20psi": 386,
+      "n_node_timesteps_negative": 0,
+      "pressure_deficit_mean_psi": 18.072477340698242,
+      "argmin_service_node": "JUNCTION-29",
+      "mean_pressure_all_126_psi": 101.46643829345703,
+      "leakage_mean_gpm": 84.76894764472371,
+      "leakage_max_gpm": 85.08929070389215,
+      "served_demand_mean_gpm": 891.4139655870024,
+      "requested_demand_mean_gpm": 906.3987348621764,
+      "unserved_demand_mean_gpm": 14.984769275173747,
+      "unserved_demand_max_gpm": 47.69467525781829,
+      "dsr_mean": 0.983337038175916,
+      "dsr_min": 0.981877650968569,
+      "leakage_share_of_served_pct": 9.509492886271168,
+      "continuity_residual_rel_max": 7.752695637464058e-06,
+      "n_timesteps": 193,
+      "valves": {
+        "VALVE-173": {
+          "commanded_setting_psi": 70.0,
+          "nominal_setting_psi": 70.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 4.719008922576904,
+          "flow_max_abs_gpm": 7.903731346130371
+        },
+        "VALVE-174": {
+          "commanded_setting_psi": 80.0,
+          "nominal_setting_psi": 80.0,
+          "frac_time_closed": 1.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.0,
+          "ever_active": false,
+          "max_abs_realisation_error_when_active_psi": null,
+          "flow_mean_gpm": 0.0,
+          "flow_max_abs_gpm": 0.0
+        },
+        "VALVE-175": {
+          "commanded_setting_psi": 55.0,
+          "nominal_setting_psi": 55.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 362.9140930175781,
+          "flow_max_abs_gpm": 1082.3310546875
+        },
+        "VALVE-176": {
+          "commanded_setting_psi": 29.762,
+          "nominal_setting_psi": 29.762,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 256.9053649902344,
+          "flow_max_abs_gpm": 782.033447265625
+        },
+        "VALVE-177": {
+          "commanded_setting_psi": 45.0,
+          "nominal_setting_psi": 45.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 20.61138343811035,
+          "flow_max_abs_gpm": 55.153202056884766
+        },
+        "VALVE-178": {
+          "commanded_setting_psi": 37.0,
+          "nominal_setting_psi": 37.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 639.88623046875,
+          "flow_max_abs_gpm": 1125.9267578125
+        },
+        "VALVE-179": {
+          "commanded_setting_psi": 44.4,
+          "nominal_setting_psi": 40.0,
+          "frac_time_closed": 0.031088082901554404,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.9689119170984456,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 600.6522216796875,
+          "flow_max_abs_gpm": 1039.2618408203125
+        },
+        "VALVE-180": {
+          "commanded_setting_psi": 16.45,
+          "nominal_setting_psi": 16.45,
+          "frac_time_closed": 1.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.0,
+          "ever_active": false,
+          "max_abs_realisation_error_when_active_psi": null,
+          "flow_mean_gpm": 0.0,
+          "flow_max_abs_gpm": 0.0
+        }
+      },
+      "swept_valve": {
+        "commanded_setting_psi": 44.4,
+        "nominal_setting_psi": 40.0,
+        "frac_time_closed": 0.031088082901554404,
+        "frac_time_open": 0.0,
+        "frac_time_active": 0.9689119170984456,
+        "ever_active": true,
+        "max_abs_realisation_error_when_active_psi": 0.0,
+        "flow_mean_gpm": 600.6522216796875,
+        "flow_max_abs_gpm": 1039.2618408203125
+      },
+      "tank_level_range_ft": {
+        "TANK-130": [
+          12.11631965637207,
+          15.975872039794922
+        ],
+        "TANK-131": [
+          11.555829048156738,
+          18.363611221313477
+        ]
+      }
+    },
+    "VALVE-179@44.5psi": {
+      "label": "VALVE-179 setting 44.5 psi, other PRVs nominal",
+      "swept_valve_name": "VALVE-179",
+      "setting_psi": 44.5,
+      "setting_ratio_of_nominal": 1.1125,
+      "valve180_control_released": false,
+      "solver": {
+        "accuracy": 1e-05,
+        "trials": 2000,
+        "rule_timestep_s": 180.0,
+        "report_timestep_s": 1800.0,
+        "demand_model": "PDA",
+        "required_pressure_psi": 20.0,
+        "minimum_pressure_psi": 0.0,
+        "pressure_exponent": 0.5
+      },
+      "echo_check": {
+        "echo_file": "D:\\Thesis\\results\\phase5\\_tmp\\p6s3b_44p5_echo.inp",
+        "n_emitter_lines": 126,
+        "emitter_total_coefficient_gpm_per_psi_alpha": 8.7650929667759,
+        "emitter_sample": {
+          "JUNCTION-0": 0.08040598029606676,
+          "JUNCTION-1": 0.015881340981690948,
+          "JUNCTION-10": 0.07166232065446165
+        },
+        "options_relevant": {
+          "DEMAND MODEL": "PDA",
+          "MINIMUM PRESSURE": "0.00",
+          "REQUIRED PRESSURE": "20.00",
+          "PRESSURE EXPONENT": "0.5",
+          "EMITTER EXPONENT": "0.5"
+        },
+        "valve_settings_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-174": 80.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0,
+          "VALVE-179": 44.5,
+          "VALVE-180": 16.45
+        }
+      },
+      "wntr_warnings": [],
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "leak_applied": true,
+      "n_service_junctions": 121,
+      "n_connector_junctions_excluded": 5,
+      "mean_service_pressure_psi": 94.88697052001953,
+      "min_service_pressure_psi": 4.222386837005615,
+      "max_service_pressure_psi": 288.229248046875,
+      "n_node_timesteps_below_20psi": 386,
+      "n_node_timesteps_negative": 0,
+      "pressure_deficit_mean_psi": 18.064897537231445,
+      "argmin_service_node": "JUNCTION-29",
+      "mean_pressure_all_126_psi": 101.43665313720703,
+      "leakage_mean_gpm": 84.75389722278096,
+      "leakage_max_gpm": 85.08815804308719,
+      "served_demand_mean_gpm": 891.4139481128682,
+      "requested_demand_mean_gpm": 906.3987348621764,
+      "unserved_demand_mean_gpm": 14.984786749308048,
+      "unserved_demand_max_gpm": 47.69485724317201,
+      "dsr_mean": 0.9833370571482037,
+      "dsr_min": 0.9818776645676441,
+      "leakage_share_of_served_pct": 9.507804696370947,
+      "continuity_residual_rel_max": 7.604024176544044e-06,
+      "n_timesteps": 193,
+      "valves": {
+        "VALVE-173": {
+          "commanded_setting_psi": 70.0,
+          "nominal_setting_psi": 70.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 4.719008922576904,
+          "flow_max_abs_gpm": 7.903731346130371
+        },
+        "VALVE-174": {
+          "commanded_setting_psi": 80.0,
+          "nominal_setting_psi": 80.0,
+          "frac_time_closed": 1.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.0,
+          "ever_active": false,
+          "max_abs_realisation_error_when_active_psi": null,
+          "flow_mean_gpm": 0.0,
+          "flow_max_abs_gpm": 0.0
+        },
+        "VALVE-175": {
+          "commanded_setting_psi": 55.0,
+          "nominal_setting_psi": 55.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 362.9140930175781,
+          "flow_max_abs_gpm": 1082.3310546875
+        },
+        "VALVE-176": {
+          "commanded_setting_psi": 29.762,
+          "nominal_setting_psi": 29.762,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 256.9053649902344,
+          "flow_max_abs_gpm": 782.033447265625
+        },
+        "VALVE-177": {
+          "commanded_setting_psi": 45.0,
+          "nominal_setting_psi": 45.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 20.61138343811035,
+          "flow_max_abs_gpm": 55.153202056884766
+        },
+        "VALVE-178": {
+          "commanded_setting_psi": 37.0,
+          "nominal_setting_psi": 37.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 684.3693237304688,
+          "flow_max_abs_gpm": 1152.70703125
+        },
+        "VALVE-179": {
+          "commanded_setting_psi": 44.5,
+          "nominal_setting_psi": 40.0,
+          "frac_time_closed": 0.010362694300518135,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.9896373056994818,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 645.1358642578125,
+          "flow_max_abs_gpm": 1066.0648193359375
+        },
+        "VALVE-180": {
+          "commanded_setting_psi": 16.45,
+          "nominal_setting_psi": 16.45,
+          "frac_time_closed": 1.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.0,
+          "ever_active": false,
+          "max_abs_realisation_error_when_active_psi": null,
+          "flow_mean_gpm": 0.0,
+          "flow_max_abs_gpm": 0.0
+        }
+      },
+      "swept_valve": {
+        "commanded_setting_psi": 44.5,
+        "nominal_setting_psi": 40.0,
+        "frac_time_closed": 0.010362694300518135,
+        "frac_time_open": 0.0,
+        "frac_time_active": 0.9896373056994818,
+        "ever_active": true,
+        "max_abs_realisation_error_when_active_psi": 0.0,
+        "flow_mean_gpm": 645.1358642578125,
+        "flow_max_abs_gpm": 1066.0648193359375
+      },
+      "tank_level_range_ft": {
+        "TANK-130": [
+          12.089085578918457,
+          15.99689769744873
+        ],
+        "TANK-131": [
+          8.806944847106934,
+          18.36100959777832
+        ]
+      }
+    },
+    "VALVE-179@44.6psi": {
+      "label": "VALVE-179 setting 44.6 psi, other PRVs nominal",
+      "swept_valve_name": "VALVE-179",
+      "setting_psi": 44.6,
+      "setting_ratio_of_nominal": 1.115,
+      "valve180_control_released": false,
+      "solver": {
+        "accuracy": 1e-05,
+        "trials": 2000,
+        "rule_timestep_s": 180.0,
+        "report_timestep_s": 1800.0,
+        "demand_model": "PDA",
+        "required_pressure_psi": 20.0,
+        "minimum_pressure_psi": 0.0,
+        "pressure_exponent": 0.5
+      },
+      "echo_check": {
+        "echo_file": "D:\\Thesis\\results\\phase5\\_tmp\\p6s3b_44p6_echo.inp",
+        "n_emitter_lines": 126,
+        "emitter_total_coefficient_gpm_per_psi_alpha": 8.7650929667759,
+        "emitter_sample": {
+          "JUNCTION-0": 0.08040598029606676,
+          "JUNCTION-1": 0.015881340981690948,
+          "JUNCTION-10": 0.07166232065446165
+        },
+        "options_relevant": {
+          "DEMAND MODEL": "PDA",
+          "MINIMUM PRESSURE": "0.00",
+          "REQUIRED PRESSURE": "20.00",
+          "PRESSURE EXPONENT": "0.5",
+          "EMITTER EXPONENT": "0.5"
+        },
+        "valve_settings_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-174": 80.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0,
+          "VALVE-179": 44.6,
+          "VALVE-180": 16.45
+        }
+      },
+      "wntr_warnings": [],
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "leak_applied": true,
+      "n_service_junctions": 121,
+      "n_connector_junctions_excluded": 5,
+      "mean_service_pressure_psi": 94.85681915283203,
+      "min_service_pressure_psi": 4.210010051727295,
+      "max_service_pressure_psi": 288.2213134765625,
+      "n_node_timesteps_below_20psi": 386,
+      "n_node_timesteps_negative": 0,
+      "pressure_deficit_mean_psi": 18.106420516967773,
+      "argmin_service_node": "JUNCTION-29",
+      "mean_pressure_all_126_psi": 101.39766693115234,
+      "leakage_mean_gpm": 84.73861844864142,
+      "leakage_max_gpm": 85.09789912592011,
+      "served_demand_mean_gpm": 891.4139270652429,
+      "requested_demand_mean_gpm": 906.3987348621764,
+      "unserved_demand_mean_gpm": 14.98480779693319,
+      "unserved_demand_max_gpm": 47.694671344204835,
+      "dsr_mean": 0.9833369197214548,
+      "dsr_min": 0.9818776652327589,
+      "leakage_share_of_served_pct": 9.506090927659399,
+      "continuity_residual_rel_max": 6.677009423583513e-06,
+      "n_timesteps": 193,
+      "valves": {
+        "VALVE-173": {
+          "commanded_setting_psi": 70.0,
+          "nominal_setting_psi": 70.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 4.719008922576904,
+          "flow_max_abs_gpm": 7.903731346130371
+        },
+        "VALVE-174": {
+          "commanded_setting_psi": 80.0,
+          "nominal_setting_psi": 80.0,
+          "frac_time_closed": 1.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.0,
+          "ever_active": false,
+          "max_abs_realisation_error_when_active_psi": null,
+          "flow_mean_gpm": 0.0,
+          "flow_max_abs_gpm": 0.0
+        },
+        "VALVE-175": {
+          "commanded_setting_psi": 55.0,
+          "nominal_setting_psi": 55.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 362.9140930175781,
+          "flow_max_abs_gpm": 1082.3310546875
+        },
+        "VALVE-176": {
+          "commanded_setting_psi": 29.762,
+          "nominal_setting_psi": 29.762,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 256.9053649902344,
+          "flow_max_abs_gpm": 782.033447265625
+        },
+        "VALVE-177": {
+          "commanded_setting_psi": 45.0,
+          "nominal_setting_psi": 45.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 20.61138343811035,
+          "flow_max_abs_gpm": 55.153202056884766
+        },
+        "VALVE-178": {
+          "commanded_setting_psi": 37.0,
+          "nominal_setting_psi": 37.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 748.6788940429688,
+          "flow_max_abs_gpm": 1189.904052734375
+        },
+        "VALVE-179": {
+          "commanded_setting_psi": 44.6,
+          "nominal_setting_psi": 40.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 709.4462280273438,
+          "flow_max_abs_gpm": 1103.192626953125
+        },
+        "VALVE-180": {
+          "commanded_setting_psi": 16.45,
+          "nominal_setting_psi": 16.45,
+          "frac_time_closed": 1.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.0,
+          "ever_active": false,
+          "max_abs_realisation_error_when_active_psi": null,
+          "flow_mean_gpm": 0.0,
+          "flow_max_abs_gpm": 0.0
+        }
+      },
+      "swept_valve": {
+        "commanded_setting_psi": 44.6,
+        "nominal_setting_psi": 40.0,
+        "frac_time_closed": 0.0,
+        "frac_time_open": 0.0,
+        "frac_time_active": 1.0,
+        "ever_active": true,
+        "max_abs_realisation_error_when_active_psi": 0.0,
+        "flow_mean_gpm": 709.4462280273438,
+        "flow_max_abs_gpm": 1103.192626953125
+      },
+      "tank_level_range_ft": {
+        "TANK-130": [
+          12.089686393737793,
+          15.98398208618164
+        ],
+        "TANK-131": [
+          7.2067742347717285,
+          18.216230392456055
+        ]
+      }
+    },
+    "VALVE-179@44.7psi": {
+      "label": "VALVE-179 setting 44.7 psi, other PRVs nominal",
+      "swept_valve_name": "VALVE-179",
+      "setting_psi": 44.7,
+      "setting_ratio_of_nominal": 1.1175000000000002,
+      "valve180_control_released": false,
+      "solver": {
+        "accuracy": 1e-05,
+        "trials": 2000,
+        "rule_timestep_s": 180.0,
+        "report_timestep_s": 1800.0,
+        "demand_model": "PDA",
+        "required_pressure_psi": 20.0,
+        "minimum_pressure_psi": 0.0,
+        "pressure_exponent": 0.5
+      },
+      "echo_check": {
+        "echo_file": "D:\\Thesis\\results\\phase5\\_tmp\\p6s3b_44p7_echo.inp",
+        "n_emitter_lines": 126,
+        "emitter_total_coefficient_gpm_per_psi_alpha": 8.7650929667759,
+        "emitter_sample": {
+          "JUNCTION-0": 0.08040598029606676,
+          "JUNCTION-1": 0.015881340981690948,
+          "JUNCTION-10": 0.07166232065446165
+        },
+        "options_relevant": {
+          "DEMAND MODEL": "PDA",
+          "MINIMUM PRESSURE": "0.00",
+          "REQUIRED PRESSURE": "20.00",
+          "PRESSURE EXPONENT": "0.5",
+          "EMITTER EXPONENT": "0.5"
+        },
+        "valve_settings_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-174": 80.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0,
+          "VALVE-179": 44.7,
+          "VALVE-180": 16.45
+        }
+      },
+      "wntr_warnings": [],
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "leak_applied": true,
+      "n_service_junctions": 121,
+      "n_connector_junctions_excluded": 5,
+      "mean_service_pressure_psi": 94.83052825927734,
+      "min_service_pressure_psi": 4.224026679992676,
+      "max_service_pressure_psi": 288.2722473144531,
+      "n_node_timesteps_below_20psi": 386,
+      "n_node_timesteps_negative": 0,
+      "pressure_deficit_mean_psi": 18.103063583374023,
+      "argmin_service_node": "JUNCTION-29",
+      "mean_pressure_all_126_psi": 101.35993194580078,
+      "leakage_mean_gpm": 84.71909392262151,
+      "leakage_max_gpm": 85.10240353279052,
+      "served_demand_mean_gpm": 891.4139056359014,
+      "requested_demand_mean_gpm": 906.3987348621764,
+      "unserved_demand_mean_gpm": 14.984829226274766,
+      "unserved_demand_max_gpm": 47.69461556804845,
+      "dsr_mean": 0.9833369410512803,
+      "dsr_min": 0.9818777174236302,
+      "leakage_share_of_served_pct": 9.503900868832202,
+      "continuity_residual_rel_max": 5.570745088334661e-06,
+      "n_timesteps": 193,
+      "valves": {
+        "VALVE-173": {
+          "commanded_setting_psi": 70.0,
+          "nominal_setting_psi": 70.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 4.719008922576904,
+          "flow_max_abs_gpm": 7.903731346130371
+        },
+        "VALVE-174": {
+          "commanded_setting_psi": 80.0,
+          "nominal_setting_psi": 80.0,
+          "frac_time_closed": 1.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.0,
+          "ever_active": false,
+          "max_abs_realisation_error_when_active_psi": null,
+          "flow_mean_gpm": 0.0,
+          "flow_max_abs_gpm": 0.0
+        },
+        "VALVE-175": {
+          "commanded_setting_psi": 55.0,
+          "nominal_setting_psi": 55.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 362.9140930175781,
+          "flow_max_abs_gpm": 1082.3310546875
+        },
+        "VALVE-176": {
+          "commanded_setting_psi": 29.762,
+          "nominal_setting_psi": 29.762,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 256.9053955078125,
+          "flow_max_abs_gpm": 782.033447265625
+        },
+        "VALVE-177": {
+          "commanded_setting_psi": 45.0,
+          "nominal_setting_psi": 45.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 20.61138343811035,
+          "flow_max_abs_gpm": 55.153202056884766
+        },
+        "VALVE-178": {
+          "commanded_setting_psi": 37.0,
+          "nominal_setting_psi": 37.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 790.3770141601562,
+          "flow_max_abs_gpm": 1215.67578125
+        },
+        "VALVE-179": {
+          "commanded_setting_psi": 44.7,
+          "nominal_setting_psi": 40.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 751.1448364257812,
+          "flow_max_abs_gpm": 1128.5675048828125
+        },
+        "VALVE-180": {
+          "commanded_setting_psi": 16.45,
+          "nominal_setting_psi": 16.45,
+          "frac_time_closed": 1.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.0,
+          "ever_active": false,
+          "max_abs_realisation_error_when_active_psi": null,
+          "flow_mean_gpm": 0.0,
+          "flow_max_abs_gpm": 0.0
+        }
+      },
+      "swept_valve": {
+        "commanded_setting_psi": 44.7,
+        "nominal_setting_psi": 40.0,
+        "frac_time_closed": 0.0,
+        "frac_time_open": 0.0,
+        "frac_time_active": 1.0,
+        "ever_active": true,
+        "max_abs_realisation_error_when_active_psi": 0.0,
+        "flow_mean_gpm": 751.1448364257812,
+        "flow_max_abs_gpm": 1128.5675048828125
+      },
+      "tank_level_range_ft": {
+        "TANK-130": [
+          12.095793724060059,
+          16.009212493896484
+        ],
+        "TANK-131": [
+          4.486124038696289,
+          18.056333541870117
+        ]
+      }
+    },
+    "VALVE-179@44.8psi": {
+      "label": "VALVE-179 setting 44.8 psi, other PRVs nominal",
+      "swept_valve_name": "VALVE-179",
+      "setting_psi": 44.8,
+      "setting_ratio_of_nominal": 1.1199999999999999,
+      "valve180_control_released": false,
+      "solver": {
+        "accuracy": 1e-05,
+        "trials": 2000,
+        "rule_timestep_s": 180.0,
+        "report_timestep_s": 1800.0,
+        "demand_model": "PDA",
+        "required_pressure_psi": 20.0,
+        "minimum_pressure_psi": 0.0,
+        "pressure_exponent": 0.5
+      },
+      "echo_check": {
+        "echo_file": "D:\\Thesis\\results\\phase5\\_tmp\\p6s3b_44p8_echo.inp",
+        "n_emitter_lines": 126,
+        "emitter_total_coefficient_gpm_per_psi_alpha": 8.7650929667759,
+        "emitter_sample": {
+          "JUNCTION-0": 0.08040598029606676,
+          "JUNCTION-1": 0.015881340981690948,
+          "JUNCTION-10": 0.07166232065446165
+        },
+        "options_relevant": {
+          "DEMAND MODEL": "PDA",
+          "MINIMUM PRESSURE": "0.00",
+          "REQUIRED PRESSURE": "20.00",
+          "PRESSURE EXPONENT": "0.5",
+          "EMITTER EXPONENT": "0.5"
+        },
+        "valve_settings_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-174": 80.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0,
+          "VALVE-179": 44.8,
+          "VALVE-180": 16.45
+        }
+      },
+      "wntr_warnings": [],
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "leak_applied": true,
+      "n_service_junctions": 121,
+      "n_connector_junctions_excluded": 5,
+      "mean_service_pressure_psi": 94.80255889892578,
+      "min_service_pressure_psi": 4.2064924240112305,
+      "max_service_pressure_psi": 288.3145446777344,
+      "n_node_timesteps_below_20psi": 423,
+      "n_node_timesteps_negative": 0,
+      "pressure_deficit_mean_psi": 18.163591384887695,
+      "argmin_service_node": "JUNCTION-29",
+      "mean_pressure_all_126_psi": 101.32128143310547,
+      "leakage_mean_gpm": 84.69903978980301,
+      "leakage_max_gpm": 85.11014407943283,
+      "served_demand_mean_gpm": 891.2653376579284,
+      "requested_demand_mean_gpm": 906.3987348621764,
+      "unserved_demand_mean_gpm": 15.133397204248048,
+      "unserved_demand_max_gpm": 47.69476931665986,
+      "dsr_mean": 0.983178491326609,
+      "dsr_min": 0.9806915641877617,
+      "leakage_share_of_served_pct": 9.50323503126191,
+      "continuity_residual_rel_max": 4.9324257815897e-06,
+      "n_timesteps": 193,
+      "valves": {
+        "VALVE-173": {
+          "commanded_setting_psi": 70.0,
+          "nominal_setting_psi": 70.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 4.719008922576904,
+          "flow_max_abs_gpm": 7.903731346130371
+        },
+        "VALVE-174": {
+          "commanded_setting_psi": 80.0,
+          "nominal_setting_psi": 80.0,
+          "frac_time_closed": 1.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.0,
+          "ever_active": false,
+          "max_abs_realisation_error_when_active_psi": null,
+          "flow_mean_gpm": 0.0,
+          "flow_max_abs_gpm": 0.0
+        },
+        "VALVE-175": {
+          "commanded_setting_psi": 55.0,
+          "nominal_setting_psi": 55.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 362.9140930175781,
+          "flow_max_abs_gpm": 1082.3310546875
+        },
+        "VALVE-176": {
+          "commanded_setting_psi": 29.762,
+          "nominal_setting_psi": 29.762,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 256.9053955078125,
+          "flow_max_abs_gpm": 782.033447265625
+        },
+        "VALVE-177": {
+          "commanded_setting_psi": 45.0,
+          "nominal_setting_psi": 45.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 20.61138343811035,
+          "flow_max_abs_gpm": 55.153202056884766
+        },
+        "VALVE-178": {
+          "commanded_setting_psi": 37.0,
+          "nominal_setting_psi": 37.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 829.7078857421875,
+          "flow_max_abs_gpm": 1249.606201171875
+        },
+        "VALVE-179": {
+          "commanded_setting_psi": 44.8,
+          "nominal_setting_psi": 40.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 790.4762573242188,
+          "flow_max_abs_gpm": 1161.6075439453125
+        },
+        "VALVE-180": {
+          "commanded_setting_psi": 16.45,
+          "nominal_setting_psi": 16.45,
+          "frac_time_closed": 1.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.0,
+          "ever_active": false,
+          "max_abs_realisation_error_when_active_psi": null,
+          "flow_mean_gpm": 0.0,
+          "flow_max_abs_gpm": 0.0
+        }
+      },
+      "swept_valve": {
+        "commanded_setting_psi": 44.8,
+        "nominal_setting_psi": 40.0,
+        "frac_time_closed": 0.0,
+        "frac_time_open": 0.0,
+        "frac_time_active": 1.0,
+        "ever_active": true,
+        "max_abs_realisation_error_when_active_psi": 0.0,
+        "flow_mean_gpm": 790.4762573242188,
+        "flow_max_abs_gpm": 1161.6075439453125
+      },
+      "tank_level_range_ft": {
+        "TANK-130": [
+          12.089686393737793,
+          15.994394302368164
+        ],
+        "TANK-131": [
+          1.8053230047225952,
+          17.945096969604492
+        ]
+      }
+    },
+    "VALVE-179@44.9psi": {
+      "label": "VALVE-179 setting 44.9 psi, other PRVs nominal",
+      "swept_valve_name": "VALVE-179",
+      "setting_psi": 44.9,
+      "setting_ratio_of_nominal": 1.1225,
+      "valve180_control_released": false,
+      "solver": {
+        "accuracy": 1e-05,
+        "trials": 2000,
+        "rule_timestep_s": 180.0,
+        "report_timestep_s": 1800.0,
+        "demand_model": "PDA",
+        "required_pressure_psi": 20.0,
+        "minimum_pressure_psi": 0.0,
+        "pressure_exponent": 0.5
+      },
+      "echo_check": {
+        "echo_file": "D:\\Thesis\\results\\phase5\\_tmp\\p6s3b_44p9_echo.inp",
+        "n_emitter_lines": 126,
+        "emitter_total_coefficient_gpm_per_psi_alpha": 8.7650929667759,
+        "emitter_sample": {
+          "JUNCTION-0": 0.08040598029606676,
+          "JUNCTION-1": 0.015881340981690948,
+          "JUNCTION-10": 0.07166232065446165
+        },
+        "options_relevant": {
+          "DEMAND MODEL": "PDA",
+          "MINIMUM PRESSURE": "0.00",
+          "REQUIRED PRESSURE": "20.00",
+          "PRESSURE EXPONENT": "0.5",
+          "EMITTER EXPONENT": "0.5"
+        },
+        "valve_settings_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-174": 80.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0,
+          "VALVE-179": 44.9,
+          "VALVE-180": 16.45
+        }
+      },
+      "wntr_warnings": [],
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "leak_applied": true,
+      "n_service_junctions": 121,
+      "n_connector_junctions_excluded": 5,
+      "mean_service_pressure_psi": 94.63346862792969,
+      "min_service_pressure_psi": -96.98062896728516,
+      "max_service_pressure_psi": 288.4070739746094,
+      "n_node_timesteps_below_20psi": 454,
+      "n_node_timesteps_negative": 18,
+      "pressure_deficit_mean_psi": 24.35947036743164,
+      "argmin_service_node": "JUNCTION-102",
+      "mean_pressure_all_126_psi": 101.12335205078125,
+      "leakage_mean_gpm": 84.5212885963153,
+      "leakage_max_gpm": 85.1175161002956,
+      "served_demand_mean_gpm": 884.4347003123636,
+      "requested_demand_mean_gpm": 906.3987348621764,
+      "unserved_demand_mean_gpm": 21.96403454981272,
+      "unserved_demand_max_gpm": 317.0443316328335,
+      "dsr_mean": 0.9767938264377223,
+      "dsr_min": 0.8204159151830753,
+      "leakage_share_of_served_pct": 9.556532389159331,
+      "continuity_residual_rel_max": 6.779810064472258e-06,
+      "n_timesteps": 193,
+      "valves": {
+        "VALVE-173": {
+          "commanded_setting_psi": 70.0,
+          "nominal_setting_psi": 70.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 4.719008922576904,
+          "flow_max_abs_gpm": 7.903731346130371
+        },
+        "VALVE-174": {
+          "commanded_setting_psi": 80.0,
+          "nominal_setting_psi": 80.0,
+          "frac_time_closed": 1.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.0,
+          "ever_active": false,
+          "max_abs_realisation_error_when_active_psi": null,
+          "flow_mean_gpm": 0.0,
+          "flow_max_abs_gpm": 0.0
+        },
+        "VALVE-175": {
+          "commanded_setting_psi": 55.0,
+          "nominal_setting_psi": 55.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 362.9140930175781,
+          "flow_max_abs_gpm": 1082.3310546875
+        },
+        "VALVE-176": {
+          "commanded_setting_psi": 29.762,
+          "nominal_setting_psi": 29.762,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 256.9053955078125,
+          "flow_max_abs_gpm": 782.033447265625
+        },
+        "VALVE-177": {
+          "commanded_setting_psi": 45.0,
+          "nominal_setting_psi": 45.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.010362694300518135,
+          "frac_time_active": 0.9896373056994818,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 20.608551025390625,
+          "flow_max_abs_gpm": 55.153202056884766
+        },
+        "VALVE-178": {
+          "commanded_setting_psi": 37.0,
+          "nominal_setting_psi": 37.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.025906735751295335,
+          "frac_time_active": 0.9740932642487047,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 869.1654663085938,
+          "flow_max_abs_gpm": 1269.797607421875
+        },
+        "VALVE-179": {
+          "commanded_setting_psi": 44.9,
+          "nominal_setting_psi": 40.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.010362694300518135,
+          "frac_time_active": 0.9896373056994818,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 3.814697265625e-06,
+          "flow_mean_gpm": 830.1088256835938,
+          "flow_max_abs_gpm": 1183.1124267578125
+        },
+        "VALVE-180": {
+          "commanded_setting_psi": 16.45,
+          "nominal_setting_psi": 16.45,
+          "frac_time_closed": 1.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.0,
+          "ever_active": false,
+          "max_abs_realisation_error_when_active_psi": null,
+          "flow_mean_gpm": 0.0,
+          "flow_max_abs_gpm": 0.0
+        }
+      },
+      "swept_valve": {
+        "commanded_setting_psi": 44.9,
+        "nominal_setting_psi": 40.0,
+        "frac_time_closed": 0.0,
+        "frac_time_open": 0.010362694300518135,
+        "frac_time_active": 0.9896373056994818,
+        "ever_active": true,
+        "max_abs_realisation_error_when_active_psi": 3.814697265625e-06,
+        "flow_mean_gpm": 830.1088256835938,
+        "flow_max_abs_gpm": 1183.1124267578125
+      },
+      "tank_level_range_ft": {
+        "TANK-130": [
+          12.097295761108398,
+          15.99539566040039
+        ],
+        "TANK-131": [
+          0.0,
+          17.945096969604492
+        ]
+      }
+    },
+    "VALVE-179@45psi": {
+      "label": "VALVE-179 setting 45 psi, other PRVs nominal",
+      "swept_valve_name": "VALVE-179",
+      "setting_psi": 45.0,
+      "setting_ratio_of_nominal": 1.125,
+      "valve180_control_released": false,
+      "solver": {
+        "accuracy": 1e-05,
+        "trials": 2000,
+        "rule_timestep_s": 180.0,
+        "report_timestep_s": 1800.0,
+        "demand_model": "PDA",
+        "required_pressure_psi": 20.0,
+        "minimum_pressure_psi": 0.0,
+        "pressure_exponent": 0.5
+      },
+      "echo_check": {
+        "echo_file": "D:\\Thesis\\results\\phase5\\_tmp\\p6s3b_45_echo.inp",
+        "n_emitter_lines": 126,
+        "emitter_total_coefficient_gpm_per_psi_alpha": 8.7650929667759,
+        "emitter_sample": {
+          "JUNCTION-0": 0.08040598029606676,
+          "JUNCTION-1": 0.015881340981690948,
+          "JUNCTION-10": 0.07166232065446165
+        },
+        "options_relevant": {
+          "DEMAND MODEL": "PDA",
+          "MINIMUM PRESSURE": "0.00",
+          "REQUIRED PRESSURE": "20.00",
+          "PRESSURE EXPONENT": "0.5",
+          "EMITTER EXPONENT": "0.5"
+        },
+        "valve_settings_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-174": 80.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0,
+          "VALVE-179": 45.0,
+          "VALVE-180": 16.45
+        }
+      },
+      "wntr_warnings": [],
+      "report_scan": {
+        "rpt_found": true,
+        "n_error_lines": 0,
+        "n_warning_lines": 0,
+        "flagged_lines": []
+      },
+      "leak_applied": true,
+      "n_service_junctions": 121,
+      "n_connector_junctions_excluded": 5,
+      "mean_service_pressure_psi": 94.41519927978516,
+      "min_service_pressure_psi": -96.983642578125,
+      "max_service_pressure_psi": 288.44140625,
+      "n_node_timesteps_below_20psi": 513,
+      "n_node_timesteps_negative": 49,
+      "pressure_deficit_mean_psi": 35.141319274902344,
+      "argmin_service_node": "JUNCTION-102",
+      "mean_pressure_all_126_psi": 100.87052154541016,
+      "leakage_mean_gpm": 84.25924906762889,
+      "leakage_max_gpm": 85.1246031010523,
+      "served_demand_mean_gpm": 875.4693878766034,
+      "requested_demand_mean_gpm": 906.3987348621764,
+      "unserved_demand_mean_gpm": 30.929346985572845,
+      "unserved_demand_max_gpm": 342.034205196067,
+      "dsr_mean": 0.9703280845963366,
+      "dsr_min": 0.8232609891181473,
+      "leakage_share_of_served_pct": 9.624465484966239,
+      "continuity_residual_rel_max": 4.555558007268701e-06,
+      "n_timesteps": 193,
+      "valves": {
+        "VALVE-173": {
+          "commanded_setting_psi": 70.0,
+          "nominal_setting_psi": 70.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 4.719008922576904,
+          "flow_max_abs_gpm": 7.903731346130371
+        },
+        "VALVE-174": {
+          "commanded_setting_psi": 80.0,
+          "nominal_setting_psi": 80.0,
+          "frac_time_closed": 1.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.0,
+          "ever_active": false,
+          "max_abs_realisation_error_when_active_psi": null,
+          "flow_mean_gpm": 0.0,
+          "flow_max_abs_gpm": 0.0
+        },
+        "VALVE-175": {
+          "commanded_setting_psi": 55.0,
+          "nominal_setting_psi": 55.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 362.9140930175781,
+          "flow_max_abs_gpm": 1082.3310546875
+        },
+        "VALVE-176": {
+          "commanded_setting_psi": 29.762,
+          "nominal_setting_psi": 29.762,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 1.0,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 256.9053955078125,
+          "flow_max_abs_gpm": 782.033447265625
+        },
+        "VALVE-177": {
+          "commanded_setting_psi": 45.0,
+          "nominal_setting_psi": 45.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.03626943005181347,
+          "frac_time_active": 0.9637305699481865,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 20.60437774658203,
+          "flow_max_abs_gpm": 55.153202056884766
+        },
+        "VALVE-178": {
+          "commanded_setting_psi": 37.0,
+          "nominal_setting_psi": 37.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.07253886010362694,
+          "frac_time_active": 0.927461139896373,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 899.234130859375,
+          "flow_max_abs_gpm": 1296.7913818359375
+        },
+        "VALVE-179": {
+          "commanded_setting_psi": 45.0,
+          "nominal_setting_psi": 40.0,
+          "frac_time_closed": 0.0,
+          "frac_time_open": 0.015544041450777202,
+          "frac_time_active": 0.9844559585492227,
+          "ever_active": true,
+          "max_abs_realisation_error_when_active_psi": 0.0,
+          "flow_mean_gpm": 860.546630859375,
+          "flow_max_abs_gpm": 1209.731689453125
+        },
+        "VALVE-180": {
+          "commanded_setting_psi": 16.45,
+          "nominal_setting_psi": 16.45,
+          "frac_time_closed": 1.0,
+          "frac_time_open": 0.0,
+          "frac_time_active": 0.0,
+          "ever_active": false,
+          "max_abs_realisation_error_when_active_psi": null,
+          "flow_mean_gpm": 0.0,
+          "flow_max_abs_gpm": 0.0
+        }
+      },
+      "swept_valve": {
+        "commanded_setting_psi": 45.0,
+        "nominal_setting_psi": 40.0,
+        "frac_time_closed": 0.0,
+        "frac_time_open": 0.015544041450777202,
+        "frac_time_active": 0.9844559585492227,
+        "ever_active": true,
+        "max_abs_realisation_error_when_active_psi": 0.0,
+        "flow_mean_gpm": 860.546630859375,
+        "flow_max_abs_gpm": 1209.731689453125
+      },
+      "tank_level_range_ft": {
+        "TANK-130": [
+          12.09659481048584,
+          16.01882553100586
+        ],
+        "TANK-131": [
+          0.0,
+          17.945096969604492
+        ]
+      }
+    }
+  },
+  "mechanism": {
+    "VALVE-179@44psi": {
+      "wntr_warnings": [],
+      "valve_upstream_node": "JUNCTION-123",
+      "valve_downstream_node": "JUNCTION-124",
+      "n_service_nodes_ever_negative": 0,
+      "nodes_ever_negative": {},
+      "valve_downstream_pressure_min_psi": 43.999996185302734,
+      "valve_upstream_pressure_min_psi": 120.8763656616211,
+      "valve_status_fractions": {
+        "closed": 0.19170984455958548,
+        "open": 0.0,
+        "active": 0.8082901554404145
+      },
+      "valve_flow_max_abs_gpm": 926.6199951171875
+    },
+    "VALVE-179@45psi": {
+      "wntr_warnings": [],
+      "valve_upstream_node": "JUNCTION-123",
+      "valve_downstream_node": "JUNCTION-124",
+      "n_service_nodes_ever_negative": 4,
+      "nodes_ever_negative": {
+        "JUNCTION-102": {
+          "elevation_ft": 1094.07,
+          "base_demand_gpm": 102.1,
+          "n_timesteps_negative": 15,
+          "min_psi": -96.983642578125,
+          "mean_psi": 14.603155136108398,
+          "first_negative_time_h": 75.0,
+          "last_negative_time_h": 96.0,
+          "valve_status_at_negative_times": [
+            1,
+            2
+          ],
+          "valve_flow_gpm_at_negative_times": [
+            1081.3927001953125,
+            1103.687255859375,
+            1120.1168212890625,
+            1141.777587890625,
+            1145.879150390625,
+            1148.8095703125
+          ],
+          "hops_from_valve_downstream_node": 5
+        },
+        "JUNCTION-103": {
+          "elevation_ft": 1031.73,
+          "base_demand_gpm": 0.755915,
+          "n_timesteps_negative": 14,
+          "min_psi": -69.97171783447266,
+          "mean_psi": 41.55958938598633,
+          "first_negative_time_h": 75.0,
+          "last_negative_time_h": 96.0,
+          "valve_status_at_negative_times": [
+            1,
+            2
+          ],
+          "valve_flow_gpm_at_negative_times": [
+            1081.3927001953125,
+            1103.687255859375,
+            1120.1168212890625,
+            1141.777587890625,
+            1145.879150390625,
+            1148.8095703125
+          ],
+          "hops_from_valve_downstream_node": 4
+        },
+        "JUNCTION-121": {
+          "elevation_ft": 957.0,
+          "base_demand_gpm": 0.0,
+          "n_timesteps_negative": 10,
+          "min_psi": -37.99821853637695,
+          "mean_psi": 73.70062255859375,
+          "first_negative_time_h": 75.0,
+          "last_negative_time_h": 96.0,
+          "valve_status_at_negative_times": [
+            1,
+            2
+          ],
+          "valve_flow_gpm_at_negative_times": [
+            1081.3927001953125,
+            1103.687255859375,
+            1120.1168212890625,
+            1141.777587890625,
+            1145.879150390625,
+            1148.8095703125
+          ],
+          "hops_from_valve_downstream_node": 3
+        },
+        "JUNCTION-122": {
+          "elevation_ft": 957.0,
+          "base_demand_gpm": 1.523888,
+          "n_timesteps_negative": 10,
+          "min_psi": -37.99821853637695,
+          "mean_psi": 33.359439849853516,
+          "first_negative_time_h": 75.0,
+          "last_negative_time_h": 96.0,
+          "valve_status_at_negative_times": [
+            1,
+            2
+          ],
+          "valve_flow_gpm_at_negative_times": [
+            1081.3927001953125,
+            1103.687255859375,
+            1120.1168212890625,
+            1141.777587890625,
+            1145.879150390625,
+            1148.8095703125
+          ],
+          "hops_from_valve_downstream_node": 2
+        }
+      },
+      "valve_downstream_pressure_min_psi": 44.8223762512207,
+      "valve_upstream_pressure_min_psi": 44.8223762512207,
+      "valve_status_fractions": {
+        "closed": 0.0,
+        "open": 0.015544041450777202,
+        "active": 0.9844559585492227
+      },
+      "valve_flow_max_abs_gpm": 1209.731689453125
+    },
+    "VALVE-179@46psi": {
+      "wntr_warnings": [],
+      "valve_upstream_node": "JUNCTION-123",
+      "valve_downstream_node": "JUNCTION-124",
+      "n_service_nodes_ever_negative": 4,
+      "nodes_ever_negative": {
+        "JUNCTION-102": {
+          "elevation_ft": 1094.07,
+          "base_demand_gpm": 102.1,
+          "n_timesteps_negative": 117,
+          "min_psi": -97.03153228759766,
+          "mean_psi": -30.513736724853516,
+          "first_negative_time_h": 34.0,
+          "last_negative_time_h": 96.0,
+          "valve_status_at_negative_times": [
+            1,
+            2
+          ],
+          "valve_flow_gpm_at_negative_times": [
+            1247.0042724609375,
+            1242.7547607421875,
+            1241.233642578125,
+            1241.0843505859375,
+            1243.373291015625,
+            1222.4384765625
+          ],
+          "hops_from_valve_downstream_node": 5
+        },
+        "JUNCTION-103": {
+          "elevation_ft": 1031.73,
+          "base_demand_gpm": 0.755915,
+          "n_timesteps_negative": 103,
+          "min_psi": -70.01961517333984,
+          "mean_psi": -3.5935261249542236,
+          "first_negative_time_h": 34.0,
+          "last_negative_time_h": 96.0,
+          "valve_status_at_negative_times": [
+            1,
+            2
+          ],
+          "valve_flow_gpm_at_negative_times": [
+            1247.0042724609375,
+            1242.7547607421875,
+            1241.233642578125,
+            1241.0843505859375,
+            1243.373291015625,
+            1222.4384765625
+          ],
+          "hops_from_valve_downstream_node": 4
+        },
+        "JUNCTION-121": {
+          "elevation_ft": 957.0,
+          "base_demand_gpm": 0.0,
+          "n_timesteps_negative": 61,
+          "min_psi": -38.0455322265625,
+          "mean_psi": 28.423648834228516,
+          "first_negative_time_h": 34.0,
+          "last_negative_time_h": 96.0,
+          "valve_status_at_negative_times": [
+            1,
+            2
+          ],
+          "valve_flow_gpm_at_negative_times": [
+            1247.0042724609375,
+            1242.7547607421875,
+            1241.233642578125,
+            1241.0843505859375,
+            1243.373291015625,
+            1222.4384765625
+          ],
+          "hops_from_valve_downstream_node": 3
+        },
+        "JUNCTION-122": {
+          "elevation_ft": 957.0,
+          "base_demand_gpm": 1.523888,
+          "n_timesteps_negative": 61,
+          "min_psi": -38.0455322265625,
+          "mean_psi": 10.976086616516113,
+          "first_negative_time_h": 34.0,
+          "last_negative_time_h": 96.0,
+          "valve_status_at_negative_times": [
+            1,
+            2
+          ],
+          "valve_flow_gpm_at_negative_times": [
+            1247.0042724609375,
+            1242.7547607421875,
+            1241.233642578125,
+            1241.0843505859375,
+            1243.373291015625,
+            1222.4384765625
+          ],
+          "hops_from_valve_downstream_node": 2
+        }
+      },
+      "valve_downstream_pressure_min_psi": 44.78001022338867,
+      "valve_upstream_pressure_min_psi": 44.78001022338867,
+      "valve_status_fractions": {
+        "closed": 0.0,
+        "open": 0.24870466321243523,
+        "active": 0.7512953367875648
+      },
+      "valve_flow_max_abs_gpm": 1374.3262939453125
+    }
+  }
+}

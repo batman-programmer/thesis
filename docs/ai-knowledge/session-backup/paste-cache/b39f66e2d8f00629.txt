@@ -1,0 +1,860 @@
+==================================================
+PHASE 3 — DECISION REVIEW & METHODOLOGY LOCK
+==================================================
+
+نقش تو همچنان Research & Engineering Partner پروژه است.
+
+Phase 1، Phase 1.5، Phase 1.5-B و Phase 2 انجام شده‌اند.
+تو اکنون باید از شواهد و نتایج همین مراحل استفاده کنی.
+
+VERY IMPORTANT:
+
+این Phase ادامه مستقیم Phase 2 است.
+از صفر شروع نکن.
+Literature Review را از ابتدا تکرار نکن.
+Proposal، Seminar و 42 مقاله را دوباره به‌صورت کامل استخراج نکن، مگر فقط برای Verify کردن یک مورد مشخص که در Decision Review ضروری باشد.
+
+هدف این Phase:
+
+«تبدیل شواهد موجود به یک Decision Register قابل بررسی،
+تفکیک تصمیم‌های Researcher / Advisor،
+قفل‌کردن حداقل تصمیم‌های لازم،
+و تولید Methodology Specification قبل از Implementation»
+
+هنوز وارد Implementation نشو.
+
+==================================================
+1. HARD RULES
+==================================================
+
+در این Phase:
+
+- هیچ کدی ننویس.
+- هیچ کدی اجرا نکن.
+- هیچ آزمایشی اجرا نکن.
+- هیچ فایل پژوهشی را بازنویسی نکن.
+- Proposal را تغییر نده.
+- Seminar را تغییر نده.
+- Scope را تغییر نده.
+- Research Question را تغییر نده.
+- شبکه را خودسرانه انتخاب نکن.
+- Reward را خودسرانه نهایی نکن.
+- State را خودسرانه نهایی نکن.
+- Action را خودسرانه نهایی نکن.
+- Algorithm را عوض نکن.
+- Dependency جدید نصب نکن.
+- فایل جدید ایجاد نکن، مگر اینکه صراحتاً در انتهای این prompt اجازه داده شود.
+- هیچ Decision را بدون مشخص‌کردن اینکه «Recommendation» است یا «Decision» قفل نکن.
+
+اگر به موردی برخوردی که هنوز Evidence کافی ندارد:
+آن را به‌عنوان UNRESOLVED ثبت کن.
+
+اگر با تعارضی مواجه شدی:
+تعارض را صریحاً گزارش کن.
+
+هرگز یک Recommendation را به‌جای Decision ننویس.
+
+==================================================
+2. SOURCE OF TRUTH
+==================================================
+
+ترتیب اعتبار:
+
+1. شواهد مستقیم از Primary Full Text
+2. اسناد مصوب پروژه:
+   - Proposal
+   - Seminar
+3. Research Corpus موجود
+4. منابع خارجی معتبر
+5. Inference
+6. Recommendation
+
+اما:
+
+Proposal و Seminar «حقیقت علمی مطلق» نیستند.
+
+اگر شواهد علمی با آن‌ها تعارض دارد:
+
+- تعارض را گزارش کن.
+- حداقل اصلاح ممکن را پیشنهاد بده.
+- Scope را بی‌صدا تغییر نده.
+- تصمیم نهایی را برای Researcher / Advisor نگه دار.
+
+==================================================
+3. USE THE COMPLETED PHASE 2 AS BASELINE
+==================================================
+
+از گزارش Phase 2 و یافته‌های قبلی به‌عنوان baseline استفاده کن.
+
+به‌خصوص این موارد را از نو اختراع نکن:
+
+- یافته‌های مرتبط با Negm 2024
+- Hu et al. 2023
+- Belfadil et al. 2023
+- Cyriac & Chacko 2026
+- Javed 2025
+- Kåge 2025
+- Fu et al. 2022
+- PDA/DDA findings
+- Reward-hacking evidence
+- Network generalization evidence
+- Demand uncertainty findings
+- State/Action evidence
+- Baseline evidence
+- Reproducibility findings
+
+در صورت استفاده، مشخص کن:
+Evidence / Inference / Recommendation / Decision
+
+==================================================
+4. MAIN TASK — DECISION REGISTER
+==================================================
+
+ابتدا یک Decision Register جامع بساز.
+
+حداقل این موارد را بررسی کن:
+
+AD1–AD6
+RS1–RS6
+U1–U10
+
+اما اگر در Phase 2 تصمیم یا uncertainty مهم دیگری وجود دارد، آن را نیز اضافه کن.
+
+برای هر Decision دقیقاً این فیلدها را ارائه کن:
+
+ID
+Decision
+Current Status
+Exact Question
+Relevant Evidence
+Evidence Type
+Confidence
+Options
+Advantages of Each Option
+Disadvantages of Each Option
+Scientific Impact
+Experimental Impact
+Scope Impact
+Reproducibility Impact
+Implementation Impact
+Risk
+What Would Become Invalid If Changed Later
+Recommendation
+Decision Owner
+Approval Required
+Can Be Locked Now? YES/NO
+Reason
+
+برای Decision Owner فقط از این دسته‌ها استفاده کن:
+
+- Researcher
+- Advisor
+- Researcher + Advisor
+- Not ready
+
+==================================================
+5. SEPARATE FACT FROM RECOMMENDATION
+==================================================
+
+برای هر تصمیم سه لایه را کاملاً جدا نگه دار:
+
+A. Evidence
+چیزی که مستقیماً در منبع دیده شده.
+
+B. Inference
+نتیجه‌ای که از چند Evidence گرفته شده.
+
+C. Recommendation
+کاری که تو پیشنهاد می‌کنی.
+
+هیچ‌کدام را با هم ترکیب نکن.
+
+مثلاً:
+
+Evidence:
+Hu et al. uses X.
+
+Inference:
+X may be suitable for our environment.
+
+Recommendation:
+I recommend X.
+
+Decision:
+NOT LOCKED until researcher approval.
+
+==================================================
+6. DECISION GROUP A — SYSTEM / SIMULATOR
+==================================================
+
+به‌طور خاص بررسی کن:
+
+### A1. EPANET version
+- 2.2 یا گزینه دیگر
+- دلیل علمی
+- قابلیت PDA
+- سازگاری با WNTR
+- reproducibility
+
+### A2. WNTR configuration
+- simulator
+- hydraulic options
+- demand model
+- relevant defaults
+
+### A3. PDA vs DDA
+این مورد research-critical است.
+
+بررسی کن:
+
+- آیا PDA باید primary simulator باشد؟
+- آیا DDA باید فقط به‌صورت ablation بماند؟
+- دقیقاً چرا؟
+- چه چیزی با PDA قابل اندازه‌گیری می‌شود؟
+- چه چیزی با DDA پنهان می‌شود؟
+
+### A4. Leakage model
+بررسی کن:
+
+- emitter-based
+- pipe-level leakage
+- N1
+- FAVAD
+- calibration
+- sensitivity
+
+اما هیچ‌کدام را بدون approval نهایی نکن.
+
+==================================================
+7. DECISION GROUP B — NETWORK
+==================================================
+
+بررسی کن:
+
+### B1. Main network
+گزینه‌ها را مقایسه کن:
+
+- EPANET Net3
+- Jowitt & Xu
+- Anytown
+- D-Town
+- سایر گزینه‌های موجود در Corpus
+
+برای هرکدام مشخص کن:
+
+- pumps؟
+- PRVs؟
+- tanks؟
+- benchmark status؟
+- reproducibility؟
+- comparability؟
+- demand uncertainty suitability؟
+- leakage suitability؟
+- computational feasibility؟
+- alignment with Proposal؟
+
+### B2. PRV placement
+این مورد را بسیار جدی بررسی کن.
+
+مشخص کن:
+
+- آیا PRVها از قبل وجود دارند؟
+- اگر نه، چه کسی/چه مقاله‌ای آن‌ها را اضافه کرده؟
+- معیار placement چیست؟
+- آیا placement می‌تواند نتیجه را bias کند؟
+- آیا باید fixed باشد؟
+- آیا باید sensitivity داشته باشد؟
+- آیا optimization of placement وارد Scope می‌شود یا نه؟
+
+DO NOT optimize PRV placement in this phase.
+
+### B3. Secondary network
+مشخص کن:
+
+- آیا به شبکه دوم نیاز داریم؟
+- اگر بله، برای چه هدفی؟
+- internal validity؟
+- external validity؟
+- generalization؟
+- آیا بودجه 7 ماه اجازه می‌دهد؟
+
+==================================================
+8. DECISION GROUP C — STATE / OBSERVATION
+==================================================
+
+گزینه‌های Phase 2 را بررسی کن:
+
+S1
+S2
+S3
+
+برای هرکدام:
+
+- observability
+- dimension
+- practicality
+- leakage of future information
+- simulator availability
+- relation to RQ
+- effect on generalization
+- risk of shortcut learning
+
+مخصوصاً بررسی کن:
+
+- pressure observations
+- tank level
+- actuator state
+- previous action
+- time encoding
+- demand information
+- leakage information
+
+اصل مهم:
+
+هر feature که در دنیای واقعی قابل مشاهده نیست، نباید بدون توجیه وارد observation شود.
+
+اگر S2 پیشنهاد اصلی است، هنوز آن را Decision نکن؛ فقط recommendation بده.
+
+==================================================
+9. DECISION GROUP D — ACTION
+==================================================
+
+گزینه‌های Phase 2 را مقایسه کن:
+
+- absolute control
+- incremental control
+- absolute + rate-limit projection
+
+برای:
+
+PRV
+VSP
+
+بررسی کن:
+
+- continuous action
+- physical feasibility
+- rate limits
+- control realization
+- saturation
+- fully-open / closed behavior
+- three-state PRV issue
+- actuator constraints
+
+Action Realization Rate را به‌عنوان validation criterion بررسی کن.
+
+هیچ action range نهایی را بدون Decision ثبت نکن.
+
+==================================================
+10. DECISION GROUP E — REWARD
+==================================================
+
+این بخش بسیار حساس است.
+
+بررسی کن:
+
+### Option A
+Weighted multi-objective reward
+
+### Option B
+Constrained formulation
+
+### Option C
+Safety filter / shield
+
+بررسی کن:
+
+- alignment with Research Question
+- reward hacking
+- pressure violation
+- leakage
+- smoothness
+- energy
+- scaling
+- normalization
+- interpretability
+- weight sensitivity
+- feasibility-first
+- Pareto interpretation
+
+به‌صراحت مشخص کن:
+
+کدام موارد:
+
+- core Scope هستند
+- optional
+- future work
+- scope-expanding
+
+و هیچ reward نهایی را بدون approval قفل نکن.
+
+==================================================
+11. DECISION GROUP F — PPO
+==================================================
+
+PPO مصوب Proposal است.
+
+بنابراین:
+
+- PPO را حذف نکن.
+- الگوریتم دیگری را جایگزین نکن.
+
+فقط بررسی کن:
+
+- آیا توجیه علمی PPO کافی است؟
+- آیا comparator لازم است؟
+- SAC به‌عنوان comparator چه ارزشی دارد؟
+- Recurrent PPO چه جایگاهی دارد؟
+
+تمایز:
+
+PPO = primary approved algorithm
+
+SAC = possible comparator
+
+Recurrent PPO = possible architectural ablation
+
+MADDPG = not primary algorithm unless approved as scope change
+
+==================================================
+12. DECISION GROUP G — TRAINING
+==================================================
+
+بررسی کن:
+
+- total timesteps
+- rollout length
+- seeds
+- hyperparameter budget
+- checkpointing
+- normalization
+- early stopping
+- validation
+- train/test separation
+- randomization
+- computational fairness
+
+برای هر مورد:
+
+- Evidence
+- Recommendation
+- Minimum viable protocol
+- Preferred protocol
+- Cost
+
+اما هنوز training را اجرا نکن.
+
+==================================================
+13. DECISION GROUP H — DEMAND UNCERTAINTY
+==================================================
+
+بررسی کن:
+
+- deterministic scenarios
+- Hu-style stochastic protocol
+- Monte Carlo
+- distribution shift
+- OOD testing
+- spatial uncertainty
+- temporal uncertainty
+
+سپس مشخص کن:
+
+- چه چیزی برای RQ1 ضروری است؟
+- چه چیزی optional است؟
+- چه چیزی Scope-expanding است؟
+
+عدم قطعیت باید operationally defined شود.
+
+==================================================
+14. DECISION GROUP I — BASELINES
+==================================================
+
+Baselineها را به سه دسته تقسیم کن:
+
+### Mandatory
+Baselineهایی که حذفشان internal validity را خراب می‌کند.
+
+### Recommended
+Baselineهایی که comparison را قوی‌تر می‌کنند.
+
+### Optional
+Baselineهایی که فقط در صورت داشتن budget اجرا شوند.
+
+بررسی کن:
+
+- Fixed PRV
+- TMPC
+- DE
+- GA
+- PSO
+- Nelder-Mead
+- P-controller/PID
+- MPC
+- single-objective PPO
+- SAC
+
+مخصوصاً fairness را بررسی کن:
+
+- same network
+- same demand scenarios
+- same constraints
+- same evaluation set
+- comparable optimization budget
+- reporting computational cost separately
+
+==================================================
+15. DECISION GROUP J — GENERALIZATION
+==================================================
+
+سه سطح را جدا نگه دار:
+
+Level 1:
+unseen demand scenarios
+
+Level 2:
+OOD operational conditions
+
+Level 3:
+different network topology
+
+مشخص کن:
+
+- کدام داخل Scope مصوب است؟
+- کدام optional است؟
+- کدام نیاز به Advisor Approval دارد؟
+
+ادعای generalization را بسیار محافظه‌کارانه تعریف کن.
+
+«generalization across networks» فقط در صورت داشتن آزمایش مناسب قابل ادعاست.
+
+==================================================
+16. DECISION GROUP K — EVALUATION
+==================================================
+
+قبل از Implementation باید مشخص شود:
+
+Primary metrics
+Secondary metrics
+Learning diagnostics
+Statistical protocol
+
+بررسی کن:
+
+- leakage volume
+- pressure violations
+- max violation
+- pressure stability
+- DSR
+- pump energy
+- actuator movement
+- Action Realization Rate
+- tank recovery
+- computational/decision time
+
+برای هر metric مشخص کن:
+
+- چرا اندازه‌گیری می‌شود؟
+- دقیقاً چه constructی را می‌سنجد؟
+- آیا با RQ ارتباط دارد؟
+- آیا ممکن است misleading باشد؟
+
+==================================================
+17. DECISION GROUP L — ABLATION
+==================================================
+
+تمام ablationهای Phase 2 را بررسی کن.
+
+اما آن‌ها را اولویت‌بندی کن:
+
+Tier 1 — ضروری:
+- PRV-only vs PRV+Pump
+- Single-objective vs Multi-objective
+- PDA vs DDA
+- uncertainty vs no-uncertainty
+
+Tier 2 — ارزشمند:
+- State variants
+- PPO vs SAC
+- absolute vs incremental
+- beta=1 vs beta=2
+
+Tier 3 — optional:
+- Recurrent PPO
+- advanced variants
+
+برای هرکدام هزینه و ارزش علمی را مشخص کن.
+
+==================================================
+18. DECISION GROUP M — REPRODUCIBILITY
+==================================================
+
+Methodology باید از ابتدا reproducible باشد.
+
+بررسی کن:
+
+- Python version
+- EPANET version
+- WNTR version
+- Stable-Baselines3
+- Gymnasium
+- PyTorch
+- seeds
+- configs
+- model checkpoints
+- logs
+- run IDs
+- git SHA
+- hardware
+- random scenario generation
+- result provenance
+
+هدف:
+
+هر result باید قابل trace باشد به:
+
+Git SHA
+→ config
+→ seed
+→ run
+→ metrics
+→ figure/table
+
+==================================================
+19. CHANGE-IMPACT MATRIX
+==================================================
+
+یک جدول بساز که نشان دهد:
+
+اگر X تغییر کند،
+چه چیزهایی باید دوباره اجرا شوند؟
+
+حداقل:
+
+- Network
+- PDA/DDA
+- Leakage model
+- State
+- Action
+- Reward
+- PPO/SAC
+- Demand uncertainty
+- Seeds
+- Metrics
+- Baselines
+
+برای هر مورد:
+
+Impact = Low / Medium / High / Critical
+
+و مشخص کن:
+
+«Which previous results become invalid?»
+
+==================================================
+20. DECISION GATE
+==================================================
+
+در پایان تمام تصمیم‌ها را در چهار دسته قرار بده:
+
+### READY TO LOCK
+Evidence کافی دارد و نیاز به approval ندارد.
+
+### NEEDS RESEARCHER DECISION
+Evidence کافی است، ولی تصمیم علمی من است.
+
+### NEEDS ADVISOR APPROVAL
+تغییر مهم در Scope / Proposal / contribution / methodology.
+
+### NEEDS MORE EVIDENCE
+هنوز evidence کافی نیست.
+
+هیچ موردی را از دسته‌های سوم و چهارم خارج نکن مگر با شواهد جدید.
+
+==================================================
+21. MINIMUM METHODOLOGY LOCK
+==================================================
+
+مشخص کن برای شروع Implementation حداقل چه مواردی باید قفل شوند.
+
+حداقل بررسی:
+
+1. Network
+2. PRV placement
+3. PDA/DDA
+4. Leakage model
+5. State
+6. Action
+7. Reward
+8. PPO
+9. Comparator
+10. Demand uncertainty
+11. Evaluation metrics
+12. Seed protocol
+13. Baselines
+14. Reproducibility protocol
+
+اگر حتی یکی از این‌ها research-critical باشد و unresolved بماند،
+شروع Implementation را متوقف اعلام کن.
+
+==================================================
+22. METHODOLOGY SPECIFICATION — DRAFT ONLY
+==================================================
+
+بعد از Decision Register یک:
+
+## Draft Methodology Specification
+
+بساز.
+
+اما بسیار مهم:
+
+این بخش فقط از تصمیم‌های LOCKED تشکیل شود.
+
+موارد unresolved را با:
+
+[UNRESOLVED]
+
+علامت بزن.
+
+این Specification باید شامل:
+
+System
+Simulator
+Network
+Hydraulic model
+Leakage model
+State
+Action
+Reward
+Algorithm
+Demand uncertainty
+Training
+Evaluation
+Baselines
+Ablations
+Sensitivity
+Reproducibility
+
+باشد.
+
+==================================================
+23. DO NOT IMPLEMENT
+==================================================
+
+حتی اگر احساس کردی methodology به اندازه کافی مشخص است:
+
+STOP.
+
+هیچ کدی ننویس.
+
+هیچ environment نساز.
+
+هیچ network را اجرا نکن.
+
+هیچ reward را تست نکن.
+
+هیچ PPO training را شروع نکن.
+
+فقط Specification تولید کن.
+
+==================================================
+24. OUTPUT FORMAT
+==================================================
+
+گزارش نهایی این Phase دقیقاً با این ساختار باشد:
+
+# Phase 3 — Decision Review & Methodology Lock
+
+## 1. Executive Summary
+
+## 2. Decisions Inherited From Phase 2
+
+## 3. Decision Register
+AD / RS / U
+
+## 4. Researcher Decisions Required
+
+## 5. Advisor Approvals Required
+
+## 6. Evidence Gaps Still Blocking Decisions
+
+## 7. Change-Impact Matrix
+
+## 8. Minimum Decisions Required Before Implementation
+
+## 9. Draft Methodology Specification
+
+## 10. Scope-Drift Check
+
+## 11. Scientific Risks Still Open
+
+## 12. Final Decision Gate
+
+## 13. Recommended Immediate Next Action
+
+## 14. Confidence & Uncertainty
+
+==================================================
+25. VERY IMPORTANT — HUMAN APPROVAL
+==================================================
+
+در انتهای گزارش یک جدول بسیار ساده بده:
+
+| Decision | Your Recommendation | Who Must Approve | Why |
+|---|---|---|---|
+
+و فقط تصمیم‌هایی را در آن قرار بده که واقعاً لازم است من یا استاد راهنما تصمیم بگیریم.
+
+==================================================
+26. INTERRUPTION / RESUME PROTOCOL
+==================================================
+
+اگر محدودیت context، اینترنت، ابزار یا زمان باعث توقف شد:
+
+قبل از توقف:
+
+- آخرین بخش تکمیل‌شده
+- بخش فعلی
+- بخش‌های باقی‌مانده
+- Evidence موجود
+- Evidence ناقص
+- تصمیم‌های قفل‌شده
+- تصمیم‌های باز
+- هیچ فایل تغییرکرده/تغییرنکرده
+
+را در یک Resume Check کوتاه ثبت کن.
+
+==================================================
+27. FINAL RULE
+==================================================
+
+هدف این Phase این نیست که «سریع به methodology برسیم».
+
+هدف این است که:
+
+از Evidence
+→ به Decision
+→ از Decision
+→ به Methodology Lock
+→ و فقط بعد از Human Approval
+→ به Implementation
+
+برسیم.
+
+اگر در هر جایی بین:
+
+Scientific correctness
+Scope
+Proposal
+Seminar
+Literature
+Implementation convenience
+
+تعارض وجود داشت:
+
+تعارض را آشکار کن.
+
+هیچ تصمیم مهمی را silent نکن.
+
+در این Phase هیچ فایل پروژه را تغییر نده.

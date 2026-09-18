@@ -1,0 +1,33 @@
+{
+  "state": "failed",
+  "detail": "منتظر دستور بعدی شما هستم. اگر بخواهید، Phase بعدی می‌تواند یکی از این‌ها باشد: `novelty-check` مستقل (برای بستن G8 و AD3)، بستن شکاف‌های G1/G3 با خواندن دستی صفحات مشخص‌شده، یا نوشتن محتوای این Phase در `docs/` پس از تأیید.",
+  "tempo": "idle",
+  "tokens": 129326,
+  "output": null,
+  "children": null,
+  "linkScanOffset": 1804104,
+  "linkScanPath": "C:\\Users\\ABN\\.claude\\projects\\D--Thesis\\10b7b88f-d1a5-4ce4-b370-a3813b0631ee.jsonl",
+  "template": "bg",
+  "respawnFlags": [
+    "--permission-mode",
+    "default",
+    "--model",
+    "opus[1m]",
+    "--effort",
+    "max"
+  ],
+  "bgIsolation": "none",
+  "providerEnv": {},
+  "interactiveLineage": true,
+  "intent": "",
+  "sessionId": "10b7b88f-d1a5-4ce4-b370-a3813b0631ee",
+  "resumeSessionId": "10b7b88f-d1a5-4ce4-b370-a3813b0631ee",
+  "daemonShort": "10b7b88f",
+  "cliVersion": "2.1.240",
+  "cwd": "D:\\Thesis",
+  "createdAt": "2026-08-26T18:45:51.589Z",
+  "updatedAt": "2026-08-28T23:21:59.876Z",
+  "firstTerminalAt": "2026-08-28T23:21:59.876Z",
+  "backend": "daemon",
+  "reapedMidWorkAt": "2026-08-26T20:38:36.404Z"
+}

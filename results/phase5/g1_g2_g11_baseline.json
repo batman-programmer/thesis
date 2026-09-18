@@ -1,0 +1,1243 @@
+{
+  "gate": "G1+G2+G11",
+  "title": "Baseline convergence, native control logic, tank dynamics",
+  "env": {
+    "timestamp_utc": "2026-09-02T22:25:13+00:00",
+    "os": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "python": "3.13.15",
+    "python_build": "Aug  5 2026 13:05:39",
+    "wntr": "1.5.0",
+    "numpy": "2.5.2",
+    "pandas": "3.0.5",
+    "scipy": "1.18.1",
+    "networkx": "3.6.1",
+    "epanet_engine_wntr": {
+      "epanet2.dll": 20200,
+      "epanet20.dll": 20012,
+      "epanet22.dll": 20200
+    },
+    "epanet_engine_epyt": 20305,
+    "original_inp_sha256": "510af942ec643eb87adcf26e5a7df1cc4c23eb0c1e470a8a1257ed055f1956f1",
+    "working_inp_sha256": "53015ba9212e46bec731d190971819996233996b498bc269e828f992830a20a9",
+    "determinism": "EPANET's hydraulic solver is deterministic. No stochastic input is used anywhere in Phase 5; leak-node selection and leak-coefficient allocation are closed-form functions of pipe length, so no random seed is required. Recorded seed: none used."
+  },
+  "runtime_notes": {
+    "rule_timestep": "The distributed [TIMES] section does not declare a rule timestep. Native EPANET then defaults to 1/10 of the hydraulic timestep = 180 s (confirmed via EPyT getTimeRuleControlStep). WNTR's own default is 360 s, so an unmodified WNTR run evaluates the tank-level pump rules at half the native frequency. Every run here sets 180 s explicitly.",
+    "report_timestep": "The distributed file reports every 1:00 while solving every 0:30. Tests that need half-hourly output set report_timestep = 1800 s in memory. This changes output resolution only, not the solution."
+  },
+  "leakage_added": false,
+  "demand_model_changed": false,
+  "actuators_overridden": false,
+  "runs": {
+    "as_distributed_report_3600s": {
+      "n_timesteps_returned": 97,
+      "t_first_s": 0.0,
+      "t_last_s": 345600.0,
+      "report_timestep_s": 3600,
+      "hydraulic_timestep_s": 1800,
+      "rule_timestep_s": 180,
+      "duration_s": 345600.0,
+      "wntr_warnings": [],
+      "report_scan": {
+        "rpt_found": true,
+        "rpt_path": "D:\\Thesis\\results\\phase5\\_tmp\\g1_asdistributed.rpt",
+        "n_lines": 12,
+        "n_flagged_lines": 0,
+        "flagged_lines": [],
+        "n_errors": 0,
+        "n_warnings": 0
+      },
+      "pressure_junctions_psi": {
+        "min": 4.223947048187256,
+        "min_at_node": "JUNCTION-29",
+        "min_at_time_s": 90000.0,
+        "max": 507.79949951171875,
+        "max_at_node": "JUNCTION-106",
+        "max_at_time_s": 208800.0,
+        "mean": 103.82583618164062,
+        "n_node_timesteps": 12222,
+        "n_negative": 0,
+        "n_below_20psi": 194,
+        "nodes_ever_negative": [],
+        "nodes_ever_below_20psi": [
+          "JUNCTION-126",
+          "JUNCTION-29"
+        ]
+      },
+      "tanks": {
+        "TANK-130": {
+          "elevation_ft": 843.9000000000001,
+          "init_level_ft": 15.159,
+          "min_level_ft": 0.0,
+          "max_level_ft": 32.1,
+          "diameter_ft": 186.0,
+          "level_min_ft": 12.121225357055664,
+          "level_max_ft": 15.976873397827148,
+          "level_first_ft": 15.158966064453125,
+          "level_last_ft": 13.959488868713379,
+          "level_range_ft": 3.855647563934326,
+          "hit_min_level": false,
+          "exceeded_max_level": false,
+          "went_negative": false,
+          "net_level_change_ft": -1.199476957321167
+        },
+        "TANK-131": {
+          "elevation_ft": 1137.1,
+          "init_level_ft": 17.945,
+          "min_level_ft": 0.0,
+          "max_level_ft": 41.9,
+          "diameter_ft": 106.00000000000001,
+          "level_min_ft": 15.399561882019043,
+          "level_max_ft": 18.348392486572266,
+          "level_first_ft": 17.945096969604492,
+          "level_last_ft": 16.973899841308594,
+          "level_range_ft": 2.948831081390381,
+          "hit_min_level": false,
+          "exceeded_max_level": false,
+          "went_negative": false,
+          "net_level_change_ft": -0.9711958765983582
+        }
+      },
+      "pumps_and_valves": {
+        "PUMP-170": {
+          "type": "Pump",
+          "status_initial": 1.0,
+          "status_final": 0.0,
+          "n_status_changes": 7,
+          "frac_time_open": 0.2268041237113402,
+          "distinct_status_values": [
+            0.0,
+            1.0
+          ],
+          "flow_min_gpm": 0.0,
+          "flow_max_gpm": 765.8873291015625,
+          "flow_mean_gpm": 172.69187927246094
+        },
+        "PUMP-172": {
+          "type": "Pump",
+          "status_initial": 1.0,
+          "status_final": 0.0,
+          "n_status_changes": 7,
+          "frac_time_open": 0.35051546391752575,
+          "distinct_status_values": [
+            0.0,
+            1.0
+          ],
+          "flow_min_gpm": 0.0,
+          "flow_max_gpm": 2413.36328125,
+          "flow_mean_gpm": 843.0296630859375
+        },
+        "VALVE-173": {
+          "type": "Valve",
+          "status_initial": 2.0,
+          "status_final": 2.0,
+          "n_status_changes": 0,
+          "frac_time_open": 1.0,
+          "distinct_status_values": [
+            2.0
+          ],
+          "flow_min_gpm": 0.0516289658844471,
+          "flow_max_gpm": 4.7231340408325195,
+          "flow_mean_gpm": 1.5130048990249634,
+          "setting_psi": 70.0
+        },
+        "VALVE-174": {
+          "type": "Valve",
+          "status_initial": 0.0,
+          "status_final": 0.0,
+          "n_status_changes": 0,
+          "frac_time_open": 0.0,
+          "distinct_status_values": [
+            0.0
+          ],
+          "flow_min_gpm": 0.0,
+          "flow_max_gpm": 0.0,
+          "flow_mean_gpm": 0.0,
+          "setting_psi": 80.0
+        },
+        "VALVE-175": {
+          "type": "Valve",
+          "status_initial": 2.0,
+          "status_final": 2.0,
+          "n_status_changes": 0,
+          "frac_time_open": 1.0,
+          "distinct_status_values": [
+            2.0
+          ],
+          "flow_min_gpm": 12.255640029907227,
+          "flow_max_gpm": 1115.4224853515625,
+          "flow_mean_gpm": 357.503662109375,
+          "setting_psi": 55.0
+        },
+        "VALVE-176": {
+          "type": "Valve",
+          "status_initial": 2.0,
+          "status_final": 2.0,
+          "n_status_changes": 0,
+          "frac_time_open": 1.0,
+          "distinct_status_values": [
+            2.0
+          ],
+          "flow_min_gpm": 9.089162826538086,
+          "flow_max_gpm": 827.2702026367188,
+          "flow_mean_gpm": 265.0619201660156,
+          "setting_psi": 29.762
+        },
+        "VALVE-177": {
+          "type": "Valve",
+          "status_initial": 2.0,
+          "status_final": 2.0,
+          "n_status_changes": 0,
+          "frac_time_open": 1.0,
+          "distinct_status_values": [
+            2.0
+          ],
+          "flow_min_gpm": 0.4115999639034271,
+          "flow_max_gpm": 53.45560073852539,
+          "flow_mean_gpm": 18.762937545776367,
+          "setting_psi": 45.0
+        },
+        "VALVE-178": {
+          "type": "Valve",
+          "status_initial": 2.0,
+          "status_final": 2.0,
+          "n_status_changes": 0,
+          "frac_time_open": 1.0,
+          "distinct_status_values": [
+            2.0
+          ],
+          "flow_min_gpm": 0.141519695520401,
+          "flow_max_gpm": 92.8045425415039,
+          "flow_mean_gpm": 37.9176139831543,
+          "setting_psi": 37.0
+        },
+        "VALVE-179": {
+          "type": "Valve",
+          "status_initial": 0.0,
+          "status_final": 0.0,
+          "n_status_changes": 0,
+          "frac_time_open": 0.0,
+          "distinct_status_values": [
+            0.0
+          ],
+          "flow_min_gpm": 0.0,
+          "flow_max_gpm": 0.0,
+          "flow_mean_gpm": 0.0,
+          "setting_psi": 40.0
+        },
+        "VALVE-180": {
+          "type": "Valve",
+          "status_initial": 0.0,
+          "status_final": 0.0,
+          "n_status_changes": 0,
+          "frac_time_open": 0.0,
+          "distinct_status_values": [
+            0.0
+          ],
+          "flow_min_gpm": 0.0,
+          "flow_max_gpm": 0.0,
+          "flow_mean_gpm": 0.0,
+          "setting_psi": 16.45
+        }
+      },
+      "pump_energy": {
+        "global_efficiency_pct": 75.0,
+        "PUMP-170": {
+          "power_mean_kW": 16.13462041666158,
+          "power_max_kW": 71.36680184374794,
+          "power_when_running_mean_kW": 71.13900820073515,
+          "energy_total_kWh": 1565.058180416173
+        },
+        "PUMP-172": {
+          "power_mean_kW": 93.24330301885043,
+          "power_max_kW": 266.3935154825905,
+          "power_when_running_mean_kW": 266.0176586126027,
+          "energy_total_kWh": 9044.600392828494
+        }
+      }
+    },
+    "report_1800s": {
+      "n_timesteps_returned": 193,
+      "t_first_s": 0.0,
+      "t_last_s": 345600.0,
+      "report_timestep_s": 1800,
+      "hydraulic_timestep_s": 1800,
+      "rule_timestep_s": 180,
+      "duration_s": 345600.0,
+      "wntr_warnings": [],
+      "report_scan": {
+        "rpt_found": true,
+        "rpt_path": "D:\\Thesis\\results\\phase5\\_tmp\\g1_report1800.rpt",
+        "n_lines": 12,
+        "n_flagged_lines": 0,
+        "flagged_lines": [],
+        "n_errors": 0,
+        "n_warnings": 0
+      },
+      "pressure_junctions_psi": {
+        "min": 4.187530517578125,
+        "min_at_node": "JUNCTION-29",
+        "min_at_time_s": 88200.0,
+        "max": 507.79949951171875,
+        "max_at_node": "JUNCTION-106",
+        "max_at_time_s": 208800.0,
+        "mean": 103.82630920410156,
+        "n_node_timesteps": 24318,
+        "n_negative": 0,
+        "n_below_20psi": 386,
+        "nodes_ever_negative": [],
+        "nodes_ever_below_20psi": [
+          "JUNCTION-126",
+          "JUNCTION-29"
+        ]
+      },
+      "tanks": {
+        "TANK-130": {
+          "elevation_ft": 843.9000000000001,
+          "init_level_ft": 15.159,
+          "min_level_ft": 0.0,
+          "max_level_ft": 32.1,
+          "diameter_ft": 186.0,
+          "level_min_ft": 12.109811782836914,
+          "level_max_ft": 15.981779098510742,
+          "level_first_ft": 15.158966064453125,
+          "level_last_ft": 13.959488868713379,
+          "level_range_ft": 3.8719677925109863,
+          "hit_min_level": false,
+          "exceeded_max_level": false,
+          "went_negative": false,
+          "net_level_change_ft": -1.199476957321167
+        },
+        "TANK-131": {
+          "elevation_ft": 1137.1,
+          "init_level_ft": 17.945,
+          "min_level_ft": 0.0,
+          "max_level_ft": 41.9,
+          "diameter_ft": 106.00000000000001,
+          "level_min_ft": 15.399561882019043,
+          "level_max_ft": 18.38724136352539,
+          "level_first_ft": 17.945096969604492,
+          "level_last_ft": 16.973899841308594,
+          "level_range_ft": 2.9876787662506104,
+          "hit_min_level": false,
+          "exceeded_max_level": false,
+          "went_negative": false,
+          "net_level_change_ft": -0.9711958765983582
+        }
+      },
+      "pumps_and_valves": {
+        "PUMP-170": {
+          "type": "Pump",
+          "status_initial": 1.0,
+          "status_final": 0.0,
+          "n_status_changes": 7,
+          "frac_time_open": 0.21761658031088082,
+          "distinct_status_values": [
+            0.0,
+            1.0
+          ],
+          "flow_min_gpm": 0.0,
+          "flow_max_gpm": 765.8873291015625,
+          "flow_mean_gpm": 165.69873046875
+        },
+        "PUMP-172": {
+          "type": "Pump",
+          "status_initial": 1.0,
+          "status_final": 0.0,
+          "n_status_changes": 7,
+          "frac_time_open": 0.35751295336787564,
+          "distinct_status_values": [
+            0.0,
+            1.0
+          ],
+          "flow_min_gpm": 0.0,
+          "flow_max_gpm": 2413.36328125,
+          "flow_mean_gpm": 859.8678588867188
+        },
+        "VALVE-173": {
+          "type": "Valve",
+          "status_initial": 2.0,
+          "status_final": 2.0,
+          "n_status_changes": 0,
+          "frac_time_open": 1.0,
+          "distinct_status_values": [
+            2.0
+          ],
+          "flow_min_gpm": 0.0516289658844471,
+          "flow_max_gpm": 4.7231340408325195,
+          "flow_mean_gpm": 1.5379855632781982,
+          "setting_psi": 70.0
+        },
+        "VALVE-174": {
+          "type": "Valve",
+          "status_initial": 0.0,
+          "status_final": 0.0,
+          "n_status_changes": 0,
+          "frac_time_open": 0.0,
+          "distinct_status_values": [
+            0.0
+          ],
+          "flow_min_gpm": 0.0,
+          "flow_max_gpm": 0.0,
+          "flow_mean_gpm": 0.0,
+          "setting_psi": 80.0
+        },
+        "VALVE-175": {
+          "type": "Valve",
+          "status_initial": 2.0,
+          "status_final": 2.0,
+          "n_status_changes": 0,
+          "frac_time_open": 1.0,
+          "distinct_status_values": [
+            2.0
+          ],
+          "flow_min_gpm": 12.255640029907227,
+          "flow_max_gpm": 1115.4224853515625,
+          "flow_mean_gpm": 363.6673583984375,
+          "setting_psi": 55.0
+        },
+        "VALVE-176": {
+          "type": "Valve",
+          "status_initial": 2.0,
+          "status_final": 2.0,
+          "n_status_changes": 0,
+          "frac_time_open": 1.0,
+          "distinct_status_values": [
+            2.0
+          ],
+          "flow_min_gpm": 9.089162826538086,
+          "flow_max_gpm": 827.2702026367188,
+          "flow_mean_gpm": 269.4178161621094,
+          "setting_psi": 29.762
+        },
+        "VALVE-177": {
+          "type": "Valve",
+          "status_initial": 2.0,
+          "status_final": 2.0,
+          "n_status_changes": 0,
+          "frac_time_open": 1.0,
+          "distinct_status_values": [
+            2.0
+          ],
+          "flow_min_gpm": 0.4115999639034271,
+          "flow_max_gpm": 53.45560073852539,
+          "flow_mean_gpm": 18.91303062438965,
+          "setting_psi": 45.0
+        },
+        "VALVE-178": {
+          "type": "Valve",
+          "status_initial": 2.0,
+          "status_final": 2.0,
+          "n_status_changes": 0,
+          "frac_time_open": 1.0,
+          "distinct_status_values": [
+            2.0
+          ],
+          "flow_min_gpm": 0.141519695520401,
+          "flow_max_gpm": 92.8045425415039,
+          "flow_mean_gpm": 37.745758056640625,
+          "setting_psi": 37.0
+        },
+        "VALVE-179": {
+          "type": "Valve",
+          "status_initial": 0.0,
+          "status_final": 0.0,
+          "n_status_changes": 0,
+          "frac_time_open": 0.0,
+          "distinct_status_values": [
+            0.0
+          ],
+          "flow_min_gpm": 0.0,
+          "flow_max_gpm": 0.0,
+          "flow_mean_gpm": 0.0,
+          "setting_psi": 40.0
+        },
+        "VALVE-180": {
+          "type": "Valve",
+          "status_initial": 0.0,
+          "status_final": 0.0,
+          "n_status_changes": 0,
+          "frac_time_open": 0.0,
+          "distinct_status_values": [
+            0.0
+          ],
+          "flow_min_gpm": 0.0,
+          "flow_max_gpm": 0.0,
+          "flow_mean_gpm": 0.0,
+          "setting_psi": 16.45
+        }
+      },
+      "pump_energy": {
+        "global_efficiency_pct": 75.0,
+        "PUMP-170": {
+          "power_mean_kW": 15.481160813895837,
+          "power_max_kW": 71.36680184374794,
+          "power_when_running_mean_kW": 71.13961993052133,
+          "energy_total_kWh": 1493.9320185409483
+        },
+        "PUMP-172": {
+          "power_mean_kW": 95.10441177895854,
+          "power_max_kW": 266.3935154825905,
+          "power_when_running_mean_kW": 266.0166880194057,
+          "energy_total_kWh": 9177.5757366695
+        }
+      }
+    },
+    "wntr_default_rule_360s": {
+      "n_timesteps_returned": 193,
+      "t_first_s": 0.0,
+      "t_last_s": 345600.0,
+      "report_timestep_s": 1800,
+      "hydraulic_timestep_s": 1800,
+      "rule_timestep_s": 360,
+      "duration_s": 345600.0,
+      "wntr_warnings": [],
+      "report_scan": {
+        "rpt_found": true,
+        "rpt_path": "D:\\Thesis\\results\\phase5\\_tmp\\g1_rule360.rpt",
+        "n_lines": 12,
+        "n_flagged_lines": 0,
+        "flagged_lines": [],
+        "n_errors": 0,
+        "n_warnings": 0
+      },
+      "pressure_junctions_psi": {
+        "min": 4.197817802429199,
+        "min_at_node": "JUNCTION-29",
+        "min_at_time_s": 90000.0,
+        "max": 507.7701110839844,
+        "max_at_node": "JUNCTION-106",
+        "max_at_time_s": 208800.0,
+        "mean": 103.82547760009766,
+        "n_node_timesteps": 24318,
+        "n_negative": 0,
+        "n_below_20psi": 386,
+        "nodes_ever_negative": [],
+        "nodes_ever_below_20psi": [
+          "JUNCTION-126",
+          "JUNCTION-29"
+        ]
+      },
+      "tanks": {
+        "TANK-130": {
+          "elevation_ft": 843.9000000000001,
+          "init_level_ft": 15.159,
+          "min_level_ft": 0.0,
+          "max_level_ft": 32.1,
+          "diameter_ft": 186.0,
+          "level_min_ft": 12.060951232910156,
+          "level_max_ft": 15.995095252990723,
+          "level_first_ft": 15.158966064453125,
+          "level_last_ft": 13.948375701904297,
+          "level_range_ft": 3.9341442584991455,
+          "hit_min_level": false,
+          "exceeded_max_level": false,
+          "went_negative": false,
+          "net_level_change_ft": -1.2105906009674072
+        },
+        "TANK-131": {
+          "elevation_ft": 1137.1,
+          "init_level_ft": 17.945,
+          "min_level_ft": 0.0,
+          "max_level_ft": 41.9,
+          "diameter_ft": 106.00000000000001,
+          "level_min_ft": 15.393354415893555,
+          "level_max_ft": 18.449718475341797,
+          "level_first_ft": 17.945096969604492,
+          "level_last_ft": 17.006940841674805,
+          "level_range_ft": 3.056363344192505,
+          "hit_min_level": false,
+          "exceeded_max_level": false,
+          "went_negative": false,
+          "net_level_change_ft": -0.9381551742553711
+        }
+      },
+      "pumps_and_valves": {
+        "PUMP-170": {
+          "type": "Pump",
+          "status_initial": 1.0,
+          "status_final": 0.0,
+          "n_status_changes": 7,
+          "frac_time_open": 0.21761658031088082,
+          "distinct_status_values": [
+            0.0,
+            1.0
+          ],
+          "flow_min_gpm": 0.0,
+          "flow_max_gpm": 765.8873291015625,
+          "flow_mean_gpm": 165.71551513671875
+        },
+        "PUMP-172": {
+          "type": "Pump",
+          "status_initial": 1.0,
+          "status_final": 0.0,
+          "n_status_changes": 7,
+          "frac_time_open": 0.35751295336787564,
+          "distinct_status_values": [
+            0.0,
+            1.0
+          ],
+          "flow_min_gpm": 0.0,
+          "flow_max_gpm": 2413.60595703125,
+          "flow_mean_gpm": 859.9395141601562
+        },
+        "VALVE-173": {
+          "type": "Valve",
+          "status_initial": 2.0,
+          "status_final": 2.0,
+          "n_status_changes": 0,
+          "frac_time_open": 1.0,
+          "distinct_status_values": [
+            2.0
+          ],
+          "flow_min_gpm": 0.0517142117023468,
+          "flow_max_gpm": 4.723141193389893,
+          "flow_mean_gpm": 1.537985920906067,
+          "setting_psi": 70.0
+        },
+        "VALVE-174": {
+          "type": "Valve",
+          "status_initial": 0.0,
+          "status_final": 0.0,
+          "n_status_changes": 0,
+          "frac_time_open": 0.0,
+          "distinct_status_values": [
+            0.0
+          ],
+          "flow_min_gpm": 0.0,
+          "flow_max_gpm": 0.0,
+          "flow_mean_gpm": 0.0,
+          "setting_psi": 80.0
+        },
+        "VALVE-175": {
+          "type": "Valve",
+          "status_initial": 2.0,
+          "status_final": 2.0,
+          "n_status_changes": 0,
+          "frac_time_open": 1.0,
+          "distinct_status_values": [
+            2.0
+          ],
+          "flow_min_gpm": 12.255626678466797,
+          "flow_max_gpm": 1115.421875,
+          "flow_mean_gpm": 363.6673583984375,
+          "setting_psi": 55.0
+        },
+        "VALVE-176": {
+          "type": "Valve",
+          "status_initial": 2.0,
+          "status_final": 2.0,
+          "n_status_changes": 0,
+          "frac_time_open": 1.0,
+          "distinct_status_values": [
+            2.0
+          ],
+          "flow_min_gpm": 9.089162826538086,
+          "flow_max_gpm": 827.2702026367188,
+          "flow_mean_gpm": 269.4178161621094,
+          "setting_psi": 29.762
+        },
+        "VALVE-177": {
+          "type": "Valve",
+          "status_initial": 2.0,
+          "status_final": 2.0,
+          "n_status_changes": 0,
+          "frac_time_open": 1.0,
+          "distinct_status_values": [
+            2.0
+          ],
+          "flow_min_gpm": 0.4115999639034271,
+          "flow_max_gpm": 53.45560073852539,
+          "flow_mean_gpm": 18.91303062438965,
+          "setting_psi": 45.0
+        },
+        "VALVE-178": {
+          "type": "Valve",
+          "status_initial": 2.0,
+          "status_final": 2.0,
+          "n_status_changes": 0,
+          "frac_time_open": 1.0,
+          "distinct_status_values": [
+            2.0
+          ],
+          "flow_min_gpm": 0.14151965081691742,
+          "flow_max_gpm": 92.8045425415039,
+          "flow_mean_gpm": 37.745758056640625,
+          "setting_psi": 37.0
+        },
+        "VALVE-179": {
+          "type": "Valve",
+          "status_initial": 0.0,
+          "status_final": 0.0,
+          "n_status_changes": 0,
+          "frac_time_open": 0.0,
+          "distinct_status_values": [
+            0.0
+          ],
+          "flow_min_gpm": 0.0,
+          "flow_max_gpm": 0.0,
+          "flow_mean_gpm": 0.0,
+          "setting_psi": 40.0
+        },
+        "VALVE-180": {
+          "type": "Valve",
+          "status_initial": 0.0,
+          "status_final": 0.0,
+          "n_status_changes": 0,
+          "frac_time_open": 0.0,
+          "distinct_status_values": [
+            0.0
+          ],
+          "flow_min_gpm": 0.0,
+          "flow_max_gpm": 0.0,
+          "flow_mean_gpm": 0.0,
+          "setting_psi": 16.45
+        }
+      },
+      "pump_energy": {
+        "global_efficiency_pct": 75.0,
+        "PUMP-170": {
+          "power_mean_kW": 15.48203412322258,
+          "power_max_kW": 71.36680184374794,
+          "power_when_running_mean_kW": 71.14363299480851,
+          "energy_total_kWh": 1494.0162928909785
+        },
+        "PUMP-172": {
+          "power_mean_kW": 95.10187531621725,
+          "power_max_kW": 266.3807774056072,
+          "power_when_running_mean_kW": 266.0095932757961,
+          "energy_total_kWh": 9177.33096801496
+        }
+      }
+    }
+  },
+  "resolution_agreement": {
+    "n_common_timesteps": 97,
+    "max_abs_pressure_diff_m": 0.0,
+    "identical_to_1e-9_m": true
+  },
+  "rule_timestep_effect": {
+    "max_abs_pressure_diff_m": 0.03225851058959961,
+    "max_abs_pressure_diff_psi": 0.04585831239819527,
+    "identical": false,
+    "n_pump_switches_rule180": {
+      "PUMP-170": 7,
+      "PUMP-172": 7
+    },
+    "n_pump_switches_rule360": {
+      "PUMP-170": 7,
+      "PUMP-172": 7
+    }
+  },
+  "native_controls": {
+    "rules_raw": {
+      "RULE-0": [
+        "IF TANK TANK-130 LEVEL >= 16.000000",
+        "THEN PUMP PUMP-172 STATUS IS CLOSED",
+        "PRIORITY 1.000000"
+      ],
+      "RULE-1": [
+        "IF TANK TANK-130 LEVEL <= 12.100000",
+        "THEN PUMP PUMP-172 STATUS IS OPEN",
+        "PRIORITY 1.000000"
+      ],
+      "RULE-3": [
+        "IF TANK TANK-131 LEVEL >= 18.400000",
+        "THEN PUMP PUMP-170 STATUS IS CLOSED",
+        "PRIORITY 1.000000"
+      ],
+      "RULE-4": [
+        "IF TANK TANK-131 LEVEL <= 15.400000",
+        "THEN PUMP PUMP-170 STATUS IS OPEN",
+        "Priority 1.000000"
+      ]
+    },
+    "controls_raw": [
+      "LINK VALVE-180 Closed At Time 0.000000"
+    ],
+    "table": [
+      {
+        "element": "PUMP-170",
+        "type": "Pump",
+        "native_control": "[RULES] RULE-3, RULE-4",
+        "trigger": [
+          "IF TANK TANK-131 LEVEL >= 18.400000",
+          "IF TANK TANK-131 LEVEL <= 15.400000"
+        ],
+        "initial_state": "Open",
+        "final_state": "Closed",
+        "states_observed": [
+          "Closed",
+          "Open"
+        ],
+        "n_switches_over_run": 7,
+        "switch_times_s": [
+          5400.0,
+          88200.0,
+          115200.0,
+          187200.0,
+          210600.0,
+          284400.0,
+          304200.0
+        ],
+        "active_in_baseline": true,
+        "frac_time_open": 0.21761658031088082
+      },
+      {
+        "element": "PUMP-172",
+        "type": "Pump",
+        "native_control": "[RULES] RULE-0, RULE-1",
+        "trigger": [
+          "IF TANK TANK-130 LEVEL >= 16.000000",
+          "IF TANK TANK-130 LEVEL <= 12.100000"
+        ],
+        "initial_state": "Open",
+        "final_state": "Closed",
+        "states_observed": [
+          "Closed",
+          "Open"
+        ],
+        "n_switches_over_run": 7,
+        "switch_times_s": [
+          10800.0,
+          90000.0,
+          133200.0,
+          189000.0,
+          225000.0,
+          286200.0,
+          320400.0
+        ],
+        "active_in_baseline": true,
+        "frac_time_open": 0.35751295336787564
+      },
+      {
+        "element": "VALVE-173",
+        "type": "Valve",
+        "native_control": "none (uncontrolled)",
+        "trigger": [
+          "-"
+        ],
+        "initial_state": "Active",
+        "final_state": "Active",
+        "states_observed": [
+          "Active"
+        ],
+        "n_switches_over_run": 0,
+        "switch_times_s": [],
+        "active_in_baseline": true,
+        "frac_time_open": 1.0
+      },
+      {
+        "element": "VALVE-174",
+        "type": "Valve",
+        "native_control": "none (uncontrolled)",
+        "trigger": [
+          "-"
+        ],
+        "initial_state": "Closed",
+        "final_state": "Closed",
+        "states_observed": [
+          "Closed"
+        ],
+        "n_switches_over_run": 0,
+        "switch_times_s": [],
+        "active_in_baseline": false,
+        "frac_time_open": 0.0
+      },
+      {
+        "element": "VALVE-175",
+        "type": "Valve",
+        "native_control": "none (uncontrolled)",
+        "trigger": [
+          "-"
+        ],
+        "initial_state": "Active",
+        "final_state": "Active",
+        "states_observed": [
+          "Active"
+        ],
+        "n_switches_over_run": 0,
+        "switch_times_s": [],
+        "active_in_baseline": true,
+        "frac_time_open": 1.0
+      },
+      {
+        "element": "VALVE-176",
+        "type": "Valve",
+        "native_control": "none (uncontrolled)",
+        "trigger": [
+          "-"
+        ],
+        "initial_state": "Active",
+        "final_state": "Active",
+        "states_observed": [
+          "Active"
+        ],
+        "n_switches_over_run": 0,
+        "switch_times_s": [],
+        "active_in_baseline": true,
+        "frac_time_open": 1.0
+      },
+      {
+        "element": "VALVE-177",
+        "type": "Valve",
+        "native_control": "none (uncontrolled)",
+        "trigger": [
+          "-"
+        ],
+        "initial_state": "Active",
+        "final_state": "Active",
+        "states_observed": [
+          "Active"
+        ],
+        "n_switches_over_run": 0,
+        "switch_times_s": [],
+        "active_in_baseline": true,
+        "frac_time_open": 1.0
+      },
+      {
+        "element": "VALVE-178",
+        "type": "Valve",
+        "native_control": "none (uncontrolled)",
+        "trigger": [
+          "-"
+        ],
+        "initial_state": "Active",
+        "final_state": "Active",
+        "states_observed": [
+          "Active"
+        ],
+        "n_switches_over_run": 0,
+        "switch_times_s": [],
+        "active_in_baseline": true,
+        "frac_time_open": 1.0
+      },
+      {
+        "element": "VALVE-179",
+        "type": "Valve",
+        "native_control": "none (uncontrolled)",
+        "trigger": [
+          "-"
+        ],
+        "initial_state": "Closed",
+        "final_state": "Closed",
+        "states_observed": [
+          "Closed"
+        ],
+        "n_switches_over_run": 0,
+        "switch_times_s": [],
+        "active_in_baseline": false,
+        "frac_time_open": 0.0
+      },
+      {
+        "element": "VALVE-180",
+        "type": "Valve",
+        "native_control": "[CONTROLS] LINK VALVE-180 Closed At Time 0.000000",
+        "trigger": [
+          "LINK VALVE-180 Closed At Time 0.000000"
+        ],
+        "initial_state": "Closed",
+        "final_state": "Closed",
+        "states_observed": [
+          "Closed"
+        ],
+        "n_switches_over_run": 0,
+        "switch_times_s": [],
+        "active_in_baseline": false,
+        "frac_time_open": 0.0
+      }
+    ],
+    "rule_timestep_used_s": 180
+  },
+  "rule_firing_evidence": {
+    "PUMP-170": {
+      "driving_tank": "TANK-131",
+      "events": [
+        {
+          "t_s": 5400.0,
+          "new_status": "Closed",
+          "tank_level_ft": 18.337779998779297
+        },
+        {
+          "t_s": 88200.0,
+          "new_status": "Open",
+          "tank_level_ft": 15.490974426269531
+        },
+        {
+          "t_s": 115200.0,
+          "new_status": "Closed",
+          "tank_level_ft": 18.320859909057617
+        },
+        {
+          "t_s": 187200.0,
+          "new_status": "Open",
+          "tank_level_ft": 15.466444969177246
+        },
+        {
+          "t_s": 210600.0,
+          "new_status": "Closed",
+          "tank_level_ft": 18.381935119628906
+        },
+        {
+          "t_s": 284400.0,
+          "new_status": "Open",
+          "tank_level_ft": 15.499184608459473
+        },
+        {
+          "t_s": 304200.0,
+          "new_status": "Closed",
+          "tank_level_ft": 18.38724136352539
+        }
+      ],
+      "tank_level_when_open_ft": [
+        15.490974426269531,
+        15.466444969177246,
+        15.499184608459473
+      ],
+      "tank_level_when_closed_ft": [
+        18.337779998779297,
+        18.320859909057617,
+        18.381935119628906,
+        18.38724136352539
+      ]
+    },
+    "PUMP-172": {
+      "driving_tank": "TANK-130",
+      "events": [
+        {
+          "t_s": 10800.0,
+          "new_status": "Closed",
+          "tank_level_ft": 15.940728187561035
+        },
+        {
+          "t_s": 90000.0,
+          "new_status": "Open",
+          "tank_level_ft": 12.121225357055664
+        },
+        {
+          "t_s": 133200.0,
+          "new_status": "Closed",
+          "tank_level_ft": 15.962255477905273
+        },
+        {
+          "t_s": 189000.0,
+          "new_status": "Open",
+          "tank_level_ft": 12.109811782836914
+        },
+        {
+          "t_s": 225000.0,
+          "new_status": "Closed",
+          "tank_level_ft": 15.981779098510742
+        },
+        {
+          "t_s": 286200.0,
+          "new_status": "Open",
+          "tank_level_ft": 12.124429702758789
+        },
+        {
+          "t_s": 320400.0,
+          "new_status": "Closed",
+          "tank_level_ft": 15.976873397827148
+        }
+      ],
+      "tank_level_when_open_ft": [
+        12.121225357055664,
+        12.109811782836914,
+        12.124429702758789
+      ],
+      "tank_level_when_closed_ft": [
+        15.940728187561035,
+        15.962255477905273,
+        15.981779098510742,
+        15.976873397827148
+      ]
+    }
+  },
+  "total_base_demand_gpm": 944.709999,
+  "valve_activity_baseline": {
+    "VALVE-173": {
+      "setting_psi": 70.0,
+      "diameter_in": 5.999999999999998,
+      "status_states": [
+        "Active"
+      ],
+      "flow_mean_gpm": 1.5379856824874878,
+      "flow_max_gpm": 4.7231340408325195,
+      "flow_abs_max_gpm": 4.7231340408325195,
+      "share_of_total_base_demand_pct": 0.16279976069927216,
+      "zero_flow_at_all_times": false,
+      "frac_time_zero_flow": 0.0
+    },
+    "VALVE-174": {
+      "setting_psi": 80.0,
+      "diameter_in": 5.999999999999998,
+      "status_states": [
+        "Closed"
+      ],
+      "flow_mean_gpm": 0.0,
+      "flow_max_gpm": 0.0,
+      "flow_abs_max_gpm": 0.0,
+      "share_of_total_base_demand_pct": 0.0,
+      "zero_flow_at_all_times": true,
+      "frac_time_zero_flow": 1.0
+    },
+    "VALVE-175": {
+      "setting_psi": 55.0,
+      "diameter_in": 10.0,
+      "status_states": [
+        "Active"
+      ],
+      "flow_mean_gpm": 363.6673889160156,
+      "flow_max_gpm": 1115.4224853515625,
+      "flow_abs_max_gpm": 1115.4224853515625,
+      "share_of_total_base_demand_pct": 38.49513626098633,
+      "zero_flow_at_all_times": false,
+      "frac_time_zero_flow": 0.0
+    },
+    "VALVE-176": {
+      "setting_psi": 29.762,
+      "diameter_in": 5.999999999999998,
+      "status_states": [
+        "Active"
+      ],
+      "flow_mean_gpm": 269.4178161621094,
+      "flow_max_gpm": 827.2702026367188,
+      "flow_abs_max_gpm": 827.2702026367188,
+      "share_of_total_base_demand_pct": 28.518571853637695,
+      "zero_flow_at_all_times": false,
+      "frac_time_zero_flow": 0.0
+    },
+    "VALVE-177": {
+      "setting_psi": 45.0,
+      "diameter_in": 5.999999999999998,
+      "status_states": [
+        "Active"
+      ],
+      "flow_mean_gpm": 18.91303062438965,
+      "flow_max_gpm": 53.45560073852539,
+      "flow_abs_max_gpm": 53.45560073852539,
+      "share_of_total_base_demand_pct": 2.001993179321289,
+      "zero_flow_at_all_times": false,
+      "frac_time_zero_flow": 0.0
+    },
+    "VALVE-178": {
+      "setting_psi": 37.0,
+      "diameter_in": 5.999999999999998,
+      "status_states": [
+        "Active"
+      ],
+      "flow_mean_gpm": 37.74575424194336,
+      "flow_max_gpm": 92.8045425415039,
+      "flow_abs_max_gpm": 92.8045425415039,
+      "share_of_total_base_demand_pct": 3.995485544204712,
+      "zero_flow_at_all_times": false,
+      "frac_time_zero_flow": 0.0
+    },
+    "VALVE-179": {
+      "setting_psi": 40.0,
+      "diameter_in": 8.0,
+      "status_states": [
+        "Closed"
+      ],
+      "flow_mean_gpm": 0.0,
+      "flow_max_gpm": 0.0,
+      "flow_abs_max_gpm": 0.0,
+      "share_of_total_base_demand_pct": 0.0,
+      "zero_flow_at_all_times": true,
+      "frac_time_zero_flow": 1.0
+    },
+    "VALVE-180": {
+      "setting_psi": 16.45,
+      "diameter_in": 8.0,
+      "status_states": [
+        "Closed"
+      ],
+      "flow_mean_gpm": 0.0,
+      "flow_max_gpm": 0.0,
+      "flow_abs_max_gpm": 0.0,
+      "share_of_total_base_demand_pct": 0.0,
+      "zero_flow_at_all_times": true,
+      "frac_time_zero_flow": 1.0
+    }
+  },
+  "documentation_discrepancies": [
+    {
+      "id": "D5-prv-activity",
+      "phase4_text": "'One [CONTROLS] line closes VALVE-180 at time 0, so 7 of the 8 PRVs are active at start.'",
+      "observed": {
+        "valves_with_identically_zero_flow_over_96h": [
+          "VALVE-174",
+          "VALVE-179",
+          "VALVE-180"
+        ],
+        "per_valve": {
+          "VALVE-173": {
+            "status_states": [
+              "Active"
+            ],
+            "flow_mean_gpm": 1.5379856824874878,
+            "share_pct": 0.16279976069927216
+          },
+          "VALVE-174": {
+            "status_states": [
+              "Closed"
+            ],
+            "flow_mean_gpm": 0.0,
+            "share_pct": 0.0
+          },
+          "VALVE-175": {
+            "status_states": [
+              "Active"
+            ],
+            "flow_mean_gpm": 363.6673889160156,
+            "share_pct": 38.49513626098633
+          },
+          "VALVE-176": {
+            "status_states": [
+              "Active"
+            ],
+            "flow_mean_gpm": 269.4178161621094,
+            "share_pct": 28.518571853637695
+          },
+          "VALVE-177": {
+            "status_states": [
+              "Active"
+            ],
+            "flow_mean_gpm": 18.91303062438965,
+            "share_pct": 2.001993179321289
+          },
+          "VALVE-178": {
+            "status_states": [
+              "Active"
+            ],
+            "flow_mean_gpm": 37.74575424194336,
+            "share_pct": 3.995485544204712
+          },
+          "VALVE-179": {
+            "status_states": [
+              "Closed"
+            ],
+            "flow_mean_gpm": 0.0,
+            "share_pct": 0.0
+          },
+          "VALVE-180": {
+            "status_states": [
+              "Closed"
+            ],
+            "flow_mean_gpm": 0.0,
+            "share_pct": 0.0
+          }
+        }
+      },
+      "explanation": "Only VALVE-180 is closed by a [CONTROLS] line, but the baseline solution also holds VALVE-174 and VALVE-179 Closed for the entire 96 h with identically zero flow. A PRV closes when downstream head exceeds the setting and flow would reverse, so these two are shut by the hydraulics, not by a control statement. Three of eight PRVs, not one, carry no flow in the distributed baseline.",
+      "consequence": "Directly material to Gate 5: an action dimension on a permanently shut PRV cannot influence the network. Reported as evidence only; no PRV is removed in this phase.",
+      "silent_correction": false
+    }
+  ],
+  "verdicts": {
+    "g1": "G1 BASELINE EPANET/WNTR CONVERGENCE = PASS",
+    "g11": "G11 TANK DYNAMICS = PASS",
+    "g2": "G2 NATIVE CONTROL LOGIC = CHARACTERISED (descriptive gate, no pass/fail)"
+  }
+}

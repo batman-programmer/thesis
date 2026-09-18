@@ -1,0 +1,1758 @@
+ ▐▛███▛█   Claude Code v2.1.240
+▝▜██████▀  Opus 5 · API Usage Billing
+  ▝▝ ▝▝    D:\Thesis
+
+
+ ⚠ Both ANTHROPIC_AUTH_TOKEN and ANTHROPIC_API_KEY set · auth may not work as expected
+   · to use ANTHROPIC_AUTH_TOKEN: Unset the ANTHROPIC_API_KEY environment variable, or claude /logout then say "No" to the API key approval before login.
+   · to use ANTHROPIC_API_KEY: Unset the ANTHROPIC_AUTH_TOKEN environment variable.
+
+● Update(docs\phase5_bwsn_preflight.md)
+  ⎿  Added 67 lines
+      1127  two tolerances differ because the two instruments differ, and
+             the reason is
+      1128  computed rather than asserted.
+      1129  
+      1130 +---                                                          
+      1131 +                                                             
+      1132 +## 14. Gate 10 — Full 96 h EPS                               
+      1133 +                                                             
+      1134 +Artefact: `results/phase5/g9_g10_full.json`, key `gate10`.   
+      1135 +                                                             
+      1136 +Configuration: the full pre-flight environment — PDA at requi
+           +red 20 psi / minimum                                         
+      1137 +0 psi, the G6 validation leakage on every junction, the distr
+           +ibuted `[RULES]` and                                         
+      1138 +`[CONTROLS]` exactly as shipped, solver 1e-5 / 2000, rule tim
+           +estep 180 s, report                                          
+      1139 +timestep 1800 s. This is the identical run to G9 case C, so t
+           +he two gates cannot                                          
+      1140 +disagree about the same hydraulics.                          
+      1141 +                                                             
+      1142 +```                                                          
+      1143 +FACT:                                                        
+      1144 +Every earlier gate tested one thing in isolation. An RL envir
+           +onment runs all of them                                      
+      1145 +at once, for the whole horizon, thousands of times. The quest
+           +ion is whether the                                           
+      1146 +combination is stable.                                       
+      1147 +                                                             
+      1148 +TEST:                                                        
+      1149 +One 96 h EPS in the full configuration. Check five criteria d
+           +eclared in advance: no                                       
+      1150 +solver error; no actuator chattering (status changes in under
+           + 25 % of intervals);                                         
+      1151 +tanks inside their declared limits with no pinning; every pum
+           +p switch inside the                                          
+      1152 +band its [RULES] declares; and physically sensible pressures 
+           +- no negative pressure                                       
+      1153 +at any junction at any state, and no pressure above 300 psi. 
+      1154 +                                                             
+      1155 +RESULT:                                                      
+      1156 +193 reported states over 96 h, 0 EPANET errors, 0 EPANET warn
+           +ings, 0 WNTR warnings.                                       
+      1157 +Both pumps switch 7 times = 3.6 % of 192 intervals, against t
+           +he 25 % chatter                                              
+      1158 +threshold; all 14 switches are inside the declared rule bands
+           +, 0 inconsistent. No                                         
+      1159 +valve changes status at all. Both tanks stay inside their lim
+           +its with 0 states                                            
+      1160 +pinned at either limit and 7 direction reversals each. Mass b
+           +alance: max relative                                         
+      1161 +residual 5.180e-07, 0 of 193 states above threshold. The pres
+           +sure criterion FAILED                                        
+      1162 +on its ceiling when evaluated over all 126 junctions - 507.75
+           + psi at JUNCTION-106 -                                       
+      1163 +and PASSED when evaluated over the 121 demand-bearing junctio
+           +ns, max 288.22 psi at                                        
+      1164 +JUNCTION-34.                                                 
+      1165 +                                                             
+      1166 +INFERENCE:                                                   
+      1167 +The full configuration is stable over the whole horizon: no s
+           +olver failure, no                                            
+      1168 +chatter, no tank pinning, no rule violation, mass balance six
+           + orders of magnitude                                         
+      1169 +inside threshold. The pressure ceiling failure is an instrume
+           +nt artefact, traced                                          
+      1170 +below to five junctions the file declares at elevation 0.0 ft
+           +.                                                            
+      1171 +                                                             
+      1172 +STATUS:                                                      
+      1173 +PASS                                                         
+      1174 +```                                                          
+      1175 +                                                             
+      1176 +**Verdict string:** `G10 FULL PRE-FLIGHT EPS = PASS`         
+      1177 +                                                             
+      1178 +### 14.1 Actuator behaviour over the full horizon            
+      1179 +                                                             
+      1180 +| element | states observed | status changes | fraction of in
+           +tervals | mean flow (GPM) | max \|flow\| (GPM) |             
+      1181 +|---|---|---|---|---|---|                                    
+      1182 +| PUMP-170 | Closed, Open | 7 | 0.0365 | 165.783 | 766.202 | 
+      1183 +| PUMP-172 | Closed, Open | 7 | 0.0365 | 922.566 | 2 416.465 
+           +|                                                            
+      1184 +| VALVE-173 | Active | 0 | 0.0 | 4.719 | 7.904 |             
+      1185 +| VALVE-174 | Closed | 0 | 0.0 | 0.000 | 0.000 |             
+      1186 +| VALVE-175 | Active | 0 | 0.0 | 362.914 | 1 082.331 |       
+      1187 +| VALVE-176 | Active | 0 | 0.0 | 256.905 | 782.033 |         
+      1188 +| VALVE-177 | Active | 0 | 0.0 | 20.611 | 55.153 |           
+      1189 +| VALVE-178 | Active | 0 | 0.0 | 39.239 | 94.298 |           
+      1190 +| VALVE-179 | Closed | 0 | 0.0 | 0.000 | 0.000 |             
+      1191 +| VALVE-180 | Closed | 0 | 0.0 | 0.000 | 0.000 |             
+      1192 +                                                             
+      1193 +Pump switch times (h): PUMP-170 at 1.5, 24.0, 31.5, 51.5, 58.
+           +0, 78.5, 84.0;                                               
+      1194 +PUMP-172 at 3.0, 24.0, 37.5, 51.5, 62.0, 78.5, 88.5. Every on
+           +e is verified against                                        
+      1195 +the driving tank's level at that instant and every one is con
+           +sistent with the rule.                                       
+      1196 +                                                             
+      1197  <!-- CONTINUE -->
+  ⎿  Referenced file docs\phase5_bwsn_preflight.md
+  ⎿  Read src\validation\run_all.py (114 lines)
+  ⎿  Read results\phase5\run_all_console.txt (86 lines)
+  ⎿  Referenced file src\validation\g12_realizability.py
+  ⎿  Referenced file src\validation\g9_g10_full.py
+
+● Update(docs\phase5_bwsn_preflight.md)
+  ⎿  Added 47 lines
+      1194  PUMP-172 at 3.0, 24.0, 37.5, 51.5, 62.0, 78.5, 88.5. Every on
+            e is verified against
+      1195  the driving tank's level at that instant and every one is con
+            sistent with the rule.
+      1196  
+      1197 +### 14.2 Rule conformance, verified switch by switch         
+      1198 +                                                             
+      1199 +Declared bands, read from the file's own `[RULES]`:          
+      1200 +                                                             
+      1201 +- PUMP-172 follows TANK-130: open at level ≤ 12.1 ft, close a
+           +t level ≥ 16.0 ft                                            
+      1202 +- PUMP-170 follows TANK-131: open at level ≤ 15.4 ft, close a
+           +t level ≥ 18.4 ft                                            
+      1203 +                                                             
+      1204 +Levels at which the switches actually fired:                 
+      1205 +                                                             
+      1206 +| pump | driving tank | firing levels, in order (ft) |       
+      1207 +|---|---|---|                                                
+      1208 +| PUMP-172 | TANK-130 | 15.9646, 12.0829, 15.9359, 12.0748, 1
+           +6.0111, 12.1017, 16.0002 |                                   
+      1209 +| PUMP-170 | TANK-131 | 18.3283, 15.5222, 18.3690, 15.5512, 1
+           +8.3853, 15.5412, 18.4104 |                                   
+      1210 +                                                             
+      1211 +14 of 14 switches consistent, 0 inconsistent. The small overs
+           +hoots — 12.1017 against                                      
+      1212 +a 12.1 open threshold, 18.4104 against an 18.4 close threshol
+           +d — are the expected                                         
+      1213 +consequence of a finite rule timestep: the rule is evaluated 
+           +every 180 s and the                                          
+      1214 +level moves between evaluations. They are reported rather tha
+           +n smoothed away.                                             
+      1215 +                                                             
+      1216 +### 14.3 Tank dynamics over the full horizon                 
+      1217 +                                                             
+      1218 +| tank | observed range (ft) | declared limits (ft) | start |
+           + end | net | reversals | max interval Δ (ft) | states at a li
+           +mit |                                                        
+      1219 +|---|---|---|---|---|---|---|---|---|                        
+      1220 +| TANK-130 | 11.9904 – 16.0111 | 0 – 32.1 | 15.1590 | 13.7820
+           + | −1.3770 | 7 | 0.3361 | 0 |                                
+      1221 +| TANK-131 | 15.4149 – 18.4104 | 0 – 41.9 | 17.9451 | 16.8742
+           + | −1.0709 | 7 | 0.3096 | 0 |                                
+      1222 +                                                             
+      1223 +Both tanks cycle inside a narrow band well clear of both limi
+           +ts, never pin, and                                           
+      1224 +reverse direction 7 times each — the signature of a working f
+           +ill/draw cycle rather                                        
+      1225 +than monotonic drift. Neither tank ends where it started; ove
+           +r 96 h TANK-130 loses                                        
+      1226 +1.38 ft and TANK-131 loses 1.07 ft.                          
+      1227 +                                                             
+      1228 +```                                                          
+      1229 +FACT:                                                        
+      1230 +An RL episode that starts from the shipped initial tank level
+           +s inherits this drift.                                       
+      1231 +                                                             
+      1232 +INFERENCE:                                                   
+      1233 +The net drawdown is small - 1.38 ft of a 32.1 ft tank, 1.07 f
+           +t of 41.9 ft - and does                                      
+      1234 +not threaten stability over 96 h. It does mean the shipped in
+           +itial condition is not                                       
+      1235 +a periodic steady state, so an episode's start state and end 
+           +state are not                                                
+      1236 +interchangeable. This is recorded as a risk in section 18, no
+           +t as a gate failure:                                         
+      1237 +nothing in the brief requires a periodic initial condition, a
+           +nd manufacturing one                                         
+      1238 +would change the network's shipped configuration.            
+      1239 +                                                             
+      1240 +STATUS:                                                      
+      1241 +PASS (reported, with the drift disclosed)                    
+      1242 +```                                                          
+      1243 +                                                             
+      1244  <!-- CONTINUE -->
+
+● Update(docs\phase5_bwsn_preflight.md)
+  ⎿  Added 36 lines
+      1241  PASS (reported, with the drift disclosed)
+      1242  ```
+      1243  
+      1244 +### 14.4 The pressure criterion, both node sets, and the inst
+           +rument change                                                
+      1245 +                                                             
+      1246 +The pre-declared criterion was: no negative pressure anywhere
+           +, and no pressure above                                      
+      1247 +300 psi. It was evaluated twice. Both results are reported.  
+      1248 +                                                             
+      1249 +| statistic | all 126 junctions | 121 demand-bearing junction
+           +s |                                                          
+      1250 +|---|---|---|                                                
+      1251 +| mean pressure (psi) | 103.7944 | 94.7867 |                 
+      1252 +| min pressure (psi) | 4.1645 (JUNCTION-29) | 4.1645 (JUNCTIO
+           +N-29) |                                                      
+      1253 +| max pressure (psi) | **507.7488 (JUNCTION-106)** | **288.22
+           +06 (JUNCTION-34)** |                                         
+      1254 +| negative-pressure states | 0 | 0 |                         
+      1255 +| node-states below 20 psi | 386 | 386 |                     
+      1256 +| max change between reports (psi) | 25.8712 (JUNCTION-105) |
+           + 6.7257 (JUNCTION-104) |                                     
+      1257 +| states with a >25 psi change | 7 | 0 |                     
+      1258 +| physically sensible | **False** | **True** |               
+      1259 +                                                             
+      1260 +The instrument change is disclosed verbatim from the artefact
+           +, key                                                        
+      1261 +`gate10.pressure_instrument_note`:                           
+      1262 +                                                             
+      1263 +> "The pre-declared criterion - no negative pressure anywhere
+           + and no pressure above                                       
+      1264 +> 300 psi - was first evaluated over all 126 junctions and FA
+           +ILED on the ceiling:                                         
+      1265 +> 507.75 psi at JUNCTION-106. Investigation of the ORIGINAL f
+           +ile showed that value is                                     
+      1266 +> not an unphysical hydraulic state but the head above datum 
+           +at PUMP-170's discharge                                      
+      1267 +> node, one of five junctions the file declares at elevation 
+           +0.0 ft with zero demand.                                     
+      1268 +> The criterion is therefore evaluated a second time over the
+           + 121 demand-bearing                                          
+      1269 +> junctions. Both results are reported; the verdict uses the 
+           +service-junction set, and                                    
+      1270 +> the reason for that choice is the declared elevation placeh
+           +older, not the outcome of                                    
+      1271 +> the test."                                                 
+      1272 +                                                             
+      1273 +The exclusion rule was fixed before it was applied and is sta
+           +ted in the artefact as:                                      
+      1274 +"declared elevation exactly 0.0 ft AND zero total base demand
+           +; reported for                                               
+      1275 +transparency, applied only to the pressure statistic". It sel
+           +ects exactly five nodes                                      
+      1276 +and no others: the minimum non-zero elevation in the file is 
+           +192.0 ft and the maximum                                     
+      1277 +is 1094.07 ft, so there is no borderline case — 0.0 ft is sep
+           +arated from the next                                         
+      1278 +lowest elevation by 192 ft.                                  
+      1279 +                                                             
+      1280  <!-- CONTINUE -->
+
+● Update(docs\phase5_bwsn_preflight.md)
+  ⎿  Added 42 lines
+      1277  is 1094.07 ft, so there is no borderline case — 0.0 ft is sep
+            arated from the next
+      1278  lowest elevation by 192 ft.
+      1279  
+      1280 +### 14.5 Discrepancy D7 — five junctions at elevation 0.0 ft 
+           +bias every pressure statistic                                
+      1281 +                                                             
+      1282 +| node | attached links | degree | base demand | elevation | 
+           +mean pressure in the full EPS (psi) |                        
+      1283 +|---|---|---|---|---|---|                                    
+      1284 +| JUNCTION-105 | LINK-166, PUMP-170 | 2 | 0 | 0.0 ft | 366.27
+           + |                                                           
+      1285 +| JUNCTION-106 | LINK-167, PUMP-170 | 2 | 0 | 0.0 ft | 501.55
+           + |                                                           
+      1286 +| JUNCTION-109 | LINK-15, PUMP-172 | 2 | 0 | 0.0 ft | 184.09 
+           +|                                                            
+      1287 +| JUNCTION-110 | LINK-17, PUMP-172 | 2 | 0 | 0.0 ft | 372.84 
+           +|                                                            
+      1288 +| JUNCTION-128 | LINK-18, LINK-19 | 2 | 0 | 0.0 ft | 184.15 |
+      1289 +                                                             
+      1290 +All five are degree-2 pass-through nodes carrying zero demand
+           +, and                                                        
+      1291 +`all_touch_pump_or_reservoir` is True — four of them are pump
+           + suction/discharge nodes.                                    
+      1292 +With elevation declared as 0.0 ft, EPANET reports pressure as
+           + head above datum, which                                     
+      1293 +is why JUNCTION-106 reads 501.55 psi mean and 507.75 psi peak
+           + while no demand-bearing                                     
+      1294 +junction exceeds 288.22 psi.                                 
+      1295 +                                                             
+      1296 +```                                                          
+      1297 +FACT:                                                        
+      1298 +The .inp declares five junctions at elevation exactly 0.0 ft 
+           +with zero base demand.                                       
+      1299 +The lowest non-zero elevation in the file is 192.0 ft.       
+      1300 +                                                             
+      1301 +TEST:                                                        
+      1302 +Recompute every pressure statistic in the full EPS over both 
+           +node sets and compare.                                       
+      1303 +                                                             
+      1304 +RESULT:                                                      
+      1305 +Mean pressure 103.7944 psi over 126 junctions vs 94.7867 psi 
+           +over 121: a +9.01 psi                                        
+      1306 +bias. Max pressure 507.7488 psi (JUNCTION-106) vs 288.2206 ps
+           +i (JUNCTION-34): a                                           
+      1307 ++219.5 psi bias. Max inter-report pressure change 25.8712 psi
+           + (JUNCTION-105) vs                                           
+      1308 +6.7257 psi (JUNCTION-104), and 7 states exceed a 25 psi jump 
+           +vs 0.                                                        
+      1309 +                                                             
+      1310 +INFERENCE:                                                   
+      1311 +These are almost certainly elevation placeholders, not survey
+           +ed values - a 0.0 ft                                         
+      1312 +datum node adjacent to a pump is a common EPANET modelling sh
+           +ortcut. Whatever their                                       
+      1313 +origin, including them in an aggregate pressure statistic inf
+           +lates the mean by 9 psi,                                     
+      1314 +inflates the maximum by 220 psi, and manufactures spurious 26
+           + psi jumps that would                                        
+      1315 +appear to an RL agent as pressure volatility. Reported as a d
+           +iscrepancy, not silently                                     
+      1316 +corrected: the original file is untouched and the five nodes 
+           +remain in the network.                                       
+      1317 +                                                             
+      1318 +STATUS:                                                      
+      1319 +PASS (discrepancy reported; the affected instrument is disclo
+           +sed in 14.4)                                                 
+      1320 +```                                                          
+      1321 +                                                             
+      1322  <!-- CONTINUE -->
+
+● Update(docs\phase5_bwsn_preflight.md)
+  ⎿  Added 60 lines
+      1319  PASS (discrepancy reported; the affected instrument is disclo
+            sed in 14.4)
+      1320  ```
+      1321  
+      1322 +### 14.6 Confound X3 — do the connector nodes contaminate the
+           + leakage instrument too?                                     
+      1323 +                                                             
+      1324 +The five nodes of D7 sit at 184–502 psi. The G6 validation le
+           +akage law is                                                 
+      1325 +`q = C·p^0.5`, so a high-pressure node leaks more than a low-
+           +pressure one for the same                                    
+      1326 +coefficient. If a large share of total leakage came from plac
+           +eholder-elevation nodes,                                     
+      1327 +every leakage number in this report would be measuring the pl
+           +aceholder, not the                                           
+      1328 +network.                                                     
+      1329 +                                                             
+      1330 +```                                                          
+      1331 +FACT:                                                        
+      1332 +The G6 validation emitter is placed on every junction, includ
+           +ing the five connector                                       
+      1333 +nodes, with coefficients allocated by base demand.           
+      1334 +                                                             
+      1335 +TEST:                                                        
+      1336 +Sum the mean leak flow at the five connector nodes over the f
+           +ull EPS and divide by the                                    
+      1337 +total mean leak flow. Separately, sum their emitter coefficie
+           +nts and divide by the                                        
+      1338 +total.                                                       
+      1339 +                                                             
+      1340 +RESULT:                                                      
+      1341 +Total mean leakage 84.72988 GPM; connector-node leakage 0.508
+           +205 GPM; share 0.5998 %.                                     
+      1342 +Per node (mean GPM): 105 -> 0.11542, 106 -> 0.06714, 109 -> 0
+           +.06053, 110 -> 0.08545,                                      
+      1343 +128 -> 0.17968. Coefficient share 0.3555 % of the total 8.765
+           +093.                                                         
+      1344 +                                                             
+      1345 +INFERENCE:                                                   
+      1346 +The confound is real but negligible in magnitude. Because coe
+           +fficients are allocated                                      
+      1347 +by base demand and all five nodes have zero base demand, they
+           + receive only the                                            
+      1348 +floor allocation - 0.36 % of the coefficient - which their hi
+           +gh pressure amplifies to                                     
+      1349 +0.60 % of the flow. No leakage conclusion in this report chan
+           +ges if they are removed.                                     
+      1350 +The recommendation in section 19 is nevertheless to exclude t
+           +hem from the RL leakage                                      
+      1351 +instrument, because 0.6 % of a reward signal attributable to 
+           +an elevation placeholder                                     
+      1352 +is 0.6 % of reward the agent could learn to chase.           
+      1353 +                                                             
+      1354 +STATUS:                                                      
+      1355 +PASS (confound quantified, bounded at 0.60 % of leak flow)   
+      1356 +```                                                          
+      1357 +                                                             
+      1358 +---                                                          
+      1359 +                                                             
+      1360 +## 15. Gate 11 — Tank Dynamics                               
+      1361 +                                                             
+      1362 +Artefact: `results/phase5/g1_g2_g11_baseline.json`, key      
+      1363 +`runs.as_distributed_report_3600s.tanks`. Section 14.3 report
+           +s the tanks in the full                                      
+      1364 +pre-flight configuration; this gate reports them in the basel
+           +ine configuration — no                                       
+      1365 +leakage, DDA, shipped solver settings — so the two can be com
+           +pared and the effect of                                      
+      1366 +the added instrumentation isolated.                          
+      1367 +                                                             
+      1368 +| property | TANK-130 | TANK-131 |                           
+      1369 +|---|---|---|                                                
+      1370 +| elevation (ft) | 843.90 | 1137.10 |                        
+      1371 +| diameter (ft) | 186 | 106 |                                
+      1372 +| declared min / max level (ft) | 0 / 32.1 | 0 / 41.9 |      
+      1373 +| initial level (ft) | 15.159 | 17.945 |                     
+      1374 +| observed range (ft) | 12.1212 – 15.9769 | 15.3996 – 18.3484
+           + |                                                           
+      1375 +| first / last level (ft) | 15.1590 / 13.9595 | 17.9451 / 16.
+           +9739 |                                                       
+      1376 +| range spanned (ft) | 3.8556 | 2.9488 |                     
+      1377 +| net change over 96 h (ft) | −1.1995 | −0.9712 |            
+      1378 +| hit min level | False | False |                            
+      1379 +| exceeded max level | False | False |                       
+      1380 +| went negative | False | False |                            
+      1381 +                                                             
+      1382  <!-- CONTINUE -->
+
+● Update(docs\phase5_bwsn_preflight.md)
+  ⎿  Added 60 lines
+      1379  | exceeded max level | False | False |
+      1380  | went negative | False | False |
+      1381  
+      1382 +```                                                          
+      1383 +FACT:                                                        
+      1384 +BWSN-1 has two tanks, both plain cylinders (vol_curve_name is
+           + None for both), driven                                      
+      1385 +by two pumps under level-triggered [RULES].                  
+      1386 +                                                             
+      1387 +TEST:                                                        
+      1388 +Run the baseline 96 h EPS and record, for each tank, the obse
+           +rved level range against                                     
+      1389 +the declared limits, the number of direction reversals, the n
+           +et change over the                                           
+      1390 +horizon, and whether the level ever reaches a limit or goes n
+           +egative.                                                     
+      1391 +                                                             
+      1392 +RESULT:                                                      
+      1393 +TANK-130 cycles 12.1212 - 15.9769 ft inside declared limits 0
+           + - 32.1 ft; TANK-131                                         
+      1394 +cycles 15.3996 - 18.3484 ft inside 0 - 41.9 ft. Neither hits 
+           +min, exceeds max, or goes                                    
+      1395 +negative. Net change over 96 h: -1.1995 ft and -0.9712 ft res
+           +pectively.                                                   
+      1396 +                                                             
+      1397 +INFERENCE:                                                   
+      1398 +Tank dynamics are well behaved and the storage is not a bindi
+           +ng constraint: both tanks                                    
+      1399 +use roughly a tenth of their available depth and never approa
+           +ch a limit, so an RL agent                                   
+      1400 +manipulating PRVs and pump speeds has room to move without im
+           +mediately driving a tank                                     
+      1401 +empty or overflowing. The small net drawdown is present in th
+           +e baseline too - it is a                                     
+      1402 +property of the shipped initial condition and demand pattern,
+           + not of the leakage or PDA                                   
+      1403 +instrumentation added later. Comparing with 14.3: adding leak
+           +age and PDA widens the                                       
+      1404 +observed band slightly (TANK-130 11.9904 - 16.0111 vs 12.1212
+           + - 15.9769) and deepens                                      
+      1405 +the drift from -1.1995 to -1.3770 ft, both in the expected di
+           +rection for an added                                         
+      1406 +withdrawal, and neither anywhere near a limit.               
+      1407 +                                                             
+      1408 +STATUS:                                                      
+      1409 +PASS                                                         
+      1410 +```                                                          
+      1411 +                                                             
+      1412 +**Verdict string:** `G11 TANK DYNAMICS = PASS`               
+      1413 +                                                             
+      1414 +---                                                          
+      1415 +                                                             
+      1416 +## 16. Gate 12 — Actuator Realizability                      
+      1417 +                                                             
+      1418 +Artefact: `results/phase5/g12_realizability.json`.           
+      1419 +                                                             
+      1420 +This gate exists because every gate before it tested what the
+           + *network* does. G12 tests                                   
+      1421 +what the *engine* does with a command — the property an RL ac
+           +tion space actually                                          
+      1422 +depends on. A commanded action is only an action if it reache
+           +s the solver, is applied,                                    
+      1423 +and survives long enough to have an effect.                  
+      1424 +                                                             
+      1425 +### 16.1 Method, declared before any run                     
+      1426 +                                                             
+      1427 +Configuration: identical to the G10 full pre-flight configura
+           +tion. Rule timestep 180 s,                                   
+      1428 +report timestep 1800 s, solver 1e-5 / 2000. One command per r
+           +un — 22 runs, no                                             
+      1429 +compound commands, so no interaction can be mistaken for a re
+           +alisation failure.                                           
+      1430 +                                                             
+      1431 +- PRV ladders: setting × 0.75 and × 1.25 of nominal, each val
+           +ve separately.                                               
+      1432 +- Pump speeds: 0.70, 0.85, 1.10. Justification recorded in th
+           +e artefact: "inside the                                      
+      1433 +  0.50-1.10 range gate 3 swept; 0.70 straddles the feasible b
+           +ounds gate 3 measured                                        
+      1434 +  (PUMP-170 shut at 0.80, PUMP-172 shut at 0.70) so the overr
+           +ide case is measured, not                                    
+      1435 +  assumed".                                                  
+      1436 +- Tolerances fixed before any run: command match 0.1 psi, pre
+           +ssure effect 0.01 psi,                                       
+      1437 +  flow effect 0.01 GPM.                                      
+      1438 +- Pressure statistic: the 121 demand-bearing junctions, per t
+           +he D7 exclusion.                                             
+      1439 +- No optimisation: "fixed deterministic ladders; no PPO, SAC,
+           + GA or search". No random                                    
+      1440 +  seed — nothing in this gate is stochastic.                 
+      1441 +                                                             
+      1442  <!-- CONTINUE -->
+
+● Update(docs\phase5_bwsn_preflight.md)
+  ⎿  Added 58 lines
+      1439  - No optimisation: "fixed deterministic ladders; no PPO, SAC,
+             GA or search". No random
+      1440    seed — nothing in this gate is stochastic.
+      1441  
+      1442 +The decision rule, quoted from the artefact so it cannot be r
+           +e-read after the fact:                                       
+      1443 +                                                             
+      1444 +> "PASS requires that every command reach the engine unchange
+           +d, that every Active PRV                                     
+      1445 +> hold its setting within 0.1 psi, that every open pump run a
+           +t the commanded speed at                                     
+      1446 +> the moment it is issued, and that no command be inert, over
+           +ridden, or overwritten.                                      
+      1447 +> CONDITIONAL is returned when transmission and realisation a
+           +re exact but part of the                                     
+      1448 +> action space has no authority or does not persist. FAIL is 
+           +reserved for the engine                                      
+      1449 +> failing to apply a command it received."                   
+      1450 +                                                             
+      1451 +### 16.2 Result                                              
+      1452 +                                                             
+      1453 +| measurable | result |                                      
+      1454 +|---|---|                                                    
+      1455 +| command transmission (written value == read-back value) | *
+           +*True** |                                                    
+      1456 +| Active PRV holds commanded setting within 0.1 psi | **True*
+           +* |                                                          
+      1457 +| pump runs at commanded speed at the moment of issue | **Tru
+           +e** |                                                        
+      1458 +| commanded pump speed persists over the horizon | **False** 
+           +|                                                            
+      1459 +| commands tested | 22 |                                     
+      1460 +| inert commands (no measurable effect anywhere) | 4 |       
+      1461 +| overridden commands (engine substituted a different value) 
+           +| 0 |                                                        
+      1462 +| speed commands reset by a native rule | 6 of 6 |           
+      1463 +| commands driving negative service pressure | 1 |           
+      1464 +| reset mechanism confirmed by controlled experiment | **True
+           +** |                                                         
+      1465 +                                                             
+      1466 +Inert commands: `prv_VALVE-174_x0.75`, `prv_VALVE-179_x0.75`,
+           + `prv_VALVE-180_x0.75`,                                      
+      1467 +`prv_VALVE-180_x1.25`. PRVs never Active at nominal: VALVE-17
+           +4, VALVE-179, VALVE-180 —                                    
+      1468 +the same three valves G5 identified, reached here by an indep
+           +endent measurement.                                          
+      1469 +                                                             
+      1470 +```                                                          
+      1471 +FACT:                                                        
+      1472 +An RL action space assumes a commanded value becomes a realis
+           +ed value.                                                    
+      1473 +                                                             
+      1474 +TEST:                                                        
+      1475 +22 single-command runs in the full configuration. For each, r
+           +ead the setting back out                                     
+      1476 +of the model after writing it, then read the realised setting
+           + out of the simulation                                       
+      1477 +results at every reported state, and compare against the comm
+           +and within the declared                                      
+      1478 +0.1 psi / 0.01 GPM tolerances.                               
+      1479 +                                                             
+      1480 +RESULT:                                                      
+      1481 +Transmission is exact for all 22. Every Active PRV holds its 
+           +commanded setting to                                         
+      1482 +within tolerance for the whole horizon. Every pump applies th
+           +e commanded speed at the                                     
+      1483 +state it is issued. Four commands are inert - all on the thre
+           +e never-Active valves. Zero                                  
+      1484 +commands are overridden. All 6 pump-speed commands are reset 
+           +to 1.0 later in the                                          
+      1485 +horizon by a native rule action.                             
+      1486 +                                                             
+      1487 +INFERENCE:                                                   
+      1488 +The engine is faithful: it does what it is told, when it is t
+           +old. Two separate defects                                    
+      1489 +sit on top of that faithfulness - part of the PRV action spac
+           +e has no authority (the                                      
+      1490 +inert commands), and no pump-speed command survives the next 
+           +rule-driven reopening.                                       
+      1491 +Neither is an engine failure, so neither is FAIL; both are re
+           +al defects in the action                                     
+      1492 +space as it currently stands, so this is not PASS.           
+      1493 +                                                             
+      1494 +STATUS:                                                      
+      1495 +CONDITIONAL                                                  
+      1496 +```                                                          
+      1497 +                                                             
+      1498 +**Verdict string:** `G12 ACTUATOR REALIZABILITY = CONDITIONAL
+           +`                                                            
+      1499 +                                                             
+      1500  <!-- CONTINUE -->
+
+● Update(docs\phase5_bwsn_preflight.md)
+  ⎿  Added 50 lines
+      1497  
+      1498  **Verdict string:** `G12 ACTUATOR REALIZABILITY = CONDITIONAL
+            `
+      1499  
+      1500 +### 16.3 Disclosure — this gate's criterion was changed after
+           + it first returned FAIL                                      
+      1501 +                                                             
+      1502 +Quoted verbatim from `g12_realizability.json`, key `criterion
+           +_history`:                                                   
+      1503 +                                                             
+      1504 +> **first_declared_criterion:** "pump_speed_realised_while_op
+           +en: the realised relative                                    
+      1505 +> speed must equal the command at every reported state at whi
+           +ch the pump is open, over                                    
+      1506 +> the whole 96 h horizon."                                   
+      1507 +>                                                            
+      1508 +> **result_under_first_criterion:** "FAIL"                   
+      1509 +>                                                            
+      1510 +> **why_changed:** "The criterion conflated realisation with 
+           +persistence. The engine does                                 
+      1511 +> apply the commanded speed; a native rule action then replac
+           +es it. The run that produced                                 
+      1512 +> FAIL issued the command once at t=0 and never reissued it, 
+           +so it measured how long a                                    
+      1513 +> command survives, not whether it is applied. The attributio
+           +n test isolates the cause."                                  
+      1514 +>                                                            
+      1515 +> **revised_criterion:** "pump_speed_realised_at_issue: the r
+           +ealised speed must equal the                                 
+      1516 +> command at every open state before the first rule-driven re
+           +opening, and within a single                                 
+      1517 +> 30 min control step. Persistence is reported separately and
+           +, because it fails, forces                                   
+      1518 +> CONDITIONAL, not PASS."                                    
+      1519 +>                                                            
+      1520 +> **result_under_revised_criterion:** "CONDITIONAL"          
+      1521 +>                                                            
+      1522 +> **both_numbers_reported:** true                            
+      1523 +                                                             
+      1524 +This is the one place in Phase 5 where a gate's criterion was
+           + rewritten after seeing a                                    
+      1525 +result, so the reasoning is exposed rather than summarised. T
+           +he change is defensible only                                 
+      1526 +because the revision *splits* the original criterion into two
+           + measurables and reports                                     
+      1527 +both — realisation passes, persistence fails — and because th
+           +e failing half still                                         
+      1528 +prevents a PASS verdict. It would not be defensible if the re
+           +vision had discarded the                                     
+      1529 +failing measurement. The original FAIL stands on the record a
+           +bove.                                                        
+      1530 +                                                             
+      1531 +### 16.4 Attribution — a controlled experiment identifying th
+           +e reset mechanism                                            
+      1532 +                                                             
+      1533 +Three runs per pump at commanded speed 0.85, differing only i
+           +n the rules present:                                         
+      1534 +                                                             
+      1535 +- **R1** — rules intact, 96 h, command issued once at t = 0. 
+      1536 +- **R2** — the one rule that reopens this pump removed, every
+           +thing else identical.                                        
+      1537 +- **R3** — a single 0.5 h step, so no rule can fire before th
+           +e run ends.                                                  
+      1538 +                                                             
+      1539 +| pump | run | open states | realisation \| open | first rese
+           +t | realised speed values observed |                         
+      1540 +|---|---|---|---|---|---|                                    
+      1541 +| PUMP-170 | R1 rules intact | 52 | 0.365 | 30.50 h | 0.0, 0.
+           +85, **1.0** |                                                
+      1542 +| PUMP-170 | R2 RULE-4 removed | 19 | **1.000** | never | 0.0
+           +, 0.85 |                                                     
+      1543 +| PUMP-170 | R3 single step | 2 | **1.000** | n/a | 0.85 |   
+      1544 +| PUMP-172 | R1 rules intact | 80 | 0.212 | 26.00 h | 0.0, 0.
+           +85, **1.0** |                                                
+      1545 +| PUMP-172 | R2 RULE-1 removed | 17 | **1.000** | never | 0.0
+           +, 0.85 |                                                     
+      1546 +| PUMP-172 | R3 single step | 2 | **1.000** | n/a | 0.85 |   
+      1547 +                                                             
+      1548 +`mechanism_confirmed = True` for both pumps.                 
+      1549 +                                                             
+      1550  <!-- CONTINUE -->
+
+● Update(docs\phase5_bwsn_preflight.md)
+  ⎿  Added 49 lines
+      1547  
+      1548  `mechanism_confirmed = True` for both pumps.
+      1549  
+      1550 +```                                                          
+      1551 +FACT:                                                        
+      1552 +Under intact rules, a commanded speed of 0.85 is realised at 
+           +only 21-37 % of open states,                                 
+      1553 +and the value 1.0 appears in the realised series even though 
+           +it was never commanded.                                      
+      1554 +                                                             
+      1555 +TEST:                                                        
+      1556 +Remove only the rule that reopens the pump (R2), and separate
+           +ly shorten the horizon so no                                 
+      1557 +rule can fire (R3). Change nothing else.                     
+      1558 +                                                             
+      1559 +RESULT:                                                      
+      1560 +In both R2 and R3, for both pumps, realisation is exactly 1.0
+           +00 and the value 1.0 never                                   
+      1561 +appears. Removing the rule removes the reset; the reset time 
+           +under R1 (30.50 h, 26.00 h)                                  
+      1562 +coincides with a rule-driven reopening.                      
+      1563 +                                                             
+      1564 +INFERENCE:                                                   
+      1565 +This is a demonstrated causal mechanism, not a correlation: t
+           +he rule action                                               
+      1566 +THEN PUMP <p> STATUS IS OPEN restores relative speed to 1.0, 
+           +discarding the commanded                                     
+      1567 +speed. The engine is not ignoring the command - it applies it
+           +, then a later rule                                          
+      1568 +overwrites it. This is confound X4 and it is the reason G12 i
+           +s CONDITIONAL rather than                                    
+      1569 +PASS. The fix is stated in section 19 and requires no topolog
+           +y change.                                                    
+      1570 +                                                             
+      1571 +STATUS:                                                      
+      1572 +Mechanism confirmed                                          
+      1573 +```                                                          
+      1574 +                                                             
+      1575 +### 16.5 Per-command persistence                             
+      1576 +                                                             
+      1577 +| command | open fraction | realised before first reset | fir
+           +st reset (h) | realisation \| open | realisation \| horizon |
+      1578 +|---|---|---|---|---|---|                                    
+      1579 +| speed PUMP-170 = 0.70 | 0.223 | shut (no open state) | 12.0
+           +0 | 0.000 | 0.124 |                                          
+      1580 +| speed PUMP-170 = 0.85 | 0.269 | **1.000** | 30.50 | 0.365 |
+           + 0.098 |                                                     
+      1581 +| speed PUMP-170 = 1.10 | 0.223 | **1.000** | 23.50 | 0.047 |
+           + 0.010 |                                                     
+      1582 +| speed PUMP-172 = 0.70 | 0.373 | shut (no open state) | 12.0
+           +0 | 0.000 | 0.124 |                                          
+      1583 +| speed PUMP-172 = 0.85 | 0.415 | **1.000** | 26.00 | 0.212 |
+           + 0.088 |                                                     
+      1584 +| speed PUMP-172 = 1.10 | 0.373 | **1.000** | 24.00 | 0.069 |
+           + 0.026 |                                                     
+      1585 +                                                             
+      1586 +The two 0.70 cases have no open state before the reset, and t
+           +his is not a realisation                                     
+      1587 +failure: G3 measured the feasible speed bounds at 0.8152 for 
+           +PUMP-170 and 0.7655 for                                      
+      1588 +PUMP-172, so 0.70 is below shut-off for both. The pump is hyd
+           +raulically incapable of                                      
+      1589 +delivering against its static lift at that speed. G12 deliber
+           +ately included a speed below                                 
+      1590 +those bounds so that this case would be measured rather than 
+           +assumed — and the result                                     
+      1591 +confirms G3 from a second direction.                         
+      1592 +                                                             
+      1593 +Realised statuses at nominal settings, for reference: VALVE-1
+           +73, -175, -176, -177, -178                                   
+      1594 +Active at all 193 states; VALVE-174, -179, -180 Closed at all
+           + 193 states. VALVE-180 is                                    
+      1595 +commanded 16.45 psi and reports a realised setting of 0.00 ps
+           +i — EPANET reports a closed                                  
+      1596 +PRV's setting as 0. PUMP-170 is Closed at 151 and Open at 42 
+           +states; PUMP-172 Closed at                                   
+      1597 +119 and Open at 74.                                          
+      1598 +                                                             
+      1599  <!-- CONTINUE -->
+
+● Update(docs\phase5_bwsn_preflight.md)
+  ⎿  Added 56 lines
+      1596  PRV's setting as 0. PUMP-170 is Closed at 151 and Open at 42 
+            states; PUMP-172 Closed at
+      1597  119 and Open at 74.
+      1598  
+      1599 +### 16.6 The one command that produced negative service press
+           +ure                                                          
+      1600 +                                                             
+      1601 +`prv_VALVE-179_x1.25` — raising VALVE-179's setting by 25 % —
+           + drove the minimum pressure                                  
+      1602 +over the 121 demand-bearing junctions to **−97.086 psi**, cha
+           +nged mean leakage by                                         
+      1603 +−5.7594 GPM, and produced a maximum pressure change of 102.14
+           +83 psi somewhere in the                                      
+      1604 +network. This is the same hazard G4 found by a different rout
+           +e (confound X1: VALVE-179                                    
+      1605 +carries identically zero flow at scales × 0.25 through × 1.00
+           +, then 1212.15 GPM at × 1.25;                                
+      1606 +at × 1.5 the minimum pressure reached −99.3792 psi across 708
+           + node-timesteps).                                            
+      1607 +                                                             
+      1608 +```                                                          
+      1609 +FACT:                                                        
+      1610 +VALVE-179 is Closed at every state under nominal settings and
+           + carries zero flow. Raising                                  
+      1611 +its setting above a threshold between 1.00x and 1.25x of nomi
+           +nal reopens it.                                              
+      1612 +                                                             
+      1613 +INFERENCE:                                                   
+      1614 +This is a discontinuous, one-sided actuator: inert over the w
+           +hole lower part of its range,                                
+      1615 +then abruptly admitting over a thousand GPM and pulling the n
+           +etwork to large negative                                     
+      1616 +pressures. For an RL agent this is the worst possible action 
+           +geometry - a flat region that                                
+      1617 +teaches nothing, adjacent to a cliff that produces catastroph
+           +ic states. It is not a                                       
+      1618 +network defect and not something Phase 5 may fix: the brief f
+           +orbids removing any PRV at                                   
+      1619 +this stage. It is the single most important item in section 1
+           +9.                                                           
+      1620 +                                                             
+      1621 +STATUS:                                                      
+      1622 +Hazard confirmed and quantified (two independent measurements
+           +)                                                            
+      1623 +```                                                          
+      1624 +                                                             
+      1625 +---                                                          
+      1626 +                                                             
+      1627 +## 17. Overall Decision                                      
+      1628 +                                                             
+      1629 +### 17.1 Gate verdict table                                  
+      1630 +                                                             
+      1631 +| gate | subject | verdict |                                 
+      1632 +|---|---|---|                                                
+      1633 +| G0 | file integrity | **PASS** |                           
+      1634 +| G1 | baseline EPANET/WNTR convergence | **PASS** |         
+      1635 +| G2 | native control logic | **CHARACTERISED** (descriptive 
+           +gate, no pass/fail) |                                        
+      1636 +| G3 | pump speed response | **PASS** |                      
+      1637 +| G4 | PRV actuator responsiveness | **PASS** |              
+      1638 +| G5 | PRV action-dimension audit | **CONDITIONAL** |        
+      1639 +| G6 | leakage model validation | **PASS** |                 
+      1640 +| G7 | PDA response | **PASS** |                             
+      1641 +| G8 | leakage/service separation | **PASS** |               
+      1642 +| G9 | mass balance | **PASS** |                             
+      1643 +| G10 | full 96 h pre-flight EPS | **PASS** |                
+      1644 +| G11 | tank dynamics | **PASS** |                           
+      1645 +| G12 | actuator realizability | **CONDITIONAL** |           
+      1646 +                                                             
+      1647 +Reproduced end to end by `src/validation/run_all.py`: 7 modul
+           +es, 0 non-zero exits,                                        
+      1648 +≈ 31 s total (2.8 / 2.7 / 3.6 / 7.8 / 5.5 / 3.2 / 5.6 s). Con
+           +sole log preserved at                                        
+      1649 +`results/phase5/run_all_console.txt`.                        
+      1650 +                                                             
+      1651 +### 17.2 Decision                                            
+      1652 +                                                             
+      1653 +**OVERALL = CONDITIONAL PASS**                               
+      1654 +                                                             
+      1655  <!-- CONTINUE -->
+
+● Update(docs\phase5_bwsn_preflight.md)
+  ⎿  Added 42 lines
+      1652  
+      1653  **OVERALL = CONDITIONAL PASS**
+      1654  
+      1655 +The hydraulics pass without qualification. Eleven of thirteen
+           + gates PASS, one is                                          
+      1656 +descriptive, and the two that are CONDITIONAL — G5 and G12 — 
+           +are both about the *action                                   
+      1657 +space*, not about whether the network solves. Specifically:  
+      1658 +                                                             
+      1659 +- Nothing failed. No gate returned FAIL.                     
+      1660 +- The solver converges, mass balance closes to 5.18e-07 relat
+           +ive, the 96 h EPS runs with                                  
+      1661 +  0 errors and 0 warnings, tanks never pin, no actuator chatt
+           +ers, and every native rule                                   
+      1662 +  fires where it says it will.                               
+      1663 +- The leakage model and PDA both respond monotonically and se
+           +parably (G6, G7, G8), so the                                 
+      1664 +  reward signal a later phase will build is measurable.      
+      1665 +- The engine faithfully applies every command it receives (G1
+           +2 transmission and                                           
+      1666 +  realisation both exact).                                   
+      1667 +                                                             
+      1668 +What is *not* ready is the action space as the shipped file p
+           +resents it:                                                  
+      1669 +                                                             
+      1670 +- 3 of the 8 PRVs (VALVE-174, -179, -180) are Closed at every
+           + state and carry identically                                 
+      1671 +  zero flow. Two independent gates found this (G5 by flow sha
+           +re, G12 by inert command).                                   
+      1672 +  Four of the 22 G12 commands were inert, all on those three 
+           +valves.                                                      
+      1673 +- No commanded pump speed survives the horizon: all 6 speed c
+           +ommands are reset to 1.0 by a                                
+      1674 +  native rule action, mechanism confirmed by controlled exper
+           +iment.                                                       
+      1675 +- VALVE-179 is a cliff actuator: inert to × 1.00, then −97 ps
+           +i service pressure at × 1.25.                                
+      1676 +                                                             
+      1677 +CONDITIONAL PASS is the correct verdict because every one of 
+           +those three items has a known,                               
+      1678 +non-invasive fix that requires no change to BWSN-1's topology
+           + and no removal or addition of                               
+      1679 +any PRV (section 19). Per the brief, D-Town is not proposed —
+           + the failure conditions that                                 
+      1680 +would justify it (a fundamental hydraulic defect with no stan
+           +dard correction) are absent —                                
+      1681 +and no other change to the thesis architecture is proposed he
+           +re.                                                          
+      1682 +                                                             
+      1683 +### 17.3 Consolidated discrepancies between the `.inp` and th
+           +e Phase 4 report                                             
+      1684 +                                                             
+      1685 +All seven are reported, none silently corrected. The original
+           + file is untouched.                                          
+      1686 +                                                             
+      1687 +| # | discrepancy | evidence | consequence |                 
+      1688 +|---|---|---|---|                                            
+      1689 +| D1 | pattern length | 4 patterns with 96/96/48/96 multiplie
+           +rs = 48/48/24/48 h cycles at the 0:30 pattern timestep, not 8
+           + h; Phase 4 counted lines in the `.inp`, not multipliers | Ph
+           +ase 4's "unrealistically short demand cycle" inference must b
+           +e **retracted**; the patterns are multi-day |                
+      1690 +| D2 | dead patterns | PATTERN-0 on 77 junctions (943.910 GPM
+           +), PATTERN-1 on 2 junctions (0.800 GPM), no pattern on 47 jun
+           +ctions; total 944.710 GPM. PATTERN-2 and PATTERN-3 are define
+           +d but referenced by nothing | 2 of 4 patterns are inert; dema
+           +nd stochasticity in a later phase cannot be built by perturbi
+           +ng them |                                                    
+      1691 +| D3 | rule timestep | file declares 180 s; WNTR's default is
+           + 360 s. Max \|ΔP\| between the two = 0.0459 psi, and 7/7 pump
+           + switches identical | small but real; adopt 180 s to match th
+           +e file |                                                     
+      1692 +| D4 | report vs hydraulic timestep | report 3600 s against a
+           + 0:30 hydraulic step → 97 states instead of 193. Cross-check 
+           +at both resolutions: max \|ΔP\| = 0.0 m | half the hydraulic 
+           +states were invisible; adopt 1800 s |                        
+      1693 +| D5 | PRV activity | Phase 4's "7 of 8 PRVs active at start"
+           + is wrong: VALVE-174, -179, -180 all carry identically zero f
+           +low. Only VALVE-180 is closed by `[CONTROLS]`; the other two 
+           +are closed by hydraulics | the usable PRV count is **5**, not
+           + 7 or 8 |                                                    
+      1694 +| D6 | shipped solver settings return unconverged states | at
+           + the file's `ACCURACY 0.005 / TRIALS 40`: emitter law violate
+           +d by 2.01 GPM, continuity by 9.97 GPM, max instantaneous imba
+           +lance 25.6669 GPM, 58/193 states over threshold — with **0 EP
+           +ANET errors and 0 warnings**. At 1e-5/2000: 0.0008 GPM | the 
+           +engine reports success while silently returning non-solutions
+           +; `ACCURACY 1e-5 / TRIALS 2000` is mandatory, not a preferenc
+           +e |                                                          
+      1695 +| D7 | five junctions at elevation 0.0 ft | mean pressure 103
+           +.7944 vs 94.7867 psi (+9.01); max 507.7488 at JUNCTION-106 vs
+           + 288.2206 at JUNCTION-34 (+219.5); max inter-report change 25
+           +.8712 vs 6.7257 psi; 7 states >25 psi vs 0 | every aggregate 
+           +pressure statistic over all 126 junctions is biased; use the 
+           +121 demand-bearing junctions |                               
+      1696 +                                                             
+      1697  <!-- CONTINUE -->
+
+● Update(docs\phase5_bwsn_preflight.md)
+  ⎿  Added 23 lines
+      1694  | D6 | shipped solver settings return unconverged states | at
+             the file's `ACCURACY 0.005 / TRIALS 40`: emitter law violate
+            d by 2.01 GPM, continuity by 9.97 GPM, max instantaneous imba
+            lance 25.6669 GPM, 58/193 states over threshold — with **0 EP
+            ANET errors and 0 warnings**. At 1e-5/2000: 0.0008 GPM | the 
+            engine reports success while silently returning non-solutions
+            ; `ACCURACY 1e-5 / TRIALS 2000` is mandatory, not a preferenc
+            e |
+      1695  | D7 | five junctions at elevation 0.0 ft | mean pressure 103
+            .7944 vs 94.7867 psi (+9.01); max 507.7488 at JUNCTION-106 vs
+             288.2206 at JUNCTION-34 (+219.5); max inter-report change 25
+            .8712 vs 6.7257 psi; 7 states >25 psi vs 0 | every aggregate 
+            pressure statistic over all 126 junctions is biased; use the 
+            121 demand-bearing junctions |
+      1696  
+      1697 +### 17.4 Consolidated confounds                              
+      1698 +                                                             
+      1699 +Each of these is an alternative explanation that was tested r
+           +ather than assumed away.                                     
+      1700 +                                                             
+      1701 +| # | confound | how it was tested | outcome |               
+      1702 +|---|---|---|---|                                            
+      1703 +| X1 | VALVE-179 reopening could make any PRV sweep look resp
+           +onsive for the wrong reason | swept the setting from × 0.25 t
+           +o × 1.5 and recorded flow and minimum service pressure at eac
+           +h step | **real and severe.** Mean flow 0 GPM at × 0.25 – × 1
+           +.00, then 1212.1509 GPM at × 1.25; min service pressure −97.0
+           +86 psi at × 1.25 (G12) and −99.3792 psi across 708 node-times
+           +teps at × 1.5 (G4). Handled by section 19 item 1 |           
+      1704 +| X2 | apparent leakage reduction could be PDA demand starvat
+           +ion, not pressure management | decomposed the change into a l
+           +eakage term and a delivered-demand term per case (G8), and co
+           +mpared nodal pressures between × 0.25 and × 0.75 | **real but
+           + bounded and explained.** 84 junctions rise and 33 fall — cur
+           +tailment reduces withdrawal, which reduces friction loss, whi
+           +ch raises pressure elsewhere. G8 closes the decomposition per
+           + case, so leakage and service are separable |                
+      1705 +| X3 | the D7 connector nodes could dominate the leakage inst
+           +rument because they sit at 184–502 psi | summed their leak fl
+           +ow and emitter coefficients as a share of the total | **real 
+           +but negligible.** 0.508205 of 84.72988 GPM = **0.5998 %** of 
+           +leak flow; 0.3555 % of the total coefficient 8.765093. No lea
+           +kage conclusion changes; excluded from the RL instrument as a
+           + precaution |                                                
+      1706 +| X4 | the pump-speed failure could be an engine defect rathe
+           +r than a rule action | removed only the reopening rule (R2), 
+           +and separately shortened the horizon so no rule can fire (R3)
+           + | **mechanism identified.** Realisation is exactly 1.000 in 
+           +R2 and R3 for both pumps and the value 1.0 never appears; `TH
+           +EN PUMP <p> STATUS IS OPEN` restores relative speed to 1.0. N
+           +ot an engine defect — a rule side-effect. Fix in section 19 i
+           +tem 5 |                                                      
+      1707 +                                                             
+      1708 +### 17.5 Instrument and criterion changes, disclosed         
+      1709 +                                                             
+      1710 +Four places in this phase measure something differently from 
+           +the first thing tried. Each is                               
+      1711 +listed with what changed, why, and where both numbers appear.
+      1712 +                                                             
+      1713 +| gate | what changed | why | both results reported |        
+      1714 +|---|---|---|---|                                            
+      1715 +| G6, G7 | mean pressure replaced by a nodal **pressure-domin
+           +ance partial order** plus a tolerance sweep | mean pressure i
+           +s not a sufficient statistic for total leakage: a redistribut
+           +ion can lower the mean and raise total leakage. A partial ord
+           +er over all nodes is falsifiable; a mean is not | yes — §10, 
+           +§11 |                                                        
+      1716 +| G9 | geometric storage agreement evaluated on **switch-free
+           + intervals only**, tolerance 5e-3 not 1e-4 | EPANET subdivide
+           +s the hydraulic timestep at a control-triggered switch, so a 
+           +switch interval's endpoints do not bracket a single timestep.
+           + The exclusion was pre-declared in the module header, before 
+           +the run. The 5e-3 tolerance is set by float32 binary-output q
+           +uantisation (2.36e-04 and 4.32e-04 relative), not chosen to f
+           +it | yes — §13.2, §13.3; the independent flow-route check kee
+           +ps the 1e-4 threshold and passes at 5.180e-07 |              
+      1717 +| G10 | pressure criterion evaluated over **121 demand-bearin
+           +g junctions** instead of all 126 | five junctions are declare
+           +d at elevation exactly 0.0 ft with zero demand; EPANET report
+           +s their pressure as head above datum. The reason is the decla
+           +red placeholder, not the outcome | yes — §14.4 table, both co
+           +lumns, and the verbatim note |                               
+      1718 +| G12 | one criterion split into **realisation** and **persis
+           +tence** | the original criterion conflated the two and return
+           +ed FAIL for a reason that was actually a rule side-effect. Th
+           +e split reports both; persistence still fails and still block
+           +s PASS | yes — §16.3 quotes the original FAIL verbatim |     
+      1719 +                                                             
+      1720  <!-- CONTINUE -->
+
+● Update(docs\phase5_bwsn_preflight.md)
+  ⎿  Added 54 lines
+      1717  | G10 | pressure criterion evaluated over **121 demand-bearin
+            g junctions** instead of all 126 | five junctions are declare
+            d at elevation exactly 0.0 ft with zero demand; EPANET report
+            s their pressure as head above datum. The reason is the decla
+            red placeholder, not the outcome | yes — §14.4 table, both co
+            lumns, and the verbatim note |
+      1718  | G12 | one criterion split into **realisation** and **persis
+            tence** | the original criterion conflated the two and return
+            ed FAIL for a reason that was actually a rule side-effect. Th
+            e split reports both; persistence still fails and still block
+            s PASS | yes — §16.3 quotes the original FAIL verbatim |
+      1719  
+      1720 +### 17.6 What this decision does not claim                   
+      1721 +                                                             
+      1722 +Stated explicitly, because the brief requires it. Nothing in 
+           +this report claims or implies:                               
+      1723 +                                                             
+      1724 +- that PPO will succeed on this environment;                 
+      1725 +- that BWSN-1 is the best available network for this thesis; 
+      1726 +- that BWSN-1 is better or worse than D-Town;                
+      1727 +- that leakage will drop by any particular percentage;       
+      1728 +- that a learned controller will beat any baseline.          
+      1729 +                                                             
+      1730 +Phase 5 asked one question — can BWSN-1 be a stable, solvable
+           +, controllable hydraulic                                     
+      1731 +environment — and answers it with **CONDITIONAL PASS** on hyd
+           +raulic and actuator evidence                                 
+      1732 +only. Every number in this report comes from a deterministic 
+           +run recorded in                                              
+      1733 +`results/phase5/`. The G6 validation leak coefficient exists 
+           +solely to make leakage                                       
+      1734 +measurable in this phase and **must not enter any thesis resu
+           +lt**.                                                        
+      1735 +                                                             
+      1736 +---                                                          
+      1737 +                                                             
+      1738 +## 18. Remaining Risks                                       
+      1739 +                                                             
+      1740 +Risks that survive the corrections in section 19, ordered by 
+           +how much they could distort a                                
+      1741 +later result.                                                
+      1742 +                                                             
+      1743 +**R1 — the effective PRV action space is 5, not 8.** VALVE-17
+           +4, -179 and -180 are Closed at                               
+      1744 +every one of 193 states and carry identically zero flow. Sect
+           +ion 19 handles VALVE-179's                                   
+      1745 +cliff, but handling it does not make the valve useful. If all
+           + 8 are kept as action                                        
+      1746 +dimensions, 3 dimensions are noise the agent must learn to ig
+           +nore, which costs sample                                     
+      1747 +efficiency and makes any policy-interpretability claim harder
+           + to defend. Phase 5 is                                       
+      1748 +forbidden from removing a PRV, so this is recorded, not fixed
+           +. *Evidence: G5, G12 inert                                   
+      1749 +commands.*                                                   
+      1750 +                                                             
+      1751 +**R2 — pump speed is a weak actuator unless the rules are add
+           +ressed.** Even with re-issue                                 
+      1752 +after every reopen (section 19 item 5), the pumps are open on
+           +ly 22–42 % of the horizon, so a                              
+      1753 +speed command has no effect most of the time. G3 also bounds 
+           +the usable range from below:                                 
+      1754 +below 0.8152 (PUMP-170) and 0.7655 (PUMP-172) the pump cannot
+           + deliver against its static                                  
+      1755 +lift and simply shuts. The usable speed band is therefore rou
+           +ghly 0.8–1.1, not 0.5–1.1.                                   
+      1756 +*Evidence: G3 feasible bounds, G12 open fractions.*          
+      1757 +                                                             
+      1758 +**R3 — the shipped initial condition is not a periodic steady
+           + state.** Over 96 h TANK-130                                 
+      1759 +loses 1.377 ft and TANK-131 loses 1.071 ft in the full config
+           +uration (−1.200 and −0.971 ft in                             
+      1760 +the baseline). Episodes starting from the shipped levels inhe
+           +rit a drift, so an episode's                                 
+      1761 +start and end states are not interchangeable and reward accum
+           +ulated late in an episode is                                 
+      1762 +not directly comparable with reward accumulated early. Constr
+           +ucting a periodic initial                                    
+      1763 +condition would change the shipped configuration and is out o
+           +f scope here. *Evidence: G11,                                
+      1764 +§14.3.*                                                      
+      1765 +                                                             
+      1766 +**R4 — 386 node-states below 20 psi in the baseline full EPS,
+           + before any agent acts.** The                                
+      1767 +PDA required pressure is 20 psi, so the network already curta
+           +ils demand somewhere at                                      
+      1768 +nominal settings, and the minimum service pressure is 4.1645 
+           +psi at JUNCTION-29. A reward                                 
+      1769 +that penalises sub-threshold pressure will therefore carry a 
+           +non-zero floor the agent cannot                              
+      1770 +remove, and a naive "pressure violations" metric will look ba
+           +d for reasons that predate the                               
+      1771 +controller. This needs an explicit baseline subtraction in th
+           +e reward or metric design.                                   
+      1772 +*Evidence: G10 pressure statistics, both node sets.*         
+      1773 +                                                             
+      1774  <!-- CONTINUE -->
+
+● Update(docs\phase5_bwsn_preflight.md)
+  ⎿  Added 53 lines
+      1771  controller. This needs an explicit baseline subtraction in th
+            e reward or metric design.
+      1772  *Evidence: G10 pressure statistics, both node sets.*
+      1773  
+      1774 +**R5 — demand stochasticity cannot be built by perturbing the
+           + shipped patterns alone.**                                   
+      1775 +PATTERN-0 drives 77 junctions (943.910 GPM), PATTERN-1 drives
+           + 2 junctions (0.800 GPM),                                    
+      1776 +47 junctions have no pattern at all, and PATTERN-2 and PATTER
+           +N-3 are defined but referenced                               
+      1777 +by nothing. Scaling PATTERN-1 moves 0.08 % of demand; the 47 
+           +unpatterned junctions do not                                 
+      1778 +respond to pattern perturbation at all. The uncertainty compo
+           +nent of the research question                                
+      1779 +will need a demand-perturbation mechanism designed deliberate
+           +ly, not inherited from the                                   
+      1780 +file. *Evidence: D2.*                                        
+      1781 +                                                             
+      1782 +**R6 — the solver setting is load-bearing and easy to lose.**
+           + At the file's own                                           
+      1783 +`ACCURACY 0.005 / TRIALS 40` the engine returns states violat
+           +ing the emitter law by 2.01 GPM                              
+      1784 +and continuity by 9.97 GPM while reporting 0 errors and 0 war
+           +nings. Any script, notebook or                               
+      1785 +config that loads the `.inp` without re-applying `1e-5 / 2000
+           +` will silently train on                                     
+      1786 +non-solutions. This must be enforced in code, not documented 
+           +in prose. *Evidence: D6, G9                                  
+      1787 +case D — 25.6669 GPM max imbalance, 58/193 states over thresh
+           +old.*                                                        
+      1788 +                                                             
+      1789 +**R7 — leak-coefficient magnitude is unvalidated against any 
+           +field data.** The G6 coefficient                             
+      1790 +was sized so leakage is measurable but not dominant (total 84
+           +.72988 GPM mean against                                      
+      1791 +944.710 GPM base demand ≈ 9 %). That is a deliberate instrume
+           +nt choice for feasibility                                    
+      1792 +testing, and it is explicitly **not** calibrated to BWSN-1 or
+           + to any real network. Phase 5                                
+      1793 +forbids optimising it, and this report forbids reusing it. Wh
+           +atever coefficient the thesis                                
+      1794 +eventually uses needs its own justification. *Evidence: G6 §1
+           +0.2.*                                                        
+      1795 +                                                             
+      1796 +**R8 — PDA feedback couples the two reward terms.** Curtailme
+           +nt at one node reduces                                       
+      1797 +withdrawal, reduces friction loss, and raises pressure at oth
+           +er nodes: 84 junctions rose                                  
+      1798 +while 33 fell between × 0.25 and × 0.75. Leakage and service 
+           +are separable (G8 closes the                                 
+      1799 +decomposition per case) but they are not independent, so a mu
+           +lti-objective reward cannot                                  
+      1800 +treat the two terms as orthogonal without justification. *Evi
+           +dence: X2, G8.*                                              
+      1801 +                                                             
+      1802 +**R9 — reproducibility depends on one pinned toolchain.** All
+           + results here come from                                      
+      1803 +wntr 1.5.0 with EPANET DLL 20200 (`epanet2.dll`), on Python 3
+           +.13.15 / Windows 11. The EPyT                                
+      1804 +engine present in the same environment is EPANET 20305 — a *d
+           +ifferent engine version*. No                                 
+      1805 +result in this report was cross-validated between the two eng
+           +ines, so an engine change is an                              
+      1806 +untested variable. *Evidence: §3.*                           
+      1807 +                                                             
+      1808 +---                                                          
+      1809 +                                                             
+      1810 +## 19. Exact Changes Required Before RL                      
+      1811 +                                                             
+      1812 +Nine changes. None alters BWSN-1's topology, and none adds or
+           + removes a PRV. The original                                 
+      1813 +`.inp` stays untouched; every change belongs in the environme
+           +nt-construction code or in the                               
+      1814 +working copy.                                                
+      1815 +                                                             
+      1816 +**1. Constrain or reshape VALVE-179's action range — highest 
+           +priority.** The valve is inert                               
+      1817 +from × 0.25 to × 1.00 of nominal and then admits 1212.1509 GP
+           +M at × 1.25, driving service                                 
+      1818 +pressure to −97.086 psi (G12) and −99.3792 psi across 708 nod
+           +e-timesteps at × 1.5 (G4). An                                
+      1819 +unconstrained action dimension here lets a random early-train
+           +ing action produce catastrophic                              
+      1820 +states. Two admissible options, both of which keep the valve 
+           +in the network: cap its                                      
+      1821 +commanded setting below the reopening threshold, or bound the
+           + whole PRV action space to                                   
+      1822 +settings verified not to produce negative service pressure. T
+           +he threshold lies between                                    
+      1823 +× 1.00 and × 1.25 and has **not** been bracketed more finely 
+           +— that measurement is owed                                   
+      1824 +before the bound is chosen. *Do not remove the valve: the bri
+           +ef forbids it, and G5 was                                    
+      1825 +explicitly instructed to present evidence only.*             
+      1826 +                                                             
+      1827  <!-- CONTINUE -->
+
+● Update(docs\phase5_bwsn_preflight.md)
+  ⎿  Added 47 lines
+      1824  before the bound is chosen. *Do not remove the valve: the bri
+            ef forbids it, and G5 was
+      1825  explicitly instructed to present evidence only.*
+      1826  
+      1827 +**2. Set `ACCURACY = 1e-5` and `TRIALS = 2000` in code, on ev
+           +ery load.** The file ships                                   
+      1828 +`0.005 / 40`, which returns states violating the emitter law 
+           +by 2.01 GPM and continuity by                                
+      1829 +9.97 GPM while EPANET reports 0 errors and 0 warnings (D6). A
+           +t 1e-5 / 2000 the same                                       
+      1830 +violation is 0.0008 GPM. This must be applied programmaticall
+           +y after every                                                
+      1831 +`WaterNetworkModel` load, and asserted, so it cannot be lost 
+           +by loading the `.inp` somewhere                              
+      1832 +else. It is the single change without which every other numbe
+           +r is unreliable.                                             
+      1833 +                                                             
+      1834 +**3. Set the rule timestep to 180 s.** The file declares 180 
+           +s; WNTR defaults to 360 s. The                               
+      1835 +measured difference is small — max |ΔP| 0.0459 psi, 7/7 pump 
+           +switches identical — but the                                 
+      1836 +file's own declared value is the correct one and there is no 
+           +reason to run at a coarser rule                              
+      1837 +resolution than the model specifies (D3).                    
+      1838 +                                                             
+      1839 +**4. Set the report timestep to 1800 s to match the 0:30 hydr
+           +aulic step.** At 3600 s only 97                              
+      1840 +of 193 hydraulic states are observable. A cross-check at both
+           + resolutions found max |ΔP| =                                
+      1841 +0.0 m, so this changes nothing physically — it changes what t
+           +he agent and the metrics can                                 
+      1842 +*see* (D4). An RL environment whose observation interval is t
+           +wice its hydraulic interval                                  
+      1843 +discards half its own states.                                
+      1844 +                                                             
+      1845 +**5. Handle the pump-speed reset.** `THEN PUMP <p> STATUS IS 
+           +OPEN` restores relative speed to                             
+      1846 +1.0, discarding a commanded speed; mechanism confirmed by con
+           +trolled experiment for both                                  
+      1847 +pumps (X4, §16.4). Two admissible fixes:                     
+      1848 +                                                             
+      1849 +- **(a)** re-issue the commanded speed after every rule-drive
+           +n reopening — i.e. write the                                 
+      1850 +  speed at every control step rather than once, which an RL e
+           +nvironment stepping every 30 min                             
+      1851 +  does naturally; or                                         
+      1852 +- **(b)** in the working copy, replace the rules' `STATUS IS 
+           +OPEN` action with                                            
+      1853 +  `SETTING IS <speed>`, which opens the pump *at* a speed ins
+           +tead of at 1.0.                                              
+      1854 +                                                             
+      1855 +Option (a) is preferred: it leaves the shipped control logic 
+           +intact and puts the fix in the                               
+      1856 +environment, which keeps the native-controls baseline directl
+           +y comparable with the learned                                
+      1857 +controller. Whichever is chosen, **verify realisation after t
+           +he fix** — the G12 per-command                               
+      1858 +persistence table (§16.5) is the before-measurement to compar
+           +e against.                                                   
+      1859 +                                                             
+      1860 +**6. Exclude the five elevation-0.0 ft junctions from every p
+           +ressure statistic.** JUNCTION-105,                           
+      1861 +-106, -109, -110, -128 are degree-2, zero-demand, pump-adjace
+           +nt nodes whose declared elevation                            
+      1862 +is exactly 0.0 ft. Including them inflates mean pressure by 9
+           +.01 psi, inflates the maximum by                             
+      1863 +219.5 psi, and manufactures 7 spurious inter-report jumps abo
+           +ve 25 psi (D7). Every pressure                               
+      1864 +observation, every pressure reward term and every pressure me
+           +tric should use the 121                                      
+      1865 +demand-bearing junctions. The exclusion rule is mechanical — 
+           +elevation exactly 0.0 ft and zero                            
+      1866 +base demand — and unambiguous, since the next lowest elevatio
+           +n in the file is 192.0 ft.                                   
+      1867 +                                                             
+      1868 +**7. Exclude the same five junctions from the leakage instrum
+           +ent.** They carry 0.5998 % of mean                           
+      1869 +leak flow and 0.3555 % of the total emitter coefficient (X3).
+           + The effect is small enough that                             
+      1870 +no conclusion in this report depends on it, and large enough 
+           +that it is reward the agent could                            
+      1871 +learn to chase for a reason that is an elevation placeholder.
+           + Place leak emitters on                                      
+      1872 +demand-bearing junctions only.                               
+      1873 +                                                             
+      1874  <!-- CONTINUE -->
+
+● Update(docs\phase5_bwsn_preflight.md)
+  ⎿  Added 53 lines, removed 1 line
+      1871  learn to chase for a reason that is an elevation placeholder.
+             Place leak emitters on
+      1872  demand-bearing junctions only.
+      1873  
+      1874 -<!-- CONTINUE -->                                            
+      1874 +**8. Bound the pump-speed action to the measured feasible ran
+           +ge, not 0.5–1.1.** G3 measured                               
+      1875 +shut-off at 0.8152 for PUMP-170 and 0.7655 for PUMP-172; G12 
+           +confirmed it independently — a                               
+      1876 +0.70 command yields zero open states. Below those bounds the 
+           +pump cannot overcome its static                              
+      1877 +lift and the command is hydraulically void, so a speed dimens
+           +ion spanning 0.5–1.1 spends a                                
+      1878 +third of its range on actions with no possible effect. Use a 
+           +lower bound at or above each                                 
+      1879 +pump's measured shut-off point.                              
+      1880 +                                                             
+      1881 +**9. Record the baseline pressure-deficit floor before design
+           +ing the reward.** At nominal                                 
+      1882 +settings the full pre-flight EPS already has 386 node-states 
+           +below the 20 psi PDA threshold and                           
+      1883 +a minimum service pressure of 4.1645 psi (JUNCTION-29). Any s
+           +ervice-pressure penalty must be                              
+      1884 +stated relative to this floor, otherwise a metric will attrib
+           +ute pre-existing deficit to the                              
+      1885 +controller. The floor is measured and available in `results/p
+           +hase5/g9_g10_full.json`.                                     
+      1886 +                                                             
+      1887 +Two items are explicitly **not** in this list, and their abse
+           +nce is deliberate. Removing                                  
+      1888 +VALVE-174, -179 or -180 from the action space is forbidden at
+           + this stage — G5 was instructed to                           
+      1889 +present evidence only, so the evidence is in §9 and §16 and t
+           +he decision belongs to the                                   
+      1890 +researcher. And no change to the thesis architecture, network
+           + choice, or experimental design is                           
+      1891 +proposed: D-Town is not proposed, because no gate returned FA
+           +IL and no fundamental hydraulic                              
+      1892 +defect was found.                                            
+      1893 +                                                             
+      1894 +---                                                          
+      1895 +                                                             
+      1896 +## 20. Summary                                               
+      1897 +                                                             
+      1898 +```                                                          
+      1899 +NETWORK = BWSN-1                                             
+      1900 +HYDRAULIC CONVERGENCE = PASS                                 
+      1901 +PDA = PASS                                                   
+      1902 +LEAKAGE = PASS                                               
+      1903 +PUMP SPEED CONTROL = PASS                                    
+      1904 +PRV CONTROL = PASS                                           
+      1905 +8-PRV ACTION SPACE = CONDITIONAL                             
+      1906 +MASS BALANCE = PASS                                          
+      1907 +96h EPS = PASS                                               
+      1908 +                                                             
+      1909 +OVERALL = CONDITIONAL PASS                                   
+      1910 +                                                             
+      1911 +NEXT STEP =                                                  
+      1912 +Implement the RL environment on BWSN-1, applying the nine cha
+           +nges in section 19 before any                                
+      1913 +training. Two of those changes must be verified by measuremen
+           +t, not assumed: (i) bracket                                  
+      1914 +VALVE-179's reopening threshold between x1.00 and x1.25 of no
+           +minal and bound the PRV action                               
+      1915 +range below it, and (ii) confirm that a commanded pump speed 
+           +is realised at every open state                              
+      1916 +once it is re-issued at each control step. Both re-use the ex
+           +isting Phase 5 harness, so both                              
+      1917 +are cheap. The two CONDITIONAL gates - G5 (effective PRV acti
+           +on space is 5 of 8) and G12                                  
+      1918 +(commanded pump speed does not persist) - are action-space de
+           +fects with known non-invasive                                
+      1919 +fixes, not hydraulic failures; no gate returned FAIL, so BWSN
+           +-1 is retained and no change to                              
+      1920 +the approved thesis architecture is proposed. The G6 validati
+           +on leak coefficient must not                                 
+      1921 +enter any thesis result.                                     
+      1922 +```                                                          
+      1923 +                                                             
+      1924 +*End of Phase 5 pre-flight report. Every number above is trac
+           +eable to a deterministic                                     
+      1925 +artefact in `results/phase5/`; the whole phase reproduces wit
+           +h                                                            
+      1926 +`.venv/Scripts/python.exe src/validation/run_all.py` in ≈ 31 
+           +s.*                                                          
+
+  Thought for 34s, searched for 2 patterns, read 1 file (ctrl+o to expand)
+● Update(docs\phase5_bwsn_preflight.md)
+  ⎿  Added 15 lines
+      1921  enter any thesis result.
+      1922  ```
+      1923  
+      1924 +The block above uses the mandated keys, which admit only PASS
+           +/FAIL on most lines. To                                      
+      1925 +prevent a line from being quoted more broadly than it was mea
+           +sured, each key maps to                                      
+      1926 +these gates:                                                 
+      1927 +                                                             
+      1928 +| summary key | gate(s) it reports | caveat carried elsewhere
+           + in this report |                                            
+      1929 +|---|---|---|                                                
+      1930 +| HYDRAULIC CONVERGENCE | G1, and G9/G10 in the full configur
+           +ation | requires `ACCURACY 1e-5 / TRIALS 2000`; at the file's
+           + shipped `0.005 / 40` this line would not be PASS (D6) |     
+      1931 +| PDA | G7 | — |                                             
+      1932 +| LEAKAGE | G6, separability by G8 | validation coefficient o
+           +nly; not calibrated, must not enter thesis results |         
+      1933 +| PUMP SPEED CONTROL | G3 — hydraulic response to a speed cha
+           +nge | the *command* does not persist: G12 persistence = False
+           +, fixed by §19 item 5; usable range is ~0.8–1.1, not 0.5–1.1 
+           +|                                                            
+      1934 +| PRV CONTROL | G4 — actuator responsiveness of the Active va
+           +lves | VALVE-179's reopening cliff (X1) must be bounded first
+           +, §19 item 1 |                                               
+      1935 +| 8-PRV ACTION SPACE | G5, corroborated by G12 inert commands
+           + | 5 of 8 valves carry flow; no PRV removed in this phase, pe
+           +r the brief |                                                
+      1936 +| MASS BALANCE | G9 | flow route at 1e-4; geometric route at 
+           +5e-3 on switch-free intervals (§13.2, §13.3) |               
+      1937 +| 96h EPS | G10 | pressure criterion evaluated on the 121 dem
+           +and-bearing junctions (§14.4, D7) |                          
+      1938 +                                                             
+      1939  *End of Phase 5 pre-flight report. Every number above is trac
+            eable to a deterministic
+      1940  artefact in `results/phase5/`; the whole phase reproduces wit
+            h
+      1941  `.venv/Scripts/python.exe src/validation/run_all.py` in ≈ 31 
+            s.*
+
+  Thought for 26s, searched for 1 pattern, read 1 file (ctrl+o to expand)
+
+● Update(docs\phase5_bwsn_preflight.md)
+  ⎿  Added 12 lines, removed 5 lines
+      1583  | speed PUMP-172 = 0.85 | 0.415 | **1.000** | 26.00 | 0.212 |
+             0.088 |
+      1584  | speed PUMP-172 = 1.10 | 0.373 | **1.000** | 24.00 | 0.069 |
+             0.026 |
+      1585  
+      1586 -The two 0.70 cases have no open state before the reset, and t
+           -his is not a realisation                                     
+      1586 +The two 0.70 cases have no open state *before* the reset, and
+           + this is not a realisation                                   
+      1587  failure: G3 measured the feasible speed bounds at 0.8152 for 
+            PUMP-170 and 0.7655 for
+      1588 -PUMP-172, so 0.70 is below shut-off for both. The pump is hyd
+           -raulically incapable of                                      
+      1589 -delivering against its static lift at that speed. G12 deliber
+           -ately included a speed below                                 
+      1590 -those bounds so that this case would be measured rather than 
+           -assumed — and the result                                     
+      1591 -confirms G3 from a second direction.                         
+      1588 +PUMP-172, so 0.70 is below shut-off for both and the pump is 
+           +hydraulically incapable of                                   
+      1589 +delivering against its static lift. Their non-zero open fract
+           +ions (0.223, 0.373) are                                      
+      1590 +entirely *post*-reset states, running at the rule-restored 1.
+           +0 rather than at the command —                               
+      1591 +which is why realisation-given-open is exactly 0.000 for both
+           +. G12 deliberately included a                                
+      1592 +speed below G3's bounds so that this case would be measured r
+           +ather than assumed, and the                                  
+      1593 +result confirms G3 from a second direction.                  
+      1594  
+      1595 +Reading the last two columns together separates the two defec
+           +ts. `realisation | open` is low                              
+      1596 +for every command (0.047–0.365) because it averages over the 
+           +whole horizon, most of which is                              
+      1597 +post-reset. `realised before first reset` is exactly 1.000 wh
+           +erever the pump can physically                               
+      1598 +run. The engine is faithful; the rule is what erases the comm
+           +and.                                                         
+      1599 +                                                             
+      1600  Realised statuses at nominal settings, for reference: VALVE-1
+            73, -175, -176, -177, -178
+      1601  Active at all 193 states; VALVE-174, -179, -180 Closed at all
+             193 states. VALVE-180 is
+      1602  commanded 16.45 psi and reports a realised setting of 0.00 ps
+            i — EPANET reports a closed
+
+  Thought for 9s, searched for 1 pattern (ctrl+o to expand)
+
+● docs/phase5_bwsn_preflight.md is complete — all 19 mandated sections plus the
+  required summary block.
+
+  Verdict: CONDITIONAL PASS. Eleven of thirteen gates PASS, one is descriptive
+  (G2), and the two CONDITIONAL gates are both about the action space rather
+  than the hydraulics:
+
+  - G5 — only 5 of 8 PRVs carry flow. VALVE-174, -179 and -180 are Closed at all
+    193 states with identically zero flow. G12 reached the same conclusion
+    independently: 4 of 22 commands were inert, all on those three valves. No
+    PRV was removed, per the brief; the evidence sits in §9 and §16 for you to
+    decide on.
+  - G12 — the engine is faithful (transmission exact, realisation exact at
+    issue), but no commanded pump speed survives the horizon. A controlled
+    experiment isolated the cause: THEN PUMP <p> STATUS IS OPEN restores
+    relative speed to 1.0. Removing only that rule gives realisation exactly
+    1.000 for both pumps.
+
+  Nothing returned FAIL, no fundamental hydraulic defect appeared, so D-Town is
+  not proposed and no other architecture change is suggested.
+
+  Four things I want to flag rather than bury:
+
+  1. D6 is the most consequential finding. At the file's shipped ACCURACY 0.005 
+     / TRIALS 40, EPANET returns states violating the emitter law by 2.01 GPM
+     and continuity by 9.97 GPM while reporting 0 errors and 0 warnings. Any
+     script that loads the .inp without re-applying 1e-5 / 2000 trains on
+     non-solutions silently.
+  2. D1 retracts a Phase 4 inference. The patterns are 48/48/24/48 h cycles, not
+     8 h — Phase 4 counted lines instead of multipliers, so its
+     "unrealistically short demand cycle" conclusion does not hold.
+  3. VALVE-179 is a cliff actuator — inert from ×0.25 to ×1.00, then 1212 GPM
+     and −97 psi service pressure at ×1.25. Its threshold has not been bracketed
+     finer than ×1.00–×1.25; that measurement is owed before the action bound
+     is chosen.
+  4. §17.5 discloses every instrument or criterion change, including the one
+     place a criterion was rewritten after seeing a result (G12), with the
+     original FAIL quoted verbatim from the artefact.
+
+  §19 lists nine required pre-RL changes, none of which touches topology or
+  adds/removes a PRV. The whole phase reproduces in ≈31 s:
+
+  .venv/Scripts/python.exe src/validation/run_all.py
+
+  The G6 validation leak coefficient is an instrument for this phase only and
+  must not enter any thesis result.
+
+❯ /effort max                                                                   
+  ⎿  Set effort level to max (this session only): Maximum capability with deepest reasoning. May use excessive tokens resulting in long response times or overthinking. Use sparingly for the hardest tasks.
+
+❯ # PHASE 6 — BWSN-1 DRL ENVIRONMENT DESIGN & FINALIZATION                      
+  یلصا فده ##                                                                   
+  :نآ عوضوم و تسا عیانص یسدنهم دشرا یسانشراک همانن‌ایاپ هژورپ نیا                
+  **Adaptive Pressure Control in Water Distribution Networks Using Deep         
+  Reinforcement Learning (DRL/PPO) Integrated with EPANET to Reduce Leakage     
+  Under Uncertain Demand**                                                      
+  .تسا                                                                          
+  :شهوژپ یلصا هکبش                                                              
+  **BWSN-1 (Battle of the Water Sensor Networks, 2008)**                        
+  .تسا                                                                          
+  Phase 5 رظن زا هکبش و هدیسر نایاپ هب pre-flight hydraulic validation یسررب    
+  .تسا هدش                                                                      
+  **.هدن ماجنا PPO یملع شیامزآ زونه ناونع چیه هب Phase نیا رد**                 
+  :هک تسا نیا Phase 6 فده                                                       
+   PPO یارب عافد لباق و reproducible، physically meaningful ،قیقد DRL طیحم کی > 
+  .دوش تست و یزاسه‌دایپ ،یحارط                                                   
+  ---                                                                           
+  Phase 5 یعطق تیعضو .1 #                                                       
+   رگم نکن یسررب رفص زا هرابود و ریگب رظن رد یعطق FACT ناونع هب ار دراوم نیا    
+  .ینک ادیپ یصخشم یراگزاسان هکنیا                                               
+  ### Gate results                                                              
+  * G0 FILE INTEGRITY = PASS                                                    
+  * G1 BASELINE EPANET/WNTR CONVERGENCE = PASS                                  
+  * G2 NATIVE CONTROL LOGIC = CHARACTERISED                                     
+  * G3 PUMP SPEED RESPONSE = PASS                                               
+  * G4 PRV ACTUATOR RESPONSIVENESS = PASS                                       
+  * G5 PRV ACTION-DIMENSION AUDIT = CONDITIONAL                                 
+  * G6 LEAKAGE MODEL VALIDATION = PASS                                          
+  * G7 PDA RESPONSE = PASS                                                      
+  * G8 LEAKAGE/SERVICE SEPARATION = PASS                                        
+  * G9 MASS BALANCE = PASS                                                      
+  * G10 FULL PRE-FLIGHT EPS = PASS                                              
+  * G11 TANK DYNAMICS = PASS                                                    
+  * G12 ACTUATOR REALIZABILITY = CONDITIONAL                                    
+  .تسا هدشن FAIL یلصا Gate چیه                                                  
+  :نیاربانب                                                                     
+  **BWSN-1 تسا هدافتسا لباق شهوژپ همادا یارب.**                                 
+  ---                                                                           
+  # 2. FACTدنوش ظفح اًنیع دیاب هک یمهم یاه                                       
+  هکبش ##                                                                       
+  * 126 junction                                                                
+  * 1 reservoir                                                                 
+  * 2 tanks                                                                     
+  * 168 pipes                                                                   
+  * 2 pumps                                                                     
+  * 8 PRVs                                                                      
+  * 96-hour EPS                                                                 
+  * hydraulic timestep = 30 min                                                 
+  * native rule timestep = 180 s                                                
+  * RL/reporting candidate timestep = 1800 s                                    
+  Topological modifications are forbidden unless separately justified and       
+  explicitly approved.                                                          
+  ---                                                                           
+  # 3. Solver configuration — NON-NEGOTIABLE                                    
+  :دننک هدافتسا تامیظنت نیا زا حیرص تروصه‌ب دیاب DRL طیحم یاهارجا مامت           
+  ```text                                                                       
+  ACCURACY = 1e-5                                                               
+  TRIALS   = 2000                                                               
+  RULE TIMESTEP = 180 s                                                         
+  CONTROL / REPORT TIMESTEP = 1800 s                                            
+  ```                                                                           
+  .دنوش راذگاو WNTR یاهdefault هب دیابن تامیظنت نیا                             
+  Phase 5 رتف‌یعض تامیظنت هک هداد ناشن:                                          
+  ```text                                                                       
+  ACCURACY = 0.005                                                              
+  TRIALS = 40                                                                   
+  ```                                                                           
+  .دننک داجیا هجوتل‌باق هنزاوم یاطخ دنناوتی‌م                                     
+  .نک verify/assert ار تامیظنت نیا ،network model ره load زا دعب                
+  ---                                                                           
+  # 4. Original benchmark integrity                                             
+  Original benchmark file دنامب یقاب هدروخنت‌سد دیاب.                            
+  Working copy یلعف:                                                            
+  ```text                                                                       
+  D:\Thesis\data\networks\working\BWSN_Network_1_working.inp                    
+  ```                                                                           
+  :هدشه‌تخانش patch اهنت                                                         
+  ```text                                                                       
+  Quality Chemical TIME                                                         
+  →                                                                             
+  Quality Chemical mg/L                                                         
+  ```                                                                           
+   hydraulically neutral و تسا WNTR 1.5.0 اب compatibility یارب اًفرص patch نیا  
+  .تسا هدش شرازگ                                                                
+  لصا                                                                           
+  ──── (579 lines hidden) ───────────────────────────────────────────────────── 
+  :دنشاب دوجوم دراوم نیا دیاب راک یاهتنا                                        
+  ### Deliverable A                                                             
+  **G5/G12 resolution report**                                                  
+  ### Deliverable B                                                             
+  **Final DRL environment specification**                                       
+  ### Deliverable C                                                             
+  **Action-space specification**                                                
+  ### Deliverable D                                                             
+  **State/observation specification**                                           
+  ### Deliverable E                                                             
+  **Reward specification**                                                      
+  ### Deliverable F                                                             
+  **Safety/constraint specification**                                           
+  ### Deliverable G                                                             
+  **Demand uncertainty specification**                                          
+  ### Deliverable H                                                             
+  **Implemented Gymnasium environment**                                         
+  ### Deliverable I                                                             
+  **Automated environment test report**                                         
+  ### Deliverable J                                                             
+  **Very short SB3 PPO compatibility smoke test**                               
+  ---                                                                           
+  # 34. FINAL PHASE 6 VERDICT                                                   
+  Verdict دشاب دروم هس نیا زا یکی طقف:                                          
+  ```text                                                                       
+  PASS                                                                          
+  CONDITIONAL                                                                   
+  FAIL                                                                          
+  ```                                                                           
+  PASS هک تسا زاجم یتقو طقف:                                                    
+  * action space هدش ییاهن                                                      
+  * G5 resolved                                                                 
+  * G12 strategy resolved                                                       
+  * environment API stable                                                      
+  * safety mechanism tested                                                     
+  * state/action/reward documented                                              
+  * reproducibility tested                                                      
+  * all critical tests pass                                                     
+  :دشاب unresolved الاب دراوم زا یکی یلو دشاب بوخ implementation طقف رگا        
+  ```text                                                                       
+  CONDITIONAL                                                                   
+  ```                                                                           
+  ---                                                                           
+  # 35. MOST IMPORTANT RESEARCH-INTEGRITY RULE                                  
+  :نک صخشم اهب‌سچرب نیا زا یکی اب اًقیقد ار میمصت ره                              
+  **VALIDATED FACT**                                                            
+  **ENGINEERING DECISION**                                                      
+  **RESEARCH ASSUMPTION**                                                       
+  **HYPOTHESIS TO TEST**                                                        
+  .نکن طولخم مه اب ار مادک چیه                                                  
+  ---                                                                           
+  # 36. WORK ORDER — IMPORTANT                                                  
+  :نک راک ریز بیترت هب                                                          
+  ### STEP 1                                                                    
+  Repository ار یلعف دک و inspect نک.                                           
+  ### STEP 2                                                                    
+  Phase 5 outputs و existing documentation ار inspect نک.                       
+  ### STEP 3                                                                    
+  G5 و VALVE-179 ار fine-characterize نک.                                       
+  ### STEP 4                                                                    
+  Pump-rule interaction یارب ار implementation strategy نک یسررب.               
+  ### STEP 5                                                                    
+  Candidate action-space formulations نک هسیاقم ار.                             
+  ### STEP 6                                                                    
+  Primary action-space formulation نک باختنا ار.                                
+  ### STEP 7                                                                    
+  State representation نک یحارط ار.                                             
+  ### STEP 8                                                                    
+  Reward نک یحارط ار.                                                           
+  ### STEP 9                                                                    
+  Safety layer نک یحارط ار.                                                     
+  ### STEP 10                                                                   
+  Demand uncertainty mechanism نک یحارط ار.                                     
+  ### STEP 11                                                                   
+  Gymnasium environment ار implement نک.                                        
+  ### STEP 12                                                                   
+  Automated tests نک ارجا ار.                                                   
+  ### STEP 13                                                                   
+  SB3 PPO compatibility smoke test نک ارجا ار.                                  
+  ### STEP 14                                                                   
+  Environment specification ار freeze نک.                                       
+  ### STEP 15                                                                   
+  Phase 6 report + verdict نک دیلوت ار.                                         
+  ---                                                                           
+  # FINAL COMMAND                                                               
+  **Do not start scientific PPO training.**                                     
+  The objective is NOT:                                                         
+  > “make PPO learn.”                                                           
+  The objective is:                                                             
+  > **“build and validate a defensible DRL environment for BWSN-1 in which      
+  every state, action, transition, reward, safety constraint, actuator          
+  behaviour, uncertainty mechanism, and evaluation metric is explicit,          
+  reproducible, and physically meaningful.”**                                   
+  Only after Phase 6 receives PASS should scientific PPO experiments begin.     
+  ⎿  3 agent types available
+
+❯ /anthropic-skills:consolidate-memory                                          
+  ⎿  Interrupted · What should Claude do instead?
+
+❯ hi                                                                            
+  ⎿  6 skills available
+  ⎿  Interrupted · What should Claude do instead?

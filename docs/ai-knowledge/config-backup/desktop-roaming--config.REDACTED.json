@@ -1,0 +1,30 @@
+{
+  "updaterLastSeenVersion": "1.40609.1",
+  "first_launch_at": 1787501321692,
+  "locale": "en-US",
+  "userThemeMode": "dark",
+  "dxt:allowlistEnabled:dd34952f-303f-4ac1-a910-6eec07239b70": false,
+  "dxt:allowlistLastUpdated:dd34952f-303f-4ac1-a910-6eec07239b70": "2026-09-01T19:01:43.728Z",
+  "dxt:allowlistCache:dd34952f-303f-4ac1-a910-6eec07239b70": "SECRET PRESENT - NOT EXPORTED",
+  "lastKnownAccountUuid": "f5bd7f1b-9c8f-406b-b55c-361505f4d7a6",
+  "lastSeenRequireCoworkFullVmSandbox": null,
+  "oauth:tokenCache": "SECRET PRESENT - NOT EXPORTED",
+  "oauth:tokenCacheV2": "SECRET PRESENT - NOT EXPORTED",
+  "hasTrackedInitialActivation": true,
+  "remote_uploads_migration_done_v1_27a098b74d0c": true,
+  "remote_marketplace_migration_done_v1": true,
+  "bootFrameLayout": {
+    "sidebarWidth": 288,
+    "collapsed": false,
+    "narrowViewportMaxWidth": 700
+  },
+  "updaterBannerStagedAt": {
+    "version": "1.40609.0",
+    "stagedAt": 1787956604995
+  },
+  "version_first_launch": {
+    "version": "1.40609.1",
+    "at": 1788288829286
+  },
+  "_backup_note": "Redacted copy of C:\\Users\\ABN\\AppData\\Roaming\\Claude\\config.json. Keys beginning 'oauth:' and 'dxt:allowlistCache' held opaque token/cache blobs and were replaced with the marker string. Everything else is verbatim."
+}
