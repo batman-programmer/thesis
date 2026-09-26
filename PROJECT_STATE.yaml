@@ -1,0 +1,202 @@
+# PROJECT_STATE.yaml
+# Machine-readable single source of truth for project state.
+# Maintained per the "PHASE 6 - CONTINUE FROM VERIFIED STATE + PERSIST EVERYTHING
+# TO DISK" instruction (sections 4 and 23). Update on every meaningful state change.
+# Label scheme (do not mix): VALIDATED_FACT | ENGINEERING_DECISION |
+# RESEARCH_ASSUMPTION | HYPOTHESIS_TO_TEST | DECISION_REQUIRED.
+# All numeric values below are read from on-disk result JSONs, not from memory.
+
+meta:
+  file_purpose: "Primary on-disk project memory. A fresh session must reconstruct state from this + docs/RECOVERY.md + the 3 Phase 6 docs, without the old chat."
+  last_updated_utc: "2026-09-26"
+  last_updated_by: "Claude Opus 4.8 (claude-opus-4-8), Claude Code / Claude Desktop"
+  maintained_under: ["CLAUDE.md", "AGENTS.md", "docs/PHASE6 brief"]
+
+project:
+  title: "Adaptive Pressure Control in Water Distribution Networks using DRL (PPO) integrated with EPANET/WNTR"
+  goal: "Reduce background leakage under uncertain demand by DRL setpoint control of pressure-reducing valves (and pump speed), validated on a benchmark network."
+  network: "BWSN-1 (Battle of the Water Sensor Networks, Network 1)"
+  network_facts:            # VALIDATED_FACT (Phase 5 integrity gate)
+    junctions_total: 126
+    junctions_service: 121
+    junctions_excluded: 5
+    excluded_nodes: ["JUNCTION-105","JUNCTION-106","JUNCTION-109","JUNCTION-110","JUNCTION-128"]
+    exclusion_rule: "declared elevation exactly 0.0 ft AND zero total base demand -> connector artefact"
+    reservoirs: 1
+    tanks: 2
+    tank_ids: ["TANK-130","TANK-131"]
+    pipes: 168
+    pumps: 2
+    pump_ids: ["PUMP-170","PUMP-172"]
+    prvs: 8
+    prv_ids: ["VALVE-173","VALVE-174","VALVE-175","VALVE-176","VALVE-177","VALVE-178","VALVE-179","VALVE-180"]
+    eps_hours: 96
+
+phase:
+  current: "Phase 6 - DRL environment design/validation (NOT PPO training)"
+  objective_verbatim_fa: "یک محیط DRL دقیق، reproducible، physically meaningful و قابل دفاع برای PPO طراحی، پیاده‌سازی و تست شود"
+  objective_en: "Design, implement and test an accurate, reproducible, physically meaningful, defensible DRL environment for PPO. NOT 'make PPO learn'."
+  classification: "IN PROGRESS"
+  classification_rule: "Never 'COMPLETE' without on-disk evidence. Allowed: NOT STARTED | IN PROGRESS | BLOCKED | CONDITIONAL | READY FOR PPO."
+
+solver_policy:               # VALIDATED_FACT - non-negotiable, asserted after every model load
+  accuracy: 1.0e-5
+  trials: 2000
+  rule_timestep_s: 180
+  control_report_timestep_s: 1800
+  demand_model: "PDA"
+  pda_required_pressure_psi: 20
+  pda_minimum_pressure_psi: 0
+  pda_pressure_exponent: 0.5
+  emitter_exponent: 0.5
+
+benchmark:                   # VALIDATED_FACT
+  original_inp: "data/networks/... (distributed BWSN_Network_1)"
+  original_inp_sha256: "510af942ec643eb87adcf26e5a7df1cc4c23eb0c1e470a8a1257ed055f1956f1"
+  working_inp: "data/networks/working/BWSN_Network_1_working.inp"
+  working_inp_sha256: "53015ba9212e46bec731d190971819996233996b498bc269e828f992830a20a9"
+  only_patch: "Quality 'Chemical TIME' -> 'Chemical mg/L' (hydraulically neutral units-label fix)"
+
+phase5:
+  status: "COMPLETE (do not rerun)"
+  gates_dir: "results/phase5/"
+  conditional_gates_resolved_in_phase6:
+    G5_action_space: "RESOLVED (see phase6 step3)"
+    G12_pump_speed_persistence: "RESOLVED (see phase6 step4)"
+  reference_state:           # VALIDATED_FACT - nominal PRVs, leak instrument on, PDA, 96h EPS, 193 report steps
+    source_file: "results/phase6/p6_s3_prv_finechar.json :: cases.reference_nominal"
+    mean_service_pressure_psi: 94.78672790527344
+    min_service_pressure_psi: 4.16452169418335
+    argmin_service_node: "JUNCTION-29"
+    max_service_pressure_psi: 288.2205810546875
+    n_node_timesteps_below_20psi: 386
+    n_node_timesteps_negative: 0
+    leakage_mean_gpm: 84.72988433677985
+    served_demand_mean_gpm: 891.4138978885177
+    requested_demand_mean_gpm: 906.3987348621764
+    unserved_demand_mean_gpm: 14.984836973658497
+    dsr_mean: 0.9833370137001072
+    leakage_share_of_served_pct: 9.505111434483867
+    n_report_timesteps: 193
+  leak_instrument:           # RESEARCH_ASSUMPTION - validation instrument, NOT a calibrated field model
+    description: "half incident pipe length per junction; one global closed-form scale k; exponent alpha=0.5 from file [OPTIONS] Emitter Exponent; target ~10% of leak-free mean inflow"
+    global_scale_k_gpm_per_ft_per_psi_alpha: 7.13768134008582e-05
+    caveat: "Not calibrated to real leakage. Used only to make pressure->leakage response observable and consistent."
+
+phase6:
+  deliverable_A: "docs/phase6_g5_g12_resolution.md (733 lines) - G5 and G12 resolution with measured evidence. COMPLETE."
+  steps:
+    step3_prv_finechar:
+      status: "COMPLETE"
+      evidence: ["results/phase6/p6_s3_prv_finechar.json","results/phase6/p6_s3b_v179_refine.json","results/phase6/p6_s3c_zone_interaction.json"]
+      result: "G5 action space fixed to 5 RL-controlled PRVs; VALVE-174/179/180 excluded on measured grounds."
+    step4_pump_strategy:
+      status: "COMPLETE"
+      evidence: ["results/phase6/p6_s4_pump_strategy.json"]
+      result: "G12 resolved: Option C on Option A mechanism. Agent commands SPEED only, re-issued every 1800 s control step; native rules retain STATUS. Option B disqualified (segmented run halts at t=79.5h, unbalanced)."
+    step5_action_encoding_absolute_vs_delta:
+      status: "DECISION BRIEF PREPARED - RECOMMENDED, pending researcher confirmation"
+      register_id: "D-P6-001"
+    step6_active_prv_and_pump_bounds:
+      status: "IN PROGRESS"
+      register_id: "D-P6-002 (pump), D-P6-003 (PRV)"
+      pump_bounds: "measured lower bounds available (see action_space.pump_speed); upper bound decision pending justification"
+      prv_bounds: "NOT YET fully measured for VALVE-173/175/176/177; only joint 0.75x-1.00x nominal tested. Per-valve fine sweep required (next action)."
+    step7_observation_design: {status: "NOT STARTED"}
+    step8_reward_design: {status: "NOT STARTED"}
+    step9_safety_action_mapping: {status: "NOT STARTED", note: "must hard-clamp VALVE-179 <= 44.7 psi if 179 ever controllable; 179 currently EXCLUDED"}
+    step10_demand_uncertainty_and_splits: {status: "NOT STARTED"}
+    step11_env_implementation: {status: "BLOCKED (deps)", modules_planned: ["bwsn_env","epanet_adapter","state_builder","action_mapper","safety","reward","demand_scenarios","metrics"]}
+    step12_automated_tests: {status: "NOT STARTED", planned_count: 16, tests_dir: "tests/ (currently empty)"}
+    step13_sb3_smoke_test: {status: "BLOCKED (deps)", note: "tiny smoke test ONLY after env ready; NOT scientific training"}
+    step14_freeze_spec: {status: "NOT STARTED"}
+    step15_final_report: {status: "NOT STARTED", file: "docs/PHASE6_FINAL_REPORT.md (only at genuine final decision point)"}
+
+action_space:
+  status: "STRUCTURE FIXED (G5); numeric bounds PARTIALLY DERIVED"
+  rl_controlled_prvs:        # VALIDATED_FACT (G5) - identities fixed; bounds see below
+    count: 5
+    valves:
+      VALVE-173: {nominal_setpoint_psi: 70.0,   bound_status: "NOT YET SWEPT per-valve"}
+      VALVE-175: {nominal_setpoint_psi: 55.0,   bound_status: "NOT YET SWEPT per-valve"}
+      VALVE-176: {nominal_setpoint_psi: 29.762, bound_status: "NOT YET SWEPT per-valve"}
+      VALVE-177: {nominal_setpoint_psi: 45.0,   bound_status: "NOT YET SWEPT per-valve"}
+      VALVE-178: {nominal_setpoint_psi: 37.0,   bound_status: "individual grid [27.75,32,37,42,46.25] tested in zone-interaction"}
+  excluded_prvs:             # VALIDATED_FACT (G5) - each excluded on measured grounds
+    VALVE-174: "reopens with adverse effect between 95->96 psi; excluded"
+    VALVE-179: "safety cliff: last clean 44.7 psi, last non-negative 44.8, first negative 44.9; signed-emitter law makes negative pressure meaningless+corrupting; excluded"
+    VALVE-180: "commanded shut by [CONTROLS]; excluded"
+  pump_speed:                # source: results/phase5/g3_pump_speed.json :: feasible_speed_bounds
+    control_mode: "SPEED only, re-issued each 1800 s control step (G12 Option C on Option A)"
+    PUMP-170:
+      min_feasible_speed: 0.8152486324365144   # VALIDATED_FACT
+      highest_speed_that_shut: 0.8
+      lowest_speed_that_ran: 0.85
+      shutoff_head_at_speed1_ft: 445.0
+    PUMP-172:
+      min_feasible_speed: 0.7655288728522932   # VALIDATED_FACT
+      highest_speed_that_shut: 0.7
+      lowest_speed_that_ran: 0.8
+      shutoff_head_at_speed1_ft: 740.0
+    sweep_span_tested: [0.50, 1.10]            # VALIDATED_FACT - no speed exceeded curve Qmax up to 1.10
+    proposed_upper_bound: 1.0                  # DECISION_REQUIRED (D-P6-002) - rated speed; conservative vs measured 1.10
+  encoding_absolute_vs_delta: "DECISION_REQUIRED (D-P6-001) - brief prepared; recommendation = ABSOLUTE, pending confirmation"
+
+state_space:
+  status: "NOT STARTED (step7)"
+  note: "Observation design + deterministic normalization to be defined and justified before env implementation."
+
+reward:
+  status: "NOT STARTED (step8)"
+  note: "Measure component scales (leakage, service/pressure-deficit, actuation) on-network BEFORE choosing weights. No weights chosen yet."
+
+demand_uncertainty:
+  status: "NOT STARTED (step10)"
+  note: "train/val/test/OOD split + seed policy to be defined. No stochastic demand implemented yet."
+
+environment:
+  status: "NOT STARTED (step11) - BLOCKED on deps"
+  src_env_dir: "src/env/ (does NOT exist yet)"
+  planned_modules: ["bwsn_env.py","epanet_adapter.py","state_builder.py","action_mapper.py","safety.py","reward.py","demand_scenarios.py","metrics.py"]
+  simulator_stack: "WNTR 1.5.0 (bundled EPANET 20200) primary; EPyT 2.3.5.2 (EPANET 20305) present, never cross-validated"
+
+tests:
+  status: "NOT STARTED (step12)"
+  tests_dir: "tests/ (exists, empty)"
+  planned_count: 16
+
+dependencies:
+  present:                   # VALIDATED_FACT - imported successfully in .venv
+    wntr: "1.5.0"
+    epyt: "2.3.5.2"
+    numpy: "2.5.2"
+    pandas: "3.0.5"
+    scipy: "1.18.1"
+    networkx: "3.6.1"
+    python: "3.13.15"
+  missing:                   # VALIDATED_FACT - import fails in .venv
+    gymnasium: "MISSING"
+    stable_baselines3: "MISSING"
+    torch: "MISSING"
+    pyyaml: "MISSING (does not block writing YAML as text; blocks Python yaml validation only)"
+  blocker: "BLOCKED: PPO/Gymnasium integration dependency unavailable. Do NOT auto-install (per instruction s20). Env implementation (step11) and SB3 smoke test (step13) cannot run until resolved with researcher approval."
+  venv_python: ".venv/Scripts/python.exe (Git Bash on Windows)"
+
+git:
+  branch: "main"
+  head_commit: "8dc8151"
+  head_subject: "1405-07-03 (portable AI-knowledge backup, committed by researcher)"
+  working_tree_at_audit: "clean"
+
+risks:
+  - "R1 (HYPOTHESIS_TO_TEST): agent may drive PRV setpoints low enough to cause <20 psi service violations; needs per-valve safe-lower-bound sweep (step6) + safety layer (step9)."
+  - "R2 (VALIDATED_FACT): Option B pump strategy can halt the simulator mid-episode (t=79.5h). Do not use SETTING-IS rule rewrite as primary. Mitigated by Option C."
+  - "R3 (RESEARCH_ASSUMPTION): leak instrument is uncalibrated; absolute leakage numbers are not field-meaningful, only relative response is."
+  - "R4 (BLOCKER): DRL deps missing; env/training work cannot proceed without approved install."
+  - "R5 (carried debt): proposal cites Hu MARL incorrectly (fix to Water Supply 23(7):2833, doi 10.2166/ws.2023.163); Negm Table 5-4 to re-verify from PDF before citing."
+
+next_action:
+  step: "Phase 6 STEP 6 - run per-valve fine setpoint sweep for VALVE-173/175/176/177/178 to derive defensible safe lower/upper bounds; persist to results/phase6/p6_s6_active_prv_bounds.json; register D-P6-003."
+  then: "Confirm D-P6-001 (absolute encoding) and D-P6-002 (pump upper bound=1.0) with researcher; then STEP 7 observation design."
+  guardrails: "No scientific PPO training. No silent research decisions. Persist every result before next major step."
+
