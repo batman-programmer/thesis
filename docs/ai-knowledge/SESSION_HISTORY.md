@@ -37,7 +37,7 @@ Additional session-bearing locations searched:
 | `D:\Thesis\*.txt` (`/export` output) | 2 exported transcripts | **Yes** → `session-backup/` root |
 | `~/.claude/todos/` | Directory exists, 0 entries | n/a |
 | `~/.claude/sessions/` | 2 `.key` files + `9072.json` | **No** — `SECRET PRESENT — NOT EXPORTED` |
-| Claude Desktop session stores | See [CLAUDE_ENVIRONMENT.md](CLAUDE_ENVIRONMENT.md) | Config only, no transcripts |
+| Claude Desktop session stores | **2 `.jsonl` transcripts + 2 `--audit.jsonl` logs** (see §8.1) | **Yes** → `session-backup/claude-desktop-transcripts/` |
 
 ---
 
@@ -332,19 +332,48 @@ Full analysis of these prompts is in
 ## 8. The five non-thesis sessions
 
 `DIRECT_OBSERVATION`. Copied for completeness of the environment record, **not**
-part of the thesis:
+part of the thesis. Copied 2026-09-26 into `session-backup/`, each source
+project-dir mirrored as its own subdirectory:
 
-| Project dir | File | Bytes |
-|---|---|---|
-| `C--Users-ABN` | `68eaba57-3be9-4948-b343-7bc51fa136b4.jsonl` | 12 668 |
-| `C--Users-ABN` | `6b7a30c6-7b41-4376-9e2d-6ae0322df4eb.jsonl` | 11 707 |
-| `C--Users-ABN-Desktop` | `44f440ad-9396-4b11-8e81-8cc5f1482391.jsonl` | 11 610 |
-| `C--Users-ABN-Desktop` | `a3ba9b4d-4fe2-41a5-aee9-3adcdbb82d55.jsonl` | 4 206 |
-| `C--Users-ABN-Desktop` | `d0da9270-9b1a-4594-8de2-bc4a857fe1f8.jsonl` | 12 173 |
+| Source project dir | File | Bytes | Backup location |
+|---|---|---|---|
+| `C--Users-ABN` | `68eaba57-3be9-4948-b343-7bc51fa136b4.jsonl` | 12 668 | `session-backup/claude-code-transcripts--C--Users-ABN/` |
+| `C--Users-ABN` | `6b7a30c6-7b41-4376-9e2d-6ae0322df4eb.jsonl` | 11 707 | `session-backup/claude-code-transcripts--C--Users-ABN/` |
+| `C--Users-ABN-Desktop` | `44f440ad-9396-4b11-8e81-8cc5f1482391.jsonl` | 11 610 | `session-backup/claude-code-transcripts--C--Users-ABN-Desktop/` |
+| `C--Users-ABN-Desktop` | `a3ba9b4d-4fe2-41a5-aee9-3adcdbb82d55.jsonl` | 4 206 | `session-backup/claude-code-transcripts--C--Users-ABN-Desktop/` |
+| `C--Users-ABN-Desktop` | `d0da9270-9b1a-4594-8de2-bc4a857fe1f8.jsonl` | 12 173 | `session-backup/claude-code-transcripts--C--Users-ABN-Desktop/` |
 
 All are ≤ 13 KB and dated 2026-08-25 / 2026-08-29. `INFERENCE`: setup or
 scratch sessions. None was run from the thesis directory and none is referenced
 by any project document.
+
+> **Provenance note (2026-09-26).** These five files were listed in this table
+> from the start, but a verification sweep found they had **not** actually been
+> written into `session-backup/` — the table asserted a copy that did not exist
+> on disk. They were physically copied on 2026-09-26 (byte sizes above verified
+> against source at copy time), making the "Copied for completeness" statement
+> true. The gap is recorded here rather than hidden, per the backup's
+> no-hidden-missing-information rule.
+
+### 8.1 Two Claude Desktop transcripts — non-thesis, budget-exhausted
+
+`DIRECT_OBSERVATION`. Contrary to the earlier claim that the Claude Desktop
+stores held "config only, no transcripts", **two Claude Desktop session
+transcripts were found** and copied to
+`session-backup/claude-desktop-transcripts/`, together with two audit logs:
+
+| File | Bytes | Content |
+|---|---|---|
+| `ce2196aa-caa8-4f83-94a5-6d08fafc3bdd.jsonl` | 11 995 | prompt `hi` → reply `API Error: 402 Budget pool quota has been exhausted` |
+| `31ef5175-4d1d-477a-b543-6cb364147ee2.jsonl` | 13 040 | prompt asking to "Schedule a daily briefing…" → same 402 error |
+| `d363756e--audit.jsonl` | 9 123 | audit log |
+| `d79b6d6a--audit.jsonl` | 8 277 | audit log |
+
+`DIRECT_OBSERVATION`. Both transcripts are dated **2026-09-06**, are **not
+thesis-related**, and **produced no work** — each terminated on a
+`402 Budget pool quota has been exhausted` error before any response. They are
+copied for completeness of the environment record only. `INFERENCE`: these are
+the desktop app's own scratch sessions, unrelated to `D:\Thesis`.
 
 ---
 

@@ -264,7 +264,8 @@ Phases 4, 5 and 6 entirely. What it does record:
 
 `INFERENCE`. **These are Phase-1-and-2 figures only.** The Phase 4–6 workload
 (session `32df42f5`, 12.4 MB of transcript) is not counted here. Do not cite
-these as project totals.
+these as project totals. For the later window, the Claude Desktop 3p
+**usage-ledger** (§8.4) is the more current accounting source.
 
 ---
 
@@ -467,6 +468,10 @@ Copied to `config-backup/desktop-roaming--claude_desktop_config.json` (1 323 B):
 `config-backup/desktop-roaming--developer_settings.json` (27 B):
 `{"allowDevTools": true}`.
 
+`config-backup/desktop-roaming--extensions-blocklist.json` (177 B) — the
+Desktop extensions block-list, copied verbatim. Non-secret; a small policy file
+listing blocked extensions. No credentials.
+
 `config-backup/desktop-roaming--config.REDACTED.json` (1 314 B) — a redacted copy
 of `%APPDATA%\Claude\config.json`. Non-secret fields preserved verbatim:
 `updaterLastSeenVersion "1.40609.1"`, `first_launch_at 1787501321692`,
@@ -522,6 +527,29 @@ MCP manifests also to `mcp-backup/`. Full detail in
 `custom3p-bootstrap-oidc.json` exist and were **not copied** —
 `SECRET PRESENT — NOT EXPORTED`. The `Preferences` file's `device_id_salt` was
 likewise left in place.
+
+### 8.4 Desktop 3p — MCP tool toggles, usage-ledger, session store
+
+`DIRECT_OBSERVATION`. Three further non-secret 3p artefacts were located and
+copied:
+
+- **`mcp-user-tool-toggles.json`** (143 B) → `mcp-backup/desktop-3p--mcp-user-tool-toggles.json`.
+  Records which MCP tools the user has toggled on/off in the Desktop UI. Non-secret;
+  no server URLs or credentials. See [MCP_AND_INTEGRATIONS.md](MCP_AND_INTEGRATIONS.md).
+- **Usage-ledger** — four `.ndjson` files (`2026-09-01`, `2026-09-02`,
+  `2026-09-03`, `2026-09-07`) → `config-backup/desktop-3p-usage-ledger/`. Per-day
+  model-usage accounting. `VERIFIED_FACT`: the ledger's list-basis total across
+  the four recorded days is **USD 470.29**. Because these dates fall inside the
+  Phase 4–6 window, this ledger — not the stale `stats-cache.json` of §3.3
+  (frozen 2026-08-27) — is the accounting source for that later work. It records
+  cost/token accounting only, **not** project knowledge.
+- **Claude-3p session store** — the Desktop 3p install keeps its own session
+  transcripts. Two were found (`ce2196aa…`, `31ef5175…`, both 2026-09-06,
+  non-thesis, budget-exhausted with no output) plus two audit logs, copied to
+  `session-backup/claude-desktop-transcripts/`. Full detail in
+  [SESSION_HISTORY.md](SESSION_HISTORY.md) §8.1. Its `memory\memory\` directory is
+  **empty** — the fourth empty memory store (see
+  [MEMORY_BACKUP.md](MEMORY_BACKUP.md) §1).
 
 ---
 

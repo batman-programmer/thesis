@@ -14,6 +14,13 @@ Three project directories exist under `~/.claude/projects/`:
 All three were inspected on 2026-09-07 05:16 UTC. **All three are empty** — zero
 files inside any `memory/` directory.
 
+`DIRECT_OBSERVATION`. A **fourth** memory store belongs to the Claude Desktop 3p
+integration: `Claude-3p\…\<session>\memory\memory\` (the doubled `memory\memory`
+path is the integration's own layout, not a typo). Inspected 2026-09-26 — it is
+**also empty**, zero files. See [MCP_AND_INTEGRATIONS.md](MCP_AND_INTEGRATIONS.md)
+§6. This brings the total to **four empty memory stores** across both installs;
+none has ever held a file.
+
 `DIRECT_OBSERVATION`. No `MEMORY.md` index file exists anywhere under
 `~/.claude/` (searched to depth 4).
 
@@ -70,6 +77,15 @@ for any memory-like content:
 session-spanning memory-like state. It was **not copied** because it may contain
 secrets or sensitive data from unrelated sessions. A migrating agent should
 inspect it manually if session history matters.
+
+`DIRECT_OBSERVATION`. A further **non-memory telemetry store** was located in the
+Claude Desktop 3p install: a **usage ledger** of four `.ndjson` files
+(`2026-09-01.ndjson`, `2026-09-02.ndjson`, `2026-09-03.ndjson`,
+`2026-09-07.ndjson`), copied to `config-backup/desktop-3p-usage-ledger/`. It
+records per-day model-usage accounting (list-basis figures, see
+[CLAUDE_ENVIRONMENT.md](CLAUDE_ENVIRONMENT.md)), **not** agent memory. It is
+logged here only so a migrating agent does not mistake it for a memory store: it
+holds no project knowledge, states, decisions or findings.
 
 ---
 

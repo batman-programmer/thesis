@@ -27,7 +27,7 @@ transcripts in `session-backup/claude-code-transcripts--D--Thesis/`.
 `INFERENCE`. **The project's entire reusable-prompt surface is: `CLAUDE.md` + four
 Skills + hand-pasted phase briefs.** Every slash command, subagent and hook that
 exists on this machine belongs to an installed plugin, not to this project. The
-20 command files and 27 agent files in `commands-backup/` and `agents-backup/`
+20 command files and 45 agent files in `commands-backup/` and `agents-backup/`
 are all plugin-provided — see [PLUGINS_INDEX.md](PLUGINS_INDEX.md).
 
 `INFERENCE`. This is good news for migration: there is **no project automation to

@@ -1,0 +1,222 @@
+# PROJECT_STATE.yaml — machine-readable snapshot of the project state
+# PART V of the AI-knowledge backup. Valid YAML (UTF-8). Generated 2026-09-26.
+# Classification tags mirror PART C; see the sibling .md files for evidence.
+# This file is a SNAPSHOT, not the source of truth. When it disagrees with a
+# .md deliverable, the .md file governs.
+
+project:
+  name: "Adaptive Pressure Control in Water Distribution Networks Using Deep Reinforcement Learning (DRL/PPO) Integrated with EPANET to Reduce Leakage Under Uncertain Demand"
+  degree: "Master's thesis"
+  field: "Industrial Engineering"
+  network: "BWSN-1 (Battle of the Water Sensor Networks, Network 1)"
+  working_directory: "D:\\Thesis"
+  language: "Persian + English (bilingual; reports in English, briefs in Persian)"
+  primary_engine: "WNTR 1.5.0 wrapping EPANET (DLL 20200); EPyT 2.3.5.2 / EPANET 2.3.05 installed but never cross-validated"
+
+status: "IN_PROGRESS — Phase 6 (DRL environment design & finalization); no PPO training permitted yet"
+
+phase:
+  current: "Phase 6 — BWSN-1 DRL Environment Design & Finalization"
+  completed_phases:
+    - "Phase 1 — Audit"
+    - "Phase 1.5 — Deep Literature Review"
+    - "Phase 1.5-B — Evidence Completion & Deep Verification"
+    - "Phase 2 — Methodology Review & Scientific Design (no docs/ report written)"
+    - "Phase 3 — Decision Review, Methodology Lock & Implementation Gate"
+    - "Phase 4 — Independent network-selection re-review"
+    - "Phase 5 — 13-gate validation (settled FACT)"
+  interposed_task: "Complete portable AI-knowledge backup to docs/ai-knowledge/ (ACTIVE)"
+
+objectives:
+  primary: "Design, implement and test a DRL environment for PPO that is precise, reproducible, physically meaningful and defensible."
+  explicit_non_objective: "The objective is NOT 'make PPO learn'. It is to build and validate a defensible environment in which every state, action, transition, reward, safety constraint, actuator behaviour, uncertainty mechanism and evaluation metric is explicit, reproducible and physically meaningful."
+  quality_bar_five_adjectives: ["دقیق (precise)", "علمی (scientific)", "قابل اجرا (executable)", "قابل تکرار (reproducible)", "قابل دفاع (defensible)"]
+  domain_goal: "Reduce leakage under uncertain demand via adaptive pressure control, without starving demand."
+
+research_questions:
+  - "Can a PPO agent controlling PRV settings (and pump speeds) adaptively reduce leakage in BWSN-1 under uncertain demand while respecting pressure/service constraints?"
+  - "What state, action, reward and safety formulation makes such a DRL environment physically meaningful and reproducible on BWSN-1?"
+
+hypotheses:
+  - id: "H1"
+    text: "Adaptive PRV/pump control learned by PPO can lower leakage relative to fixed nominal settings under demand uncertainty."
+    label: "HYPOTHESIS TO TEST"
+  - id: "H2"
+    text: "Lower leakage is NOT necessarily a better solution — leakage reduction can be confounded by demand starvation (DSR drop) and by PDA pressure feedback."
+    label: "VALIDATED FACT (established in Phase 5 experiments)"
+
+methodology:
+  approach: "Model-based DRL (PPO) on a fixed benchmark network simulated with WNTR/EPANET; environment-first, training deferred."
+  network_preserved: "126 junctions, 1 reservoir, 2 tanks, 168 pipes, 2 pumps, 8 PRVs"
+  simulation: "96 h EPS; hydraulic timestep 30 min; native rule timestep 180 s; RL/reporting candidate control interval 1800 s"
+  solver_config_non_negotiable:
+    ACCURACY: 1.0e-5
+    TRIALS: 2000
+    RULE_TIMESTEP_s: 180
+    CONTROL_REPORT_TIMESTEP_s: 1800
+    note: "Must be asserted after every load; must NOT be left to WNTR defaults."
+  demand_model_PDA:
+    required_pressure_psi: 20
+    minimum_pressure_psi: 0
+    pressure_exponent: 0.5
+    emitter_exponent: 0.5
+  service_junctions: "121 service-bearing junctions; 5 connector nodes (JUNCTION-105,-106,-109,-110,-128) excluded from service statistics explicitly in code"
+  actuators: "8 PRVs on dedicated valve links between paired artificial nodes; 2 pumps (PUMP-170, PUMP-172)"
+  emitter_law: "signed: q = sign(p) * C * |p|^0.5"
+  affinity_law: "h(q) = n^2*h0 - r*(q/n)^n_exp; max |residual| of any running operating point 8.62e-05 ft"
+  train_eval_separation: "train/val/test/OOD scenario split with fixed seeds and scenario IDs (planned, not yet implemented)"
+
+completed_work:
+  - "Phase 5 13-gate validation settled as FACT: G0 PASS, G1 PASS, G2 CHARACTERISED, G3 PASS, G4 PASS, G5 CONDITIONAL, G6 PASS, G7 PASS, G8 PASS, G9 PASS, G10 PASS, G11 PASS, G12 CONDITIONAL — no core gate FAILED"
+  - "Solver correctness established: ACCURACY is the dominant lever; 1e-5/2000 gives max imbalance ~0.0008 GPM vs shipped 0.005/40 giving 25.67 GPM while falsely reporting 0 errors"
+  - "Segmented-EPS three-part carry-forward proven: tank init_level + pump initial_status + options.time.pattern_start"
+  - "wntr.metrics.expected_demand shown to have two defects for segmented use (own time index; ignores pattern_start)"
+  - "Pump control semantics resolved: SETTING IS <speed> writes speed but does not reopen a shut pump; STATUS IS OPEN reopens but overwrites speed to 1.0; hold rate 1.72% without re-issue, 98.62% with"
+  - "Connector-node artefact characterised (5 junctions at elevation 0.0, zero base demand, extreme pressures)"
+  - "Leakage/starvation separation quantified: at all-PRV x0.25, 99.67% of inflow drop is unserved demand, 3.39% is leakage saving, DSR 0.7596"
+  - "Confound X2 (PDA feedback raises downstream pressure under curtailment) identified"
+  - "AI-knowledge backup: 20 authored docs + backup directories written to docs/ai-knowledge/"
+
+active_work:
+  - "Completing the portable AI-knowledge backup (PART V/Y/U finalization + owed corrections + PART Z verification)"
+
+blocked_work:
+  - task: "STEP 11 — implement src/env/ 8 modules and run any Gymnasium/SB3 code"
+    blocker: "gymnasium, stable-baselines3, torch are ABSENT from .venv — hard blocker; must pin and install"
+  - task: "STEP 12 — the 16 automated tests"
+    blocker: "tests/ directory is empty; env not yet implemented"
+  - task: "STEP 13 — SB3 PPO smoke test"
+    blocker: "depends on env + SB3 install; scientific PPO training explicitly forbidden this phase"
+
+decisions:
+  - id: "D-solver"
+    decision: "Lock ACCURACY=1e-5, TRIALS=2000, rule 180 s, control/report 1800 s; assert after every load"
+    label: "ENGINEERING DECISION"
+  - id: "D-service-nodes"
+    decision: "Compute service statistics over the 121 service-bearing junctions only; exclude the 5 connector nodes explicitly in code"
+    label: "ENGINEERING DECISION"
+  - id: "D-pump-restore"
+    decision: "Pump status carry-forward requires explicit STATUS handling; SETTING alone will not reopen a shut pump"
+    label: "VALIDATED FACT"
+  - id: "D-dual-cadence"
+    decision: "Statistics on the 1800 s / 193-instant frame; 180 s interior rows used only to detect rule firings"
+    label: "ENGINEERING DECISION"
+  - id: "D-valve179"
+    decision: "VALVE-179 never exposed as unconstrained continuous action; hard-clamp <= 44.7 psi if actuated; fine-characterise 40-50 psi in 1 psi steps"
+    label: "ENGINEERING DECISION"
+  - id: "D-bounds-from-measurement"
+    decision: "All actuator bounds derived from measurement, never chosen arbitrarily"
+    label: "ENGINEERING DECISION"
+  - full_record: "See DECISIONS.md for the complete decision log with evidence, alternatives and uncertainty."
+
+findings:
+  summary: "See FINDINGS.md and EXPERIMENTS.md for exact numerical results."
+  key:
+    - "Shipped 0.005/40 solver config reports 0 errors while max instantaneous imbalance is 25.6669 GPM; 58/193 states over threshold"
+    - "Signed emitter law matches engine at JUNCTION-126 (p=-5.731 psi): engine -0.6416 GPM = signed law; pressure-clipped law gives 0.0"
+    - "Connector-node pressures: mean 103.7944 (126 nodes) vs 94.7867 psi (121); max 507.7488 at JUNCTION-106 vs 288.2206 at JUNCTION-34"
+    - "PRV nominal states: 173 Active, 174 Closed, 175 Active, 176 Active, 177 Active, 178 Active, 179 Closed, 180 Closed"
+    - "Pump shut-off speeds (measured feasible range): PUMP-170 0.8152, PUMP-172 0.7655 — bounds are NOT 0.5-1.1"
+
+experiments:
+  location: "results/phase5/ (scratch in results/phase5/_tmp, 459 MB / 3963 files, excluded from backup)"
+  detail: "See EXPERIMENTS.md for exact numerical findings (segmented vs monolithic simulation, pattern timing, pump carry-forward, pressure-dominance partial order, leakage/starvation separation, affinity-law residuals)."
+
+failed_approaches:
+  detail: "See FAILED_APPROACHES.md."
+  key:
+    - "Trusting WNTR default solver accuracy — silently wrong (0 reported errors, large imbalance)"
+    - "Pressure-clipped emitter law — wrong sign/magnitude at sub-atmospheric nodes; use signed law"
+    - "wntr.metrics.expected_demand for segmented EPS — two defects; must rebuild demand with pattern_start"
+    - "SETTING IS <speed> to restore a pump — does not reopen; needs STATUS IS OPEN (which then overwrites speed to 1.0)"
+    - "Including connector nodes in service statistics — contaminates pressure metrics"
+
+unresolved_questions:
+  - "Option A/B/C for the G12 pump-persistence fix not yet finalized (evaluate on 8 criteria, choose ONE primary; no silent rule removal)"
+  - "Absolute vs delta action formulation not yet selected"
+  - "Reward metric scales not yet measured; weighting deferred until scales known"
+  - "Why the Phase 5/6/backup briefs are absent from history.jsonl (recoverable from transcript 32df42f5)"
+  - "EPyT/EPANET 2.3.05 never cross-validated against WNTR-bundled EPANET 20200"
+
+risks:
+  - "Silent scientific-meaning change from a small code edit (reward term, normalization, bound, simulator param) — treat all as research-impacting"
+  - "Reward hacking / unintended incentives once PPO trains (leakage down via demand starvation)"
+  - "Data leakage of future information into observation or action mapping"
+  - "Simulator artefacts (connector nodes, solver accuracy) contaminating metrics"
+  - "Missing DRL dependencies (gymnasium/SB3/torch) blocking implementation"
+
+constraints:
+  - "NO scientific PPO training in Phase 6 (smoke test only)"
+  - "Solver config non-negotiable; assert after every load"
+  - "Benchmark topology and actuator topology frozen; only sanctioned .inp patch is Quality Chemical TIME -> mg/L on the working copy"
+  - "No silent rule removal"
+  - "Do not delete or auto-include inactive PRVs without investigation"
+  - "VALVE-179: no unconstrained continuous action; hard-clamp <= 44.7 psi"
+  - "No arbitrary actuator bounds — derive from measurement"
+  - "No future information leakage into observation/action mapping"
+  - "Label every decision as exactly one of VALIDATED FACT / ENGINEERING DECISION / RESEARCH ASSUMPTION / HYPOTHESIS TO TEST — do not mix"
+  - "Priority hierarchy: scientific validity > approved scope > project decisions > convenience; surface conflicts, never resolve silently"
+
+dependencies:
+  present:
+    - "Python venv: D:\\Thesis\\.venv\\Scripts\\python.exe"
+    - "WNTR 1.5.0 (bundled EPANET DLL 20200)"
+    - "EPyT 2.3.5.2 (EPANET 2.3.05) — installed, not cross-validated"
+    - "git (3 commits on main)"
+  missing_hard_blockers:
+    - "gymnasium (pinned) — ABSENT"
+    - "stable-baselines3 (pinned) — ABSENT"
+    - "torch (pinned) — ABSENT"
+  external_capabilities_used:
+    - "WebSearch (built-in) — ~52 calls in recorded window"
+    - "WebFetch (built-in) — ~44 calls"
+  mcp_servers: "NONE configured or used anywhere in Claude Code"
+
+important_files:
+  original_benchmark: "D:\\Thesis\\data\\networks\\BWSN_Network_1.inp (untouched original)"
+  working_copy: "D:\\Thesis\\data\\networks\\working\\BWSN_Network_1_working.inp (only patch: Quality Chemical TIME -> mg/L)"
+  constitution: "D:\\Thesis\\CLAUDE.md (Research Engineering Constitution, 23 sections)"
+  proposal_pdf: "D:\\Thesis\\proposal\\proposal.pdf (952351 B; text at session-backup/.../prop_def.txt)"
+  seminar_pdf: "D:\\Thesis\\seminar\\seminar.pdf (3620347 B; text at session-backup/.../sem_def.txt)"
+  planned_env_modules: "src/env/{bwsn_env,epanet_adapter,state_builder,action_mapper,safety,reward,demand_scenarios,metrics}.py (NOT yet created)"
+  tests_dir: "tests/ (empty; 16 tests planned)"
+  key_transcript: "session-backup/claude-code-transcripts--D--Thesis/32df42f5-06e0-4c73-91f0-0a6aea86fc15.jsonl (12.4 MB; only source for Phase 5/6/backup briefs)"
+  backup_root: "D:\\Thesis\\docs\\ai-knowledge\\"
+
+important_skills:
+  project_skills:
+    - "research-review (4 project Skills in .claude/skills/; only formal dispatch recorded)"
+    - "methodology-review"
+    - "novelty-check"
+    - "change-impact"
+  note: "See SKILLS_INDEX.md. Five distinct Skill storage systems exist on the machine; the ARS symlink skills/ dir checked out as plain text files on Windows."
+
+important_plugins:
+  plugins:
+    - "academic-research-skills (ARS) — most-loaded plugin (214+90 loads) but ZERO /ars-* commands ever run"
+    - "superpowers (.kimi-plugin mapping table documents WebFetch -> FetchURL pattern)"
+    - "document-skills"
+  note: "See PLUGINS_INDEX.md. Two independent plugin systems: Claude Code and Claude Desktop."
+
+important_integrations:
+  mcp: "NONE used. Two Claude Desktop plugin .mcp.json files exist (pdf-viewer 1 stdio server; engineering 10 HTTP servers, 2 with empty urls) — never used in this project."
+  runnable_without_credentials: "npx -y @modelcontextprotocol/server-pdf --stdio (pdf-viewer; never used here)"
+  note: "See MCP_AND_INTEGRATIONS.md. All credentials recorded as SECRET PRESENT — NOT EXPORTED."
+
+current_next_steps:
+  backup:
+    - "Apply owed corrections to SESSION_HISTORY.md, MEMORY_BACKUP.md, CLAUDE_ENVIRONMENT.md, INDEX.md"
+    - "Re-measure docs/ai-knowledge/ and fix INDEX.md totals"
+    - "Run PART Z 17-point verification; report the 17 FINAL OUTPUT items"
+  phase6_after_backup:
+    - "STEP 5-6: choose absolute vs delta action; derive all active-PRV bounds and pump-speed bounds from measurement"
+    - "STEP 7: observation design + deterministic normalisation (no future info)"
+    - "STEP 8: measure reward metric scales, then weight; re-derive pump energy under Option C first"
+    - "STEP 9: safety/action-mapping layer with runtime detection; VALVE-179 hard-clamp"
+    - "STEP 10: demand uncertainty, train/val/test/OOD split, seeds, scenario IDs"
+    - "STEP 11: install pinned gymnasium/stable-baselines3/torch; implement src/env/ 8 modules"
+    - "STEP 12: 16 automated tests; STEP 13: SB3 PPO smoke test only"
+    - "STEP 14: freeze specification; STEP 15: Phase 6 report, deliverables A-J, decision table, formalisation, single verdict"
+  carried_debts:
+    - "Correct proposal's Hu MARL citation to Water Supply 23(7):2833, doi 10.2166/ws.2023.163"
+    - "Re-verify Negm Table 5-4 directly from the PDF before citing"

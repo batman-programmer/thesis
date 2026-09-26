@@ -63,14 +63,16 @@ FAILED_APPROACHES.md, CODEBASE_MAP.md.
 | `skills-backup/` | 4 project skills + 11 Claude Desktop skills, verbatim | 4.1 MB |
 | `plugins-backup/` | 5 full plugin source trees, verbatim | 52 MB |
 | `mcp-backup/` | The 2 `.mcp.json` files that exist on the machine | 5 KB |
-| `commands-backup/` | 18 slash-command definition files | 54 KB |
+| `commands-backup/` | 20 slash-command definition files | 54 KB |
 | `hooks-backup/` | Both plugins' hook configs **and** their hook scripts | 35 KB |
-| `agents-backup/` | 39 subagent definition files | 1.4 MB |
-| `session-backup/` | 14 Claude Code transcripts, 10 paste-cache prompts, 98-entry prompt history, 2 root `.txt` transcripts | 20 MB |
-| `config-backup/` | 9 configuration files (1 redacted) | 61 KB |
+| `agents-backup/` | 45 agent/subagent definition files (42 under academic-research-skills `agents/`, 3 document-skills skill-creator) | 1.2 MB |
+| `session-backup/` | 14 thesis Claude Code transcripts + 5 non-thesis Code transcripts, 2 Claude Desktop transcripts (+ their audit logs), 10 paste-cache prompts, 98-entry prompt history, 2 root `.txt` transcripts | 23.0 MB |
+| `config-backup/` | 11 configuration files (1 redacted) **plus** a 4-file Desktop usage-ledger | 58 KB |
 | `_backup_tools/` | `mk_session_aux.py` — the script that generated two of the session-backup files, kept so extraction is reproducible not asserted | 3 KB |
 
-**Total: 661 directories, 2871 files, ~77 MB.**
+**Total: 672 directories (including the backup root), 2 919 files, ~75 MB.**
+Re-measured 2026-09-26 after the 5 non-thesis Code transcripts were copied in
+(exact: 78 626 331 bytes).
 
 ---
 
