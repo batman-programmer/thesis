@@ -158,3 +158,156 @@ RESEARCH ASSUMPTION · HYPOTHESIS TO TEST · DECISION REQUIRED.
 - **Next action:** researcher approval of D-P6-003 (and D-P6-002 pump upper bound);
   confirm D-P6-001 (absolute encoding); then STEP 7 observation/state design.
 
+---
+
+## WU-5 — STEP 6 decision review (four-question methodological brief) (2026-09-27, current session)
+
+- **Objective:** Answer four researcher questions before bound approval —
+  (1) VALVE-173 authority/dead-zone, (2) PRV upper-bound policy (nominal vs
+  headroom), (3) pump upper bound (1.0 vs 1.10), (4) absolute vs delta action.
+  NO re-run, NO freeze, NO action-space modification.
+- **Starting state:** STEP 6 accepted as complete; D-P6-003 PROPOSED/PENDING.
+- **Evidence inspected (existing files only):** `p6_s6_active_prv_bounds.json`
+  (per-valve full sweeps, high_side_regulation, actuator_authority),
+  `results/phase5/g3_pump_speed.json` (feasible_speed_bounds, response_summary).
+- **Action taken:** Extracted exact per-setpoint measured values; produced the
+  four-question decision brief; recorded a decision-review addendum in
+  PHASE6_DECISION_REGISTER.md.
+- **Result (measured highlights):** 173 fully closed (0 gpm) for 5–50 psi, first
+  active at 60 psi, saturates at 110 → ~77% dead-zone within proposed [5,70],
+  authority 0.279 gpm. VALVE-176 recovers service above nominal (n<20 386→193 at
+  ≥35 psi) at +leakage; the other four only add leakage above nominal. Pump: 1.10
+  measured feasible, 1.0 is a design choice. Native STATUS reset to speed 1.0 makes
+  absolute encoding the robust choice.
+- **Decision:** review recommendations recorded (173→regulating range B + ablation;
+  PRV upper→headroom ceiling with reward-side trade-off; pump upper consistent with
+  PRV policy; absolute confirmed). All PENDING researcher approval.
+- **Decision class:** DECISION REQUIRED (researcher). No VALIDATED FACT changed.
+- **Files changed:** docs/PHASE6_DECISION_REGISTER.md, docs/PHASE6_EXECUTION_LOG.md,
+  PROJECT_STATE.yaml (session checkpoint only). No script, no result JSON, no env.
+- **Tests:** none (analysis only; no simulation re-run).
+- **Risks/caveats:** review SUPERSEDES the earlier "upper = nominal" leaning
+  (Q2); the proposed-bounds table in the JSON is unchanged and still records
+  [service-clean lower, nominal] — it is NOT frozen and will be reconciled only
+  after the researcher chooses the upper-bound policy.
+- **Next action:** await researcher decisions on Q1–Q4; then reconcile D-P6-003 and
+  proceed to STEP 7.
+
+---
+
+## WU-6 — STEP 6 terminology/evidence clarification + focused VALVE-173 low-side refinement (2026-09-27, current session)
+
+- **Objective:** Before bound approval, tighten the PRV upper-bound terminology
+  (item 1), resolve the one unmeasured VALVE-173 coarse-grid gap (item 2), and
+  narrow the over-general cross-actuator claim (item 3) — then present a final
+  per-PRV decision table (item 4). NO full STEP 6 re-run, NO freeze, NO APPROVED.
+- **Starting state:** D-P6-003 PROPOSED/PENDING. STEP 6 JSON records A/B/C domains
+  but earlier prose called the four non-173 grid caps a "regulation ceiling"; the
+  VALVE-173 coarse grid jumped 50→60 psi (no data in the open interval); the
+  cross-actuator note read "jointly sufficient at the most aggressive tested corner".
+- **Evidence inspected:** `results/phase6/p6_s6_active_prv_bounds.json` (per-valve
+  `high_side_regulation`, `frac_time_active/open/closed`, `observed_domain_psi`,
+  `cross_actuator_joint_lower_corner`); `src/validation/p6_s6_active_prv_bounds.py`
+  and `p6_s3_prv_finechar.py` (`run_case`/`measure`/`build`/`service_nodes`
+  machinery reused).
+- **Action taken:** (a) Extracted the precise A/B/C values from disk; confirmed only
+  VALVE-173 has an OBSERVED Active→Open transition (Active through 100, Open at 110);
+  175/176/177/178 remain Active at their 2×nominal grid cap → true Open ceiling
+  UNTESTED. (b) Wrote and ran `src/validation/p6_s6b_v173_lowside_refine.py` — a
+  focused sweep of VALVE-173 ONLY across 50..60 psi (integer grid, refined to
+  0.25 psi around the activation crossings), other four PRVs + both pumps at nominal,
+  identical solver/PDA/leak instrument; wrote a NEW file (STEP 6 JSON preserved, §12).
+  (c) Rewrote the cross-actuator claim to the single tested corner and flagged mixed
+  corners/interior as a future STEP-9/STEP-12 test.
+- **Exact setpoints evaluated (n=14):** 50, 51, 52, 53, 54, 54.25, 54.5, 54.75, 55,
+  56, 57, 58, 59, 60 psi (+ reference nominal).
+- **Result (measured; reference reproduced EXACTLY: 386 <20psi, 0 neg, 84.730 gpm):**
+  - VALVE-173 is fully CLOSED (0.00 gpm, frac_active=0, frac_closed=1.0) at every
+    setpoint **≤ 54.25 psi**, and flips fully ACTIVE (frac_active=1.0, 4.441 gpm) at
+    **54.5 psi** — a sharp 0.25 psi step, NO partial-activation zone.
+  - **last definitely closed = 54.25 psi; first definitely active = 54.5 psi;
+    practical regulating lower edge = 54.5 psi.**
+  - Across the whole (50,60] range: min service pressure flat at 4.165 psi, n<20psi
+    = 386 (0 new violations), 0 negative, leakage nearly flat (84.451 gpm closed →
+    84.554 gpm at 60) — the low side of VALVE-173 is safe but nearly inert.
+  - The repo now SUPPORTS a ~55 psi lower bound for 173 (measured 54.5), which the
+    earlier coarse grid did NOT.
+- **A/B/C corrected terminology (item 1):** A = highest tested no-negative setpoint
+  {173:110, 175:110, 176:59.524, 177:90, 178:74}; B = highest tested REGULATING
+  setpoint {173:100, 175:110, 176:59.524, 177:90, 178:74}; C = observed Active→Open
+  onset {173:110; 175/176/177/178 = UNTESTED, still Active at cap}. The caps for the
+  four non-173 valves are **highest tested regulating setpoints, not demonstrated
+  ceilings.**
+- **Cross-actuator claim (item 3), narrowed:** the joint run tested ONE corner only
+  (all five at proposed lowers, 173=5/175=21.5/176=20/177=20/178=20) and was
+  service-clean there. That validates that single corner — NOT the whole 5-D box.
+  Mixed corners, interior points, and pump+stochastic-demand combinations are
+  UNTESTED → future STEP-9 safety-layer / STEP-12 joint-safety test. The tested
+  corner also used 173=5 (closed); re-scoping 173's lower to ≥54.5 changes it.
+- **Failures / negatives NOT hidden (§7/§12):** VALVE-173 remains a weak actuator
+  (≈4.4–4.5 gpm flow, ~0.1 gpm leakage span across (50,60]); its [5,70] proposal
+  carries a ~70% closed dead-zone. No negative pressure and no new <20 psi violation
+  anywhere in this refinement (as expected for a near-inert valve).
+- **Decision:** Propose re-scoping VALVE-173's DRL domain to its measured regulating
+  range **[54.5, 100]**; keep A/B/C terminology precise; keep the cross-actuator
+  claim to the single tested corner. All PROPOSED — PENDING APPROVAL.
+- **Decision class:** VALIDATED FACT (step6b measurements + A/B/C extraction) +
+  ENGINEERING DECISION (proposed 173 re-scope) + DECISION REQUIRED (researcher
+  approval; nothing frozen).
+- **Files changed:** src/validation/p6_s6b_v173_lowside_refine.py (new);
+  results/phase6/p6_s6b_v173_lowside_refine.json (new); PROJECT_STATE.yaml;
+  docs/PHASE6_DECISION_REGISTER.md; docs/PHASE6_EVIDENCE_INDEX.md; docs/RECOVERY.md;
+  docs/PHASE6_EXECUTION_LOG.md. **p6_s6_active_prv_bounds.json NOT overwritten (§12).**
+- **Tests:** py_compile clean; reference nominal reproduced exactly (386/0/84.730);
+  all 14 setpoints solver-clean, continuity residual < 1e-3, 0 negative, 0 new <20psi.
+- **Risks/caveats:** leak instrument uncalibrated (R3); single-corner joint result
+  not generalizable (R1b); VALVE-173 weak-actuator hypothesis stands; bounds PROPOSED,
+  NOT frozen; D-P6-003 NOT APPROVED.
+- **Next action:** researcher approval of the clarified D-P6-003 (173 re-scope +
+  per-valve upper-bound policy) and D-P6-002 (pump upper); confirm D-P6-001; STEP 7.
+
+---
+
+## WU-7 — Action-space APPROVAL persisted + spec + git checkpoint (2026-09-27, current session)
+
+- **Objective:** Persist the researcher's explicit approval of the DRL action space
+  (D-P6-001 encoding, D-P6-002 pump bounds, D-P6-003 PRV set + bounds), create the
+  frozen action-space specification, and git-checkpoint it as a SEPARATE commit
+  BEFORE any STEP 7 work (per the ACTION-SPACE approval instruction §8–§10).
+- **Starting state:** D-P6-001/002/003 were PROPOSED/REVIEWED but PENDING; no
+  `docs/PHASE6_ACTION_SPACE_SPEC.md`; PROJECT_STATE `action_space.status` not frozen.
+- **Approval received (researcher, 2026-09-27):**
+  - D-P6-001 = ABSOLUTE encoding; `a_i ∈ [-1,1]`;
+    `physical_i = lower_i + ((a_i + 1)/2)*(upper_i - lower_i)`. Delta = separate future ablation.
+  - D-P6-003 PRV bounds (psi): 173 [54.5,100.0]; 175 [21.5,110.0]; 176 [20.0,59.524];
+    177 [20.0,90.0]; 178 [20.0,74.0]. Controlled {173,175,176,177,178}; excluded
+    {174,179,180} KEEP in the hydraulic model; 179 stays excluded (safety-critical).
+  - D-P6-002 pump bounds (rel speed): PUMP-170 [0.82,1.10]; PUMP-172 [0.77,1.10].
+  - Pump strategy = keep native STATUS rules, agent controls SPEED only, re-issue
+    speed each control step; commanded vs realized vs status kept explicit.
+- **Action taken:** Flipped D-P6-001/002/003 headers + Status/Approval lines to
+  APPROVED 2026-09-27 in the decision register and appended a consolidated APPROVAL
+  section (exact values + PROPOSED→REVIEWED→APPROVED provenance, proposed history
+  retained, NOT erased). Updated PROJECT_STATE.yaml (`action_space.approved` frozen
+  block, step5/step6 APPROVED, `state_space` → IN PROGRESS, session_checkpoint,
+  next_action). Created `docs/PHASE6_ACTION_SPACE_SPEC.md` (§9.1–§9.10 + the exact
+  ordered 7-element action vector). Updated EVIDENCE_INDEX and RECOVERY.
+- **Result:** Action space APPROVED & FROZEN on disk; reconstructable without chat.
+  Exact ordered vector: action[0..4] → VALVE-173/175/176/177/178 (psi);
+  action[5..6] → PUMP-170/172 (rel speed); action_dim 7; normalized box [-1,1]^7.
+- **Decision:** Freeze the action space; proceed to STEP 7 only after checkpoint.
+- **Decision class:** ENGINEERING DECISION (bounds/encoding) on VALIDATED FACT
+  (measured characterization); researcher-approved.
+- **Files changed:** docs/PHASE6_ACTION_SPACE_SPEC.md (new); PROJECT_STATE.yaml;
+  docs/PHASE6_DECISION_REGISTER.md; docs/PHASE6_EVIDENCE_INDEX.md; docs/RECOVERY.md;
+  docs/PHASE6_EXECUTION_LOG.md. NO result JSON overwritten; NO env/reward/PPO code.
+- **Tests:** doc/state consistency check — approved values equal the item-4
+  clarification table + step6b 173 lower edge (54.5); YAML tab-line scan clean.
+- **Risks/caveats:** joint 5-D box safety still UNTESTED (R1b); leak instrument
+  uncalibrated (R3); deps still missing (R4). Approval freezes per-actuator bounds
+  ONLY, not exhaustive joint safety.
+- **Git checkpoint:** commit `phase6: approve drl actuator action space` — hash
+  recorded here and in PROJECT_STATE.yaml / RECOVERY.md after the commit
+  (scratch `results/phase5/_tmp/*` deliberately excluded).
+- **Next action:** STEP 7 — DRL state/observation design (WU-8).
+

@@ -64,13 +64,49 @@ hard-safe & service-clean (B) / proposed (C). Bounds PROPOSED — PENDING APPROV
 | 176 service + proposed | proposed_bounds_table.VALVE-176 | svc [20,59.524]; PROPOSED [20,29.762]; save 0.746% | service transition 19.75->20.0 |
 | 177 domains + authority | proposed_bounds_table.VALVE-177 / per_valve | obs/safe [5,90], svc [20,90]; PROPOSED [20,45]; flow 20.61 gpm; save 0.408% | no negative to 5 psi; service transition 19.75->20.0 |
 | 178 domains + authority | proposed_bounds_table.VALVE-178 / per_valve | obs/safe [5,74], svc [20,74]; PROPOSED [20,37]; flow 39.24 gpm; save 0.245% | no negative to 5 psi; service transition 19.75->20.0 |
-| Joint lower-corner safe | cross_actuator_joint_lower_corner | 0 neg, 0 new <20psi, min 4.190 psi, leak 81.383 gpm (−3.347) | per-valve box constraints jointly sufficient at aggressive corner |
+| Joint lower-corner safe (ONE corner) | cross_actuator_joint_lower_corner | 0 neg, 0 new <20psi, min 4.190 psi, leak 81.383 gpm (−3.347) | validates ONLY the single all-PRVs-at-proposed-lowers corner; NOT the whole 5-D box (mixed corners/interior UNTESTED → STEP-9/STEP-12) |
 | Bounds are asymmetric | proposed_bounds_table.* | one-sided [svc-lower, nominal], differ per valve | no shared %-band (§7 satisfied) |
+
+## STEP 6b — focused VALVE-173 low-side refinement (D-P6-003 evidence; NEW file)
+
+All rows from `results/phase6/p6_s6b_v173_lowside_refine.json`. Focused refinement of
+the single unmeasured (50,60] coarse-grid bracket; `p6_s6_active_prv_bounds.json`
+NOT overwritten (§12). Bounds still PROPOSED — PENDING APPROVAL.
+
+| Claim | Section/Key | Result | Interpretation |
+|---|---|---|---|
+| Reference reproduced | reference_nominal_case | 386 <20psi, 0 neg, mean 94.787, leak 84.730 | step6b anchored to the same reference; reproducibility confirmed |
+| 173 last closed / first active | derived | last fully closed 54.25 psi; first active 54.5 psi; bracket width 0.25 | sharp closed→active step; no partial-activation zone |
+| 173 practical regulating lower edge | derived.practical_regulating_lower_edge_psi | 54.5 psi | repo now supports ~55 psi lower bound (was unmeasured 50→60) |
+| 173 low side safe but inert | sweep[] | (50,60]: min 4.165 psi, n<20=386 (0 new), 0 neg, leak 84.451→84.554 | weak actuator; safe; ~0.1 gpm leakage span across the bracket |
+| A/B/C corrected | activity_definitions + p6_s6 high_side_regulation | A{173:110,175:110,176:59.524,177:90,178:74}; B{173:100, others=cap}; C{173:110 observed, others UNTESTED} | only 173 has an observed Active→Open onset; the four caps are "highest tested regulating", not ceilings |
+
+## Approved action space (D-P6-001/002/003, APPROVED 2026-09-27)
+
+Spec: `docs/PHASE6_ACTION_SPACE_SPEC.md`. Register: APPROVAL section of
+`docs/PHASE6_DECISION_REGISTER.md`. State: `PROJECT_STATE.yaml :: action_space.approved`.
+The approved *values* are an ENGINEERING DECISION built on the VALIDATED-FACT
+measurements already indexed above; this section maps each approved value to that
+underlying evidence.
+
+| Approved item | Value | Evidence backing the value |
+|---|---|---|
+| Encoding (D-P6-001) | ABSOLUTE; `a_i∈[-1,1]`; `physical_i = lower_i + ((a_i+1)/2)*(upper_i-lower_i)` | p6_s4_pump_strategy.json (native STATUS resets speed→1.0 ⇒ absolute robust); ENGINEERING DECISION |
+| PRV set | {173,175,176,177,178}; exclude {174,179,180} (kept in model) | p6_s3_prv_finechar.json, p6_s3b_v179_refine.json, p6_s3c_zone_interaction.json |
+| VALVE-173 bounds | [54.5, 100.0] psi | p6_s6b_v173_lowside_refine.json (first-active 54.5); p6_s6 high_side_regulation (Active→Open 100→110) |
+| VALVE-175 bounds | [21.5, 110.0] psi | p6_s6_active_prv_bounds.json (svc 21.5; cap 110 still Active) |
+| VALVE-176 bounds | [20.0, 59.524] psi | p6_s6_active_prv_bounds.json (svc 20; neg-cliff <=12.75; cap 59.524) |
+| VALVE-177 bounds | [20.0, 90.0] psi | p6_s6_active_prv_bounds.json (svc 20; cap 90 still Active) |
+| VALVE-178 bounds | [20.0, 74.0] psi | p6_s6_active_prv_bounds.json (svc 20; cap 74 still Active) |
+| Pump bounds (D-P6-002) | PUMP-170 [0.82,1.10]; PUMP-172 [0.77,1.10] | g3_pump_speed.json (shut-off 0.8152/0.7655; feasible to 1.10) |
+| Pump strategy | SPEED only, re-issue each step; native STATUS kept | p6_s4_pump_strategy.json (speed_hold 0.9862 vs 0.0172) |
+| Upper-bound terminology | 175/176/177/178 uppers = highest tested REGULATING, NOT ceilings | p6_s6b_v173 activity_definitions; p6_s6 high_side_regulation (four caps still Active) |
+| Joint-box safety | single lower-corner only; NOT exhaustive | p6_s6 cross_actuator_joint_lower_corner (ONE corner) → STEP-9/12 |
 
 ## Still-missing evidence (drives next action)
 
 | Needed claim | Why missing | How to obtain |
 |---|---|---|
-| Researcher approval of proposed PRV bounds | D-P6-003 is characterization only | explicit approval (§14) — then freeze |
-| Pump upper bound policy | D-P6-002 open | researcher choice 1.0 vs 1.10 |
-| Observation/state design | STEP 7 not started | STEP 7 |
+| Joint 5-D action-box safety (mixed corners/interior/pump+demand) | only single lower-corner tested (R1b) | STEP 9 safety layer + STEP 12 automated joint tests |
+| Leak calibration | instrument uncalibrated (R3) | out of Phase 6 scope; relative response only |
+| Observation/state design | STEP 7 IN PROGRESS | STEP 7 → docs/PHASE6_STATE_SPEC.md + results/phase6/p6_s7_*.json |
