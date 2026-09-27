@@ -331,18 +331,18 @@ dependencies:
 
 git:
   branch: "main"
-  head_commit: "a9654c2"
-  head_subject: "phase6: compare reward formulations"
+  head_commit: "56db0e5"
+  head_subject: "phase6: prepare D-P6-005 reward decision brief"
   recent_commits:
+    - "56db0e5 phase6: prepare D-P6-005 reward decision brief"
+    - "262b738 phase6: record reward-formulation-comparison commit hash (checkpoint)"
     - "a9654c2 phase6: compare reward formulations"
     - "0d7dc1a phase6: record STEP 8 commit hash in PROJECT_STATE (checkpoint)"
     - "a2fab2e phase6: add STEP 8 reward-component scale analysis (D-P6-005, PROPOSED)"
     - "0cd7f2e phase6: approve observation specification (D-P6-004 APPROVED & FROZEN)"
     - "8b66147 phase6: record STEP 7 commit hash in PROJECT_STATE (checkpoint)"
     - "f7ce429 phase6: add STEP 7 DRL observation/state design (D-P6-004, PROPOSED)"
-    - "6c34ab9 phase6: record action-space approval commit hash (checkpoint B)"
-    - "e91c363 phase6: approve drl actuator action space (action-space APPROVAL checkpoint A)"
-  working_tree_note: "results/phase5/_tmp/ scratch (~600 files) + src/**/__pycache__/*.pyc left untracked (pre-existing debt, deliberately NOT committed). STEP 8 comparison (WU-10) commit a9654c2 staged only the 9 explicit deliverable + doc paths (generator, JSON, tests, 5 tracking docs + this file)."
+  working_tree_note: "results/phase5/_tmp/ scratch (~600 files) + src/**/__pycache__/*.pyc left untracked (pre-existing debt, deliberately NOT committed). WU-11 D-P6-005 decision brief commit 56db0e5 staged only the 9 explicit deliverable + doc paths (generator, JSON, test, brief MD, and 5 tracking docs incl. this file); a checkpoint commit records 56db0e5's hash."
   next_commit_subject: "phase6: (STEP 9 safety clamp OR D-P6-005 formulation selection — awaiting researcher)"
 
 
