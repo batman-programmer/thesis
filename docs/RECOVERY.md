@@ -8,8 +8,10 @@ chat.**
 Last updated: 2026-09-27 (UTC) by Claude Opus 4.8. **Action space APPROVED & FROZEN
 2026-09-27 (D-P6-001/002/003); STEP 7 observation design APPROVED & FROZEN 2026-09-27
 (D-P6-004, observation_dim=139); STEP 8 (reward design — MEASURE component scales, do
-NOT train) MEASUREMENT COMPLETE 2026-09-27 (D-P6-005 PROPOSED — formulation & weights
-NOT selected).**
+NOT train) MEASUREMENT COMPLETE 2026-09-27 (WU-9), FORMULATION COMPARISON COMPLETE
+2026-09-27 (WU-10, evidence only), and D-P6-005 DECISION BRIEF PREPARED 2026-09-27
+(WU-11). D-P6-005 remains PROPOSED / DECISION PENDING RESEARCHER — formulation & weights
+NOT selected; researcher_selection=null.**
 
 ---
 
@@ -149,8 +151,20 @@ Source `results/phase5/g3_pump_speed.json`:
   ~4.17 psi); leak-only → `prv_lower_pump_lower` (min svc 1.295 psi); hard-20-psi terms
   (F2/F4@20) fire on the native baseline (2 chronic <20 nodes) → ill-posed; θ=0 never
   fires but permissive; leak-term dynamic range 0.108 vs unit max-move cost 1.0. NO winner
-  selected. NEXT: researcher selects ONE formulation + weights (resolves D-P6-005). Do NOT
-  choose final weights, do NOT start PPO.
+  selected. **STEP 8 D-P6-005 DECISION BRIEF also done (WU-11, 2026-09-27):** WU-9 + WU-10
+  evidence converted into a decision-ready brief so the researcher can select ONE formulation
+  + parameters. On disk: `docs/PHASE6_D_P6_005_DECISION_BRIEF.md` (11 sections, researcher
+  decision block BLANK), `src/validation/p6_d_p6_005_decision_brief.py` (pure aggregator —
+  no EPANET/PPO/RNG; deterministic regeneration byte-reproduces the JSON),
+  `results/phase6/p6_d_p6_005_decision_brief.json` (**researcher_selection=null**),
+  `tests/test_decision_brief.py` (63/63 full battery). FOUR "PROVISIONAL CANDIDATE — NOT
+  APPROVED" parameterizations traced to measured scales (C-A/C-B F1 with w_A=0.1 from the
+  measured 0.108 leak range, C-C F3 baseline-relative, C-D dense-deficit + negative-only hard
+  gate); chronic-baseline finding: a HARD absolute 20-psi reward constraint is ILL-POSED
+  (frac_ts_any_node_below_20psi=1.0 on the native baseline) → use dense deficit / worst-node /
+  baseline-relative / negative-only gate at reward level, and leave the enforced 20-psi
+  guarantee to STEP-9. NO formulation selected/scored/ranked. NEXT: researcher completes the
+  decision block (resolves D-P6-005). Do NOT choose final weights, do NOT start PPO.
 - STEP 9 safety layer, STEP 10 demand uncertainty/splits: NOT STARTED.
   STEP-9 must hard-clamp to the approved bounds.
 - STEP 11 `src/env/` (8 modules) + STEP 12 `tests/` (16 tests) + STEP 13 SB3
@@ -204,6 +218,18 @@ result is written to `results/phase6/` as JSON (raw + summary + interpretation).
   D-P6-005 but does NOT resolve it — no formulation is selected/scored/ranked, no weights
   tuned, no STEP-9 clamp added, no PPO trained. Re-run only if the leak instrument, solver
   policy, action bounds, or 121-service-node set changes.
+- **DO NOT** re-run the STEP 8 D-P6-005 decision-brief aggregator
+  (`src/validation/p6_d_p6_005_decision_brief.py`) or rewrite
+  `docs/PHASE6_D_P6_005_DECISION_BRIEF.md` — the brief is on disk (WU-11, 2026-09-27:
+  `results/phase6/p6_d_p6_005_decision_brief.json` with **researcher_selection=null**, 63/63
+  tests). It is a PURE aggregator of WU-9 + WU-10 (no EPANET/PPO/RNG; deterministic
+  regeneration byte-reproduces the JSON), so re-running changes nothing unless those two
+  artefacts change. The FOUR candidate parameterizations are "PROVISIONAL CANDIDATE — NOT
+  APPROVED" — do NOT treat any as chosen. The brief PREPARES the D-P6-005 gate but does NOT
+  resolve it: no formulation selected/scored/ranked, no weights tuned. Do NOT fill in the
+  researcher's decision block, do NOT set researcher_selection, do NOT implement
+  `src/env/reward.py` (STEP 11) or a STEP-9 clamp, and do NOT start PPO — those await the
+  researcher's D-P6-005 selection.
 - **DO NOT** start scientific PPO training. A tiny smoke test is allowed ONLY after
   the env is implemented and validated, and only to prove the loop runs.
 - **DO NOT** auto-install gymnasium / stable_baselines3 / torch.

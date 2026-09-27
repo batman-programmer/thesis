@@ -1,0 +1,1322 @@
+{
+  "decision_id": "D-P6-005",
+  "status": "PROPOSED / DECISION PENDING RESEARCHER",
+  "generated_by": "src/validation/p6_d_p6_005_decision_brief.py (WU-11)",
+  "measures_nothing_new": true,
+  "no_epanet_no_ppo_no_selection": true,
+  "evidence_artifacts": {
+    "wu9_scale_analysis": "results/phase6/p6_s8_reward_scale_analysis.json",
+    "wu10_formulation_comparison": "results/phase6/p6_s8_reward_formulation_comparison.json",
+    "state_spec": "results/phase6/p6_s7_state_spec.json",
+    "reward_spec_doc": "docs/PHASE6_REWARD_SPEC.md",
+    "action_space_spec_doc": "docs/PHASE6_ACTION_SPACE_SPEC.md"
+  },
+  "frozen_constraints": {
+    "action_space": {
+      "decision": "D-P6-001/002/003 APPROVED & FROZEN",
+      "action_dim": 7,
+      "encoding": "ABSOLUTE a_i in [-1,1]; physical = lower + ((a+1)/2)*(upper-lower)",
+      "ordered_bounds": [
+        {
+          "index": 0,
+          "actuator": "VALVE-173",
+          "lower": 54.5,
+          "upper": 100.0,
+          "unit": "psi"
+        },
+        {
+          "index": 1,
+          "actuator": "VALVE-175",
+          "lower": 21.5,
+          "upper": 110.0,
+          "unit": "psi"
+        },
+        {
+          "index": 2,
+          "actuator": "VALVE-176",
+          "lower": 20.0,
+          "upper": 59.524,
+          "unit": "psi"
+        },
+        {
+          "index": 3,
+          "actuator": "VALVE-177",
+          "lower": 20.0,
+          "upper": 90.0,
+          "unit": "psi"
+        },
+        {
+          "index": 4,
+          "actuator": "VALVE-178",
+          "lower": 20.0,
+          "upper": 74.0,
+          "unit": "psi"
+        },
+        {
+          "index": 5,
+          "actuator": "PUMP-170",
+          "lower": 0.82,
+          "upper": 1.1,
+          "unit": "rel_speed"
+        },
+        {
+          "index": 6,
+          "actuator": "PUMP-172",
+          "lower": 0.77,
+          "upper": 1.1,
+          "unit": "rel_speed"
+        }
+      ],
+      "excluded_valves_kept_in_model": [
+        "VALVE-174",
+        "VALVE-179",
+        "VALVE-180"
+      ],
+      "pump_strategy": "SPEED only, re-issued each step; native STATUS rules intact"
+    },
+    "observation": {
+      "decision": "D-P6-004 APPROVED & FROZEN",
+      "observation_dim": 139,
+      "dtype": "float32",
+      "reward_must_not_modify_state": true
+    },
+    "service_node_policy": {
+      "n_service_junctions": 121,
+      "n_connector_junctions_excluded": 5,
+      "connector_nodes": [
+        "JUNCTION-105",
+        "JUNCTION-106",
+        "JUNCTION-109",
+        "JUNCTION-110",
+        "JUNCTION-128"
+      ]
+    },
+    "solver_policy": {
+      "accuracy": 1e-05,
+      "trials": 2000,
+      "rule_timestep_s": 180,
+      "report_timestep_s": 1800,
+      "pda_required_psi": 20.0,
+      "pda_minimum_psi": 0.0,
+      "pda_exponent": 0.5,
+      "asserted_after_every_load": true
+    }
+  },
+  "normalization_constants_frozen": {
+    "leak_ref_gpm": 84.72988433677985,
+    "req_ref_gpm": 906.3987348621764,
+    "deficit_ref_psi_nodesum": 28.671793365478514,
+    "power_ref_kw": 88.10062475649187,
+    "movement_L2sq_max": 28.0,
+    "note": "FIXED constants measured once (baseline reference run / this analysis) and frozen; NOT per-episode running statistics -> no train/eval leakage. deficit_ref guards against a ~0 baseline deficit by taking max(baseline mean, pooled p95)."
+  },
+  "normalization_constants_match_across_artifacts": {
+    "leak_ref_gpm": true,
+    "req_ref_gpm": true,
+    "deficit_ref_psi_nodesum": true,
+    "power_ref_kw": true,
+    "movement_L2sq_max": true
+  },
+  "candidate_formulations": [
+    {
+      "status": "PROPOSED",
+      "sign_convention": "reward is a NEGATIVE cost; higher (less negative) is better",
+      "time_aggregation": "per report timestep (1800 s); episode return = sum over the 193 report steps of a 96 h EPS. Reported here as per-step temporal statistics + per-config mean. No discounting applied in this measurement.",
+      "terminal_behavior": "fixed-horizon EPS, no early termination in Phase 6; a STEP-9 safety termination/clamp is NOT part of this measurement.",
+      "normalization_constants_used": {
+        "leak_ref_gpm": 84.72988433677985,
+        "req_ref_gpm": 906.3987348621764,
+        "deficit_ref_psi_nodesum": 28.671793365478514,
+        "power_ref_kw": 88.10062475649187,
+        "movement_L2sq_max": 28.0
+      },
+      "id": "F1",
+      "name": "normalized_weighted_sum",
+      "expression": "r_t = -w_L*(leak_t/leak_ref) - w_U*(unserved_t^+/req_ref) - w_P*(deficit_t/deficit_ref) - w_A*(||da_t||^2/L2sq_max) - w_E*(power_t/power_ref)",
+      "components": [
+        "leakage",
+        "unserved_demand",
+        "pressure_deficit",
+        "actuator_movement",
+        "pump_power(optional)"
+      ],
+      "clipping": "unserved clipped at >=0; da=0 for static holds",
+      "epsilon_handling": "all denominators are fixed nonzero constants",
+      "provisional_weights": {
+        "w_L": 1.0,
+        "w_U": 1.0,
+        "w_P": 1.0,
+        "w_A": 1.0,
+        "w_E": 0.0
+      }
+    },
+    {
+      "status": "PROPOSED",
+      "sign_convention": "reward is a NEGATIVE cost; higher (less negative) is better",
+      "time_aggregation": "per report timestep (1800 s); episode return = sum over the 193 report steps of a 96 h EPS. Reported here as per-step temporal statistics + per-config mean. No discounting applied in this measurement.",
+      "terminal_behavior": "fixed-horizon EPS, no early termination in Phase 6; a STEP-9 safety termination/clamp is NOT part of this measurement.",
+      "normalization_constants_used": {
+        "leak_ref_gpm": 84.72988433677985,
+        "req_ref_gpm": 906.3987348621764,
+        "deficit_ref_psi_nodesum": 28.671793365478514,
+        "power_ref_kw": 88.10062475649187,
+        "movement_L2sq_max": 28.0
+      },
+      "id": "F2",
+      "name": "constrained_penalty_service_protected",
+      "expression": "r_t = -(leak_t/leak_ref) - LAMBDA*(deficit_t/deficit_ref) - BIG*max(0, n_below20_t)",
+      "components": [
+        "leakage",
+        "pressure_deficit",
+        "n_below20(hard)"
+      ],
+      "clipping": "n_below20 clipped at >=0 (a count, already >=0)",
+      "epsilon_handling": "fixed nonzero denominators",
+      "provisional_parameters": {
+        "lambda_service": 20.0,
+        "big_hard": 100.0
+      }
+    },
+    {
+      "status": "PROPOSED",
+      "sign_convention": "reward is a NEGATIVE cost; higher (less negative) is better",
+      "time_aggregation": "per report timestep (1800 s); episode return = sum over the 193 report steps of a 96 h EPS. Reported here as per-step temporal statistics + per-config mean. No discounting applied in this measurement.",
+      "terminal_behavior": "fixed-horizon EPS, no early termination in Phase 6; a STEP-9 safety termination/clamp is NOT part of this measurement.",
+      "normalization_constants_used": {
+        "leak_ref_gpm": 84.72988433677985,
+        "req_ref_gpm": 906.3987348621764,
+        "deficit_ref_psi_nodesum": 28.671793365478514,
+        "power_ref_kw": 88.10062475649187,
+        "movement_L2sq_max": 28.0
+      },
+      "id": "F3",
+      "name": "baseline_relative_improvement",
+      "expression": "r_t = (leak_ref - leak_t)/leak_ref - w_U*max(0, unserved_t - unserved_ref)/req_ref - w_P_safety*(deficit_t/deficit_ref)",
+      "components": [
+        "fractional_leak_reduction_vs_native",
+        "excess_unserved",
+        "pressure_deficit"
+      ],
+      "clipping": "excess unserved clipped at >=0",
+      "epsilon_handling": "fixed nonzero denominators",
+      "baseline_constants": {
+        "unserved_ref_gpm": 14.98483697365873,
+        "source": "native reference req-served (frozen)"
+      },
+      "provisional_weights": {
+        "w_U": 1.0,
+        "w_P_safety": 1.0
+      }
+    },
+    {
+      "status": "PROPOSED",
+      "sign_convention": "reward is a NEGATIVE cost; higher (less negative) is better",
+      "time_aggregation": "per report timestep (1800 s); episode return = sum over the 193 report steps of a 96 h EPS. Reported here as per-step temporal statistics + per-config mean. No discounting applied in this measurement.",
+      "terminal_behavior": "fixed-horizon EPS, no early termination in Phase 6; a STEP-9 safety termination/clamp is NOT part of this measurement.",
+      "normalization_constants_used": {
+        "leak_ref_gpm": 84.72988433677985,
+        "req_ref_gpm": 906.3987348621764,
+        "deficit_ref_psi_nodesum": 28.671793365478514,
+        "power_ref_kw": 88.10062475649187,
+        "movement_L2sq_max": 28.0
+      },
+      "id": "F4",
+      "name": "safety_first_lexicographic",
+      "expression": "if min_svc_p_t < 0: r_t = -c_hard - deficit_t/deficit_ref; elif min_svc_p_t < theta: r_t = -c_soft - deficit_t/deficit_ref; else: r_t = -(leak_t/leak_ref) - eps*(||da_t||^2/L2sq_max)",
+      "components": [
+        "safety_band(min_service_pressure)",
+        "pressure_deficit",
+        "leakage",
+        "actuator_movement(tie-break)"
+      ],
+      "clipping": "branch selection by min service pressure vs threshold",
+      "epsilon_handling": "fixed nonzero denominators; eps effort tie-break",
+      "provisional_parameters": {
+        "safety_threshold_psi": 20.0,
+        "c_soft_service": 10.0,
+        "c_hard_negative": 100.0,
+        "eps_effort": 0.01
+      }
+    }
+  ],
+  "decision_dimensions": [
+    "leakage_management_signal",
+    "service_preservation",
+    "pressure_safety_signal_density",
+    "signal_density_dense_vs_sparse",
+    "scale_stability_fixed_normalisation",
+    "interpretability_thesis_explainability",
+    "parameter_count_and_sensitivity",
+    "reward_hacking_resistance",
+    "ppo_continuous_action_compatibility",
+    "step9_safety_layer_compatibility",
+    "reproducibility_no_leakage",
+    "baseline_relatability"
+  ],
+  "quantitative_evidence": {
+    "pooled_component_stats": {
+      "leakage_gpm": {
+        "n": 3667,
+        "mean": 84.95466584081781,
+        "median": 84.68276454297536,
+        "std": 2.5183286168590873,
+        "min": 79.91541642179445,
+        "max": 90.14959532741754,
+        "p5": 81.13865569725102,
+        "p25": 83.95087525695342,
+        "p75": 85.90837777835532,
+        "p95": 89.77928016697048,
+        "mean_abs_step_diff": 0.04375633354318132
+      },
+      "served_demand_gpm": {
+        "n": 3667,
+        "mean": 882.6028759224089,
+        "median": 753.4393536721641,
+        "std": 563.9044879520479,
+        "min": 25.947301009096563,
+        "max": 2736.9451401438882,
+        "p5": 85.02104148480237,
+        "p25": 434.2681743990165,
+        "p75": 1232.9661489191556,
+        "p95": 1887.4260595475444,
+        "mean_abs_step_diff": 171.50215489659493
+      },
+      "requested_demand_gpm": {
+        "n": 3667,
+        "mean": 906.3987348621761,
+        "median": 774.0061991800001,
+        "std": 578.2023762676808,
+        "min": 28.31729997,
+        "max": 2736.8742972699997,
+        "p5": 84.95189991000001,
+        "p25": 453.07679952,
+        "p75": 1264.37469883,
+        "p95": 1953.4289981,
+        "mean_abs_step_diff": 176.09487314289143
+      },
+      "unserved_demand_gpm": {
+        "n": 3667,
+        "mean": 23.79585893976739,
+        "median": 11.850715845196078,
+        "std": 33.789687779544614,
+        "min": -0.07140540036880338,
+        "max": 221.79086443890174,
+        "p5": -0.06990147296065743,
+        "p25": 1.611739515411628,
+        "p75": 26.434745819299224,
+        "p95": 96.9489819126117,
+        "mean_abs_step_diff": 5.2041906142908
+      },
+      "dsr": {
+        "n": 3667,
+        "mean": 0.9734169016594456,
+        "median": 0.9827188625375808,
+        "std": 0.028833862699044338,
+        "min": 0.9141979346467793,
+        "max": 1.0024575301455059,
+        "p5": 0.9145350342228891,
+        "p25": 0.9821957556555823,
+        "p75": 0.985499096481484,
+        "p95": 1.0001439794661497,
+        "mean_abs_step_diff": 0.0007971306316183938
+      },
+      "pressure_deficit_psi_nodesum": {
+        "n": 3667,
+        "mean": 19.859735269132997,
+        "median": 18.311899185180664,
+        "std": 4.673523126210727,
+        "min": 14.07815933227539,
+        "max": 31.727617263793945,
+        "p5": 14.462136268615723,
+        "p25": 17.451401710510254,
+        "p75": 19.36495876312256,
+        "p95": 28.671793365478514,
+        "mean_abs_step_diff": 0.08640352468703916
+      },
+      "n_service_nodes_below_20psi": {
+        "n": 3667,
+        "mean": 1.794382328879193,
+        "median": 2.0,
+        "std": 0.40751204799317114,
+        "min": 1.0,
+        "max": 3.0,
+        "p5": 1.0,
+        "p25": 2.0,
+        "p75": 2.0,
+        "p95": 2.0,
+        "mean_abs_step_diff": 0.002727768685215494
+      },
+      "min_service_pressure_psi": {
+        "n": 3667,
+        "mean": 4.76928151902172,
+        "median": 4.933772087097168,
+        "std": 1.0816040237440314,
+        "min": 1.0896363258361816,
+        "max": 5.929166793823242,
+        "p5": 1.870565366744995,
+        "p25": 4.481205940246582,
+        "p75": 5.5668625831604,
+        "p95": 5.8476166248321535,
+        "mean_abs_step_diff": 0.05942397031768449
+      },
+      "n_service_nodes_negative": {
+        "n": 3667,
+        "mean": 0.0,
+        "median": 0.0,
+        "std": 0.0,
+        "min": 0.0,
+        "max": 0.0,
+        "p5": 0.0,
+        "p25": 0.0,
+        "p75": 0.0,
+        "p95": 0.0,
+        "mean_abs_step_diff": 0.0
+      },
+      "pump_hydraulic_power_kw": {
+        "n": 3667,
+        "mean": 79.85447340165038,
+        "median": 0.0,
+        "std": 104.92346671651174,
+        "min": 0.0,
+        "max": 323.5826110839844,
+        "p5": 0.0,
+        "p25": 0.0,
+        "p75": 199.62670135498047,
+        "p95": 252.77397613525392,
+        "mean_abs_step_diff": 8.902607489594722
+      }
+    },
+    "cross_component_correlation": {
+      "labels": [
+        "leakage_gpm",
+        "served_demand_gpm",
+        "requested_demand_gpm",
+        "unserved_demand_gpm",
+        "dsr",
+        "pressure_deficit_psi_nodesum",
+        "n_service_nodes_below_20psi",
+        "min_service_pressure_psi",
+        "n_service_nodes_negative",
+        "pump_hydraulic_power_kw"
+      ],
+      "matrix": [
+        [
+          1.0,
+          -0.0007,
+          -0.0348,
+          -0.5847,
+          0.7497,
+          -0.7735,
+          -0.7419,
+          0.0958,
+          0.0,
+          0.0314
+        ],
+        [
+          -0.0007,
+          1.0,
+          0.9986,
+          0.3985,
+          0.0625,
+          -0.0023,
+          -0.0086,
+          -0.1598,
+          0.0,
+          0.0611
+        ],
+        [
+          -0.0348,
+          0.9986,
+          1.0,
+          0.4471,
+          0.0179,
+          0.0416,
+          0.0127,
+          -0.1613,
+          0.0,
+          0.059
+        ],
+        [
+          -0.5847,
+          0.3985,
+          0.4471,
+          1.0,
+          -0.7359,
+          0.751,
+          0.36,
+          -0.093,
+          0.0,
+          -0.0098
+        ],
+        [
+          0.7497,
+          0.0625,
+          0.0179,
+          -0.7359,
+          1.0,
+          -0.9653,
+          -0.4703,
+          0.0294,
+          0.0,
+          0.0428
+        ],
+        [
+          -0.7735,
+          -0.0023,
+          0.0416,
+          0.751,
+          -0.9653,
+          1.0,
+          0.4844,
+          -0.2616,
+          0.0,
+          -0.0154
+        ],
+        [
+          -0.7419,
+          -0.0086,
+          0.0127,
+          0.36,
+          -0.4703,
+          0.4844,
+          1.0,
+          0.0777,
+          0.0,
+          0.0129
+        ],
+        [
+          0.0958,
+          -0.1598,
+          -0.1613,
+          -0.093,
+          0.0294,
+          -0.2616,
+          0.0777,
+          1.0,
+          0.0,
+          -0.0505
+        ],
+        [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        [
+          0.0314,
+          0.0611,
+          0.059,
+          -0.0098,
+          0.0428,
+          -0.0154,
+          0.0129,
+          -0.0505,
+          0.0,
+          1.0
+        ]
+      ]
+    },
+    "pathology_checks_wu9": {
+      "leakage_only_collapses_service": {
+        "description": "A leakage-ONLY reward pushes pressure to the PRV lower bound; measure whether service degrades there.",
+        "reference_leak_gpm": 84.72988433677985,
+        "all_lower_leak_gpm": 81.38381870141156,
+        "leak_reduction_gpm": 3.3460656353682907,
+        "reference_dsr_mean": 0.9833370137001072,
+        "all_lower_dsr_mean": 0.9193996684666168,
+        "reference_min_service_psi": 4.16452169418335,
+        "all_lower_min_service_psi": 4.189884185791016,
+        "all_lower_new_node_timesteps_below_20psi": 0,
+        "verdict": "service must be protected explicitly; a leakage-only reward is not safe by construction (see boundary check)."
+      },
+      "pressure_only_raises_leakage": {
+        "reference_leak_gpm": 84.72988433677985,
+        "all_upper_leak_gpm": 89.7592331333586,
+        "leak_increase_gpm": 5.029348796578759,
+        "verdict": "maximising pressure inflates leakage; objectives oppose."
+      },
+      "scale_imbalance": {
+        "pooled_median_abs_magnitude": {
+          "leakage_gpm": 84.68276454297536,
+          "served_demand_gpm": 753.4393536721641,
+          "requested_demand_gpm": 774.0061991800001,
+          "unserved_demand_gpm": 11.850715845196078,
+          "dsr": 0.9827188625375808,
+          "pressure_deficit_psi_nodesum": 18.311899185180664,
+          "n_service_nodes_below_20psi": 2.0,
+          "min_service_pressure_psi": 4.933772087097168,
+          "n_service_nodes_negative": 0.0,
+          "pump_hydraulic_power_kw": 0.0
+        },
+        "penalty_terms_max_over_min_ratio": 7.145793186603424,
+        "verdict": "raw components span very different magnitudes; a raw weighted sum is dominated by the largest -> fixed normalisation is required before weighting."
+      },
+      "sparse_or_degenerate_signal": {
+        "frac_timesteps_zero_negative_nodes": 1.0,
+        "frac_timesteps_zero_below20_nodes": 0.0,
+        "n_negative_pool_max": 0.0,
+        "dsr_pool_std": 0.028833862699044338,
+        "verdict": "negative-pressure count is (near-)always zero in bounds -> a pure hard-violation term is sparse; the smooth deficit / min-pressure terms carry the dense safety signal."
+      },
+      "actuator_penalty_domination": {
+        "max_per_step_L2sq_movement_unnormalised": 28.0,
+        "verdict": "unnormalised movement (L2^2 up to 28) would dominate normalised leakage/service terms (~O(1)); the effort term MUST be normalised by its analytic maximum."
+      },
+      "reward_hacking_closed_pump_ambiguity": {
+        "verdict": "effort/smoothness MUST use the COMMANDED normalised action; realised pump speed is reset to 1.0 by STATUS-IS-OPEN or 0 when closed (G12), so penalising realised speed is gameable and mis-attributes native-rule behaviour."
+      },
+      "boundary_seeking_safety": {
+        "leak_min_corner_is_prv_all_lower": true,
+        "all_lower_n_node_timesteps_negative": 0,
+        "all_lower_min_service_psi": 4.189884185791016,
+        "all_lower_new_node_timesteps_below_20psi": 0,
+        "verdict": "the leakage optimum sits at the PRV lower bound; this single corner is characterised here only. Exhaustive joint in-box safety is a STEP-9 (safety layer) + STEP-12 (tests) job; a safety term/clamp is required, not optional."
+      }
+    },
+    "pathology_results_wu10": {
+      "A_leakage_only_collapses_service": {
+        "incentive_argmax_config": "prv_lower_pump_lower",
+        "argmax_sits_on_action_bound": true,
+        "min_service_psi_at_argmax": 1.2946763038635254,
+        "reference_min_service_psi": 4.16452169418335,
+        "mean_leak_norm_at_argmax": 0.9514690948246894,
+        "observation": "a leak-only reward's highest-reward tested command sits at the PRV lower bound; its worst-node service pressure is reported for the researcher to judge."
+      },
+      "B_service_only_raises_leakage": {
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_sits_on_action_bound": true,
+        "mean_leak_norm_at_argmax": 1.0155111389435745,
+        "reference_mean_leak_norm": 1.0,
+        "observation": "a service/safety-only reward's highest-reward tested command raises leakage relative to the leak-only incentive; the two objectives pull in opposite directions (consistent with STEP 8 correlations)."
+      },
+      "C_actuator_penalty_domination": {
+        "leak_term_dynamic_range_across_configs": 0.10788834247085066,
+        "max_single_step_movement_cost_at_w_A_1": 1.0,
+        "note": "realised movement is 0 in all static configs; ANALYTIC only. A unit-weight max move (cost 1.0) is comparable to the entire measured leak-term range across tested commands (~0.108), so an un-tuned effort weight could dominate the leakage objective - weight choice is a D-P6-005 concern, not resolved here."
+      },
+      "D_boundary_seeking_per_formulation": {
+        "F1": {
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_sits_on_action_bound": true,
+          "min_service_psi_at_argmax": 4.165553092956543,
+          "mean_n_below20_at_argmax": 1.0,
+          "mean_leak_norm_at_argmax": 1.0155111389435745
+        },
+        "F2": {
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_sits_on_action_bound": true,
+          "min_service_psi_at_argmax": 4.165553092956543,
+          "mean_n_below20_at_argmax": 1.0,
+          "mean_leak_norm_at_argmax": 1.0155111389435745
+        },
+        "F3": {
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_sits_on_action_bound": true,
+          "min_service_psi_at_argmax": 4.165553092956543,
+          "mean_n_below20_at_argmax": 1.0,
+          "mean_leak_norm_at_argmax": 1.0155111389435745
+        },
+        "F4": {
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_sits_on_action_bound": true,
+          "min_service_psi_at_argmax": 4.165553092956543,
+          "mean_n_below20_at_argmax": 1.0,
+          "mean_leak_norm_at_argmax": 1.0155111389435745
+        }
+      },
+      "E_flat_or_weak_signal_per_formulation": {
+        "F1": {
+          "reward_spread_across_configs": 0.5411681294614186,
+          "mean_within_config_std": 0.03185325821477033
+        },
+        "F2": {
+          "reward_spread_across_configs": 110.45481095741287,
+          "mean_within_config_std": 2.5468122778044684
+        },
+        "F3": {
+          "reward_spread_across_configs": 0.5254448193651963,
+          "mean_within_config_std": 0.030004222564233313
+        },
+        "F4": {
+          "reward_spread_across_configs": 0.5259426500765887,
+          "mean_within_config_std": 0.023064538775375034
+        }
+      },
+      "F_sparse_or_degenerate_violation_signal": {
+        "frac_pooled_ts_any_node_below_20psi": 1.0,
+        "frac_pooled_ts_any_node_negative": 0.0,
+        "reference_mean_n_below20": 2.0,
+        "observation": "the <0 psi hard term is identically inactive in bounds (sparse), while the <20 psi term is active at ~every timestep INCLUDING the native baseline (2 chronically low nodes). A hard 20 psi constraint term therefore fires on the baseline itself; the smooth deficit / min-pressure terms carry the dense safety signal."
+      },
+      "G_reward_hacking_and_degeneracy": {
+        "closed_pump_realized_speed": "effort/smoothness MUST be computed on the COMMANDED normalised action; realised pump speed is reset to 1.0 by STATUS-IS-OPEN or 0 when closed (G12), so penalising realised speed is gameable.",
+        "hard_20psi_constraint_degeneracy": "F2 (BIG*n_below20) and F4 (threshold 20 psi) treat the network's chronic sub-20 nodes as a constraint violation on EVERY tested command, so the leakage objective receives little/no gradient under those parameters - an ill-posed hard constraint, not a learning signal.",
+        "lexicographic_0psi_permissiveness": "F4 with a 0 psi threshold never triggers in bounds, so it reduces to pure leak minimisation and inherits the boundary-seeking-to-lower-PRV incentive while reporting 'safe'."
+      },
+      "H_weight_penalty_sensitivity": {
+        "note": "see `sensitivity_results`: varying the PROVISIONAL weights shifts the incentive-argmax configuration; this is expected and is exactly why weight selection is deferred to the researcher (D-P6-005)."
+      }
+    },
+    "induced_incentive_per_formulation": {
+      "F1": {
+        "argmax_config_within_tested_set": "prv_176_upper",
+        "argmax_mean_reward": -1.5346600162411683,
+        "reward_spread_across_tested_configs": 0.5411681294614186
+      },
+      "F2": {
+        "argmax_config_within_tested_set": "prv_176_upper",
+        "argmax_mean_reward": -111.39848868489547,
+        "reward_spread_across_tested_configs": 110.45481095741287
+      },
+      "F3": {
+        "argmax_config_within_tested_set": "prv_176_upper",
+        "argmax_mean_reward": -0.5346600162411682,
+        "reward_spread_across_tested_configs": 0.5254448193651963
+      },
+      "F4": {
+        "argmax_config_within_tested_set": "prv_176_upper",
+        "argmax_mean_reward": -10.519148877297594,
+        "reward_spread_across_tested_configs": 0.5259426500765887
+      }
+    },
+    "pooled_reward_statistics": {
+      "F1": {
+        "n": 3667,
+        "mean": -1.7215790169099456,
+        "median": -1.656444397453193,
+        "std": 0.1708080647574491,
+        "min": -2.274338543469959,
+        "max": -1.5097431766645337,
+        "p5": -2.0813741452150354,
+        "p25": -1.7073254834248472,
+        "p75": -1.6214106235634396,
+        "p95": -1.555528988198792,
+        "mean_abs_step_diff": 0.007493398090734915
+      },
+      "F2": {
+        "n": 3667,
+        "mean": -194.2940375897262,
+        "median": -213.74963994557007,
+        "std": 42.403356131278315,
+        "min": -316.85918638736297,
+        "max": -110.85107537349231,
+        "p5": -220.9873078173246,
+        "p25": -214.52377490273443,
+        "p75": -213.15095365887862,
+        "p95": -111.13979375008923,
+        "mean_abs_step_diff": 0.33266583713937786
+      },
+      "F3": {
+        "n": 3667,
+        "mean": -0.7111412019819208,
+        "median": -0.644273582208174,
+        "std": 0.16718849735360633,
+        "min": -1.2578062642452565,
+        "max": -0.5097431766645337,
+        "p5": -1.0648418659903327,
+        "p25": -0.6962885620428443,
+        "p75": -0.6126136436727919,
+        "p95": -0.5555289881987918,
+        "mean_abs_step_diff": 0.006839039776638495
+      },
+      "F4": {
+        "n": 3667,
+        "mean": -10.69265758914978,
+        "median": -10.638672961672102,
+        "std": 0.16300072571804153,
+        "min": -11.106579447590283,
+        "max": -10.491010769812041,
+        "p5": -11.0,
+        "p25": -10.675401029725556,
+        "p75": -10.608660975198088,
+        "p95": -10.504402919073366,
+        "mean_abs_step_diff": 0.003013537506554121
+      }
+    },
+    "temporal_reward_statistics": {
+      "F1": {
+        "mean_within_config_std": 0.03185325821477033,
+        "mean_within_config_abs_step_diff": 0.006334435129457122
+      },
+      "F2": {
+        "mean_within_config_std": 2.5468122778044684,
+        "mean_within_config_abs_step_diff": 0.093737468680769
+      },
+      "F3": {
+        "mean_within_config_std": 0.030004222564233313,
+        "mean_within_config_abs_step_diff": 0.005708571197191618
+      },
+      "F4": {
+        "mean_within_config_std": 0.023064538775375034,
+        "mean_within_config_abs_step_diff": 0.001955130615758565
+      }
+    },
+    "actuator_effort_analytic": {
+      "movement_L2sq_max": 28.0,
+      "normalised_movement_for_max_single_step_move": 1.0,
+      "normalised_movement_for_static_hold": 0.0,
+      "note": "realised movement is 0 in every static configuration here; a boundary-to-boundary single-step move would add w_A*1.0 of cost. Whether that dominates depends on the (unchosen) weights and the realised policy trajectory - a training-time HYPOTHESIS. The effort term MUST use the COMMANDED normalised action, never realised pump speed (native STATUS resets it)."
+    },
+    "tested_configurations": [
+      "reference_nominal",
+      "prv_all_lower",
+      "prv_all_upper",
+      "prv_173_lower",
+      "prv_173_upper",
+      "prv_175_lower",
+      "prv_175_upper",
+      "prv_176_lower",
+      "prv_176_upper",
+      "prv_177_lower",
+      "prv_177_upper",
+      "prv_178_lower",
+      "prv_178_upper",
+      "pump_all_lower",
+      "pump_all_upper",
+      "prv_lower_pump_lower",
+      "prv_upper_pump_upper",
+      "prv_lower_pump_upper",
+      "prv_upper_pump_lower"
+    ],
+    "n_tested_configs": 19
+  },
+  "chronic_baseline_service_issue": {
+    "observation": "The frozen native baseline already holds >=1 service node < 20 psi at EVERY report timestep (frac_ts_any_node_below_20psi = 1.0; 386 node-timesteps < 20 psi; min service pressure 4.16452 psi @ JUNCTION-29) with 0 negative-pressure nodes.",
+    "baseline_metrics": {
+      "n_node_timesteps_below_20psi": 386,
+      "n_node_timesteps_negative": 0,
+      "frac_ts_any_node_below_20psi": 1.0,
+      "frac_ts_any_node_negative": 0.0,
+      "min_service_psi_over_horizon": 4.16452169418335
+    },
+    "threshold_handling_options": {
+      "absolute_hard_20psi_constraint": "ILL-POSED on this network: it penalises the native baseline itself at every timestep and cannot separate agent-caused violations from pre-existing ones.",
+      "deficit_based_penalty": "WELL-POSED: dense, smooth sum of max(0, 20 - p_i) over service nodes; normalised by deficit_ref (28.6718). Measured deficit<->leak corr -0.7735.",
+      "improvement_relative_to_baseline": "WELL-POSED: penalise only unserved/deficit ABOVE the baseline level; zero-centred at the native controller (F3 / C-C).",
+      "worst_node_min_pressure": "WELL-POSED: dense min_service_pressure signal (WU-9 mean 4.77 psi, range [1.09, 5.93]); used as the lexicographic trigger in F4.",
+      "min_pressure_hard_constraint": "ONLY well-posed on NEGATIVE pressure (baseline count 0). A hard 20-psi min constraint is NOT well-posed (baseline violates it).",
+      "fraction_below_threshold": "Degenerate as a hard term (fraction = 1.0 at baseline); usable only as a dense/relative signal, not a hard gate."
+    },
+    "conclusion": "No formulation can use a HARD 20-psi constraint without penalising the native baseline itself. Dense deficit / worst-node min-pressure / baseline-relative service signals are the defensible safety channels; any hard gate must key on NEGATIVE pressure (or on a threshold strictly below the baseline worst-node ~4.16 psi), and the enforced 20-psi guarantee belongs to the STEP-9 execution-level clamp, not to a reward-level hard term."
+  },
+  "candidate_parameterizations": [
+    {
+      "candidate_id": "C-A_F1_balanced_dense",
+      "status": "PROVISIONAL CANDIDATE - NOT APPROVED",
+      "base_formulation": "F1_normalized_weighted_sum",
+      "equation": "r_t = - w_L*(leak_t/leak_ref) - w_U*(unserved_t^+/req_ref) - w_P*(deficit_t/deficit_ref) - w_A*(||da_t||^2/L2sq_max) - w_E*(power_t/power_ref)",
+      "constants": {
+        "leak_ref_gpm": 84.72988433677985,
+        "req_ref_gpm": 906.3987348621764,
+        "deficit_ref_psi_nodesum": 28.671793365478514,
+        "power_ref_kw": 88.10062475649187,
+        "movement_L2sq_max": 28.0
+      },
+      "provisional_weights": {
+        "w_L": 1.0,
+        "w_U": 1.0,
+        "w_P": 1.0,
+        "w_A": 0.1,
+        "w_E": 0.0
+      },
+      "scale_derivation": "All four active terms are pre-normalised to O(1) by the FROZEN WU-9 constants, so unit weights are the neutral starting point. w_A=0.1 is read from WU-10 pathology C: the leak-term dynamic range across in-bounds commands is ~0.108, while one max-movement step costs 1.0 at w_A=1; scaling w_A to ~0.1 keeps a full-swing action step commensurate with (not dominating) the measured leakage signal. w_E=0 keeps the (optional, hydraulic-only) energy term out to avoid parameter proliferation.",
+      "plausibility": "dense, differentiable, PPO-continuous friendly (INFERRED).",
+      "tradeoff": "Balanced leakage/service/safety/effort; but WU-10 induced-incentive argmax under unit weights is prv_176_upper and the leak-only optimum sits at the PRV lower corner (OBSERVED) -> a STEP-9 clamp is required, not optional.",
+      "risk": "WU-10 F1_vary_w_P shows w_P=0 -> prv_175_lower; w_P>=0.5 -> prv_176_upper. w_P below ~0.5 lets the incentive drift toward the low-pressure corner.",
+      "validation_experiment": "After the STEP-9 clamp exists: short deterministic PPO smoke test to confirm the per-step reward is non-flat and finite; measure realised ||da||^2 to replace the analytic effort ceiling (HYPOTHESIS)."
+    },
+    {
+      "candidate_id": "C-B_F1_safety_leaning",
+      "status": "PROVISIONAL CANDIDATE - NOT APPROVED",
+      "base_formulation": "F1_normalized_weighted_sum",
+      "equation": "same functional form as C-A",
+      "constants": {
+        "leak_ref_gpm": 84.72988433677985,
+        "req_ref_gpm": 906.3987348621764,
+        "deficit_ref_psi_nodesum": 28.671793365478514,
+        "power_ref_kw": 88.10062475649187,
+        "movement_L2sq_max": 28.0
+      },
+      "provisional_weights": {
+        "w_L": 1.0,
+        "w_U": 1.0,
+        "w_P": 2.0,
+        "w_A": 0.1,
+        "w_E": 0.0
+      },
+      "scale_derivation": "Identical to C-A except w_P=2.0. Motivated by the measured deficit<->leak correlation -0.7735 and the dense worst-node min-pressure signal (WU-9): a heavier normalised deficit weight more strongly protects worst-node pressure. w_P=2 is still O(1) after normalisation.",
+      "plausibility": "dense, differentiable; a safety-leaning emphasis of C-A (INFERRED).",
+      "tradeoff": "More weight on pressure safety may reduce achievable leakage cuts; this is a different emphasis, NOT a ranking versus C-A.",
+      "risk": "Over-weighting deficit could flatten the leakage gradient (leak span ~+/-6%).",
+      "validation_experiment": "Same smoke test as C-A; compare realised min-pressure margin."
+    },
+    {
+      "candidate_id": "C-C_F3_baseline_relative",
+      "status": "PROVISIONAL CANDIDATE - NOT APPROVED",
+      "base_formulation": "F3_baseline_relative_improvement",
+      "equation": "r_t = (leak_ref - leak_t)/leak_ref - w_U*max(0, unserved_t - unserved_ref)/req_ref - w_P_safety*(deficit_t/deficit_ref)",
+      "constants": {
+        "leak_ref_gpm": 84.72988433677985,
+        "req_ref_gpm": 906.3987348621764,
+        "deficit_ref_psi_nodesum": 28.671793365478514,
+        "unserved_ref_gpm": 15.103309701248634
+      },
+      "provisional_weights": {
+        "w_U": 1.0,
+        "w_P_safety": 1.0
+      },
+      "scale_derivation": "Leakage improvement term is intrinsically normalised (fraction of baseline leakage) and zero-centred at the native controller, so no leak weight is needed. unserved_ref is the baseline unserved implied by DSR=0.98334 (~15.10 GPM; the WU-9 accounting value is 14.985 GPM). w_P_safety=1 uses the FROZEN deficit_ref. WU-10 F3 sweep: w_P_safety=0 -> prv_175_lower/prv_lower_pump_lower; w_P_safety>=1 -> prv_176_upper, so keep w_P_safety>=1.",
+      "plausibility": "interpretable as % leakage reduction vs native baseline (INFERRED).",
+      "tradeoff": "Directly answers the thesis objective (reduction vs baseline) but the leakage improvement dynamic range is small (~+/-6%), so signal-to-noise must be checked.",
+      "risk": "Small reward magnitude may need reward/advantage scaling at training time.",
+      "validation_experiment": "Smoke test: confirm advantage estimates are non-degenerate."
+    },
+    {
+      "candidate_id": "C-D_dense_deficit_no_hard_count",
+      "status": "PROVISIONAL CANDIDATE - NOT APPROVED",
+      "base_formulation": "F2/F4_family_dense_safety_variant",
+      "equation": "r_t = -(leak_t/leak_ref) - LAMBDA*(deficit_t/deficit_ref) - BIG*max(0, n_negative_t)   # hard term on NEGATIVE nodes only",
+      "constants": {
+        "leak_ref_gpm": 84.72988433677985,
+        "deficit_ref_psi_nodesum": 28.671793365478514
+      },
+      "provisional_weights": {
+        "LAMBDA_service": 5.0,
+        "BIG_hard_negative": 100.0
+      },
+      "scale_derivation": "Explicitly REPLACES the F2 hard n_below_20 term with the dense deficit term, because WU-10 pathology F/G show the 20-psi count fires on the native baseline itself (frac_ts_any_node_below_20psi = 1.0) -> a hard 20-psi term is ill-posed on this network. The hard term is retained ONLY on NEGATIVE nodes (baseline count 0, frac_negative=0.0) so it is well-posed and fires only if a control drives a node sub-zero. LAMBDA=5 keeps the normalised deficit term within ~1 order of magnitude of the O(1) leak term (deficit_ref-normalised); it is a central value in [1,10], not fitted.",
+      "plausibility": "service protected by construction with a well-posed hard backstop (INFERRED).",
+      "tradeoff": "Avoids the ill-posed 20-psi penalty; but LAMBDA is unmeasured and sets the leakage/service exchange rate, which the researcher must choose.",
+      "risk": "WU-10 F2 lambda/big sweep argmax is stable at prv_176_upper (incentive direction robust) but reward MAGNITUDE is untuned; a very large LAMBDA suppresses the leakage gradient.",
+      "validation_experiment": "Smoke test with STEP-9 clamp active; confirm the negative-node hard term never fires in-bounds and only activates on genuine violations."
+    }
+  ],
+  "sensitivity_results": {
+    "source": "WU-10 sensitivity_results (deterministic parameter sweeps; no re-run)",
+    "note": "Low/central/high parameter sweeps already on disk. These indicate INCENTIVE DIRECTION (argmax config), NOT a formulation ranking or score.",
+    "sweeps": {
+      "F1_vary_w_P": [
+        {
+          "params": {
+            "w_L": 1.0,
+            "w_U": 1.0,
+            "w_P": 0.0,
+            "w_A": 0.0,
+            "w_E": 0.0
+          },
+          "incentive_argmax_config": "prv_175_lower",
+          "argmax_mean_reward": -0.9943190198476233,
+          "reference_mean_reward": -1.0165322792247022,
+          "prv_all_lower_mean_reward": -1.039775162720952,
+          "reference_minus_prv_all_lower": 0.0232428834962497
+        },
+        {
+          "params": {
+            "w_L": 1.0,
+            "w_U": 1.0,
+            "w_P": 0.5,
+            "w_A": 0.0,
+            "w_E": 0.0
+          },
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_mean_reward": -1.275085577592371,
+          "reference_mean_reward": -1.3328903481491163,
+          "prv_all_lower_mean_reward": -1.5256219532607347,
+          "reference_minus_prv_all_lower": 0.19273160511161835
+        },
+        {
+          "params": {
+            "w_L": 1.0,
+            "w_U": 1.0,
+            "w_P": 1.0,
+            "w_A": 0.0,
+            "w_E": 0.0
+          },
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_mean_reward": -1.5346600162411683,
+          "reference_mean_reward": -1.6492484170735306,
+          "prv_all_lower_mean_reward": -2.0114687438005174,
+          "reference_minus_prv_all_lower": 0.3622203267269868
+        },
+        {
+          "params": {
+            "w_L": 1.0,
+            "w_U": 1.0,
+            "w_P": 2.0,
+            "w_A": 0.0,
+            "w_E": 0.0
+          },
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_mean_reward": -2.0538088935387617,
+          "reference_mean_reward": -2.2819645549223586,
+          "prv_all_lower_mean_reward": -2.983162324880083,
+          "reference_minus_prv_all_lower": 0.7011977699577243
+        },
+        {
+          "params": {
+            "w_L": 1.0,
+            "w_U": 1.0,
+            "w_P": 5.0,
+            "w_A": 0.0,
+            "w_E": 0.0
+          },
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_mean_reward": -3.611255525431544,
+          "reference_mean_reward": -4.180112968468843,
+          "prv_all_lower_mean_reward": -5.898243068118779,
+          "reference_minus_prv_all_lower": 1.7181300996499358
+        }
+      ],
+      "F1_vary_w_U": [
+        {
+          "params": {
+            "w_L": 1.0,
+            "w_U": 0.0,
+            "w_P": 1.0,
+            "w_A": 0.0,
+            "w_E": 0.0
+          },
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_mean_reward": -1.5346600162411683,
+          "reference_mean_reward": -1.632716137848828,
+          "prv_all_lower_mean_reward": -1.932202607362801,
+          "reference_minus_prv_all_lower": 0.29948646951397295
+        },
+        {
+          "params": {
+            "w_L": 1.0,
+            "w_U": 1.0,
+            "w_P": 1.0,
+            "w_A": 0.0,
+            "w_E": 0.0
+          },
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_mean_reward": -1.5346600162411683,
+          "reference_mean_reward": -1.6492484170735306,
+          "prv_all_lower_mean_reward": -2.0114687438005174,
+          "reference_minus_prv_all_lower": 0.3622203267269868
+        },
+        {
+          "params": {
+            "w_L": 1.0,
+            "w_U": 5.0,
+            "w_P": 1.0,
+            "w_A": 0.0,
+            "w_E": 0.0
+          },
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_mean_reward": -1.5346600162411683,
+          "reference_mean_reward": -1.71537753397234,
+          "prv_all_lower_mean_reward": -2.328533289551384,
+          "reference_minus_prv_all_lower": 0.6131557555790439
+        }
+      ],
+      "F2_vary_lambda_big": [
+        {
+          "params": {
+            "lambda_service": 5.0,
+            "big_hard": 10.0
+          },
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_mean_reward": -13.611255525431543,
+          "reference_mean_reward": -24.16358068924414,
+          "prv_all_lower_mean_reward": -25.818976931681064,
+          "reference_minus_prv_all_lower": 1.6553962424369253
+        },
+        {
+          "params": {
+            "lambda_service": 5.0,
+            "big_hard": 100.0
+          },
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_mean_reward": -103.61125552543152,
+          "reference_mean_reward": -204.16358068924413,
+          "prv_all_lower_mean_reward": -205.81897693168108,
+          "reference_minus_prv_all_lower": 1.6553962424369502
+        },
+        {
+          "params": {
+            "lambda_service": 5.0,
+            "big_hard": 1000.0
+          },
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_mean_reward": -1003.6112555254316,
+          "reference_mean_reward": -2004.163580689244,
+          "prv_all_lower_mean_reward": -2005.8189769316812,
+          "reference_minus_prv_all_lower": 1.6553962424370638
+        },
+        {
+          "params": {
+            "lambda_service": 20.0,
+            "big_hard": 10.0
+          },
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_mean_reward": -21.398488684895455,
+          "reference_mean_reward": -33.65432275697656,
+          "prv_all_lower_mean_reward": -40.39438064787455,
+          "reference_minus_prv_all_lower": 6.740057890897987
+        },
+        {
+          "params": {
+            "lambda_service": 20.0,
+            "big_hard": 100.0
+          },
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_mean_reward": -111.39848868489547,
+          "reference_mean_reward": -213.65432275697657,
+          "prv_all_lower_mean_reward": -220.39438064787456,
+          "reference_minus_prv_all_lower": 6.740057890897987
+        },
+        {
+          "params": {
+            "lambda_service": 20.0,
+            "big_hard": 1000.0
+          },
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_mean_reward": -1011.3984886848955,
+          "reference_mean_reward": -2013.6543227569766,
+          "prv_all_lower_mean_reward": -2020.3943806478746,
+          "reference_minus_prv_all_lower": 6.740057890898015
+        },
+        {
+          "params": {
+            "lambda_service": 100.0,
+            "big_hard": 10.0
+          },
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_mean_reward": -62.93039886870296,
+          "reference_mean_reward": -84.27161378488282,
+          "prv_all_lower_mean_reward": -118.1298671342398,
+          "reference_minus_prv_all_lower": 33.858253349356985
+        },
+        {
+          "params": {
+            "lambda_service": 100.0,
+            "big_hard": 100.0
+          },
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_mean_reward": -152.93039886870295,
+          "reference_mean_reward": -264.2716137848828,
+          "prv_all_lower_mean_reward": -298.12986713423976,
+          "reference_minus_prv_all_lower": 33.85825334935697
+        },
+        {
+          "params": {
+            "lambda_service": 100.0,
+            "big_hard": 1000.0
+          },
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_mean_reward": -1052.930398868703,
+          "reference_mean_reward": -2064.271613784883,
+          "prv_all_lower_mean_reward": -2098.12986713424,
+          "reference_minus_prv_all_lower": 33.858253349357256
+        }
+      ],
+      "F3_vary_w_U_w_P": [
+        {
+          "params": {
+            "w_U": 0.0,
+            "w_P_safety": 0.0
+          },
+          "incentive_argmax_config": "prv_lower_pump_lower",
+          "argmax_mean_reward": 0.04853090517531048,
+          "reference_mean_reward": -4.431184837598787e-17,
+          "prv_all_lower_mean_reward": 0.03949097371676478,
+          "reference_minus_prv_all_lower": -0.03949097371676482
+        },
+        {
+          "params": {
+            "w_U": 0.0,
+            "w_P_safety": 1.0
+          },
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_mean_reward": -0.5346600162411682,
+          "reference_mean_reward": -0.6327161378488281,
+          "prv_all_lower_mean_reward": -0.9322026073628007,
+          "reference_minus_prv_all_lower": 0.2994864695139726
+        },
+        {
+          "params": {
+            "w_U": 0.0,
+            "w_P_safety": 5.0
+          },
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_mean_reward": -2.611255525431544,
+          "reference_mean_reward": -3.1635806892441405,
+          "prv_all_lower_mean_reward": -4.818976931681063,
+          "reference_minus_prv_all_lower": 1.6553962424369226
+        },
+        {
+          "params": {
+            "w_U": 1.0,
+            "w_P_safety": 0.0
+          },
+          "incentive_argmax_config": "prv_175_lower",
+          "argmax_mean_reward": 0.017982149799542487,
+          "reference_mean_reward": -0.004233627605161215,
+          "prv_all_lower_mean_reward": -0.024051963388839984,
+          "reference_minus_prv_all_lower": 0.019818335783678767
+        },
+        {
+          "params": {
+            "w_U": 1.0,
+            "w_P_safety": 1.0
+          },
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_mean_reward": -0.5346600162411682,
+          "reference_mean_reward": -0.6369497654539893,
+          "prv_all_lower_mean_reward": -0.9957455444684057,
+          "reference_minus_prv_all_lower": 0.3587957790144164
+        },
+        {
+          "params": {
+            "w_U": 1.0,
+            "w_P_safety": 5.0
+          },
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_mean_reward": -2.611255525431544,
+          "reference_mean_reward": -3.167814316849302,
+          "prv_all_lower_mean_reward": -4.882519868786668,
+          "reference_minus_prv_all_lower": 1.714705551937366
+        },
+        {
+          "params": {
+            "w_U": 5.0,
+            "w_P_safety": 0.0
+          },
+          "incentive_argmax_config": "prv_175_lower",
+          "argmax_mean_reward": 0.0010393369816481244,
+          "reference_mean_reward": -0.021168138025805895,
+          "prv_all_lower_mean_reward": -0.278223711811259,
+          "reference_minus_prv_all_lower": 0.2570555737854531
+        },
+        {
+          "params": {
+            "w_U": 5.0,
+            "w_P_safety": 1.0
+          },
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_mean_reward": -0.5346600162411682,
+          "reference_mean_reward": -0.653884275874634,
+          "prv_all_lower_mean_reward": -1.2499172928908246,
+          "reference_minus_prv_all_lower": 0.5960330170161906
+        },
+        {
+          "params": {
+            "w_U": 5.0,
+            "w_P_safety": 5.0
+          },
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_mean_reward": -2.611255525431544,
+          "reference_mean_reward": -3.184748827269946,
+          "prv_all_lower_mean_reward": -5.136691617209087,
+          "reference_minus_prv_all_lower": 1.9519427899391415
+        }
+      ],
+      "F4_vary_threshold": [
+        {
+          "params": {
+            "safety_threshold_psi": 0.0,
+            "c_soft_service": 10.0,
+            "c_hard_negative": 100.0,
+            "eps_effort": 0.01
+          },
+          "incentive_argmax_config": "prv_lower_pump_lower",
+          "argmax_mean_reward": -0.9514690948246894,
+          "reference_mean_reward": -1.0,
+          "prv_all_lower_mean_reward": -0.9605090262832353,
+          "reference_minus_prv_all_lower": -0.03949097371676469
+        },
+        {
+          "params": {
+            "safety_threshold_psi": 20.0,
+            "c_soft_service": 10.0,
+            "c_hard_negative": 100.0,
+            "eps_effort": 0.01
+          },
+          "incentive_argmax_config": "prv_176_upper",
+          "argmax_mean_reward": -10.519148877297594,
+          "reference_mean_reward": -10.63271613784883,
+          "prv_all_lower_mean_reward": -10.971693581079567,
+          "reference_minus_prv_all_lower": 0.3389774432307373
+        }
+      ],
+      "note": "PROVISIONAL FOR COMPARISON ONLY. The incentive-argmax shifting with weights is the intended demonstration that weight/formulation selection is a researcher decision (D-P6-005), not an automatable one."
+    },
+    "analytic_effort_weight_reading": {
+      "parameter": "w_A (movement weight, F1 family, candidates C-A/C-B)",
+      "low": {
+        "w_A": 0.0,
+        "effect": "no smoothness pressure; realised movement unconstrained"
+      },
+      "central": {
+        "w_A": 0.1,
+        "effect": "max-move step (~1.0) ~ leak-term range (~0.108)"
+      },
+      "high": {
+        "w_A": 1.0,
+        "effect": "one max-move step (1.0) dominates the leak signal (~0.108)"
+      },
+      "basis": "ANALYTIC (static runs have 0 movement); realised effort is a training HYPOTHESIS"
+    }
+  },
+  "safety_dependencies": {
+    "reward_level_D_P6_005": "Dense/relative service and pressure terms SHAPE behaviour but do NOT guarantee any pressure bound.",
+    "execution_level_STEP_9": "A state-dependent safety clamp to the APPROVED action bounds is REQUIRED to enforce feasibility; WU-9/WU-10 boundary-seeking checks show the leak optimum sits on the PRV lower corner. STEP-9 is a SEPARATE decision, not part of D-P6-005, and is NOT implemented here.",
+    "separation_of_concerns": "action bounds (frozen) != reward shaping (D-P6-005) != safety clamp (STEP-9)."
+  },
+  "constraints": {
+    "no_hard_20psi_reward_term": "ill-posed on native baseline (see chronic_baseline_service_issue)",
+    "effort_uses_commanded_action": true,
+    "fixed_normalisation_no_running_stats": true,
+    "no_future_information": true
+  },
+  "uncertainties": [
+    "Realised actuator-movement distribution is unknown (static runs = 0 movement); effort scale is analytic -> HYPOTHESIS until a policy trajectory exists.",
+    "Leakage is a VALIDATION instrument, not field-calibrated; only RELATIVE response is meaningful.",
+    "Joint 5-D in-box safety is characterised at a single lower corner only; interior/mixed corners are a STEP-9/STEP-12 job.",
+    "Reward weights / LAMBDA / thresholds set leakage<->service exchange rates that are value judgements for the researcher, not measured quantities.",
+    "Pump power is HYDRAULIC only (no efficiency curve); energy term optional."
+  ],
+  "reproducibility_information": {
+    "working_inp_sha256": "53015ba9212e46bec731d190971819996233996b498bc269e828f992830a20a9",
+    "step8_artefact_used": "p6_s8_reward_scale_analysis.json",
+    "deterministic": "EPANET deterministic; no RNG; no seed",
+    "reference_reproduces_frozen_baseline": {
+      "reference_leak_mean_gpm": 84.72988433677985,
+      "frozen_leak_ref_gpm": 84.72988433677985,
+      "leak_ref_abs_diff": 0.0,
+      "req_ref_abs_diff": 0.0,
+      "reference_dsr_mean": 0.9833370137001072,
+      "reference_n_node_ts_below_20psi": 386,
+      "reference_n_node_ts_negative": 0,
+      "per_timestep_vs_validated_accounting_max_abs_diff": 0.0
+    },
+    "no_topology_or_native_rule_change": true,
+    "no_future_information_used": true,
+    "native_controls_count": 5,
+    "all_reward_values_finite": true,
+    "generator": "src/validation/p6_s8_reward_formulation_comparison.py",
+    "component_extractor": "src/validation/p6_s8_reward_scale_analysis.py"
+  },
+  "researcher_selection": null,
+  "self_checks": {
+    "status_is_proposed": true,
+    "researcher_selection_is_null": true,
+    "constants_match_across_artifacts": true,
+    "all_values_finite": true,
+    "observation_dim_139": true,
+    "action_dim_7": true,
+    "action_ordering_unchanged": true,
+    "service_mask_121_5": true,
+    "all_candidates_not_approved": true,
+    "n_candidates_between_2_and_4": true,
+    "no_winner_key": true
+  }
+}

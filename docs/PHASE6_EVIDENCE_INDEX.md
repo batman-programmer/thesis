@@ -185,12 +185,33 @@ from the WU-9 artefact.
 | Analytic effort probe | actuator_effort_analytic | dim implied 7, L2sq_max 28, max-move norm 1.0, static-hold norm 0.0 | effort ÷ 28; realised distribution is a training-time HYPOTHESIS |
 | Test battery | tests/test_reward_formulation_comparison.py | 23 comparison ok; full battery 44/44 | normalization/signs/branches/mask/reproducibility/no-future-info |
 
+## STEP 8 — D-P6-005 reward decision brief (WU-11, D-P6-005 PROPOSED / DECISION PENDING RESEARCHER)
+
+Doc: `docs/PHASE6_D_P6_005_DECISION_BRIEF.md` (11 sections; researcher decision block BLANK).
+Register: D-P6-005 decision-brief note (status UNCHANGED — still PROPOSED). Raw artefact:
+`results/phase6/p6_d_p6_005_decision_brief.json` (**researcher_selection=null**); generator
+`src/validation/p6_d_p6_005_decision_brief.py`; tests `tests/test_decision_brief.py`.
+**Decision-gate PREP only — no formulation selected/scored/ranked, no weights tuned, no
+STEP-9 clamp, no PPO.** Pure aggregator of the WU-9 + WU-10 artefacts: no EPANET, no PPO,
+no RNG, no new measurement.
+
+| Claim | Section/Key | Result | Interpretation |
+|---|---|---|---|
+| Brief keeps D-P6-005 PROPOSED, no selection | status / researcher_selection | status "PROPOSED / DECISION PENDING RESEARCHER"; researcher_selection null; no winner/ranking/scores keys | AI prepares the gate; the researcher makes the scientific decision |
+| Frozen normalisation reused without drift | normalization_constants_frozen / _match_across_artifacts | leak 84.72988, req 906.39873, deficit 28.67179, power 88.10062, L2sq 28.0; cross-artefact abs diff <1e-9 (all true) | no online/running/test-set stats; no data leakage; matches WU-9 |
+| Frozen constraints untouched | frozen_constraints | action_dim 7 + ordered bounds [173,175,176,177,178,170,172]; observation_dim 139; service mask 121/5; solver policy | reward brief does NOT reopen D-P6-001/002/003 or D-P6-004 |
+| Four provisional candidates, all NOT APPROVED | candidate_parameterizations | C-A/C-B F1 (w_A=0.1 from measured 0.108 leak range); C-C F3 baseline-relative; C-D dense deficit + negative-only hard gate {Λ=5,BIG=100} | constants traced to measured scales, NOT tuned to a preferred result |
+| Chronic sub-20-psi baseline → hard 20-psi ill-posed | chronic_baseline_service_issue | frac_ts_any_node_below_20psi 1.0; frac_ts_any_node_negative 0.0; "ILL-POSED" | no formulation can use a hard absolute 20-psi reward constraint without penalising the baseline; use dense deficit / worst-node / baseline-relative / negative-only gate |
+| Reward vs STEP-9 separation | safety_dependencies | reward shaping (D-P6-005) DISTINCT from the enforced clamp (STEP-9) | the enforced 20-psi guarantee is STEP-9's, not the reward's |
+| Deterministic regeneration | (test) test_17 | rebuilt JSON byte-reproduces the on-disk artefact | reproducible; no RNG / running stats |
+| Test battery | tests/test_decision_brief.py | 19 decision-brief ok; full battery 63/63 | status/null-selection/no-ranking/finite/constants/action-order/obs-dim/service-mask/candidates/reproducibility/integrity |
+
 ## Still-missing evidence (drives next action)
 
 | Needed claim | Why missing | How to obtain |
 |---|---|---|
 | Joint 5-D action-box safety (mixed corners/interior/pump+demand) | only single lower-corner tested (R1b) | STEP 9 safety layer + STEP 12 automated joint tests |
-| Reward formulation + weights (D-P6-005 selection) | STEP 8 MEASURES scales/pathologies (WU-9) and COMPARES F1–F4 under provisional params (WU-10); no formulation selected, no weights chosen | researcher selects ONE formulation + weights (resolves D-P6-005); STEP 11 implements `src/env/reward.py` |
+| Reward formulation + weights (D-P6-005 selection) | STEP 8 MEASURES scales/pathologies (WU-9), COMPARES F1–F4 under provisional params (WU-10), and PREPARES a decision brief with 4 provisional NOT-APPROVED candidates (WU-11); no formulation selected, no weights chosen | researcher completes the decision block in `docs/PHASE6_D_P6_005_DECISION_BRIEF.md` (selects ONE formulation + parameters, resolves D-P6-005); STEP 11 implements `src/env/reward.py` |
 | Realised actuator-movement distribution | static runs = 0 movement; effort scale is analytic (R5-effort, HYPOTHESIS) | measured at training time once a policy trajectory exists |
 | Leak calibration | instrument uncalibrated (R3) | out of Phase 6 scope; relative response only |
 | Observation/state design | DELIVERABLES PRODUCED; D-P6-004 PROPOSED — awaiting researcher approval (not frozen) | researcher sign-off on the 5 review points → freeze 139-dim layout |

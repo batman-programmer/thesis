@@ -508,3 +508,48 @@ RESEARCH ASSUMPTION · HYPOTHESIS TO TEST · DECISION REQUIRED.
 - **Next action:** researcher selects ONE formulation + weights (resolves D-P6-005); then
   STEP 9 hard safety clamp; reward function is STEP 11. DO NOT start PPO (§16).
 
+---
+
+## WU-11 — STEP 8: D-P6-005 reward decision brief (this session)
+
+- **Objective:** Convert the completed STEP 8 evidence (WU-9 scale analysis + WU-10
+  formulation comparison) into a decision-ready scientific brief so the researcher can
+  explicitly select ONE reward formulation + parameters. The AI prepares; the researcher decides.
+- **Starting state:** HEAD `262b738`; STEP 8 measurement + comparison COMPLETE; D-P6-004
+  APPROVED & FROZEN; D-P6-005 PROPOSED; action space frozen. No decision-brief files existed.
+- **Evidence inspected:** `results/phase6/p6_s8_reward_scale_analysis.json` (pooled stats,
+  correlations, pathologies, frozen constants), `results/phase6/p6_s8_reward_formulation_comparison.json`
+  (per-config metrics, induced incentives, pathologies A–H, sensitivity sweeps, reproducibility),
+  `results/phase6/p6_s7_state_spec.json`, `docs/PHASE6_DECISION_REGISTER.md`.
+- **Action taken:** Wrote a pure aggregator (`src/validation/p6_d_p6_005_decision_brief.py`)
+  that RE-LOADS the two frozen artefacts (no EPANET, no PPO, no RNG), re-checks the frozen
+  normalisation constants match across artefacts (abs diff <1e-9), assembles the decision-brief
+  JSON with `researcher_selection: null`, and runs 11 internal self-checks. Authored the 11-section
+  `docs/PHASE6_D_P6_005_DECISION_BRIEF.md`. Defined FOUR "PROVISIONAL CANDIDATE — NOT APPROVED"
+  parameterizations whose constants trace to measured scales (e.g. C-A `w_A=0.1` from the measured
+  0.108 leak-term range), NOT tuned to any result.
+- **Result:** `docs/PHASE6_D_P6_005_DECISION_BRIEF.md` + `results/phase6/p6_d_p6_005_decision_brief.json`
+  created. The chronic sub-20-psi analysis concludes a HARD 20-psi reward constraint is ill-posed on
+  the native baseline (frac_ts_any_node_below_20psi = 1.0); dense deficit / worst-node / baseline-relative
+  signals are the defensible reward-level channels; the enforced 20-psi guarantee is STEP-9's.
+- **Decision:** D-P6-005 **remains PROPOSED / DECISION PENDING RESEARCHER** — the brief prepares the
+  gate; no formulation selected/scored/ranked, no weights tuned, no STEP-9 clamp, no PPO.
+- **Decision class:** DECISION REQUIRED (researcher selection) + VALIDATED FACT (re-used measured evidence).
+- **Files changed:** src/validation/p6_d_p6_005_decision_brief.py (new);
+  results/phase6/p6_d_p6_005_decision_brief.json (new); docs/PHASE6_D_P6_005_DECISION_BRIEF.md (new);
+  tests/test_decision_brief.py (new); docs/PHASE6_DECISION_REGISTER.md (WU-11 note, status UNCHANGED);
+  docs/PHASE6_EVIDENCE_INDEX.md; docs/RECOVERY.md; PROJECT_STATE.yaml; docs/PHASE6_EXECUTION_LOG.md.
+  NO action-space/observation file reopened; NO STEP-11 env reward code; NO STEP-9 clamp; NO PPO.
+- **Tests:** `.venv/Scripts/python.exe -m unittest discover -s tests -v` → **63 ok**
+  (19 decision-brief + 23 comparison + 12 STEP 8 + 9 STEP 7): brief status PROPOSED,
+  researcher_selection null, no winner/ranking keys, all values finite, constants match frozen WU-9,
+  action dim 7 + ordering + bounds unchanged, observation dim 139, service mask 121/5, candidates all
+  NOT APPROVED (2–4), deterministic regeneration byte-reproduces the artefact, chronic-baseline &
+  safety-separation documented, WU-9/WU-10 integrity preserved.
+- **Risks/caveats:** realised movement distribution unknown → effort scale analytic (HYPOTHESIS);
+  leak instrument uncalibrated → RELATIVE only (R3); joint 5-D box safety single-corner only (R1b →
+  STEP-9/12); weights/Λ/θ are researcher value judgements; PPO deps still missing (R4). D-P6-005 open.
+- **Next action:** researcher completes the decision block (selects ONE formulation + parameters);
+  then STEP 9 safety clamp; reward function is STEP 11. DO NOT start PPO (§16).
+
+

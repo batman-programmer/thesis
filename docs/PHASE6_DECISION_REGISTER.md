@@ -612,4 +612,30 @@ ablations, not silent changes.
   unit-weight max move cost of 1.0 (effort-domination is a weight-choice concern,
   analytic only). This evidence **informs but does not resolve** D-P6-005.
 
+### D-P6-005 — decision-brief note (WU-11, 2026-09-27; status UNCHANGED — still PROPOSED)
+
+A **decision brief** was assembled to convert the WU-9 + WU-10 evidence into a
+decision-ready package for the researcher: `docs/PHASE6_D_P6_005_DECISION_BRIEF.md`
+(11 sections) and `results/phase6/p6_d_p6_005_decision_brief.json`
+(`researcher_selection: null`), generator
+`src/validation/p6_d_p6_005_decision_brief.py`, tests
+`tests/test_decision_brief.py` (19 tests; full battery **63/63**). **No new EPANET
+run, no PPO, no STEP-9 clamp; no formulation selected/scored/ranked/labelled; no
+weights tuned.** The brief (i) reconstructs state from disk; (ii) restates the frozen
+action space (D-P6-001/002/003) and observation (D-P6-004); (iii) extracts the WU-9/WU-10
+quantitative evidence; (iv) states 12 FACTUAL decision dimensions (not scored); (v) gives
+the exact math + parameters-to-approve for F1–F4; (vi) analyses the chronic sub-20-psi
+baseline and concludes **no formulation can use a hard 20-psi constraint without penalising
+the native baseline itself** — dense deficit / worst-node min-pressure / baseline-relative
+signals are the defensible reward-level safety channels, and any hard gate must key on
+negative pressure (STEP-9 owns the enforced 20-psi guarantee); (vii) offers **four
+PROVISIONAL CANDIDATE — NOT APPROVED** parameterizations (C-A F1 balanced `w_A=0.1` from the
+measured 0.108 leak-term range; C-B F1 safety-leaning `w_P=2`; C-C F3 baseline-relative;
+C-D dense-deficit with a negative-only hard gate) whose constants trace to measured scales
+and are NOT tuned to a preferred result; (viii) presents the WU-10 low/central/high
+sensitivity sweeps as an incentive-direction indicator, NOT a ranking; (ix) keeps the
+reward (D-P6-005) separate from the STEP-9 safety clamp; (x) leaves the researcher decision
+block blank. **D-P6-005 remains PROPOSED / DECISION PENDING RESEARCHER.**
+
+
 
