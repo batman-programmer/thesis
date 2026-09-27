@@ -139,8 +139,18 @@ Source `results/phase5/g3_pump_speed.json`:
   constants (frozen, no running stats): leak_ref 84.72988, req_ref 906.39873, deficit_ref
   28.67179, power_ref 88.10062, movement_L2sq_max 28.0. 4 PROPOSED formulations: F1
   normalised weighted sum, F2 constrained penalty (service protected by construction), F3
-  baseline-relative improvement, F4 safety-first lexicographic. NEXT: researcher selects
-  ONE formulation + weights (resolves D-P6-005). Do NOT choose final weights, do NOT start PPO.
+  baseline-relative improvement, F4 safety-first lexicographic. **STEP 8 COMPARISON also
+  done (WU-10, 2026-09-27):** F1–F4 evaluated per-timestep over the same 19 validated
+  static commands with PROVISIONAL comparison-only params (F1 w_·=1; F2 Λ=20,BIG=100; F3
+  w_U=w_P_safety=1; F4 θ=20). On disk: `src/validation/p6_s8_reward_formulation_comparison.py`,
+  `results/phase6/p6_s8_reward_formulation_comparison.json`,
+  `tests/test_reward_formulation_comparison.py` (44/44 full battery), spec §8.9–§8.11. Key:
+  under provisional weights all four incentive-argmax = `prv_176_upper` (bound, min svc
+  ~4.17 psi); leak-only → `prv_lower_pump_lower` (min svc 1.295 psi); hard-20-psi terms
+  (F2/F4@20) fire on the native baseline (2 chronic <20 nodes) → ill-posed; θ=0 never
+  fires but permissive; leak-term dynamic range 0.108 vs unit max-move cost 1.0. NO winner
+  selected. NEXT: researcher selects ONE formulation + weights (resolves D-P6-005). Do NOT
+  choose final weights, do NOT start PPO.
 - STEP 9 safety layer, STEP 10 demand uncertainty/splits: NOT STARTED.
   STEP-9 must hard-clamp to the approved bounds.
 - STEP 11 `src/env/` (8 modules) + STEP 12 `tests/` (16 tests) + STEP 13 SB3
@@ -186,6 +196,14 @@ result is written to `results/phase6/` as JSON (raw + summary + interpretation).
   action bounds, or 121-service-node set changes. Do NOT choose reward weights, do NOT
   select a formulation, and do NOT implement `src/env/reward.py` (STEP 11) without the
   researcher's D-P6-005 selection. Do NOT start scientific PPO training.
+- **DO NOT** re-run the STEP 8 reward-formulation comparison
+  (`src/validation/p6_s8_reward_formulation_comparison.py`) or rewrite §8.9–§8.11 of
+  `docs/PHASE6_REWARD_SPEC.md` — the comparison is on disk (WU-10, 2026-09-27:
+  `results/phase6/p6_s8_reward_formulation_comparison.json`, 44/44 tests). The PROVISIONAL
+  comparison params are illustrative ONLY (NOT proposed weights). It adds evidence for
+  D-P6-005 but does NOT resolve it — no formulation is selected/scored/ranked, no weights
+  tuned, no STEP-9 clamp added, no PPO trained. Re-run only if the leak instrument, solver
+  policy, action bounds, or 121-service-node set changes.
 - **DO NOT** start scientific PPO training. A tiny smoke test is allowed ONLY after
   the env is implemented and validated, and only to prove the loop runs.
 - **DO NOT** auto-install gymnasium / stable_baselines3 / torch.

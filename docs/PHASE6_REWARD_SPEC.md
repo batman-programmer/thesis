@@ -300,3 +300,117 @@ remain **PROPOSED**.
 **Evidence:** `results/phase6/p6_s8_reward_scale_analysis.json`;
 generator `src/validation/p6_s8_reward_scale_analysis.py`;
 tests `tests/test_reward_scale_analysis.py` (12/12 STEP 8 + 9/9 STEP 7 passing).
+
+---
+
+## 8.9 Empirical comparison of candidate formulations F1–F4 [MEASUREMENT / D-P6-005 EVIDENCE]
+
+This section reports a **controlled side-by-side comparison** of the four proposed
+formulations (§8.5). It produces transparent, reproducible evidence for the
+researcher's D-P6-005 decision. It **does not** select, score, rank, or label any
+formulation, and it does **not** change §8.5–§8.8 or resolve D-P6-005. All
+formulations remain **PROPOSED**.
+
+**Method.** The four rewards were evaluated **per report timestep** over the same
+**19 static in-bounds commands** used for the STEP 8 scale analysis (reference,
+all-PRV-lower, all-PRV-upper, ten per-PRV edges, two pump edges, four mixed
+PRV×pump corners), re-running the validated 96 h protocol (1800 s report / 180 s
+rule / ACC 1e-5 / TRIALS 2000 / PDA) and reusing the **validated STEP 8 component
+extractor** verbatim. The frozen normalization constants (§8.6) and the derived
+`unserved_ref = 14.98484 GPM` are **loaded from the STEP 8 artefact** — no online,
+running, or test-set statistics. A reproducibility gate reproduced the frozen
+baseline exactly (`leak_ref_abs_diff = 0.0`, `req_ref_abs_diff = 0.0`,
+`n_node_ts_below_20psi = 386`, `n_node_ts_negative = 0`,
+`per_timestep_vs_validated_accounting_max_abs_diff = 0.0`, all reward values
+finite).
+
+**Provisional comparison parameters — `PROVISIONAL FOR COMPARISON ONLY`.** These
+are illustrative constants chosen solely to make the four rewards comparable on
+one scale; they are **not** proposed weights and carry no recommendation:
+
+| Formulation | Provisional parameters |
+|---|---|
+| F1 (normalized weighted sum) | `w_L = w_U = w_P = w_A = 1`, `w_E = 0` |
+| F2 (constrained penalty) | `Λ = 20`, `BIG = 100` |
+| F3 (baseline-relative improvement) | `w_U = 1`, `w_P_safety = 1` |
+| F4 (safety-first lexicographic) | `threshold = 20 psi`, `c_soft = 10`, `c_hard = 100`, `eps_effort = 0.01` |
+
+**Empirical findings (descriptive).** To probe incentive direction without
+comparing formulations against each other, we report, for each reward, the
+**incentive-argmax**: the tested command with the highest mean reward within the
+tested set. This is an *incentive direction indicator*, **not** a ranking of
+formulations and **not** a claim that the argmax command is a good operating point.
+
+1. **Induced incentive under the provisional parameters.** All four rewards place
+   their incentive-argmax on the **same** tested command, `prv_176_upper`
+   (VALVE-176 at its upper bound 59.524 psi, others nominal), which sits on an
+   action bound and carries `mean n_below20 = 1.0` and `min service ≈ 4.17 psi`.
+   Under these provisional weights the incentive is toward *raising* VALVE-176
+   (fewer chronically-low nodes, lower deficit) rather than toward the
+   leak-minimizing lower corner. Reward spread across tested commands: F1 0.541,
+   F3 0.525, F4 0.526; F2 110.5 (dominated by the `BIG·n_below20` term).
+
+2. **Isolated-objective checks (Pathology A/B).** A **leakage-only** incentive
+   placed its argmax at `prv_lower_pump_lower`, on the action bound, with worst-node
+   service **1.295 psi** (vs reference 4.165 psi). A **service/safety-only** incentive
+   placed its argmax at `prv_176_upper` with `leak_norm 1.0155` (> reference 1.0).
+   The two objectives pull in opposite directions, consistent with the STEP 8
+   correlations (leak↔deficit −0.774).
+
+3. **Hard 20 psi constraint degeneracy (Pathology F/G).** Every pooled timestep has
+   at least one service node below 20 psi (`frac = 1.0`), including the native
+   baseline (2 chronically low nodes); no timestep has a negative node
+   (`frac = 0.0`). Consequently F2 (`BIG·n_below20`) and F4 (`threshold = 20 psi`)
+   treat the network's chronic sub-20 nodes as a violation on **every** tested
+   command, so the leakage objective receives little/no gradient — an **ill-posed
+   hard constraint**. A 0 psi threshold (F4 sensitivity) never triggers in bounds,
+   so F4 collapses to pure leak minimization and inherits the
+   boundary-seeking-to-lower-PRV incentive while reporting "safe."
+
+4. **Actuator-penalty domination (Pathology C, analytic).** The normalized leak term
+   spans only **0.108** across the whole tested set, whereas a unit-weight maximum
+   single-step movement costs **1.0**. An un-tuned effort weight could therefore
+   dominate the leakage objective. Realised movement is 0 in all static runs, so
+   this is **analytic [HYPOTHESIS TO TEST]**; effort/smoothness must be computed on
+   the **commanded** normalized action (realised pump speed is reset by STATUS-IS
+   rules per G12 and is gameable).
+
+5. **Weight/penalty sensitivity (Pathology H).** Varying the provisional parameters
+   moves the incentive-argmax: e.g. F1 with `w_P = 0` shifts the argmax to
+   `prv_175_lower` (leak-leaning), while `w_P ≥ 0.5` shifts it to `prv_176_upper`;
+   F3 with both safety weights 0 shifts to `prv_lower_pump_lower`. This sensitivity
+   is expected and is precisely why weight selection is deferred to the researcher.
+
+## 8.10 Factual comparison table (no ranking) [D-P6-005 EVIDENCE]
+
+Descriptive attributes only. No formulation is scored, ranked, or labelled; this
+table is decision support for D-P6-005, which remains **PROPOSED**.
+
+| Attribute | F1 normalized weighted sum | F2 constrained penalty | F3 baseline-relative improvement | F4 safety-first lexicographic |
+|---|---|---|---|---|
+| **Mathematical form** | linear sum of normalized penalties | leak + soft deficit + `BIG·n_below20` count | improvement over baseline − capped unserved − safety | branch on min-pressure threshold, then leak, effort tie-break |
+| **Normalization** | all terms ÷ frozen refs (§8.6); O(1) | leak/deficit ÷ refs; hard term is an unnormalized count | leak relative to `leak_ref`; unserved ÷ `req_ref` | leak ÷ `leak_ref`; constant offsets `c_soft`, `c_hard` |
+| **Service behavior (measured)** | deficit/unserved terms pull incentive to `prv_176_upper` (fewer low nodes) | count term dominates; incentive pinned to fewest-sub-20 command | safety penalty required to avoid leak-corner incentive | soft band active at every ts (θ=20); constant −c_soft offset |
+| **Leakage behavior (measured)** | leak term dynamic range only 0.108 across tested set | leakage receives little gradient under hard 20 psi term | improvement term active; leak-corner incentive without safety term | no leak gradient at θ=20; pure leak min at θ=0 |
+| **Boundary tendency (measured)** | argmax on bound (`prv_176_upper`) at provisional weights | argmax on bound (`prv_176_upper`) | argmax on bound; leak-corner (`prv_lower_pump_lower`) if safety weights=0 | leak-corner (`prv_lower_pump_lower`, min svc 1.295 psi) at θ=0 |
+| **Weight/penalty sensitivity (measured)** | argmax moves with `w_P` (0→`prv_175_lower`; ≥0.5→`prv_176_upper`) | argmax stable across `BIG∈{10,100,1000}` (count dominates) | argmax moves with safety weights | argmax flips with threshold (0 vs 20 psi) |
+| **Reward-hacking / degeneracy observations** | effort weight can dominate leak (range 0.108 vs move-cost 1.0) | hard 20 psi term fires on baseline itself → ill-posed constraint | depends on explicit safety term to avoid leak corner | θ=20 degenerate (always-on); θ=0 permissive (reports "safe" while sub-20) |
+| **Implementation complexity** | lowest — one linear expression | low — one extra count term | moderate — baseline reference + clipping | highest — conditional branch + tie-break |
+| **Unresolved concern (→ D-P6-005 / STEP 9)** | choose `w_·` so effort ≪ leak dynamic range | 20 psi count ill-posed for BWSN-1; choose a feasible service term | pick safety term that prevents leak-corner incentive | pick a service threshold the network can actually meet; avoid 0 psi permissiveness |
+
+## 8.11 Safety implication (belongs to STEP 9, not STEP 8) [ENGINEERING NOTE]
+
+The isolated-objective and boundary-seeking checks show a **leakage-driving reward
+sends its incentive to the PRV lower corner with worst-node service ≈ 1.3 psi**.
+This confirms that a **state-dependent safety mechanism is required** — but that is
+**STEP 9 (unapproved)** and is **not** added here. STEP 8 keeps the fixed action
+**bounds** (STEP 6, D-P6-001/002/003) distinct from a state-dependent safety
+**clamp**; no clamp was inserted into any formulation or into the environment. The
+chronic sub-20 baseline (2 nodes) is a **formulation-design consideration**, not a
+constraint the environment can currently satisfy.
+
+**Status.** D-P6-005 remains **PROPOSED**. No formulation is selected; no weights
+are chosen; no PPO is trained. **Evidence:**
+`results/phase6/p6_s8_reward_formulation_comparison.json`; generator
+`src/validation/p6_s8_reward_formulation_comparison.py`; tests
+`tests/test_reward_formulation_comparison.py`.

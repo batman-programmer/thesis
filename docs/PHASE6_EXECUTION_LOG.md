@@ -440,3 +440,71 @@ RESEARCH ASSUMPTION · HYPOTHESIS TO TEST · DECISION REQUIRED.
   (separate approved decision); then STEP 9 hard safety clamp (clamp to approved bounds,
   protect worst-node pressure); reward function itself is STEP 11. DO NOT start PPO (§16).
 
+
+## WU-10 — STEP 8: empirical comparison of the four candidate formulations (2026-09-27, current session)
+
+- **Trigger:** researcher instruction to produce transparent, reproducible evidence
+  comparing F1–F4 for the D-P6-005 decision — explicitly WITHOUT selecting a winner,
+  assigning scores/ranks/tiers, tuning weights, adding a STEP-9 safety clamp, or
+  training PPO. Continuation of WU-9 (measurement), not a re-measurement.
+- **Method:** re-ran the SAME 19 validated static in-bounds commands (reference,
+  joint PRV lower/upper, 10 per-PRV edges, 2 pump edges, 4 mixed corners) under the
+  validated 96 h protocol (1800 s report / 180 s rule / ACC 1e-5 / TRIALS 2000 / PDA),
+  reusing the WU-9 component extractor verbatim, and evaluated F1–F4 per report
+  timestep. Frozen normalisation constants (§8.6) + derived `unserved_ref=14.98484`
+  were LOADED from the WU-9 artefact — no online/running/test-set statistics.
+- **PROVISIONAL comparison-only parameters (NOT proposed weights):** F1 `w_L=w_U=w_P=w_A=1,
+  w_E=0`; F2 `Λ=20,BIG=100`; F3 `w_U=w_P_safety=1`; F4 `θ=20 psi,c_soft=10,c_hard=100,
+  eps_effort=0.01`. Labelled "PROVISIONAL FOR COMPARISON ONLY" in code, JSON, and spec.
+- **Reproducibility gate (asserted, all passed):** leak_ref_abs_diff 0.0, req_ref_abs_diff
+  0.0, reference n_below20 386, n_negative 0, per-timestep vs validated accounting max
+  abs diff 0.0, all reward values finite, native_controls_count 5, no topology / native-
+  rule change, no future information.
+- **Descriptive findings (NO ranking, NO winner):**
+  1. **Induced incentive (provisional weights):** all four rewards place their
+     incentive-argmax (highest-mean-reward tested command = incentive direction, NOT a
+     formulation ranking) on the SAME bound command `prv_176_upper` (min service ≈4.17
+     psi, mean n_below20 1.0). Reward spreads: F1 0.541, F3 0.525, F4 0.526, F2 110.5.
+  2. **Isolated objectives oppose (Pathology A/B):** leak-only argmax `prv_lower_pump_lower`
+     (min service 1.295 psi vs ref 4.165); service-only argmax `prv_176_upper` (leak_norm
+     1.0155 > ref 1.0). Consistent with WU-9 correlations.
+  3. **Hard-20-psi degeneracy (Pathology F/G):** frac pooled ts with ≥1 node <20 psi = 1.0
+     (incl. baseline's 2 chronic nodes); frac with a negative node = 0.0. F2 (BIG·n_below20)
+     and F4 (θ=20) therefore fire on the baseline itself (ill-posed constraint, little leak
+     gradient); F4 at θ=0 never triggers → collapses to leak-corner-seeking while "safe".
+  4. **Actuator-penalty domination (Pathology C, analytic):** normalised leak term spans
+     only 0.108 across the tested set vs a unit-weight max single-step move cost of 1.0 →
+     an un-tuned effort weight could dominate leakage; realised movement is 0 in static
+     runs (HYPOTHESIS TO TEST); effort MUST use the COMMANDED action (G12 reset ambiguity).
+  5. **Weight sensitivity (Pathology H):** varying provisional weights shifts the
+     incentive-argmax (F1 `w_P=0`→`prv_175_lower`, `w_P≥0.5`→`prv_176_upper`; F3 safety=0
+     →`prv_lower_pump_lower`; F4 θ 0↔20 flips) — exactly why selection is the researcher's.
+- **Safety implication:** a leakage-driving reward sends its incentive to the PRV lower
+  corner (min service ≈1.3 psi) → a state-dependent safety mechanism is REQUIRED, but that
+  is STEP 9 (unapproved) and was NOT added. Action bounds (STEP 6) kept distinct from a
+  safety clamp; no clamp inserted into any formulation or the env.
+- **Decision:** D-P6-005 **remains PROPOSED** — this WU adds comparison evidence only; no
+  formulation/weights selected, no score/rank/tier/winner assigned.
+- **Decision class:** VALIDATED FACT (per-timestep measured reward behaviour under the
+  validated instrument) + DECISION REQUIRED (researcher selection of formulation + weights).
+- **Files changed:** src/validation/p6_s8_reward_formulation_comparison.py (new);
+  results/phase6/p6_s8_reward_formulation_comparison.json (new);
+  tests/test_reward_formulation_comparison.py (new); docs/PHASE6_REWARD_SPEC.md (§8.9–§8.11);
+  docs/PHASE6_DECISION_REGISTER.md (D-P6-005 comparison-evidence note, status UNCHANGED);
+  docs/PHASE6_EVIDENCE_INDEX.md; docs/RECOVERY.md; PROJECT_STATE.yaml;
+  docs/PHASE6_EXECUTION_LOG.md. NO action-space/observation file reopened; NO
+  reward-function env code (STEP 11); NO STEP-9 clamp; NO PPO.
+- **Tests:** `.venv/Scripts/python.exe -m unittest discover -s tests -v` → 44 ok
+  (23 comparison + 12 STEP 8 + 9 STEP 7): normalization exactness/signs, F1 monotonic in
+  leak, F2 count scaling, F3 baseline-relative zero point, F4 lexicographic branches,
+  unserved clip ≥0, movement 0 for static hold, analytic effort dim-7 ceiling, incentive-
+  argmax picks max mean, PART-13 keys present, reference reproduces baseline, per-ts
+  accounting <1e-6, service mask 121/5, frozen constants, no topology/future info,
+  status asserts D-P6-005 PROPOSED and 4 formulations.
+- **Risks/caveats:** effort scale analytic (realised movement a HYPOTHESIS); leak
+  instrument uncalibrated → RELATIVE only (R3); coverage = edges+corners+reference, NOT the
+  joint interior (R1b → STEP-9/STEP-12); provisional weights are illustrative — a different
+  choice shifts incentives; PPO deps still missing (R4). Nothing frozen; D-P6-005 open.
+- **Next action:** researcher selects ONE formulation + weights (resolves D-P6-005); then
+  STEP 9 hard safety clamp; reward function is STEP 11. DO NOT start PPO (§16).
+

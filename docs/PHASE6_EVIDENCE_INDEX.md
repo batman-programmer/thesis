@@ -158,12 +158,39 @@ chosen, no PPO trained. 19 static in-bounds configs × 193 report ts = 3667 pool
 | Determinism + integrity | integrity | all finite; no topology/native-rule change; no future info; native controls unchanged | reproducible, no leakage |
 | Test battery | tests/test_reward_scale_analysis.py | 12 STEP 8 + 9 STEP 7 = 21/21 ok | pure helpers + artefact checks |
 
+## STEP 8 — reward-formulation comparison (D-P6-005 evidence, PROPOSED)
+
+Spec: `docs/PHASE6_REWARD_SPEC.md` §8.9–§8.11. Register: D-P6-005 comparison-evidence
+note (status UNCHANGED — still PROPOSED). Raw evidence:
+`results/phase6/p6_s8_reward_formulation_comparison.json`; generator
+`src/validation/p6_s8_reward_formulation_comparison.py`; tests
+`tests/test_reward_formulation_comparison.py`. **Comparison only — no formulation
+selected/scored/ranked, no weights tuned, no STEP-9 clamp, no PPO.** Same 19 static
+in-bounds commands × 193 report ts as the WU-9 measurement; frozen constants loaded
+from the WU-9 artefact.
+
+| Claim | Section/Key | Result | Interpretation |
+|---|---|---|---|
+| Reproduces frozen baseline exactly | reproducibility_information.reference_reproduces_frozen_baseline | leak_ref_abs_diff 0.0, req 0.0, below20 386, neg 0, per-ts vs accounting 0.0 | comparison anchored to the validated instrument; no drift |
+| Provisional params labelled comparison-only | provisional_parameters | F1 w_·=1/w_E=0; F2 Λ=20,BIG=100; F3 w_U=w_P_safety=1; F4 θ=20,c_soft=10,c_hard=100 | illustrative constants, NOT proposed weights |
+| Induced incentive (all four) | induced_incentive_per_formulation | argmax = `prv_176_upper` for F1/F2/F3/F4; spreads F1 0.541 / F2 110.5 / F3 0.525 / F4 0.526 | incentive-direction indicator, NOT a formulation ranking |
+| Leak-only collapses service (A) | pathology_results.A_leakage_only_collapses_service | argmax `prv_lower_pump_lower`, min svc 1.295 psi (ref 4.165) | leakage-driving incentive → PRV lower corner, unsafe worst-node |
+| Service-only raises leakage (B) | pathology_results.B_service_only_raises_leakage | argmax `prv_176_upper`, leak_norm 1.0155 (ref 1.0) | objectives oppose (consistent with WU-9 correlations) |
+| Actuator-penalty domination (C) | pathology_results.C_actuator_penalty_domination | leak-term range 0.108 vs max move cost 1.0 (w_A=1) | un-tuned effort weight could dominate leakage; ANALYTIC (da=0 in statics) |
+| Boundary-seeking (D) | pathology_results.D_boundary_seeking_per_formulation | all argmax on_bound=True, min svc 4.166, n_below20 1.0 | provisional-weight incentive sits on a bound → STEP-9 clamp required |
+| Flat/weak signal (E) | pathology_results.E_flat_or_weak_signal_per_formulation | within-config std F1 0.032 / F3 0.030 / F4 0.023 / F2 2.55 | reward varies mostly across commands, little within a static hold |
+| Sparse/degenerate violation (F) | pathology_results.F_sparse_or_degenerate_violation_signal | frac<20psi 1.0, frac<0psi 0.0, ref n_below20 2.0 | hard-20 term fires on baseline; <0 term never fires in-bounds |
+| Reward-hacking / degeneracy (G) | pathology_results.G_reward_hacking_and_degeneracy | hard-20 ill-posed; θ=0 permissive; effort must use COMMANDED action | formulation-design considerations for D-P6-005 |
+| Weight/penalty sensitivity (H) | sensitivity_results | F1 w_P 0→`prv_175_lower`, ≥0.5→`prv_176_upper`; F4 θ 0↔20 flips argmax | incentive shifts with parameters → selection is the researcher's |
+| Analytic effort probe | actuator_effort_analytic | dim implied 7, L2sq_max 28, max-move norm 1.0, static-hold norm 0.0 | effort ÷ 28; realised distribution is a training-time HYPOTHESIS |
+| Test battery | tests/test_reward_formulation_comparison.py | 23 comparison ok; full battery 44/44 | normalization/signs/branches/mask/reproducibility/no-future-info |
+
 ## Still-missing evidence (drives next action)
 
 | Needed claim | Why missing | How to obtain |
 |---|---|---|
 | Joint 5-D action-box safety (mixed corners/interior/pump+demand) | only single lower-corner tested (R1b) | STEP 9 safety layer + STEP 12 automated joint tests |
-| Reward formulation + weights (D-P6-005 selection) | STEP 8 MEASURES scales/pathologies and PROPOSES F1–F4 only; no weights chosen | researcher selects ONE formulation + weights (resolves D-P6-005); STEP 11 implements `src/env/reward.py` |
+| Reward formulation + weights (D-P6-005 selection) | STEP 8 MEASURES scales/pathologies (WU-9) and COMPARES F1–F4 under provisional params (WU-10); no formulation selected, no weights chosen | researcher selects ONE formulation + weights (resolves D-P6-005); STEP 11 implements `src/env/reward.py` |
 | Realised actuator-movement distribution | static runs = 0 movement; effort scale is analytic (R5-effort, HYPOTHESIS) | measured at training time once a policy trajectory exists |
 | Leak calibration | instrument uncalibrated (R3) | out of Phase 6 scope; relative response only |
 | Observation/state design | DELIVERABLES PRODUCED; D-P6-004 PROPOSED — awaiting researcher approval (not frozen) | researcher sign-off on the 5 review points → freeze 139-dim layout |

@@ -1,0 +1,2732 @@
+{
+  "experiment_metadata": {
+    "phase": 6,
+    "step": 8,
+    "title": "Empirical comparison of the four PROPOSED reward formulations (F1-F4) for the BWSN-1 PPO environment",
+    "status": "EVIDENCE ONLY. No formulation selected, no score/rank/tier/winner assigned, no weights tuned, no safety clamp added (STEP 9), no PPO trained. D-P6-005 remains PROPOSED.",
+    "generated_utc": "2026-09-27T10:07:29.881476+00:00",
+    "env": {
+      "timestamp_utc": "2026-09-27T10:07:29+00:00",
+      "os": "Windows-11-10.0.26200-SP0",
+      "machine": "AMD64",
+      "python": "3.13.15",
+      "python_build": "Aug  5 2026 13:05:39",
+      "wntr": "1.5.0",
+      "numpy": "2.5.2",
+      "pandas": "3.0.5",
+      "scipy": "1.18.1",
+      "networkx": "3.6.1",
+      "epanet_engine_wntr": {
+        "epanet2.dll": 20200,
+        "epanet20.dll": 20012,
+        "epanet22.dll": 20200
+      },
+      "epanet_engine_epyt": 20305,
+      "original_inp_sha256": "510af942ec643eb87adcf26e5a7df1cc4c23eb0c1e470a8a1257ed055f1956f1",
+      "working_inp_sha256": "53015ba9212e46bec731d190971819996233996b498bc269e828f992830a20a9",
+      "determinism": "EPANET's hydraulic solver is deterministic. No stochastic input is used anywhere in Phase 5; leak-node selection and leak-coefficient allocation are closed-form functions of pipe length, so no random seed is required. Recorded seed: none used."
+    },
+    "purpose": "transparent, reproducible evidence for the researcher to make and document decision D-P6-005; measurement over preference, evidence over intuition.",
+    "coverage_statement": "19 static in-bounds commands x 193 report timesteps = 3667 instants: native reference, joint PRV lower/upper edges, each PRV isolated at its lower/upper edge, both pump edges, and four mixed PRV+pump corners. This is the edges+corners+reference of the 7-D action box and is NOT exhaustive over the joint-action interior; interior/mixed-corner joint safety is a STEP-9 + STEP-12 job.",
+    "solver_policy": {
+      "accuracy": 1e-05,
+      "trials": 2000,
+      "rule_timestep_s": 180,
+      "report_timestep_s": 1800,
+      "pda_required_psi": 20.0,
+      "pda_minimum_psi": 0.0,
+      "pda_exponent": 0.5,
+      "asserted_after_every_load": true
+    },
+    "service_node_policy": {
+      "n_service_junctions": 121,
+      "n_connector_junctions": 5,
+      "connector_nodes": [
+        "JUNCTION-105",
+        "JUNCTION-106",
+        "JUNCTION-109",
+        "JUNCTION-110",
+        "JUNCTION-128"
+      ]
+    },
+    "leak_instrument_status": "VALIDATION instrument, NOT field-calibrated; only RELATIVE leakage response is meaningful (brief 18).",
+    "action_space_reference": {
+      "source": "docs/PHASE6_ACTION_SPACE_SPEC.md (D-P6-001/002/003, FROZEN)",
+      "prv_bounds_psi": {
+        "VALVE-173": [
+          54.5,
+          100.0
+        ],
+        "VALVE-175": [
+          21.5,
+          110.0
+        ],
+        "VALVE-176": [
+          20.0,
+          59.524
+        ],
+        "VALVE-177": [
+          20.0,
+          90.0
+        ],
+        "VALVE-178": [
+          20.0,
+          74.0
+        ]
+      },
+      "pump_bounds_rel_speed": {
+        "PUMP-170": [
+          0.82,
+          1.1
+        ],
+        "PUMP-172": [
+          0.77,
+          1.1
+        ]
+      }
+    },
+    "separation_of_concerns": "action-space bounds (STEP 6, fixed) are NOT a safety mechanism; any state-dependent clamp is STEP 9 (unapproved) and is NOT applied in this measurement."
+  },
+  "formulations": [
+    {
+      "status": "PROPOSED",
+      "sign_convention": "reward is a NEGATIVE cost; higher (less negative) is better",
+      "time_aggregation": "per report timestep (1800 s); episode return = sum over the 193 report steps of a 96 h EPS. Reported here as per-step temporal statistics + per-config mean. No discounting applied in this measurement.",
+      "terminal_behavior": "fixed-horizon EPS, no early termination in Phase 6; a STEP-9 safety termination/clamp is NOT part of this measurement.",
+      "normalization_constants_used": {
+        "leak_ref_gpm": 84.72988433677985,
+        "req_ref_gpm": 906.3987348621764,
+        "deficit_ref_psi_nodesum": 28.671793365478514,
+        "power_ref_kw": 88.10062475649187,
+        "movement_L2sq_max": 28.0
+      },
+      "id": "F1",
+      "name": "normalized_weighted_sum",
+      "expression": "r_t = -w_L*(leak_t/leak_ref) - w_U*(unserved_t^+/req_ref) - w_P*(deficit_t/deficit_ref) - w_A*(||da_t||^2/L2sq_max) - w_E*(power_t/power_ref)",
+      "components": [
+        "leakage",
+        "unserved_demand",
+        "pressure_deficit",
+        "actuator_movement",
+        "pump_power(optional)"
+      ],
+      "clipping": "unserved clipped at >=0; da=0 for static holds",
+      "epsilon_handling": "all denominators are fixed nonzero constants",
+      "provisional_weights": {
+        "w_L": 1.0,
+        "w_U": 1.0,
+        "w_P": 1.0,
+        "w_A": 1.0,
+        "w_E": 0.0
+      }
+    },
+    {
+      "status": "PROPOSED",
+      "sign_convention": "reward is a NEGATIVE cost; higher (less negative) is better",
+      "time_aggregation": "per report timestep (1800 s); episode return = sum over the 193 report steps of a 96 h EPS. Reported here as per-step temporal statistics + per-config mean. No discounting applied in this measurement.",
+      "terminal_behavior": "fixed-horizon EPS, no early termination in Phase 6; a STEP-9 safety termination/clamp is NOT part of this measurement.",
+      "normalization_constants_used": {
+        "leak_ref_gpm": 84.72988433677985,
+        "req_ref_gpm": 906.3987348621764,
+        "deficit_ref_psi_nodesum": 28.671793365478514,
+        "power_ref_kw": 88.10062475649187,
+        "movement_L2sq_max": 28.0
+      },
+      "id": "F2",
+      "name": "constrained_penalty_service_protected",
+      "expression": "r_t = -(leak_t/leak_ref) - LAMBDA*(deficit_t/deficit_ref) - BIG*max(0, n_below20_t)",
+      "components": [
+        "leakage",
+        "pressure_deficit",
+        "n_below20(hard)"
+      ],
+      "clipping": "n_below20 clipped at >=0 (a count, already >=0)",
+      "epsilon_handling": "fixed nonzero denominators",
+      "provisional_parameters": {
+        "lambda_service": 20.0,
+        "big_hard": 100.0
+      }
+    },
+    {
+      "status": "PROPOSED",
+      "sign_convention": "reward is a NEGATIVE cost; higher (less negative) is better",
+      "time_aggregation": "per report timestep (1800 s); episode return = sum over the 193 report steps of a 96 h EPS. Reported here as per-step temporal statistics + per-config mean. No discounting applied in this measurement.",
+      "terminal_behavior": "fixed-horizon EPS, no early termination in Phase 6; a STEP-9 safety termination/clamp is NOT part of this measurement.",
+      "normalization_constants_used": {
+        "leak_ref_gpm": 84.72988433677985,
+        "req_ref_gpm": 906.3987348621764,
+        "deficit_ref_psi_nodesum": 28.671793365478514,
+        "power_ref_kw": 88.10062475649187,
+        "movement_L2sq_max": 28.0
+      },
+      "id": "F3",
+      "name": "baseline_relative_improvement",
+      "expression": "r_t = (leak_ref - leak_t)/leak_ref - w_U*max(0, unserved_t - unserved_ref)/req_ref - w_P_safety*(deficit_t/deficit_ref)",
+      "components": [
+        "fractional_leak_reduction_vs_native",
+        "excess_unserved",
+        "pressure_deficit"
+      ],
+      "clipping": "excess unserved clipped at >=0",
+      "epsilon_handling": "fixed nonzero denominators",
+      "baseline_constants": {
+        "unserved_ref_gpm": 14.98483697365873,
+        "source": "native reference req-served (frozen)"
+      },
+      "provisional_weights": {
+        "w_U": 1.0,
+        "w_P_safety": 1.0
+      }
+    },
+    {
+      "status": "PROPOSED",
+      "sign_convention": "reward is a NEGATIVE cost; higher (less negative) is better",
+      "time_aggregation": "per report timestep (1800 s); episode return = sum over the 193 report steps of a 96 h EPS. Reported here as per-step temporal statistics + per-config mean. No discounting applied in this measurement.",
+      "terminal_behavior": "fixed-horizon EPS, no early termination in Phase 6; a STEP-9 safety termination/clamp is NOT part of this measurement.",
+      "normalization_constants_used": {
+        "leak_ref_gpm": 84.72988433677985,
+        "req_ref_gpm": 906.3987348621764,
+        "deficit_ref_psi_nodesum": 28.671793365478514,
+        "power_ref_kw": 88.10062475649187,
+        "movement_L2sq_max": 28.0
+      },
+      "id": "F4",
+      "name": "safety_first_lexicographic",
+      "expression": "if min_svc_p_t < 0: r_t = -c_hard - deficit_t/deficit_ref; elif min_svc_p_t < theta: r_t = -c_soft - deficit_t/deficit_ref; else: r_t = -(leak_t/leak_ref) - eps*(||da_t||^2/L2sq_max)",
+      "components": [
+        "safety_band(min_service_pressure)",
+        "pressure_deficit",
+        "leakage",
+        "actuator_movement(tie-break)"
+      ],
+      "clipping": "branch selection by min service pressure vs threshold",
+      "epsilon_handling": "fixed nonzero denominators; eps effort tie-break",
+      "provisional_parameters": {
+        "safety_threshold_psi": 20.0,
+        "c_soft_service": 10.0,
+        "c_hard_negative": 100.0,
+        "eps_effort": 0.01
+      }
+    }
+  ],
+  "provisional_parameters": {
+    "disclaimer": "PROVISIONAL FOR COMPARISON ONLY - none selected or tuned",
+    "values": {
+      "F1_normalized_weighted_sum": {
+        "w_L": 1.0,
+        "w_U": 1.0,
+        "w_P": 1.0,
+        "w_A": 1.0,
+        "w_E": 0.0
+      },
+      "F2_constrained_penalty": {
+        "lambda_service": 20.0,
+        "big_hard": 100.0
+      },
+      "F3_baseline_relative": {
+        "w_U": 1.0,
+        "w_P_safety": 1.0
+      },
+      "F4_safety_first_lexicographic": {
+        "safety_threshold_psi": 20.0,
+        "c_soft_service": 10.0,
+        "c_hard_negative": 100.0,
+        "eps_effort": 0.01
+      }
+    }
+  },
+  "normalization_constants": {
+    "leak_ref_gpm": 84.72988433677985,
+    "req_ref_gpm": 906.3987348621764,
+    "deficit_ref_psi_nodesum": 28.671793365478514,
+    "power_ref_kw": 88.10062475649187,
+    "movement_L2sq_max": 28.0,
+    "derived_baseline_unserved_ref_gpm": 14.98483697365873,
+    "source": "LOADED verbatim from results/phase6/p6_s8_reward_scale_analysis.json (frozen, no online/running statistics, no test-set fitting).",
+    "note": "FIXED constants measured once (baseline reference run / this analysis) and frozen; NOT per-episode running statistics -> no train/eval leakage. deficit_ref guards against a ~0 baseline deficit by taking max(baseline mean, pooled p95)."
+  },
+  "tested_configurations": [
+    {
+      "label": "reference_nominal",
+      "category": "native_reference",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      }
+    },
+    {
+      "label": "prv_all_lower",
+      "category": "joint_prv_lower_edge_lower_pressure",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 54.5,
+          "VALVE-175": 21.5,
+          "VALVE-176": 20.0,
+          "VALVE-177": 20.0,
+          "VALVE-178": 20.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      }
+    },
+    {
+      "label": "prv_all_upper",
+      "category": "joint_prv_upper_edge_higher_pressure",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 100.0,
+          "VALVE-175": 110.0,
+          "VALVE-176": 59.524,
+          "VALVE-177": 90.0,
+          "VALVE-178": 74.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      }
+    },
+    {
+      "label": "prv_173_lower",
+      "category": "single_prv_edge",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 54.5,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      }
+    },
+    {
+      "label": "prv_173_upper",
+      "category": "single_prv_edge",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 100.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      }
+    },
+    {
+      "label": "prv_175_lower",
+      "category": "single_prv_edge",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 21.5,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      }
+    },
+    {
+      "label": "prv_175_upper",
+      "category": "single_prv_edge",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 110.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      }
+    },
+    {
+      "label": "prv_176_lower",
+      "category": "single_prv_edge",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 20.0,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      }
+    },
+    {
+      "label": "prv_176_upper",
+      "category": "single_prv_edge",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 59.524,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      }
+    },
+    {
+      "label": "prv_177_lower",
+      "category": "single_prv_edge",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 20.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      }
+    },
+    {
+      "label": "prv_177_upper",
+      "category": "single_prv_edge",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 90.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      }
+    },
+    {
+      "label": "prv_178_lower",
+      "category": "single_prv_edge",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 20.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      }
+    },
+    {
+      "label": "prv_178_upper",
+      "category": "single_prv_edge",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 74.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      }
+    },
+    {
+      "label": "pump_all_lower",
+      "category": "pump_only_edge",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 0.82,
+          "PUMP-172": 0.77
+        }
+      }
+    },
+    {
+      "label": "pump_all_upper",
+      "category": "pump_only_edge",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.1,
+          "PUMP-172": 1.1
+        }
+      }
+    },
+    {
+      "label": "prv_lower_pump_lower",
+      "category": "joint_prv_pump_corner",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 54.5,
+          "VALVE-175": 21.5,
+          "VALVE-176": 20.0,
+          "VALVE-177": 20.0,
+          "VALVE-178": 20.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 0.82,
+          "PUMP-172": 0.77
+        }
+      }
+    },
+    {
+      "label": "prv_upper_pump_upper",
+      "category": "joint_prv_pump_corner",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 100.0,
+          "VALVE-175": 110.0,
+          "VALVE-176": 59.524,
+          "VALVE-177": 90.0,
+          "VALVE-178": 74.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.1,
+          "PUMP-172": 1.1
+        }
+      }
+    },
+    {
+      "label": "prv_lower_pump_upper",
+      "category": "joint_prv_pump_corner",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 54.5,
+          "VALVE-175": 21.5,
+          "VALVE-176": 20.0,
+          "VALVE-177": 20.0,
+          "VALVE-178": 20.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.1,
+          "PUMP-172": 1.1
+        }
+      }
+    },
+    {
+      "label": "prv_upper_pump_lower",
+      "category": "joint_prv_pump_corner",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 100.0,
+          "VALVE-175": 110.0,
+          "VALVE-176": 59.524,
+          "VALVE-177": 90.0,
+          "VALVE-178": 74.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 0.82,
+          "PUMP-172": 0.77
+        }
+      }
+    }
+  ],
+  "per_configuration_metrics": {
+    "reference_nominal": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "validated_accounting_subset": {
+        "leakage_mean_gpm": 84.72988433677985,
+        "dsr_mean": 0.9833370137001072,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0
+      },
+      "per_timestep_vs_accounting_max_abs_diff": 0.0,
+      "violating_fractions": {
+        "frac_ts_any_node_below_20psi": 1.0,
+        "frac_ts_any_node_negative": 0.0,
+        "mean_n_nodes_below_20psi": 2.0,
+        "min_service_psi_over_horizon": 4.16452169418335
+      },
+      "reward_temporal_stats": {
+        "F1": {
+          "n": 193,
+          "mean": -1.6492484170735306,
+          "median": -1.6449211704129776,
+          "std": 0.022994842453100663,
+          "min": -1.7176863537173106,
+          "max": -1.609248609352675,
+          "p5": -1.6842102679816482,
+          "p25": -1.6692243008178402,
+          "p75": -1.6310130820280588,
+          "p95": -1.6118518075499877,
+          "mean_abs_step_diff": 0.004365244144401575
+        },
+        "F2": {
+          "n": 193,
+          "mean": -213.65432275697657,
+          "median": -213.66649190355167,
+          "std": 0.3753122483386298,
+          "min": -214.3766750293794,
+          "max": -213.0932534884019,
+          "p5": -214.24522982067515,
+          "p25": -213.97720007161303,
+          "p75": -213.30065952457676,
+          "p95": -213.13360473840757,
+          "mean_abs_step_diff": 0.04276093822972079
+        },
+        "F3": {
+          "n": 193,
+          "mean": -0.6369497654539893,
+          "median": -0.6374653592842954,
+          "std": 0.020031338347312817,
+          "min": -0.7011540744926079,
+          "max": -0.6072296676064599,
+          "p5": -0.6676779887569455,
+          "p25": -0.6541859720779566,
+          "p75": -0.6181132118935014,
+          "p95": -0.6092905008483742,
+          "mean_abs_step_diff": 0.003467055581868784
+        },
+        "F4": {
+          "n": 193,
+          "mean": -10.63271613784883,
+          "median": -10.633362788174237,
+          "std": 0.018858126619619907,
+          "min": -10.669032034614157,
+          "max": -10.604527569515549,
+          "p5": -10.662406877382491,
+          "p25": -10.648995882007817,
+          "p75": -10.614961184989324,
+          "p95": -10.606532428766016,
+          "mean_abs_step_diff": 0.0021481134247799314
+        }
+      },
+      "all_reward_finite": true
+    },
+    "prv_all_lower": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 54.5,
+          "VALVE-175": 21.5,
+          "VALVE-176": 20.0,
+          "VALVE-177": 20.0,
+          "VALVE-178": 20.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "validated_accounting_subset": {
+        "leakage_mean_gpm": 81.38381870141156,
+        "dsr_mean": 0.9193996684666168,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0
+      },
+      "per_timestep_vs_accounting_max_abs_diff": 0.0,
+      "violating_fractions": {
+        "frac_ts_any_node_below_20psi": 1.0,
+        "frac_ts_any_node_negative": 0.0,
+        "mean_n_nodes_below_20psi": 2.0,
+        "min_service_psi_over_horizon": 4.189884185791016
+      },
+      "reward_temporal_stats": {
+        "F1": {
+          "n": 193,
+          "mean": -2.0114687438005174,
+          "median": -2.0029239210020906,
+          "std": 0.05749609416960643,
+          "min": -2.20459396634857,
+          "max": -1.9141601904750605,
+          "p5": -2.1194203820857203,
+          "p25": -2.050539448084285,
+          "p75": -1.965565076320307,
+          "p95": -1.9281940806377622,
+          "mean_abs_step_diff": 0.01661777850217087
+        },
+        "F2": {
+          "n": 193,
+          "mean": -220.39438064787456,
+          "median": -220.39266638275902,
+          "std": 0.3625308722452905,
+          "min": -221.07310685043012,
+          "max": -219.86713311038991,
+          "p5": -220.99405933096625,
+          "p25": -220.71482383378924,
+          "p75": -220.04500653362155,
+          "p95": -219.89739639827647,
+          "mean_abs_step_diff": 0.04146324630670787
+        },
+        "F3": {
+          "n": 193,
+          "mean": -0.9957455444684057,
+          "median": -0.986391641777388,
+          "std": 0.056421486932699105,
+          "min": -1.1880616871238672,
+          "max": -0.9092255612652137,
+          "p5": -1.1028881028610173,
+          "p25": -1.0340071688595824,
+          "p75": -0.9490327970956043,
+          "p95": -0.9119271403104904,
+          "mean_abs_step_diff": 0.0161801590531442
+        },
+        "F4": {
+          "n": 193,
+          "mean": -10.971693581079567,
+          "median": -10.97167919442039,
+          "std": 0.018214730278022295,
+          "min": -11.005782676759047,
+          "max": -10.945208953437874,
+          "p5": -11.001794738058717,
+          "p25": -10.987858379833495,
+          "p75": -10.95415430471173,
+          "p95": -10.946727658800757,
+          "mean_abs_step_diff": 0.0020826282948889032
+        }
+      },
+      "all_reward_finite": true
+    },
+    "prv_all_upper": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 100.0,
+          "VALVE-175": 110.0,
+          "VALVE-176": 59.524,
+          "VALVE-177": 90.0,
+          "VALVE-178": 74.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "validated_accounting_subset": {
+        "leakage_mean_gpm": 89.7592331333586,
+        "dsr_mean": 1.000180882194326,
+        "n_node_timesteps_below_20psi": 193,
+        "n_node_timesteps_negative_pressure": 0
+      },
+      "per_timestep_vs_accounting_max_abs_diff": 0.0,
+      "violating_fractions": {
+        "frac_ts_any_node_below_20psi": 1.0,
+        "frac_ts_any_node_negative": 0.0,
+        "mean_n_nodes_below_20psi": 1.0,
+        "min_service_psi_over_horizon": 4.167034149169922
+      },
+      "reward_temporal_stats": {
+        "F1": {
+          "n": 193,
+          "mean": -1.5786128087536415,
+          "median": -1.5791427682237424,
+          "std": 0.016812924878016982,
+          "min": -1.6085957563501065,
+          "max": -1.5538135947876193,
+          "p5": -1.6053445451490327,
+          "p25": -1.5931365938492437,
+          "p75": -1.5623394894753266,
+          "p95": -1.555703969910309,
+          "mean_abs_step_diff": 0.001902674070817418
+        },
+        "F2": {
+          "n": 193,
+          "mean": -111.44446486645758,
+          "median": -111.44066101906598,
+          "std": 0.37068482067847686,
+          "min": -112.10054194365009,
+          "max": -110.89791621824631,
+          "p5": -112.02181403148415,
+          "p25": -111.75924645765649,
+          "p75": -111.09039642845562,
+          "p95": -110.93400826025174,
+          "mean_abs_step_diff": 0.04142989659770224
+        },
+        "F3": {
+          "n": 193,
+          "mean": -0.5786128087536416,
+          "median": -0.5791427682237426,
+          "std": 0.016812924878016985,
+          "min": -0.6085957563501067,
+          "max": -0.5538135947876193,
+          "p5": -0.6053445451490328,
+          "p25": -0.5931365938492437,
+          "p75": -0.5623394894753266,
+          "p95": -0.555703969910309,
+          "mean_abs_step_diff": 0.0019026740708174203
+        },
+        "F4": {
+          "n": 193,
+          "mean": -10.519255371458101,
+          "median": -10.51907072336319,
+          "std": 0.01862667949356297,
+          "min": -10.552214005207407,
+          "max": -10.491792022036421,
+          "p5": -10.548332238045743,
+          "p25": -10.53512950120425,
+          "p75": -10.501495541873057,
+          "p95": -10.49360893903686,
+          "mean_abs_step_diff": 0.0020812690669159972
+        }
+      },
+      "all_reward_finite": true
+    },
+    "prv_173_lower": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 54.5,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "validated_accounting_subset": {
+        "leakage_mean_gpm": 84.45235543743065,
+        "dsr_mean": 0.9833353350813864,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0
+      },
+      "per_timestep_vs_accounting_max_abs_diff": 0.0,
+      "violating_fractions": {
+        "frac_ts_any_node_below_20psi": 1.0,
+        "frac_ts_any_node_negative": 0.0,
+        "mean_n_nodes_below_20psi": 2.0,
+        "min_service_psi_over_horizon": 4.16536808013916
+      },
+      "reward_temporal_stats": {
+        "F1": {
+          "n": 193,
+          "mean": -1.6460059073951552,
+          "median": -1.6416282875907715,
+          "std": 0.022971341171364915,
+          "min": -1.714388483210473,
+          "max": -1.606386910708217,
+          "p5": -1.6810813789244003,
+          "p25": -1.6658624657406618,
+          "p75": -1.6281223476551063,
+          "p95": -1.6089863905438668,
+          "mean_abs_step_diff": 0.004360265649758351
+        },
+        "F2": {
+          "n": 193,
+          "mean": -213.65169176695957,
+          "median": -213.66292596466874,
+          "std": 0.37469673386366387,
+          "min": -214.37281554452804,
+          "max": -213.0967414259672,
+          "p5": -214.24297606507633,
+          "p25": -213.98220783473815,
+          "p75": -213.29594141197606,
+          "p95": -213.13205630741697,
+          "mean_abs_step_diff": 0.0426466233286115
+        },
+        "F3": {
+          "n": 193,
+          "mean": -0.6337068689964991,
+          "median": -0.6341848367952088,
+          "std": 0.02001087863735499,
+          "min": -0.6978562039857702,
+          "max": -0.6041932221679662,
+          "p5": -0.6645490996996976,
+          "p25": -0.6508553050201514,
+          "p75": -0.6147940149349188,
+          "p95": -0.6060931728944396,
+          "mean_abs_step_diff": 0.0034620727686087136
+        },
+        "F4": {
+          "n": 193,
+          "mean": -10.632748361083845,
+          "median": -10.633348019952692,
+          "std": 0.01882736498472057,
+          "min": -10.66900249817107,
+          "max": -10.604794129262066,
+          "p5": -10.662414261493263,
+          "p25": -10.649268495394697,
+          "p75": -10.614902577767792,
+          "p95": -10.606651080117123,
+          "mean_abs_step_diff": 0.002142366762746123
+        }
+      },
+      "all_reward_finite": true
+    },
+    "prv_173_upper": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 100.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "validated_accounting_subset": {
+        "leakage_mean_gpm": 85.20620777209052,
+        "dsr_mean": 0.9833402453337868,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0
+      },
+      "per_timestep_vs_accounting_max_abs_diff": 0.0,
+      "violating_fractions": {
+        "frac_ts_any_node_below_20psi": 1.0,
+        "frac_ts_any_node_negative": 0.0,
+        "mean_n_nodes_below_20psi": 2.0,
+        "min_service_psi_over_horizon": 4.1630144119262695
+      },
+      "reward_temporal_stats": {
+        "F1": {
+          "n": 193,
+          "mean": -1.654857772572919,
+          "median": -1.650578569256943,
+          "std": 0.02297253340141955,
+          "min": -1.7233513741682533,
+          "max": -1.6149893021351103,
+          "p5": -1.6899165665471305,
+          "p25": -1.6745515120570693,
+          "p75": -1.6367434565057275,
+          "p95": -1.6175988264922376,
+          "mean_abs_step_diff": 0.00436027638740069
+        },
+        "F2": {
+          "n": 193,
+          "mean": -213.65972515426316,
+          "median": -213.6725888557228,
+          "std": 0.3743162846727454,
+          "min": -214.3833223136008,
+          "max": -213.10153440415948,
+          "p5": -214.24599090525476,
+          "p25": -213.98599862612068,
+          "p75": -213.3080231859837,
+          "p95": -213.13798247717682,
+          "mean_abs_step_diff": 0.04254225576153751
+        },
+        "F3": {
+          "n": 193,
+          "mean": -0.6425598789396965,
+          "median": -0.6430796393022263,
+          "std": 0.02000542505174916,
+          "min": -0.7068190949435507,
+          "max": -0.6129700501173583,
+          "p5": -0.6733842873224279,
+          "p25": -0.6594295359000605,
+          "p75": -0.6238129781276831,
+          "p95": -0.6150036575851241,
+          "mean_abs_step_diff": 0.0034620779128585947
+        },
+        "F4": {
+          "n": 193,
+          "mean": -10.632705174221163,
+          "median": -10.633386736641604,
+          "std": 0.018808471891381393,
+          "min": -10.66908365686604,
+          "max": -10.60466128179169,
+          "p5": -10.662200135585579,
+          "p25": -10.649012047223291,
+          "p75": -10.61504879646578,
+          "p95": -10.606506630944779,
+          "mean_abs_step_diff": 0.0021371211059758866
+        }
+      },
+      "all_reward_finite": true
+    },
+    "prv_175_lower": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 21.5,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "validated_accounting_subset": {
+        "leakage_mean_gpm": 82.84736822153799,
+        "dsr_mean": 0.9833261937519474,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0
+      },
+      "per_timestep_vs_accounting_max_abs_diff": 0.0,
+      "violating_fractions": {
+        "frac_ts_any_node_below_20psi": 1.0,
+        "frac_ts_any_node_negative": 0.0,
+        "mean_n_nodes_below_20psi": 2.0,
+        "min_service_psi_over_horizon": 4.170419216156006
+      },
+      "reward_temporal_stats": {
+        "F1": {
+          "n": 193,
+          "mean": -1.6268864972750474,
+          "median": -1.6226488106326418,
+          "std": 0.0229622384417063,
+          "min": -1.6952342296512326,
+          "max": -1.5870488983013713,
+          "p5": -1.6618204051752967,
+          "p25": -1.6468884583459704,
+          "p75": -1.6087381083412153,
+          "p95": -1.5896273129830663,
+          "mean_abs_step_diff": 0.004374353410913652
+        },
+        "F2": {
+          "n": 193,
+          "mean": -213.6291316955445,
+          "median": -213.64232670059874,
+          "std": 0.3751601932341756,
+          "min": -214.35037985851753,
+          "max": -213.07143945009955,
+          "p5": -214.22248802646152,
+          "p25": -213.95319209832113,
+          "p75": -213.2715971118678,
+          "p95": -213.1113943445825,
+          "mean_abs_step_diff": 0.04283454173351764
+        },
+        "F3": {
+          "n": 193,
+          "mean": -0.6145853276278817,
+          "median": -0.6151734594261876,
+          "std": 0.020003237962538098,
+          "min": -0.6787019504265299,
+          "max": -0.585031389449894,
+          "p5": -0.645288125950594,
+          "p25": -0.6319827856507473,
+          "p75": -0.5955810640294262,
+          "p95": -0.5869048487997058,
+          "mean_abs_step_diff": 0.003476416889779916
+        },
+        "F4": {
+          "n": 193,
+          "mean": -10.632567477427425,
+          "median": -10.633264998599147,
+          "std": 0.018851265368372557,
+          "min": -10.668830002682494,
+          "max": -10.604532159638461,
+          "p5": -10.662402154212536,
+          "p25": -10.648906407872786,
+          "p75": -10.614617125341463,
+          "p95": -10.606526175555091,
+          "mean_abs_step_diff": 0.002152734037639122
+        }
+      },
+      "all_reward_finite": true
+    },
+    "prv_175_upper": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 110.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "validated_accounting_subset": {
+        "leakage_mean_gpm": 87.13235299397107,
+        "dsr_mean": 0.9833548023633046,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0
+      },
+      "per_timestep_vs_accounting_max_abs_diff": 0.0,
+      "violating_fractions": {
+        "frac_ts_any_node_below_20psi": 1.0,
+        "frac_ts_any_node_negative": 0.0,
+        "mean_n_nodes_below_20psi": 2.0,
+        "min_service_psi_over_horizon": 4.156958103179932
+      },
+      "reward_temporal_stats": {
+        "F1": {
+          "n": 193,
+          "mean": -1.6776801868378777,
+          "median": -1.6734588095376397,
+          "std": 0.023026598974062198,
+          "min": -1.746312334106399,
+          "max": -1.6377184275678354,
+          "p5": -1.7128254582125289,
+          "p25": -1.6973861171981008,
+          "p75": -1.6597085970160939,
+          "p95": -1.6403536133661045,
+          "mean_abs_step_diff": 0.004367908716047759
+        },
+        "F2": {
+          "n": 193,
+          "mean": -213.68437483863724,
+          "median": -213.69732901317616,
+          "std": 0.3759880914022929,
+          "min": -214.41021525687592,
+          "max": -213.12406963228415,
+          "p5": -214.2745564679069,
+          "p25": -214.0108314715009,
+          "p75": -213.32712662393834,
+          "p95": -213.16361917428648,
+          "mean_abs_step_diff": 0.04267634951860888
+        },
+        "F3": {
+          "n": 193,
+          "mean": -0.6653856866492953,
+          "median": -0.6658322490762145,
+          "std": 0.020063418456072714,
+          "min": -0.7297800548816964,
+          "max": -0.6356973981691443,
+          "p5": -0.6962931789878263,
+          "p25": -0.6825822651310757,
+          "p75": -0.6463952036994695,
+          "p95": -0.6376686040593686,
+          "mean_abs_step_diff": 0.003469472405656622
+        },
+        "F4": {
+          "n": 193,
+          "mean": -10.632801019792856,
+          "median": -10.633487320204553,
+          "std": 0.01889202494932456,
+          "min": -10.669290278920615,
+          "max": -10.604651170216579,
+          "p5": -10.66241149411481,
+          "p25": -10.649174431136753,
+          "p75": -10.614866122878574,
+          "p95": -10.606601254000292,
+          "mean_abs_step_diff": 0.002143831666103111
+        }
+      },
+      "all_reward_finite": true
+    },
+    "prv_176_lower": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 20.0,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "validated_accounting_subset": {
+        "leakage_mean_gpm": 84.0976963769298,
+        "dsr_mean": 0.919414472007267,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0
+      },
+      "per_timestep_vs_accounting_max_abs_diff": 0.0,
+      "violating_fractions": {
+        "frac_ts_any_node_below_20psi": 1.0,
+        "frac_ts_any_node_negative": 0.0,
+        "mean_n_nodes_below_20psi": 2.0,
+        "min_service_psi_over_horizon": 4.183087348937988
+      },
+      "reward_temporal_stats": {
+        "F1": {
+          "n": 193,
+          "mean": -2.0436462458153963,
+          "median": -2.0349780218340254,
+          "std": 0.05751029953163304,
+          "min": -2.2368669195953386,
+          "max": -1.9464338613888321,
+          "p5": -2.151669178463594,
+          "p25": -2.08291001851322,
+          "p75": -1.9975891125129306,
+          "p95": -1.9604265131024587,
+          "mean_abs_step_diff": 0.016624879343975423
+        },
+        "F2": {
+          "n": 193,
+          "mean": -220.4294915752485,
+          "median": -220.42924380348097,
+          "std": 0.36251439953925935,
+          "min": -221.10987027068037,
+          "max": -219.8929290991187,
+          "p5": -221.02610745588188,
+          "p25": -220.7504224090754,
+          "p75": -220.07931432362045,
+          "p95": -219.93209973062753,
+          "mean_abs_step_diff": 0.04148969908907422
+        },
+        "F3": {
+          "n": 193,
+          "mean": -1.0279236301587313,
+          "median": -1.0184457426093225,
+          "std": 0.05643575548709241,
+          "min": -1.2203346403706357,
+          "max": -0.9414711996071932,
+          "p5": -1.1351368992388913,
+          "p25": -1.0663777392885172,
+          "p75": -0.981056833288228,
+          "p95": -0.9441774029860358,
+          "mean_abs_step_diff": 0.01618738411805744
+        },
+        "F4": {
+          "n": 193,
+          "mean": -10.971847639557208,
+          "median": -10.971776052666192,
+          "std": 0.018214566758688783,
+          "min": -11.006019766585997,
+          "max": -10.94481786166104,
+          "p5": -11.001757657848406,
+          "p25": -10.98788465662408,
+          "p75": -10.954278304553883,
+          "p95": -10.946871748746092,
+          "mean_abs_step_diff": 0.002084800010650848
+        }
+      },
+      "all_reward_finite": true
+    },
+    "prv_176_upper": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 59.524,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "validated_accounting_subset": {
+        "leakage_mean_gpm": 86.04414134540062,
+        "dsr_mean": 1.0001554532187218,
+        "n_node_timesteps_below_20psi": 193,
+        "n_node_timesteps_negative_pressure": 0
+      },
+      "per_timestep_vs_accounting_max_abs_diff": 0.0,
+      "violating_fractions": {
+        "frac_ts_any_node_below_20psi": 1.0,
+        "frac_ts_any_node_negative": 0.0,
+        "mean_n_nodes_below_20psi": 1.0,
+        "min_service_psi_over_horizon": 4.165553092956543
+      },
+      "reward_temporal_stats": {
+        "F1": {
+          "n": 193,
+          "mean": -1.5346600162411683,
+          "median": -1.5351573497065432,
+          "std": 0.016859406976676723,
+          "min": -1.5647733983630925,
+          "max": -1.5097431766645337,
+          "p5": -1.5614620124373761,
+          "p25": -1.549249463448076,
+          "p75": -1.5184115975079497,
+          "p95": -1.5117034744383795,
+          "mean_abs_step_diff": 0.0019111992024809707
+        },
+        "F2": {
+          "n": 193,
+          "mean": -111.39848868489547,
+          "median": -111.39396463548758,
+          "std": 0.3715785604262352,
+          "min": -112.0576970128711,
+          "max": -110.85107537349231,
+          "p5": -111.9768665669818,
+          "p25": -111.70984921984422,
+          "p75": -111.03739862864377,
+          "p95": -110.88812915561294,
+          "mean_abs_step_diff": 0.04147668697482243
+        },
+        "F3": {
+          "n": 193,
+          "mean": -0.5346600162411682,
+          "median": -0.535157349706543,
+          "std": 0.01685940697667673,
+          "min": -0.5647733983630926,
+          "max": -0.5097431766645337,
+          "p5": -0.5614620124373761,
+          "p25": -0.5492494634480761,
+          "p75": -0.5184115975079499,
+          "p95": -0.5117034744383795,
+          "mean_abs_step_diff": 0.001911199202480969
+        },
+        "F4": {
+          "n": 193,
+          "mean": -10.519148877297594,
+          "median": -10.518954506772932,
+          "std": 0.018671278554760473,
+          "min": -10.552265660721051,
+          "max": -10.491649062990936,
+          "p5": -10.54823407593894,
+          "p25": -10.534850967224047,
+          "p75": -10.501036196964224,
+          "p95": -10.493506546034157,
+          "mean_abs_step_diff": 0.0020836374081876587
+        }
+      },
+      "all_reward_finite": true
+    },
+    "prv_177_lower": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 20.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "validated_accounting_subset": {
+        "leakage_mean_gpm": 84.38431390582902,
+        "dsr_mean": 0.9833356662928353,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0
+      },
+      "per_timestep_vs_accounting_max_abs_diff": 0.0,
+      "violating_fractions": {
+        "frac_ts_any_node_below_20psi": 1.0,
+        "frac_ts_any_node_negative": 0.0,
+        "mean_n_nodes_below_20psi": 2.0,
+        "min_service_psi_over_horizon": 4.16452169418335
+      },
+      "reward_temporal_stats": {
+        "F1": {
+          "n": 193,
+          "mean": -1.6451720759403308,
+          "median": -1.6408436425877113,
+          "std": 0.022992256090475453,
+          "min": -1.7136087203797334,
+          "max": -1.6051720747873157,
+          "p5": -1.680133237963934,
+          "p25": -1.6652545179220848,
+          "p75": -1.626934644103812,
+          "p95": -1.6077754560684312,
+          "mean_abs_step_diff": 0.004367815688505936
+        },
+        "F2": {
+          "n": 193,
+          "mean": -213.65027566220516,
+          "median": -213.66241342056387,
+          "std": 0.3754028920980952,
+          "min": -214.37259743480237,
+          "max": -213.08914005627793,
+          "p5": -214.2390846394016,
+          "p25": -213.9731058892915,
+          "p75": -213.29401388405375,
+          "p95": -213.1295194853595,
+          "mean_abs_step_diff": 0.04278431684631793
+        },
+        "F3": {
+          "n": 193,
+          "mean": -0.6328731071969038,
+          "median": -0.6333870880197624,
+          "std": 0.020029279309584105,
+          "min": -0.6970764411550311,
+          "max": -0.6031516259953743,
+          "p5": -0.6636009587392313,
+          "p25": -0.6499523860218299,
+          "p75": -0.6140344008495363,
+          "p95": -0.6051359122125735,
+          "mean_abs_step_diff": 0.0034696893874027837
+        },
+        "F4": {
+          "n": 193,
+          "mean": -10.632717707872848,
+          "median": -10.633362788174237,
+          "std": 0.018862620899073285,
+          "min": -10.669032034614157,
+          "max": -10.604525706856975,
+          "p5": -10.66230300755763,
+          "p25": -10.648994950678532,
+          "p75": -10.614846298869475,
+          "p95": -10.606532056234302,
+          "mean_abs_step_diff": 0.0021492938707915743
+        }
+      },
+      "all_reward_finite": true
+    },
+    "prv_177_upper": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 90.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "validated_accounting_subset": {
+        "leakage_mean_gpm": 85.21270621999568,
+        "dsr_mean": 0.9833394153777071,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0
+      },
+      "per_timestep_vs_accounting_max_abs_diff": 0.0,
+      "violating_fractions": {
+        "frac_ts_any_node_below_20psi": 1.0,
+        "frac_ts_any_node_negative": 0.0,
+        "mean_n_nodes_below_20psi": 2.0,
+        "min_service_psi_over_horizon": 4.159602642059326
+      },
+      "reward_temporal_stats": {
+        "F1": {
+          "n": 193,
+          "mean": -1.6549386510217357,
+          "median": -1.6506144790181367,
+          "std": 0.023000441738693755,
+          "min": -1.7235355551050136,
+          "max": -1.6150949664307603,
+          "p5": -1.690057104465388,
+          "p25": -1.6745901284338358,
+          "p75": -1.6368365662669062,
+          "p95": -1.6176980187781502,
+          "mean_abs_step_diff": 0.004372433240748136
+        },
+        "F2": {
+          "n": 193,
+          "mean": -213.65987865223997,
+          "median": -213.67218577444257,
+          "std": 0.3749514951732707,
+          "min": -214.38578531826312,
+          "max": -213.10232530353156,
+          "p5": -214.24821045685263,
+          "p25": -213.9859621620187,
+          "p75": -213.306333006322,
+          "p95": -213.1382290439688,
+          "mean_abs_step_diff": 0.04262626329410235
+        },
+        "F3": {
+          "n": 193,
+          "mean": -0.6426405597954016,
+          "median": -0.6431261361475067,
+          "std": 0.020035317361885914,
+          "min": -0.707003275880311,
+          "max": -0.6130771542225493,
+          "p5": -0.6735248252406856,
+          "p25": -0.6597093065055125,
+          "p75": -0.623804350354327,
+          "p95": -0.6150442783307483,
+          "mean_abs_step_diff": 0.0034741446299507146
+        },
+        "F4": {
+          "n": 193,
+          "mean": -10.632709014317236,
+          "median": -10.633362788174237,
+          "std": 0.01884002342063539,
+          "min": -10.669203598773445,
+          "max": -10.604697271016263,
+          "p5": -10.662257452250813,
+          "p25": -10.649006525771092,
+          "p75": -10.614960253660037,
+          "p95": -10.606515292307142,
+          "mean_abs_step_diff": 0.002141338766468918
+        }
+      },
+      "all_reward_finite": true
+    },
+    "prv_178_lower": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 20.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "validated_accounting_subset": {
+        "leakage_mean_gpm": 84.52139871313871,
+        "dsr_mean": 0.9833361062054394,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0
+      },
+      "per_timestep_vs_accounting_max_abs_diff": 0.0,
+      "violating_fractions": {
+        "frac_ts_any_node_below_20psi": 1.0,
+        "frac_ts_any_node_negative": 0.0,
+        "mean_n_nodes_below_20psi": 2.0,
+        "min_service_psi_over_horizon": 4.16452169418335
+      },
+      "reward_temporal_stats": {
+        "F1": {
+          "n": 193,
+          "mean": -1.6467563558259797,
+          "median": -1.6424586484636299,
+          "std": 0.022995713221278805,
+          "min": -1.7152226038216885,
+          "max": -1.6067855135251519,
+          "p5": -1.6817472938097242,
+          "p25": -1.6666052510753933,
+          "p75": -1.6285503064169782,
+          "p95": -1.6093888350842884,
+          "mean_abs_step_diff": 0.004364454838951304
+        },
+        "F2": {
+          "n": 193,
+          "mean": -213.65122501502944,
+          "median": -213.664027878168,
+          "std": 0.3753780173169497,
+          "min": -214.37421129260954,
+          "max": -213.0907536708329,
+          "p5": -214.24274856446854,
+          "p25": -213.97471919787208,
+          "p75": -213.29569975621902,
+          "p95": -213.13113366942972,
+          "mean_abs_step_diff": 0.042743135685828694
+        },
+        "F3": {
+          "n": 193,
+          "mean": -0.6344574976669732,
+          "median": -0.635001666829438,
+          "std": 0.02003353723279649,
+          "min": -0.6986903245969858,
+          "max": -0.6047652405503696,
+          "p5": -0.6652150145850214,
+          "p25": -0.6517224054323473,
+          "p75": -0.6156491355012832,
+          "p95": -0.6067512012562674,
+          "mean_abs_step_diff": 0.0034662937134946285
+        },
+        "F4": {
+          "n": 193,
+          "mean": -10.632684280320834,
+          "median": -10.633362788174237,
+          "std": 0.018861464912960882,
+          "min": -10.669032034614157,
+          "max": -10.604525706856975,
+          "p5": -10.662405946053203,
+          "p25": -10.648994950678532,
+          "p75": -10.6148499576631,
+          "p95": -10.606532056234302,
+          "mean_abs_step_diff": 0.002147219514973634
+        }
+      },
+      "all_reward_finite": true
+    },
+    "prv_178_upper": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 74.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "validated_accounting_subset": {
+        "leakage_mean_gpm": 85.08425874567963,
+        "dsr_mean": 0.9833390014559413,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0
+      },
+      "per_timestep_vs_accounting_max_abs_diff": 0.0,
+      "violating_fractions": {
+        "frac_ts_any_node_below_20psi": 1.0,
+        "frac_ts_any_node_negative": 0.0,
+        "mean_n_nodes_below_20psi": 2.0,
+        "min_service_psi_over_horizon": 4.1596293449401855
+      },
+      "reward_temporal_stats": {
+        "F1": {
+          "n": 193,
+          "mean": -1.6534217278483143,
+          "median": -1.6490973469377237,
+          "std": 0.023019408041482798,
+          "min": -1.7220189440128895,
+          "max": -1.6135760900709522,
+          "p5": -1.6885397712706036,
+          "p25": -1.6733943924078791,
+          "p75": -1.6353177850339482,
+          "p95": -1.6161792002540725,
+          "mean_abs_step_diff": 0.0043782969164832125
+        },
+        "F2": {
+          "n": 193,
+          "mean": -213.6583401182631,
+          "median": -213.67066927765012,
+          "std": 0.37588951031979434,
+          "min": -214.38425101736516,
+          "max": -213.09988948038426,
+          "p5": -214.24834474482654,
+          "p25": -213.9846825602537,
+          "p75": -213.2983258857721,
+          "p95": -213.13667999310107,
+          "mean_abs_step_diff": 0.04275850185499408
+        },
+        "F3": {
+          "n": 193,
+          "mean": -0.6411235450149225,
+          "median": -0.6416421687067375,
+          "std": 0.020057975804633858,
+          "min": -0.7054866647881867,
+          "max": -0.6114123386774719,
+          "p5": -0.6720074920459008,
+          "p25": -0.65819164564791,
+          "p75": -0.6222857804215839,
+          "p95": -0.613373220353564,
+          "mean_abs_step_diff": 0.0034800441044931913
+        },
+        "F4": {
+          "n": 193,
+          "mean": -10.632707885830156,
+          "median": -10.633362788174237,
+          "std": 0.01888693334155866,
+          "min": -10.669202667444159,
+          "max": -10.604656691668778,
+          "p5": -10.662384166252602,
+          "p25": -10.649161924714907,
+          "p75": -10.61464792573144,
+          "p95": -10.606513642523836,
+          "mean_abs_step_diff": 0.002147987307272383
+        }
+      },
+      "all_reward_finite": true
+    },
+    "pump_all_lower": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 0.82,
+          "PUMP-172": 0.77
+        }
+      },
+      "n_timesteps": 193,
+      "validated_accounting_subset": {
+        "leakage_mean_gpm": 83.89757280762403,
+        "dsr_mean": 0.9833122550840635,
+        "n_node_timesteps_below_20psi": 391,
+        "n_node_timesteps_negative_pressure": 0
+      },
+      "per_timestep_vs_accounting_max_abs_diff": 0.0,
+      "violating_fractions": {
+        "frac_ts_any_node_below_20psi": 1.0,
+        "frac_ts_any_node_negative": 0.0,
+        "mean_n_nodes_below_20psi": 2.0259067357512954,
+        "min_service_psi_over_horizon": 1.1432963609695435
+      },
+      "reward_temporal_stats": {
+        "F1": {
+          "n": 193,
+          "mean": -1.7190362442431983,
+          "median": -1.7321215913828059,
+          "std": 0.04352027357523761,
+          "min": -1.8127172449126334,
+          "max": -1.6392592147401577,
+          "p5": -1.771831702602478,
+          "p25": -1.7543535421866197,
+          "p75": -1.6948068421545137,
+          "p95": -1.6496043568358743,
+          "mean_abs_step_diff": 0.0037057059053163567
+        },
+        "F2": {
+          "n": 193,
+          "mean": -217.8264149979228,
+          "median": -215.53860110919277,
+          "std": 16.132674843933128,
+          "min": -316.85918638736297,
+          "max": -213.3912964773875,
+          "p5": -216.27751535413248,
+          "p25": -216.13818860482164,
+          "p75": -214.41302413817513,
+          "p95": -213.6868088499547,
+          "mean_abs_step_diff": 0.542332193377476
+        },
+        "F3": {
+          "n": 193,
+          "mean": -0.7067366951886095,
+          "median": -0.7245193474302201,
+          "std": 0.04238803795515073,
+          "min": -0.7961849656879306,
+          "max": -0.6290691184767926,
+          "p5": -0.7552994233777752,
+          "p25": -0.7429021106362345,
+          "p75": -0.678274562929811,
+          "p95": -0.6354778600549159,
+          "mean_abs_step_diff": 0.0025692304032625232
+        },
+        "F4": {
+          "n": 193,
+          "mean": -10.71227822696719,
+          "median": -10.727507739146802,
+          "std": 0.046557649975876296,
+          "min": -10.793871403595459,
+          "max": -10.61953294740999,
+          "p5": -10.764688998683447,
+          "p25": -10.757707687827896,
+          "p75": -10.670949708138698,
+          "p95": -10.634369568437707,
+          "mean_abs_step_diff": 0.0010807016151884081
+        }
+      },
+      "all_reward_finite": true
+    },
+    "pump_all_upper": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.1,
+          "PUMP-172": 1.1
+        }
+      },
+      "n_timesteps": 193,
+      "validated_accounting_subset": {
+        "leakage_mean_gpm": 84.72650138783735,
+        "dsr_mean": 0.9833369629319946,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0
+      },
+      "per_timestep_vs_accounting_max_abs_diff": 0.0,
+      "violating_fractions": {
+        "frac_ts_any_node_below_20psi": 1.0,
+        "frac_ts_any_node_negative": 0.0,
+        "mean_n_nodes_below_20psi": 2.0,
+        "min_service_psi_over_horizon": 4.161321640014648
+      },
+      "reward_temporal_stats": {
+        "F1": {
+          "n": 193,
+          "mean": -1.6497328617266447,
+          "median": -1.6456759122213456,
+          "std": 0.022979900627829803,
+          "min": -1.7177976381580096,
+          "max": -1.609523017033475,
+          "p5": -1.684384881852477,
+          "p25": -1.6690875285433155,
+          "p75": -1.631265098333225,
+          "p95": -1.6121263056348156,
+          "mean_abs_step_diff": 0.004393140050191864
+        },
+        "F2": {
+          "n": 193,
+          "mean": -213.66477000518904,
+          "median": -213.69129393825745,
+          "std": 0.3782462686330465,
+          "min": -214.37890622263097,
+          "max": -213.08958218714858,
+          "p5": -214.24859633989433,
+          "p25": -213.98325803962814,
+          "p75": -213.299954427344,
+          "p95": -213.1309543802544,
+          "mean_abs_step_diff": 0.04303801773681112
+        },
+        "F3": {
+          "n": 193,
+          "mean": -0.6374342057394302,
+          "median": -0.6391287384636894,
+          "std": 0.02009913085354914,
+          "min": -0.7012653589333069,
+          "max": -0.6075032571555039,
+          "p5": -0.6678526026277742,
+          "p25": -0.6538139505414804,
+          "p75": -0.6178705955628353,
+          "p95": -0.6093765521396776,
+          "mean_abs_step_diff": 0.003494944155536845
+        },
+        "F4": {
+          "n": 193,
+          "mean": -10.633240496573364,
+          "median": -10.634661992528983,
+          "std": 0.01900770651558545,
+          "min": -10.669143594557982,
+          "max": -10.604270190014857,
+          "p5": -10.662624914873177,
+          "p25": -10.64930029363748,
+          "p75": -10.614926127094037,
+          "p95": -10.606423436630081,
+          "mean_abs_step_diff": 0.0021629907864746853
+        }
+      },
+      "all_reward_finite": true
+    },
+    "prv_lower_pump_lower": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 54.5,
+          "VALVE-175": 21.5,
+          "VALVE-176": 20.0,
+          "VALVE-177": 20.0,
+          "VALVE-178": 20.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 0.82,
+          "PUMP-172": 0.77
+        }
+      },
+      "n_timesteps": 193,
+      "validated_accounting_subset": {
+        "leakage_mean_gpm": 80.61786635451655,
+        "dsr_mean": 0.9193965586241878,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0
+      },
+      "per_timestep_vs_accounting_max_abs_diff": 0.0,
+      "violating_fractions": {
+        "frac_ts_any_node_below_20psi": 1.0,
+        "frac_ts_any_node_negative": 0.0,
+        "mean_n_nodes_below_20psi": 2.0,
+        "min_service_psi_over_horizon": 1.2946763038635254
+      },
+      "reward_temporal_stats": {
+        "F1": {
+          "n": 193,
+          "mean": -2.075828145702587,
+          "median": -2.074992572293934,
+          "std": 0.06589997605317895,
+          "min": -2.274338543469959,
+          "max": -1.9486189375491403,
+          "p5": -2.195072047343743,
+          "p25": -2.112526512023951,
+          "p75": -2.030774245162453,
+          "p95": -1.9633207714235636,
+          "mean_abs_step_diff": 0.01625197102939108
+        },
+        "F2": {
+          "n": 193,
+          "mean": -221.85329964230834,
+          "median": -222.09521483411643,
+          "std": 0.8707404292847285,
+          "min": -223.0748876572419,
+          "max": -220.13984862627962,
+          "p5": -222.89597005271094,
+          "p25": -222.62153172408784,
+          "p75": -221.03388023732813,
+          "p95": -220.4249831490974,
+          "mean_abs_step_diff": 0.018052935850228675
+        },
+        "F3": {
+          "n": 193,
+          "mean": -1.0601048356063645,
+          "median": -1.0584602930692313,
+          "std": 0.06490466998206343,
+          "min": -1.2578062642452565,
+          "max": -0.9426603120873522,
+          "p5": -1.1785397681190402,
+          "p25": -1.0959942327992487,
+          "p75": -1.0199219943852014,
+          "p95": -0.9486628122491048,
+          "mean_abs_step_diff": 0.015816815986532635
+        },
+        "F4": {
+          "n": 193,
+          "mean": -11.045091527374183,
+          "median": -11.057259308656176,
+          "std": 0.04379818455180594,
+          "min": -11.106579447590283,
+          "max": -10.958936414504118,
+          "p5": -11.097541362528892,
+          "p25": -11.083783566737313,
+          "p75": -11.0039351855486,
+          "p95": -10.973250493278556,
+          "mean_abs_step_diff": 0.0009079396860554589
+        }
+      },
+      "all_reward_finite": true
+    },
+    "prv_upper_pump_upper": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 100.0,
+          "VALVE-175": 110.0,
+          "VALVE-176": 59.524,
+          "VALVE-177": 90.0,
+          "VALVE-178": 74.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.1,
+          "PUMP-172": 1.1
+        }
+      },
+      "n_timesteps": 193,
+      "validated_accounting_subset": {
+        "leakage_mean_gpm": 89.75527817309793,
+        "dsr_mean": 1.0001808024664087,
+        "n_node_timesteps_below_20psi": 193,
+        "n_node_timesteps_negative_pressure": 0
+      },
+      "per_timestep_vs_accounting_max_abs_diff": 0.0,
+      "violating_fractions": {
+        "frac_ts_any_node_below_20psi": 1.0,
+        "frac_ts_any_node_negative": 0.0,
+        "mean_n_nodes_below_20psi": 1.0,
+        "min_service_psi_over_horizon": 4.163939952850342
+      },
+      "reward_temporal_stats": {
+        "F1": {
+          "n": 193,
+          "mean": -1.57918738291537,
+          "median": -1.5797938360917838,
+          "std": 0.01703097910472002,
+          "min": -1.6087041712249444,
+          "max": -1.5535918712886916,
+          "p5": -1.6056030121187168,
+          "p25": -1.5932999988226226,
+          "p75": -1.5626637134551407,
+          "p95": -1.555467579252486,
+          "mean_abs_step_diff": 0.0019068411639696612
+        },
+        "F2": {
+          "n": 193,
+          "mean": -111.4568432179505,
+          "median": -111.48423396310062,
+          "std": 0.37607207658827063,
+          "min": -112.10270038024903,
+          "max": -110.88417997064171,
+          "p5": -112.04031864358129,
+          "p25": -111.77413324179409,
+          "p75": -111.09303224422096,
+          "p95": -110.93166329650482,
+          "mean_abs_step_diff": 0.041692581711688805
+        },
+        "F3": {
+          "n": 193,
+          "mean": -0.57918738291537,
+          "median": -0.5797938360917837,
+          "std": 0.017030979104720033,
+          "min": -0.6087041712249445,
+          "max": -0.5535918712886916,
+          "p5": -0.6056030121187168,
+          "p25": -0.5932999988226225,
+          "p75": -0.5626637134551408,
+          "p95": -0.5554675792524859,
+          "mean_abs_step_diff": 0.0019068411639696647
+        },
+        "F4": {
+          "n": 193,
+          "mean": -10.519876622896586,
+          "median": -10.521286322474149,
+          "std": 0.018898774299352394,
+          "min": -10.552321906357609,
+          "max": -10.491010769812041,
+          "p5": -10.549191156480271,
+          "p25": -10.535742914586487,
+          "p75": -10.501610827134028,
+          "p95": -10.493492363219593,
+          "mean_abs_step_diff": 0.002095872712042155
+        }
+      },
+      "all_reward_finite": true
+    },
+    "prv_lower_pump_upper": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 54.5,
+          "VALVE-175": 21.5,
+          "VALVE-176": 20.0,
+          "VALVE-177": 20.0,
+          "VALVE-178": 20.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.1,
+          "PUMP-172": 1.1
+        }
+      },
+      "n_timesteps": 193,
+      "validated_accounting_subset": {
+        "leakage_mean_gpm": 81.37969065716081,
+        "dsr_mean": 0.9193996688508628,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0
+      },
+      "per_timestep_vs_accounting_max_abs_diff": 0.0,
+      "violating_fractions": {
+        "frac_ts_any_node_below_20psi": 1.0,
+        "frac_ts_any_node_negative": 0.0,
+        "mean_n_nodes_below_20psi": 2.0,
+        "min_service_psi_over_horizon": 4.179490566253662
+      },
+      "reward_temporal_stats": {
+        "F1": {
+          "n": 193,
+          "mean": -2.0119727281291166,
+          "median": -2.0027601816332266,
+          "std": 0.057437216248502246,
+          "min": -2.207799423332774,
+          "max": -1.9141765024978477,
+          "p5": -2.1210425184049324,
+          "p25": -2.050556656225572,
+          "p75": -1.966522651790052,
+          "p95": -1.928210338349254,
+          "mean_abs_step_diff": 0.016648021104061904
+        },
+        "F2": {
+          "n": 193,
+          "mean": -220.40538639283767,
+          "median": -220.40433639941472,
+          "std": 0.365797012317209,
+          "min": -221.08682245859373,
+          "max": -219.8655650885016,
+          "p5": -220.98968854556134,
+          "p25": -220.72113922854084,
+          "p75": -220.0501330906683,
+          "p95": -219.89925594422292,
+          "mean_abs_step_diff": 0.04159791594188104
+        },
+        "F3": {
+          "n": 193,
+          "mean": -0.9962495269203785,
+          "median": -0.986227902408524,
+          "std": 0.05637186903419832,
+          "min": -1.1912671441080713,
+          "max": -0.9092427790979045,
+          "p5": -1.10451023918023,
+          "p25": -1.034024377000869,
+          "p75": -0.9499903725653494,
+          "p95": -0.9119434205797561,
+          "mean_abs_step_diff": 0.016210392814746174
+        },
+        "F4": {
+          "n": 193,
+          "mean": -10.972246304330248,
+          "median": -10.972226616470325,
+          "std": 0.018379060784495624,
+          "min": -11.006511375402258,
+          "max": -10.9450309364971,
+          "p5": -11.001656182870285,
+          "p25": -10.988172437373628,
+          "p75": -10.954411617688901,
+          "p95": -10.946821217479943,
+          "mean_abs_step_diff": 0.002090396994763618
+        }
+      },
+      "all_reward_finite": true
+    },
+    "prv_upper_pump_lower": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 100.0,
+          "VALVE-175": 110.0,
+          "VALVE-176": 59.524,
+          "VALVE-177": 90.0,
+          "VALVE-178": 74.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 0.82,
+          "PUMP-172": 0.77
+        }
+      },
+      "n_timesteps": 193,
+      "validated_accounting_subset": {
+        "leakage_mean_gpm": 88.90600569174825,
+        "dsr_mean": 1.0001006281225637,
+        "n_node_timesteps_below_20psi": 206,
+        "n_node_timesteps_negative_pressure": 0
+      },
+      "per_timestep_vs_accounting_max_abs_diff": 0.0,
+      "violating_fractions": {
+        "frac_ts_any_node_below_20psi": 1.0,
+        "frac_ts_any_node_negative": 0.0,
+        "mean_n_nodes_below_20psi": 1.067357512953368,
+        "min_service_psi_over_horizon": 1.0896363258361816
+      },
+      "reward_temporal_stats": {
+        "F1": {
+          "n": 193,
+          "mean": -1.650888552170442,
+          "median": -1.6634178877003052,
+          "std": 0.042729461381649896,
+          "min": -1.7434021633311871,
+          "max": -1.564852609157011,
+          "p5": -1.6967843550233423,
+          "p25": -1.6856987094616893,
+          "p75": -1.60775495581818,
+          "p95": -1.5805533050874918,
+          "mean_abs_step_diff": 0.001081008094099151
+        },
+        "F2": {
+          "n": 193,
+          "mean": -119.81420851399463,
+          "median": -113.36643484643494,
+          "std": 25.42149852821963,
+          "min": -214.9969440943879,
+          "max": -111.1566042833478,
+          "p5": -214.07360755909056,
+          "p25": -113.89598811258685,
+          "p75": -112.1436699002286,
+          "p95": -111.49460739131736,
+          "mean_abs_step_diff": 0.5440658050949793
+        },
+        "F3": {
+          "n": 193,
+          "mean": -0.6507459543228346,
+          "median": -0.6634178877003053,
+          "std": 0.04248555935233796,
+          "min": -0.7385899309881039,
+          "max": -0.564852609157011,
+          "p5": -0.6967843550233422,
+          "p25": -0.6856987094616893,
+          "p75": -0.6077549558181802,
+          "p95": -0.5805533050874919,
+          "mean_abs_step_diff": 0.0010559443839789188
+        },
+        "F4": {
+          "n": 193,
+          "mean": -10.601458487596581,
+          "median": -10.615948260986034,
+          "std": 0.04816930913232821,
+          "min": -10.697808113863148,
+          "max": -10.504829035483725,
+          "p5": -10.654035717223204,
+          "p25": -10.642646810690799,
+          "p75": -10.554521839179495,
+          "p95": -10.521792320327888,
+          "mean_abs_step_diff": 0.0011672386674943154
+        }
+      },
+      "all_reward_finite": true
+    }
+  },
+  "pooled_statistics": {
+    "F1": {
+      "n": 3667,
+      "mean": -1.7215790169099456,
+      "median": -1.656444397453193,
+      "std": 0.1708080647574491,
+      "min": -2.274338543469959,
+      "max": -1.5097431766645337,
+      "p5": -2.0813741452150354,
+      "p25": -1.7073254834248472,
+      "p75": -1.6214106235634396,
+      "p95": -1.555528988198792,
+      "mean_abs_step_diff": 0.007493398090734915
+    },
+    "F2": {
+      "n": 3667,
+      "mean": -194.2940375897262,
+      "median": -213.74963994557007,
+      "std": 42.403356131278315,
+      "min": -316.85918638736297,
+      "max": -110.85107537349231,
+      "p5": -220.9873078173246,
+      "p25": -214.52377490273443,
+      "p75": -213.15095365887862,
+      "p95": -111.13979375008923,
+      "mean_abs_step_diff": 0.33266583713937786
+    },
+    "F3": {
+      "n": 3667,
+      "mean": -0.7111412019819208,
+      "median": -0.644273582208174,
+      "std": 0.16718849735360633,
+      "min": -1.2578062642452565,
+      "max": -0.5097431766645337,
+      "p5": -1.0648418659903327,
+      "p25": -0.6962885620428443,
+      "p75": -0.6126136436727919,
+      "p95": -0.5555289881987918,
+      "mean_abs_step_diff": 0.006839039776638495
+    },
+    "F4": {
+      "n": 3667,
+      "mean": -10.69265758914978,
+      "median": -10.638672961672102,
+      "std": 0.16300072571804153,
+      "min": -11.106579447590283,
+      "max": -10.491010769812041,
+      "p5": -11.0,
+      "p25": -10.675401029725556,
+      "p75": -10.608660975198088,
+      "p95": -10.504402919073366,
+      "mean_abs_step_diff": 0.003013537506554121
+    }
+  },
+  "temporal_statistics": {
+    "F1": {
+      "mean_within_config_std": 0.03185325821477033,
+      "mean_within_config_abs_step_diff": 0.006334435129457122
+    },
+    "F2": {
+      "mean_within_config_std": 2.5468122778044684,
+      "mean_within_config_abs_step_diff": 0.093737468680769
+    },
+    "F3": {
+      "mean_within_config_std": 0.030004222564233313,
+      "mean_within_config_abs_step_diff": 0.005708571197191618
+    },
+    "F4": {
+      "mean_within_config_std": 0.023064538775375034,
+      "mean_within_config_abs_step_diff": 0.001955130615758565
+    }
+  },
+  "induced_incentive_per_formulation": {
+    "F1": {
+      "argmax_config_within_tested_set": "prv_176_upper",
+      "argmax_mean_reward": -1.5346600162411683,
+      "reward_spread_across_tested_configs": 0.5411681294614186
+    },
+    "F2": {
+      "argmax_config_within_tested_set": "prv_176_upper",
+      "argmax_mean_reward": -111.39848868489547,
+      "reward_spread_across_tested_configs": 110.45481095741287
+    },
+    "F3": {
+      "argmax_config_within_tested_set": "prv_176_upper",
+      "argmax_mean_reward": -0.5346600162411682,
+      "reward_spread_across_tested_configs": 0.5254448193651963
+    },
+    "F4": {
+      "argmax_config_within_tested_set": "prv_176_upper",
+      "argmax_mean_reward": -10.519148877297594,
+      "reward_spread_across_tested_configs": 0.5259426500765887
+    }
+  },
+  "actuator_effort_analytic": {
+    "movement_L2sq_max": 28.0,
+    "normalised_movement_for_max_single_step_move": 1.0,
+    "normalised_movement_for_static_hold": 0.0,
+    "note": "realised movement is 0 in every static configuration here; a boundary-to-boundary single-step move would add w_A*1.0 of cost. Whether that dominates depends on the (unchosen) weights and the realised policy trajectory - a training-time HYPOTHESIS. The effort term MUST use the COMMANDED normalised action, never realised pump speed (native STATUS resets it)."
+  },
+  "pathology_results": {
+    "A_leakage_only_collapses_service": {
+      "incentive_argmax_config": "prv_lower_pump_lower",
+      "argmax_sits_on_action_bound": true,
+      "min_service_psi_at_argmax": 1.2946763038635254,
+      "reference_min_service_psi": 4.16452169418335,
+      "mean_leak_norm_at_argmax": 0.9514690948246894,
+      "observation": "a leak-only reward's highest-reward tested command sits at the PRV lower bound; its worst-node service pressure is reported for the researcher to judge."
+    },
+    "B_service_only_raises_leakage": {
+      "incentive_argmax_config": "prv_176_upper",
+      "argmax_sits_on_action_bound": true,
+      "mean_leak_norm_at_argmax": 1.0155111389435745,
+      "reference_mean_leak_norm": 1.0,
+      "observation": "a service/safety-only reward's highest-reward tested command raises leakage relative to the leak-only incentive; the two objectives pull in opposite directions (consistent with STEP 8 correlations)."
+    },
+    "C_actuator_penalty_domination": {
+      "leak_term_dynamic_range_across_configs": 0.10788834247085066,
+      "max_single_step_movement_cost_at_w_A_1": 1.0,
+      "note": "realised movement is 0 in all static configs; ANALYTIC only. A unit-weight max move (cost 1.0) is comparable to the entire measured leak-term range across tested commands (~0.108), so an un-tuned effort weight could dominate the leakage objective - weight choice is a D-P6-005 concern, not resolved here."
+    },
+    "D_boundary_seeking_per_formulation": {
+      "F1": {
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_sits_on_action_bound": true,
+        "min_service_psi_at_argmax": 4.165553092956543,
+        "mean_n_below20_at_argmax": 1.0,
+        "mean_leak_norm_at_argmax": 1.0155111389435745
+      },
+      "F2": {
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_sits_on_action_bound": true,
+        "min_service_psi_at_argmax": 4.165553092956543,
+        "mean_n_below20_at_argmax": 1.0,
+        "mean_leak_norm_at_argmax": 1.0155111389435745
+      },
+      "F3": {
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_sits_on_action_bound": true,
+        "min_service_psi_at_argmax": 4.165553092956543,
+        "mean_n_below20_at_argmax": 1.0,
+        "mean_leak_norm_at_argmax": 1.0155111389435745
+      },
+      "F4": {
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_sits_on_action_bound": true,
+        "min_service_psi_at_argmax": 4.165553092956543,
+        "mean_n_below20_at_argmax": 1.0,
+        "mean_leak_norm_at_argmax": 1.0155111389435745
+      }
+    },
+    "E_flat_or_weak_signal_per_formulation": {
+      "F1": {
+        "reward_spread_across_configs": 0.5411681294614186,
+        "mean_within_config_std": 0.03185325821477033
+      },
+      "F2": {
+        "reward_spread_across_configs": 110.45481095741287,
+        "mean_within_config_std": 2.5468122778044684
+      },
+      "F3": {
+        "reward_spread_across_configs": 0.5254448193651963,
+        "mean_within_config_std": 0.030004222564233313
+      },
+      "F4": {
+        "reward_spread_across_configs": 0.5259426500765887,
+        "mean_within_config_std": 0.023064538775375034
+      }
+    },
+    "F_sparse_or_degenerate_violation_signal": {
+      "frac_pooled_ts_any_node_below_20psi": 1.0,
+      "frac_pooled_ts_any_node_negative": 0.0,
+      "reference_mean_n_below20": 2.0,
+      "observation": "the <0 psi hard term is identically inactive in bounds (sparse), while the <20 psi term is active at ~every timestep INCLUDING the native baseline (2 chronically low nodes). A hard 20 psi constraint term therefore fires on the baseline itself; the smooth deficit / min-pressure terms carry the dense safety signal."
+    },
+    "G_reward_hacking_and_degeneracy": {
+      "closed_pump_realized_speed": "effort/smoothness MUST be computed on the COMMANDED normalised action; realised pump speed is reset to 1.0 by STATUS-IS-OPEN or 0 when closed (G12), so penalising realised speed is gameable.",
+      "hard_20psi_constraint_degeneracy": "F2 (BIG*n_below20) and F4 (threshold 20 psi) treat the network's chronic sub-20 nodes as a constraint violation on EVERY tested command, so the leakage objective receives little/no gradient under those parameters - an ill-posed hard constraint, not a learning signal.",
+      "lexicographic_0psi_permissiveness": "F4 with a 0 psi threshold never triggers in bounds, so it reduces to pure leak minimisation and inherits the boundary-seeking-to-lower-PRV incentive while reporting 'safe'."
+    },
+    "H_weight_penalty_sensitivity": {
+      "note": "see `sensitivity_results`: varying the PROVISIONAL weights shifts the incentive-argmax configuration; this is expected and is exactly why weight selection is deferred to the researcher (D-P6-005)."
+    }
+  },
+  "sensitivity_results": {
+    "F1_vary_w_P": [
+      {
+        "params": {
+          "w_L": 1.0,
+          "w_U": 1.0,
+          "w_P": 0.0,
+          "w_A": 0.0,
+          "w_E": 0.0
+        },
+        "incentive_argmax_config": "prv_175_lower",
+        "argmax_mean_reward": -0.9943190198476233,
+        "reference_mean_reward": -1.0165322792247022,
+        "prv_all_lower_mean_reward": -1.039775162720952,
+        "reference_minus_prv_all_lower": 0.0232428834962497
+      },
+      {
+        "params": {
+          "w_L": 1.0,
+          "w_U": 1.0,
+          "w_P": 0.5,
+          "w_A": 0.0,
+          "w_E": 0.0
+        },
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_mean_reward": -1.275085577592371,
+        "reference_mean_reward": -1.3328903481491163,
+        "prv_all_lower_mean_reward": -1.5256219532607347,
+        "reference_minus_prv_all_lower": 0.19273160511161835
+      },
+      {
+        "params": {
+          "w_L": 1.0,
+          "w_U": 1.0,
+          "w_P": 1.0,
+          "w_A": 0.0,
+          "w_E": 0.0
+        },
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_mean_reward": -1.5346600162411683,
+        "reference_mean_reward": -1.6492484170735306,
+        "prv_all_lower_mean_reward": -2.0114687438005174,
+        "reference_minus_prv_all_lower": 0.3622203267269868
+      },
+      {
+        "params": {
+          "w_L": 1.0,
+          "w_U": 1.0,
+          "w_P": 2.0,
+          "w_A": 0.0,
+          "w_E": 0.0
+        },
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_mean_reward": -2.0538088935387617,
+        "reference_mean_reward": -2.2819645549223586,
+        "prv_all_lower_mean_reward": -2.983162324880083,
+        "reference_minus_prv_all_lower": 0.7011977699577243
+      },
+      {
+        "params": {
+          "w_L": 1.0,
+          "w_U": 1.0,
+          "w_P": 5.0,
+          "w_A": 0.0,
+          "w_E": 0.0
+        },
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_mean_reward": -3.611255525431544,
+        "reference_mean_reward": -4.180112968468843,
+        "prv_all_lower_mean_reward": -5.898243068118779,
+        "reference_minus_prv_all_lower": 1.7181300996499358
+      }
+    ],
+    "F1_vary_w_U": [
+      {
+        "params": {
+          "w_L": 1.0,
+          "w_U": 0.0,
+          "w_P": 1.0,
+          "w_A": 0.0,
+          "w_E": 0.0
+        },
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_mean_reward": -1.5346600162411683,
+        "reference_mean_reward": -1.632716137848828,
+        "prv_all_lower_mean_reward": -1.932202607362801,
+        "reference_minus_prv_all_lower": 0.29948646951397295
+      },
+      {
+        "params": {
+          "w_L": 1.0,
+          "w_U": 1.0,
+          "w_P": 1.0,
+          "w_A": 0.0,
+          "w_E": 0.0
+        },
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_mean_reward": -1.5346600162411683,
+        "reference_mean_reward": -1.6492484170735306,
+        "prv_all_lower_mean_reward": -2.0114687438005174,
+        "reference_minus_prv_all_lower": 0.3622203267269868
+      },
+      {
+        "params": {
+          "w_L": 1.0,
+          "w_U": 5.0,
+          "w_P": 1.0,
+          "w_A": 0.0,
+          "w_E": 0.0
+        },
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_mean_reward": -1.5346600162411683,
+        "reference_mean_reward": -1.71537753397234,
+        "prv_all_lower_mean_reward": -2.328533289551384,
+        "reference_minus_prv_all_lower": 0.6131557555790439
+      }
+    ],
+    "F2_vary_lambda_big": [
+      {
+        "params": {
+          "lambda_service": 5.0,
+          "big_hard": 10.0
+        },
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_mean_reward": -13.611255525431543,
+        "reference_mean_reward": -24.16358068924414,
+        "prv_all_lower_mean_reward": -25.818976931681064,
+        "reference_minus_prv_all_lower": 1.6553962424369253
+      },
+      {
+        "params": {
+          "lambda_service": 5.0,
+          "big_hard": 100.0
+        },
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_mean_reward": -103.61125552543152,
+        "reference_mean_reward": -204.16358068924413,
+        "prv_all_lower_mean_reward": -205.81897693168108,
+        "reference_minus_prv_all_lower": 1.6553962424369502
+      },
+      {
+        "params": {
+          "lambda_service": 5.0,
+          "big_hard": 1000.0
+        },
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_mean_reward": -1003.6112555254316,
+        "reference_mean_reward": -2004.163580689244,
+        "prv_all_lower_mean_reward": -2005.8189769316812,
+        "reference_minus_prv_all_lower": 1.6553962424370638
+      },
+      {
+        "params": {
+          "lambda_service": 20.0,
+          "big_hard": 10.0
+        },
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_mean_reward": -21.398488684895455,
+        "reference_mean_reward": -33.65432275697656,
+        "prv_all_lower_mean_reward": -40.39438064787455,
+        "reference_minus_prv_all_lower": 6.740057890897987
+      },
+      {
+        "params": {
+          "lambda_service": 20.0,
+          "big_hard": 100.0
+        },
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_mean_reward": -111.39848868489547,
+        "reference_mean_reward": -213.65432275697657,
+        "prv_all_lower_mean_reward": -220.39438064787456,
+        "reference_minus_prv_all_lower": 6.740057890897987
+      },
+      {
+        "params": {
+          "lambda_service": 20.0,
+          "big_hard": 1000.0
+        },
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_mean_reward": -1011.3984886848955,
+        "reference_mean_reward": -2013.6543227569766,
+        "prv_all_lower_mean_reward": -2020.3943806478746,
+        "reference_minus_prv_all_lower": 6.740057890898015
+      },
+      {
+        "params": {
+          "lambda_service": 100.0,
+          "big_hard": 10.0
+        },
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_mean_reward": -62.93039886870296,
+        "reference_mean_reward": -84.27161378488282,
+        "prv_all_lower_mean_reward": -118.1298671342398,
+        "reference_minus_prv_all_lower": 33.858253349356985
+      },
+      {
+        "params": {
+          "lambda_service": 100.0,
+          "big_hard": 100.0
+        },
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_mean_reward": -152.93039886870295,
+        "reference_mean_reward": -264.2716137848828,
+        "prv_all_lower_mean_reward": -298.12986713423976,
+        "reference_minus_prv_all_lower": 33.85825334935697
+      },
+      {
+        "params": {
+          "lambda_service": 100.0,
+          "big_hard": 1000.0
+        },
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_mean_reward": -1052.930398868703,
+        "reference_mean_reward": -2064.271613784883,
+        "prv_all_lower_mean_reward": -2098.12986713424,
+        "reference_minus_prv_all_lower": 33.858253349357256
+      }
+    ],
+    "F3_vary_w_U_w_P": [
+      {
+        "params": {
+          "w_U": 0.0,
+          "w_P_safety": 0.0
+        },
+        "incentive_argmax_config": "prv_lower_pump_lower",
+        "argmax_mean_reward": 0.04853090517531048,
+        "reference_mean_reward": -4.431184837598787e-17,
+        "prv_all_lower_mean_reward": 0.03949097371676478,
+        "reference_minus_prv_all_lower": -0.03949097371676482
+      },
+      {
+        "params": {
+          "w_U": 0.0,
+          "w_P_safety": 1.0
+        },
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_mean_reward": -0.5346600162411682,
+        "reference_mean_reward": -0.6327161378488281,
+        "prv_all_lower_mean_reward": -0.9322026073628007,
+        "reference_minus_prv_all_lower": 0.2994864695139726
+      },
+      {
+        "params": {
+          "w_U": 0.0,
+          "w_P_safety": 5.0
+        },
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_mean_reward": -2.611255525431544,
+        "reference_mean_reward": -3.1635806892441405,
+        "prv_all_lower_mean_reward": -4.818976931681063,
+        "reference_minus_prv_all_lower": 1.6553962424369226
+      },
+      {
+        "params": {
+          "w_U": 1.0,
+          "w_P_safety": 0.0
+        },
+        "incentive_argmax_config": "prv_175_lower",
+        "argmax_mean_reward": 0.017982149799542487,
+        "reference_mean_reward": -0.004233627605161215,
+        "prv_all_lower_mean_reward": -0.024051963388839984,
+        "reference_minus_prv_all_lower": 0.019818335783678767
+      },
+      {
+        "params": {
+          "w_U": 1.0,
+          "w_P_safety": 1.0
+        },
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_mean_reward": -0.5346600162411682,
+        "reference_mean_reward": -0.6369497654539893,
+        "prv_all_lower_mean_reward": -0.9957455444684057,
+        "reference_minus_prv_all_lower": 0.3587957790144164
+      },
+      {
+        "params": {
+          "w_U": 1.0,
+          "w_P_safety": 5.0
+        },
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_mean_reward": -2.611255525431544,
+        "reference_mean_reward": -3.167814316849302,
+        "prv_all_lower_mean_reward": -4.882519868786668,
+        "reference_minus_prv_all_lower": 1.714705551937366
+      },
+      {
+        "params": {
+          "w_U": 5.0,
+          "w_P_safety": 0.0
+        },
+        "incentive_argmax_config": "prv_175_lower",
+        "argmax_mean_reward": 0.0010393369816481244,
+        "reference_mean_reward": -0.021168138025805895,
+        "prv_all_lower_mean_reward": -0.278223711811259,
+        "reference_minus_prv_all_lower": 0.2570555737854531
+      },
+      {
+        "params": {
+          "w_U": 5.0,
+          "w_P_safety": 1.0
+        },
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_mean_reward": -0.5346600162411682,
+        "reference_mean_reward": -0.653884275874634,
+        "prv_all_lower_mean_reward": -1.2499172928908246,
+        "reference_minus_prv_all_lower": 0.5960330170161906
+      },
+      {
+        "params": {
+          "w_U": 5.0,
+          "w_P_safety": 5.0
+        },
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_mean_reward": -2.611255525431544,
+        "reference_mean_reward": -3.184748827269946,
+        "prv_all_lower_mean_reward": -5.136691617209087,
+        "reference_minus_prv_all_lower": 1.9519427899391415
+      }
+    ],
+    "F4_vary_threshold": [
+      {
+        "params": {
+          "safety_threshold_psi": 0.0,
+          "c_soft_service": 10.0,
+          "c_hard_negative": 100.0,
+          "eps_effort": 0.01
+        },
+        "incentive_argmax_config": "prv_lower_pump_lower",
+        "argmax_mean_reward": -0.9514690948246894,
+        "reference_mean_reward": -1.0,
+        "prv_all_lower_mean_reward": -0.9605090262832353,
+        "reference_minus_prv_all_lower": -0.03949097371676469
+      },
+      {
+        "params": {
+          "safety_threshold_psi": 20.0,
+          "c_soft_service": 10.0,
+          "c_hard_negative": 100.0,
+          "eps_effort": 0.01
+        },
+        "incentive_argmax_config": "prv_176_upper",
+        "argmax_mean_reward": -10.519148877297594,
+        "reference_mean_reward": -10.63271613784883,
+        "prv_all_lower_mean_reward": -10.971693581079567,
+        "reference_minus_prv_all_lower": 0.3389774432307373
+      }
+    ],
+    "note": "PROVISIONAL FOR COMPARISON ONLY. The incentive-argmax shifting with weights is the intended demonstration that weight/formulation selection is a researcher decision (D-P6-005), not an automatable one."
+  },
+  "limitations": [
+    "Static-command runs: realised actuator movement is 0, so the F1/F4 effort term is identically 0 here; its scale is ANALYTIC (HYPOTHESIS).",
+    "Leakage is a VALIDATION instrument, not field-calibrated; only relative response is meaningful, never an absolute leakage claim.",
+    "Coverage is edges+corners+reference of the 7-D action box; the joint interior is NOT covered - no exhaustive joint-safety claim.",
+    "Provisional weights/penalties are for side-by-side comparison only; no formulation is scored, ranked, or selected (D-P6-005 stays PROPOSED).",
+    "The <20 psi service threshold is chronically unmet by the native BWSN-1 baseline (2 nodes), so hard 20 psi constraint terms fire on the baseline itself - a formulation-design consideration, not a bug."
+  ],
+  "reproducibility_information": {
+    "working_inp_sha256": "53015ba9212e46bec731d190971819996233996b498bc269e828f992830a20a9",
+    "step8_artefact_used": "p6_s8_reward_scale_analysis.json",
+    "deterministic": "EPANET deterministic; no RNG; no seed",
+    "reference_reproduces_frozen_baseline": {
+      "reference_leak_mean_gpm": 84.72988433677985,
+      "frozen_leak_ref_gpm": 84.72988433677985,
+      "leak_ref_abs_diff": 0.0,
+      "req_ref_abs_diff": 0.0,
+      "reference_dsr_mean": 0.9833370137001072,
+      "reference_n_node_ts_below_20psi": 386,
+      "reference_n_node_ts_negative": 0,
+      "per_timestep_vs_validated_accounting_max_abs_diff": 0.0
+    },
+    "no_topology_or_native_rule_change": true,
+    "no_future_information_used": true,
+    "native_controls_count": 5,
+    "all_reward_values_finite": true,
+    "generator": "src/validation/p6_s8_reward_formulation_comparison.py",
+    "component_extractor": "src/validation/p6_s8_reward_scale_analysis.py"
+  }
+}

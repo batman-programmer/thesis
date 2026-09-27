@@ -590,5 +590,26 @@ ablations, not silent changes.
 - **Validation:** `tests/test_reward_scale_analysis.py` 21/21 pass; integrity
   flags all true (finite, no topology/native-rule change, no future information,
   per-timestep vs validated accounting max abs diff 0.0).
+- **Additional comparison evidence (2026-09-27, status UNCHANGED — still
+  PROPOSED):** the four formulations F1–F4 were evaluated per-timestep over the
+  same 19 validated static commands with PROVISIONAL comparison-only parameters
+  (F1 `w_·=1,w_E=0`; F2 `Λ=20,BIG=100`; F3 `w_U=w_P_safety=1`; F4 `θ=20 psi,
+  c_soft=10,c_hard=100`). Evidence:
+  `results/phase6/p6_s8_reward_formulation_comparison.json`; generator
+  `src/validation/p6_s8_reward_formulation_comparison.py`; tests
+  `tests/test_reward_formulation_comparison.py` (23/23 pass; full battery 44/44);
+  spec §8.9–§8.11 of `docs/PHASE6_REWARD_SPEC.md`. **No formulation is selected,
+  scored, ranked, or labelled; no weights are tuned; no safety clamp is added
+  (STEP 9); no PPO is trained.** Key descriptive findings: (a) under the
+  provisional weights all four rewards place their incentive-argmax on the same
+  bound command `prv_176_upper` (min service ≈4.17 psi, 1 sub-20 node); (b) a
+  leak-only incentive drives to `prv_lower_pump_lower` (min service 1.295 psi),
+  a service-only incentive raises leakage — the two oppose; (c) every pooled
+  timestep has ≥1 node <20 psi (incl. the native baseline's 2 nodes) and 0
+  negative nodes, so hard-20-psi terms (F2 count, F4 θ=20) fire on the baseline
+  itself (ill-posed constraint) while θ=0 is trivially satisfied yet permissive;
+  (d) the normalized leak term spans only 0.108 across the tested set vs a
+  unit-weight max move cost of 1.0 (effort-domination is a weight-choice concern,
+  analytic only). This evidence **informs but does not resolve** D-P6-005.
 
 

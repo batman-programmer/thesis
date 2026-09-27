@@ -269,6 +269,21 @@ reward:
   tests: "tests/test_reward_scale_analysis.py — 12/12 STEP 8 + 9/9 STEP 7 = 21/21 passing (stdlib unittest + numpy)."
   limitations: "Static-command runs (effort scale analytic, HYPOTHESIS). Leak instrument uncalibrated (relative response only). Representative in-bounds set only (interior/mixed-corner joint safety = STEP-9/STEP-12). Pump power hydraulic-only."
   next: "Researcher selects ONE formulation + weights (resolve D-P6-005) and STEP 9 implements the hard safety clamp the boundary-seeking check proves is required. No weights chosen here; no PPO training."
+  formulation_comparison:    # WU-10 (2026-09-27): EVIDENCE ONLY; D-P6-005 status UNCHANGED (still PROPOSED)
+    status: "STEP 8 COMPARISON COMPLETE (2026-09-27, WU-10). F1-F4 evaluated per-timestep over the same 19 validated static commands with PROVISIONAL comparison-only params. NO formulation selected/scored/ranked, NO weights tuned, NO STEP-9 clamp added, NO PPO. D-P6-005 remains PROPOSED."
+    deliverables: ["src/validation/p6_s8_reward_formulation_comparison.py", "results/phase6/p6_s8_reward_formulation_comparison.json", "tests/test_reward_formulation_comparison.py", "docs/PHASE6_REWARD_SPEC.md (§8.9-§8.11)"]
+    provisional_params_comparison_only: "F1 {w_L:1,w_U:1,w_P:1,w_A:1,w_E:0}; F2 {lambda:20,big:100}; F3 {w_U:1,w_P_safety:1}; F4 {theta:20psi,c_soft:10,c_hard:100,eps_effort:0.01}. Illustrative to place rewards on one scale; NOT proposed weights."
+    normalization_source: "LOADED verbatim from results/phase6/p6_s8_reward_scale_analysis.json (frozen; no online/running/test-set stats). unserved_ref=14.98483697365873 GPM derived."
+    reproducibility: "leak_ref_abs_diff 0.0, req_ref_abs_diff 0.0, reference below20 386, neg 0, per-ts vs validated accounting 0.0, all rewards finite, no topology/native-rule change, no future info."
+    descriptive_findings:    # VALIDATED_FACT (measured per-timestep); incentive-argmax = direction indicator, NOT a ranking
+      induced_incentive: "all four incentive-argmax = prv_176_upper (on bound, min svc ~4.17 psi, n_below20 1.0); spreads F1 0.541/F2 110.5/F3 0.525/F4 0.526."
+      leak_only_vs_service_only: "leak-only argmax prv_lower_pump_lower (min svc 1.295 psi); service-only argmax prv_176_upper (leak_norm 1.0155>1.0) -> oppose."
+      hard_20psi_degeneracy: "frac ts any node <20psi =1.0 (incl native baseline 2 nodes); frac <0psi =0.0. F2 count + F4@20 fire on baseline (ill-posed); F4@0 never fires but permissive."
+      actuator_domination_analytic: "leak-term dynamic range 0.108 vs unit max-move cost 1.0 -> un-tuned effort weight could dominate; realised movement 0 in statics (HYPOTHESIS)."
+      weight_sensitivity: "varying provisional params shifts incentive-argmax (F1 w_P 0->prv_175_lower, >=0.5->prv_176_upper; F4 theta 0<->20 flips) -> selection is the researcher's."
+    tests: "tests/test_reward_formulation_comparison.py — 23 comparison tests; full battery 44/44 (23 + 12 STEP 8 + 9 STEP 7)."
+    safety_note: "leakage-driving incentive -> PRV lower corner (min svc ~1.3 psi) -> state-dependent safety mechanism REQUIRED, but that is STEP 9 (unapproved) and NOT added here; action bounds kept distinct from a clamp."
+    next: "Comparison INFORMS but does NOT resolve D-P6-005; researcher still selects ONE formulation + weights. No winner selected. No PPO."
 
 demand_uncertainty:
   status: "NOT STARTED (step10)"
@@ -306,17 +321,19 @@ dependencies:
 
 git:
   branch: "main"
-  head_commit: "a2fab2e"
-  head_subject: "phase6: add STEP 8 reward-component scale analysis (D-P6-005, PROPOSED)"
+  head_commit: "0d7dc1a"
+  head_subject: "phase6: record STEP 8 commit hash in PROJECT_STATE (checkpoint)"
   recent_commits:
+    - "0d7dc1a phase6: record STEP 8 commit hash in PROJECT_STATE (checkpoint)"
     - "a2fab2e phase6: add STEP 8 reward-component scale analysis (D-P6-005, PROPOSED)"
     - "0cd7f2e phase6: approve observation specification (D-P6-004 APPROVED & FROZEN)"
     - "8b66147 phase6: record STEP 7 commit hash in PROJECT_STATE (checkpoint)"
     - "f7ce429 phase6: add STEP 7 DRL observation/state design (D-P6-004, PROPOSED)"
     - "6c34ab9 phase6: record action-space approval commit hash (checkpoint B)"
     - "e91c363 phase6: approve drl actuator action space (action-space APPROVAL checkpoint A)"
-  working_tree_note: "results/phase5/_tmp/ scratch (~600 files) + src/**/__pycache__/*.pyc left untracked (pre-existing debt, deliberately NOT committed). STEP 8 commit a2fab2e staged only the 9 specific deliverable + doc paths."
-  next_commit_subject: "phase6: (STEP 9 safety clamp OR D-P6-005 formulation selection — awaiting researcher)"
+  working_tree_note: "results/phase5/_tmp/ scratch (~600 files) + src/**/__pycache__/*.pyc left untracked (pre-existing debt, deliberately NOT committed). STEP 8 comparison (WU-10) stages only the explicit deliverable + doc paths (generator, JSON, tests, 5 tracking docs)."
+  next_commit_subject: "phase6: compare reward formulations"
+
 
 risks:
   - "R1 (MEASURED, was HYPOTHESIS): driving PRV setpoints low DOES cause <20 psi service violations for 175 (<21.5), 176 (<20; negative <13), 177 (<20), 178 (<20). VALVE-173 is exempt (inert). Per-valve service-clean lower bounds now measured (step6, D-P6-003); a STEP-9 safety layer should still clamp to the approved bounds."
@@ -345,7 +362,7 @@ session_checkpoint:          # brief s.20 - on-disk, not chat-only
   date_utc: "2026-09-27"
   current_phase: "Phase 6 - DRL environment design/validation"
   current_step: "STEP 8 — REWARD DESIGN: MEASUREMENT COMPLETE 2026-09-27 (D-P6-005 PROPOSED). Component scales measured, pathologies checked, 4 formulations PROPOSED (no weights, no PPO). D-P6-004 observation APPROVED & FROZEN (139-dim). Action space APPROVED & FROZEN (D-P6-001/002/003). NEXT: researcher selects a formulation+weights; then STEP 9 safety clamp."
-  completed: ["G5 action space", "G12 pump control", "STEP 6 PRV per-valve characterization (measured)", "STEP 6 four-question decision-review brief (no re-run)", "STEP 6b focused VALVE-173 (50,60] refinement (measured)", "STEP 6 A/B/C terminology correction", "Action-space APPROVAL persisted (D-P6-001/002/003) + docs/PHASE6_ACTION_SPACE_SPEC.md created + git checkpoint A", "STEP 7 observation design APPROVED & FROZEN (D-P6-004): docs/PHASE6_STATE_SPEC.md, src/env/state_builder.py + 9/9 tests, results/phase6/p6_s7_state_spec.json", "STEP 8 reward-component scale MEASUREMENT (D-P6-005 PROPOSED): docs/PHASE6_REWARD_SPEC.md, src/validation/p6_s8_reward_scale_analysis.py, results/phase6/p6_s8_reward_scale_analysis.json, tests/test_reward_scale_analysis.py (21/21 tests)"]
+  completed: ["G5 action space", "G12 pump control", "STEP 6 PRV per-valve characterization (measured)", "STEP 6 four-question decision-review brief (no re-run)", "STEP 6b focused VALVE-173 (50,60] refinement (measured)", "STEP 6 A/B/C terminology correction", "Action-space APPROVAL persisted (D-P6-001/002/003) + docs/PHASE6_ACTION_SPACE_SPEC.md created + git checkpoint A", "STEP 7 observation design APPROVED & FROZEN (D-P6-004): docs/PHASE6_STATE_SPEC.md, src/env/state_builder.py + 9/9 tests, results/phase6/p6_s7_state_spec.json", "STEP 8 reward-component scale MEASUREMENT (D-P6-005 PROPOSED): docs/PHASE6_REWARD_SPEC.md, src/validation/p6_s8_reward_scale_analysis.py, results/phase6/p6_s8_reward_scale_analysis.json, tests/test_reward_scale_analysis.py (21/21 tests)", "STEP 8 reward-formulation COMPARISON (WU-10, EVIDENCE ONLY, D-P6-005 unchanged): src/validation/p6_s8_reward_formulation_comparison.py, results/phase6/p6_s8_reward_formulation_comparison.json, tests/test_reward_formulation_comparison.py (44/44 full battery), docs/PHASE6_REWARD_SPEC.md §8.9-§8.11 (no formulation selected/scored/ranked, no weights tuned, no STEP-9 clamp, no PPO)"]
   not_completed: ["STEP 8 reward FORMULATION selection + weights (D-P6-005 resolution; formulations PROPOSED not approved)", "STEP 9-15"]
   pending_research_decisions: ["STEP 8 reward formulation: components (leakage / service-DSR / pressure-safety / actuator effort+smoothness / optional energy) to be scale-measured; a small set of principled formulations (normalized weighted sum / constrained-penalty / baseline-relative / safety-first-lexicographic) will be PROPOSED, NOT approved, pending measured-scale evidence and researcher sign-off. No weights chosen prematurely.", "Open non-blocking items: joint 5-D box safety (R1b, STEP-9/12), leak calibration (R3), DRL dependency install (R4)."]
   step7_2026_09_27:              # WU-8 checkpoint (this session). STEP-6 detail below preserved as history.
@@ -385,7 +402,7 @@ session_checkpoint:          # brief s.20 - on-disk, not chat-only
   tests_run: "step6b run: reference reproduced exactly (mean 94.787 / 386 <20psi / 0 negative / 84.730 gpm); 14 setpoints in (50,60], all solver-clean, 0 negative, 0 new <20psi."
   files_changed: ["src/validation/p6_s6b_v173_lowside_refine.py", "results/phase6/p6_s6b_v173_lowside_refine.json", "docs/PHASE6_DECISION_REGISTER.md", "docs/PHASE6_EXECUTION_LOG.md", "docs/PHASE6_EVIDENCE_INDEX.md", "docs/RECOVERY.md", "PROJECT_STATE.yaml"]
   git_commit: "STEP 6 characterization committed at 627567b; step6b + clarification docs update in checkpoint A (approval); STEP 7 checkpoints follow."
-  exact_next_action: "STEP 8 reward-component scale MEASUREMENT COMPLETE 2026-09-27 (D-P6-005 PROPOSED): src/validation/p6_s8_reward_scale_analysis.py wrote results/phase6/p6_s8_reward_scale_analysis.json; docs/PHASE6_REWARD_SPEC.md documents scales/correlations/pathologies + 4 PROPOSED formulations + fixed normalisation constants; tests/test_reward_scale_analysis.py 21/21 pass. NEXT (researcher decision, do NOT do silently): review measured scales + pathology evidence, select ONE formulation (F1-F4) + weights to resolve D-P6-005, then STEP 9 implements the hard safety clamp the boundary-seeking check proves is required (clamp to approved bounds). Do NOT choose weights unilaterally. Do NOT start PPO training. Do NOT reopen D-P6-001/002/003 or D-P6-004."
+  exact_next_action: "STEP 8 reward-component scale MEASUREMENT COMPLETE 2026-09-27 (D-P6-005 PROPOSED): src/validation/p6_s8_reward_scale_analysis.py wrote results/phase6/p6_s8_reward_scale_analysis.json; docs/PHASE6_REWARD_SPEC.md documents scales/correlations/pathologies + 4 PROPOSED formulations + fixed normalisation constants; tests/test_reward_scale_analysis.py 21/21 pass. STEP 8 FORMULATION COMPARISON also COMPLETE 2026-09-27 (WU-10, EVIDENCE ONLY, D-P6-005 status UNCHANGED): src/validation/p6_s8_reward_formulation_comparison.py wrote results/phase6/p6_s8_reward_formulation_comparison.json; docs/PHASE6_REWARD_SPEC.md §8.9-§8.11; tests/test_reward_formulation_comparison.py (full battery 44/44). NEXT (researcher decision, do NOT do silently): review measured scales + pathology + comparison evidence, select ONE formulation (F1-F4) + weights to resolve D-P6-005, then STEP 9 implements the hard safety clamp the boundary-seeking check proves is required (clamp to approved bounds). Do NOT choose weights unilaterally. Do NOT select a winner. Do NOT start PPO training. Do NOT reopen D-P6-001/002/003 or D-P6-004."
   recovery_file: "docs/RECOVERY.md"
 
 
