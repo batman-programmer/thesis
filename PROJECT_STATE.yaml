@@ -267,14 +267,16 @@ dependencies:
 
 git:
   branch: "main"
-  head_commit: "e91c363"
-  head_subject: "phase6: approve drl actuator action space"
+  head_commit: "f7ce429"
+  head_subject: "phase6: add STEP 7 DRL observation/state design (D-P6-004, PROPOSED)"
   recent_commits:
+    - "f7ce429 phase6: add STEP 7 DRL observation/state design (D-P6-004, PROPOSED) — observation_dim=139, 9/9 tests, PROPOSED not frozen"
+    - "6c34ab9 phase6: record action-space approval commit hash (checkpoint B)"
     - "e91c363 phase6: approve drl actuator action space (action-space APPROVAL checkpoint A)"
     - "8c89ba2 phase6: add VALVE-173 low-side refinement evidence (step6b)"
     - "627567b phase6: characterize per-prv action bounds"
-  working_tree_note: "results/phase5/_tmp/ scratch (~600 files) + src/validation/__pycache__/*.pyc left untracked (pre-existing debt, deliberately NOT committed)."
-  next_commit_subject: "phase6: record action-space approval commit hash (checkpoint B); then STEP 7 state-spec checkpoints"
+  working_tree_note: "results/phase5/_tmp/ scratch (~600 files) + src/**/__pycache__/*.pyc left untracked (pre-existing debt, deliberately NOT committed). STEP 7 commit staged only the specific deliverable + doc paths."
+  next_commit_subject: "STEP 8 reward design (only after D-P6-004 observation is approved)"
 
 risks:
   - "R1 (MEASURED, was HYPOTHESIS): driving PRV setpoints low DOES cause <20 psi service violations for 175 (<21.5), 176 (<20; negative <13), 177 (<20), 178 (<20). VALVE-173 is exempt (inert). Per-valve service-clean lower bounds now measured (step6, D-P6-003); a STEP-9 safety layer should still clamp to the approved bounds."
