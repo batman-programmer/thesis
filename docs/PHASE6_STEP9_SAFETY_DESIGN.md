@@ -303,3 +303,146 @@ directly demonstrates that action-handling output is **state-dependent**, as req
 - **Uncalibrated leak:** `Q_leak` uses an uncalibrated emitter coefficient (relative use only).
 - **Evidence only:** `researcher_selection = null`; mechanism/policy selection + production wrapper +
   `reward.py` + PPO are **out of scope** and deferred to the researcher (§9).
+
+---
+
+# PHASE 6 — STEP 9 (WU-16): Temporal Characterisation — Single-Step vs Trajectory-Aware Safety
+
+**Status:** EMPIRICAL EVIDENCE ONLY — the *temporal* behaviour of the STEP-9 candidate rules is
+*measured* over the full 96 h horizon so the researcher can later judge whether a look-ahead-based
+check is sufficient. **No mechanism, no action-handling policy, and no look-ahead horizon is
+selected, ranked, scored, or recommended** (`researcher_selection = null`). No production wrapper, no
+`reward.py`, no PPO. This section is **appended below** the WU-14 (§1–§9) and WU-15 (§10.1–§10.9)
+sections and does **not** replace them.
+
+**Date:** 2026-09-28 · **Work unit:** WU-16 · **Preceded by:** WU-15 empirical characterisation
+(§10) and its measured decision-instant/sustained gap (≈5.53 psi vs ≈1.29 psi).
+
+## Artefacts (WU-16)
+
+| Artefact | Path |
+|---|---|
+| Machine-readable characterisation | `results/phase6/p6_s9_temporal_safety_characterization.json` |
+| Measurement generator | `src/validation/p6_s9_temporal_safety_characterization.py` |
+| Test battery | `tests/test_temporal_safety_characterization.py` (20 tests) |
+
+The generator **reuses the validated WU-8 instrument** (`p6_s8_reward_scale_analysis.py`) for every
+hydraulic solve and the **WU-15 module** (`p6_s9_safety_mechanism_characterization.py`) for the frozen
+action encoding, rule predicates, and forbidden-key guard — same working INP
+(`sha256 53015ba9…20a9`), same PDA accounting, same 121/5 service/connector mask, same
+`n_native_controls = 5` (read from disk, not assumed). It runs **3 full 96 h EPS solves**
+(reference_nominal, prv_lower_pump_lower, prv_all_lower), reads the WU-15 commands and 5.53/1.29
+anchors from the persisted WU-15 JSON, carries a `generated_utc` stamp (not byte-reproduced), and
+`_self_checks` raises `SystemExit` on any invariant breach.
+
+## 11.1 The temporal question (PART 3)
+
+A single-step post-action safety check evaluates the *decision instant* only (report index 0, sharing
+the current tank state). WU-15 measured that the severe command `prv_lower_pump_lower` looks
+comparatively mild at that instant (`p_min ≈ 5.53 psi`) yet drives the worst-node pressure to
+`≈ 1.29 psi` later in the horizon as tanks drain. WU-16 asks, empirically: **can a purely single-step
+(or short few-step) look-ahead miss delayed hydraulic deterioration that a trajectory-aware check would
+see?** Per PART 7 this is reported as *"single-step non-activation followed by delayed deterioration"* —
+**never** "false negative" (there is no validated safe/unsafe oracle; §10.2 PART 5).
+
+## 11.2 Two views per configuration (PART 7)
+
+- **VIEW A — single-step / decision instant** (`view_A_single_step_decision_instant`, report index 0):
+  the metrics a one-step check would see. Severe: `p_min 5.5279`, `D 27.49`, `N_neg 0`, `N_20 2`,
+  `DSR 0.9227`, `Q_unserved 126.2 gpm`.
+- **VIEW B — full-horizon trajectory** (`view_B_trajectory_over_full_horizon`): severe
+  `p_min_horizon 1.2947 psi` at **report index 192 = 96.0 h (the END of the horizon)**,
+  `D_max 31.73`, `DSR_min 0.9142`, `max_N_neg 0`. The worst instant is the *last* one, so **any finite
+  look-ahead shorter than the full horizon understates the collapse.**
+
+WU-15's 5.53/1.29 numbers are **reproduced from persisted data** (`wu15_delayed_collapse_reproduction`,
+abs diff `0.0` on both, normalized action `[-1]×7` reproduced exactly, understatement `4.233 psi`).
+
+## 11.3 Horizon sensitivity (PART 9) — the central table
+
+Worst `p_min` over the look-ahead window `[0..H]` for the severe command, `H` in control steps
+(1 step = one 30-min report instant); horizons are **characterised, not selected**:
+
+| Horizon H | Window | Severe worst `p_min` (psi) |
+|---|---|---|
+| 1 | 0.5 h | 5.4615 |
+| 2 | 1.0 h | 5.4045 |
+| 4 | 2.0 h | 5.3083 |
+| 8 | 4.0 h | 5.1472 |
+| full | 96.0 h | **1.2947** |
+
+The severe worst-node pressure first drops below `θ_p = 5 psi` at **report index 13 (6.5 h)** — i.e.
+**beyond the longest short horizon measured (H=8 = 4 h)**. Below `θ_p = 10/15/20` it is already under at
+index 0 (the decision instant is 5.53 psi, itself sub-10). So on the tested corner a short look-ahead
+(≤4 h) keyed to `θ_p = 5` sees `p_min ≈ 5.1–5.5 psi` and **stays quiet**, while the danger materialises
+hours later.
+
+## 11.4 Temporal candidate behaviour (PART 8) — TS1–TS4, characterised not ranked
+
+The four temporal candidates **extend** S1–S4 to a window (SAFE = do NOT intervene over `[0..H]`); they
+do **not** replace them. `activates` == the rule intervenes (SAFE violated somewhere in the window).
+Measured on `prv_lower_pump_lower` vs the baseline trajectory:
+
+- **TS1** (absolute worst-node, `θ_p = 5`): `activates = false` for **H=1,2,4,8**; `true` only at
+  **full**. This is the single-step-miss-then-delayed-deterioration phenomenon, exhibited directly.
+- **TS2** (baseline-relative worst-node, `ε_p = 0`): `activates = true` at **every** horizon including
+  **H=1** (`worst Δp_min −0.097` by H=1, deepening to `−4.30` at full). A *relative* window guard is far
+  more temporally sensitive here than the absolute one — it reacts to early degradation before the
+  absolute floor is breached. Reported as measured behaviour, **not** as a virtue.
+- **TS3** (aggregate deficit increase): reported per `ε_D` × horizon (descriptive).
+- **TS4** (negative-pressure backstop): `activates = false` at **every** horizon for **every** swept
+  in-bounds config (`max_N_neg = 0` throughout) — standalone it gives **no 20-psi protection**, exactly
+  as in §10.5/§10.6.
+
+**No candidate is called sufficient, best, or preferred; the enumeration TS1→TS4 is definitional.**
+
+## 11.5 Baseline compatibility over the horizon (PART 5)
+
+The identity hold (`reference → reference`) reproduces the chronic ill-posedness on the *trajectory*:
+**TS1 `θ_p = 20` activates** (`worst_p_min 4.16452 psi` over the horizon — the frozen chronic worst
+node), while **TS1 `θ_p = 0` does not**, and **TS2 `ε_p = 0` never activates at any horizon** (a
+relative rule cannot reject an unchanged hold). Confirms §4/§10.6: a hard absolute-20 window gate
+penalises the native baseline itself; relative and negative-keyed gates are baseline-compatible.
+
+## 11.6 Mechanism coincident with the delayed collapse (PART 11) — no causal overclaim
+
+Over the severe horizon the two tanks **drain substantially** by the worst-node instant: TANK-130
+`15.16 → 5.37 ft` (`Δ −9.79`, bounds `[0, 32.1]`) and TANK-131 `17.95 → 5.21 ft` (`Δ −12.74`, bounds
+`[0, 41.9]`). The pressure collapse is **coincident with** this drawdown; the artefact records the tank,
+pump, and native-rule series so the association is visible, but **no causal mechanism is asserted**.
+Native pump-rule events: **0** for `prv_lower_pump_lower` (its pumps are commanded to reduced fixed
+speed and never toggle status), **14** each for `reference_nominal` and `prv_all_lower` (pumps at speed
+1.0 toggle on the tank-level rules). This is reported as *"coincident with"*, not as cause.
+
+## 11.7 Safety-handling implication (PART 12) — detection ≠ guarantee
+
+A look-ahead check that fits within a short window cannot, on this evidence, be assumed to detect a
+collapse that emerges hours later; **detecting** a delayed collapse (with a long-enough look-ahead) is
+also **not the same as guaranteeing** the network avoids it — enforcement, fallback feasibility, and the
+train/execute gap (§5, §10.3) remain separate STEP-9 design questions. **No wrapper is implemented and
+no handling policy is chosen here.**
+
+## 11.8 Computational cost & PPO compatibility (PART 13–14)
+
+Cost is reported as `forward_solves_per_decision = H` (one deterministic EPANET solve per look-ahead
+step), a linear per-step estimate from the measured full-run wall-clock, and
+`horizon_truncation_extra_solves = 0`. PPO compatibility (`PPO_compatibility`): the look-ahead is
+deterministic (adds no stochasticity), adds `H` extra solves and action latency per decision, is
+compatible with the 30-min decision interval, may make executed ≠ commanded (PPO must observe the gap),
+and requires **no** environment differentiability. Reported **per horizon**, not selected.
+
+## 11.9 Limitations carried forward (PART 15 / R1b)
+
+- **Finite look-ahead ≠ long-term safety.** The worst instant is the horizon endpoint (96 h); any look
+  ahead shorter than the full episode understates sustained danger, and even the full-horizon check is
+  bounded by the 96 h EPS — it says nothing beyond it.
+- **Coverage:** only 3 operating points (reference + two lower corners) are simulated over the full
+  horizon; interior points, mixed PRV corners, and the joint (action × uncertain-demand) space are
+  **not** characterised. **Do NOT claim the 7-D action box is globally safe.**
+- **No oracle:** no validated safe/unsafe ground truth ⇒ no FP/FN/accuracy; only descriptive activation.
+- **Action persistence (PART 10):** the sustained case holds the command every step (the realistic
+  re-issue-every-step case); a genuine apply-once-then-revert run would require adding non-native
+  time-based controls to the frozen instrument (changing `n_native_controls`), so it is **not**
+  simulated — near-term indices and realized-speed evolution are reported instead.
+- **Evidence only:** `researcher_selection = null`; mechanism/policy/**horizon** selection + production
+  wrapper + `reward.py` + PPO are **out of scope** and deferred to the researcher (§9).
