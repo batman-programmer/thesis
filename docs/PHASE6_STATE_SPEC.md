@@ -1,6 +1,6 @@
 # PHASE6_STATE_SPEC.md — DRL Observation / State Design (STEP 7)
 
-**Status:** PROPOSED — PENDING RESEARCHER APPROVAL (decision **D-P6-004**).
+**Status:** APPROVED & FROZEN — researcher sign-off 2026-09-27 (decision **D-P6-004**).
 **Date:** 2026-09-27. **Depends on:** APPROVED action space
 (`docs/PHASE6_ACTION_SPACE_SPEC.md`, D-P6-001/002/003).
 **Scope of this document:** define *exactly what the PPO agent observes* at each
@@ -9,9 +9,12 @@ control step. This is **STATE DESIGN ONLY**. It does NOT define the reward
 `gymnasium` environment (STEP 11), or any training. Those remain out of scope and
 are not decided here.
 
-Unlike the action space, the observation design has **not yet been approved by the
-researcher**. It is a Level-2 research-impacting decision (CLAUDE.md §3) and is
-presented here for review. Do not treat it as frozen until D-P6-004 is approved.
+The 139-dim observation layout, ordering, normalization and demand/Markov framing
+are **FROZEN** exactly as the action vector was frozen. The prior status was
+*PROPOSED — PENDING RESEARCHER APPROVAL*; that history is preserved (register
+D-P6-004) and the values were not changed on approval. STEP 8 (reward) and all later
+steps read this state but MUST NOT modify the observation specification; reopen only
+on new contradictory evidence, registered as a superseding decision.
 
 ---
 
@@ -263,18 +266,26 @@ exposure, or history are explicit **future** decisions, not silent changes.
 | Pump STATUS resets speed → realized ≠ commanded | `results/phase6/p6_s4_pump_strategy.json` | `reopen_semantics` |
 | Reference safety references (n<20psi=386, n_neg=0, min 4.165 psi) | `results/phase6/p6_s3_prv_finechar.json` | `cases.reference_nominal` |
 
-## 7.14 Approval gate — decision D-P6-004 (PROPOSED)
+## 7.14 Approval gate — decision D-P6-004 (APPROVED & FROZEN 2026-09-27)
 
-This observation design is **PROPOSED, pending researcher approval** (CLAUDE.md
-§17 step 10). Points a reviewer should explicitly accept or amend:
+This observation design was **APPROVED by the researcher on 2026-09-27** (CLAUDE.md
+§17 step 10). The five review points were accepted as the frozen baseline exactly as
+proposed (no values changed on approval):
 
-1. **Full 121-node pressure observability** (vs a realistic sensor subset).
-2. **Demand Option A** (no explicit demand; time-of-day as diurnal prior).
-3. **Fixed pressure band `[−20, 300]` psi** (vs per-node bands).
-4. Carrying **both** prev-commanded and realized actuator state (dimension cost).
-5. **Single-step (MLP) observation**, accepting approximate Markovity (no history).
+1. **Full 121-node pressure observability** — ACCEPTED as the baseline (a realistic
+   reduced sensor subset remains a documented future ablation, not adopted).
+2. **Demand Option A** — ACCEPTED (no explicit demand; time-of-day sin/cos is the only
+   diurnal prior; future/forecast demand remains FORBIDDEN).
+3. **Fixed pressure band `[−20, 300]` psi** — ACCEPTED (per-node elevation bands remain
+   a future refinement).
+4. **Both prev-commanded and realized actuator state** — ACCEPTED (+9 dims; keeps the
+   native STATUS/regulation override observable).
+5. **Single-step (MLP) observation** — ACCEPTED as approximate-Markov / POMDP (tank
+   levels are the observed memory; frame-stack / recurrent policy is a future remedy
+   only if instability appears).
 
-Until D-P6-004 is approved, `observation_dim = 139` and the layout above are the
-**working** design; the ordering will be frozen (like the action vector) on
-approval. Earlier alternatives are preserved in this section and in
-`docs/PHASE6_DECISION_REGISTER.md`.
+`observation_dim = 139` and the block layout above are now **FROZEN**, exactly as the
+action vector was frozen (D-P6-001/002/003). STEP 8 (reward) and later steps read this
+state but MUST NOT modify it. Earlier alternatives are preserved in this section and in
+`docs/PHASE6_DECISION_REGISTER.md`; reopen only on new contradictory evidence via a
+superseding decision.

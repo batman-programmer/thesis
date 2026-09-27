@@ -408,9 +408,12 @@ pump + stochastic-demand combinations (risk R1b).
   NOT reward, safety, demand model, or the env).
 - **Decision class:** ENGINEERING DECISION + RESEARCH ASSUMPTION (Level-2,
   research-impacting, CLAUDE.md §3).
-- **Status:** **PROPOSED — PENDING RESEARCHER APPROVAL.** Layout is WORKING, NOT
-  frozen. Unlike D-P6-001/002/003, this is not yet approved and must not be treated
-  as final until the researcher accepts or amends it.
+- **Status:** **APPROVED & FROZEN — researcher sign-off 2026-09-27.** The 139-dim
+  observation layout is now frozen exactly as the action vector was (D-P6-001/002/003).
+  Superseded prior status was *PROPOSED — PENDING RESEARCHER APPROVAL* (2026-09-27);
+  provenance preserved below, values not erased. Do not silently alter the layout,
+  normalization, ordering, or the demand/Markov framing while designing the reward
+  (STEP 8) or thereafter without new contradictory evidence.
 
 ### Question
 
@@ -486,12 +489,28 @@ ablations, not silent changes.
 
 ### Status / Approval / Implementation / Validation
 
-- **Status:** PROPOSED — PENDING RESEARCHER APPROVAL (not frozen).
-- **Approval:** awaiting researcher sign-off on the 5 review points above.
+- **Status:** APPROVED & FROZEN (researcher sign-off 2026-09-27). Prior status
+  PROPOSED — PENDING RESEARCHER APPROVAL (2026-09-27); history preserved, not erased.
+- **Approval — the 5 review points are accepted as the frozen baseline:**
+  1. **Pressure observability:** full 121-node service-pressure vector accepted for the
+     baseline (reduced sensor subset remains a documented future ablation, not adopted).
+  2. **Demand exposure:** Option A — demand is NOT observed; time-of-day sin/cos is the
+     only diurnal prior; pressures/tanks are the demand consequences; future/forecast
+     demand remains FORBIDDEN.
+  3. **Normalization band:** fixed physical band `[-20, 300]` psi → `(p+20)/320` clipped,
+     no data-derived running statistics (per-node elevation bands remain a future refinement).
+  4. **Actuator state representation:** retain BOTH previous-commanded and realized
+     actuator state (+9 dims) so the native STATUS/regulation override is observable.
+  5. **Temporal structure:** single-step MLP observation accepted as approximate-Markov /
+     POMDP (tank levels are the observed memory); frame-stack / recurrent policy remains a
+     future remedy only if training instability appears.
 - **Implementation:** `src/env/state_builder.py` (pure numpy), `ObservationConfig` +
   `RawState` + `build_observation` + `observation_bounds`; `docs/PHASE6_STATE_SPEC.md`.
 - **Validation:** `tests/test_state_builder.py` 9/9; `results/phase6/p6_s7_state_spec.json`
   consistency + sample checks all true.
-- **On approval:** freeze the 139-dim layout (as the action vector was), then STEP 8.
+- **Frozen — downstream contract:** the 139-dim layout, ordering, normalization and the
+  demand/Markov framing are now FROZEN. STEP 8 (reward) reads the environment state but
+  MUST NOT alter the observation specification. Reopen only on new contradictory evidence,
+  registered as a superseding decision.
 
 
