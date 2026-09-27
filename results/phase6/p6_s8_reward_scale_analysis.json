@@ -1,0 +1,3705 @@
+{
+  "phase": 6,
+  "step": 8,
+  "title": "Reward-component scale, variability and correlation analysis for the BWSN-1 PPO environment (MEASURE ONLY, not train)",
+  "status": "MEASUREMENT COMPLETE. Reward formulations are PROPOSED, NOT approved. No weights chosen, no PPO training, observation (STEP 7) and action space (STEP 6) unchanged.",
+  "generated_utc": "2026-09-27T09:23:22.701546+00:00",
+  "env": {
+    "timestamp_utc": "2026-09-27T09:23:22+00:00",
+    "os": "Windows-11-10.0.26200-SP0",
+    "machine": "AMD64",
+    "python": "3.13.15",
+    "python_build": "Aug  5 2026 13:05:39",
+    "wntr": "1.5.0",
+    "numpy": "2.5.2",
+    "pandas": "3.0.5",
+    "scipy": "1.18.1",
+    "networkx": "3.6.1",
+    "epanet_engine_wntr": {
+      "epanet2.dll": 20200,
+      "epanet20.dll": 20012,
+      "epanet22.dll": 20200
+    },
+    "epanet_engine_epyt": 20305,
+    "original_inp_sha256": "510af942ec643eb87adcf26e5a7df1cc4c23eb0c1e470a8a1257ed055f1956f1",
+    "working_inp_sha256": "53015ba9212e46bec731d190971819996233996b498bc269e828f992830a20a9",
+    "determinism": "EPANET's hydraulic solver is deterministic. No stochastic input is used anywhere in Phase 5; leak-node selection and leak-coefficient allocation are closed-form functions of pipe length, so no random seed is required. Recorded seed: none used."
+  },
+  "scope_statement": "Validation/characterisation only. Every number is produced by the EPANET solver from the working copy with native controls and rules untouched, under the mandated solver policy and the Phase 5 leakage instrument. No optimisation, no search, no reward tuning, no RL.",
+  "solver_policy": {
+    "accuracy": 1e-05,
+    "trials": 2000,
+    "rule_timestep_s": 180,
+    "report_timestep_s": 1800,
+    "pda_required_psi": 20.0,
+    "pda_minimum_psi": 0.0,
+    "pda_exponent": 0.5,
+    "asserted_after_every_load": true
+  },
+  "service_node_policy": {
+    "rule": "declared elevation exactly 0.0 ft AND zero total base demand -> connector artefact, excluded from every service/safety statistic but KEPT in the hydraulic model",
+    "n_service_junctions": 121,
+    "n_connector_junctions": 5,
+    "connector_nodes": [
+      "JUNCTION-105",
+      "JUNCTION-106",
+      "JUNCTION-109",
+      "JUNCTION-110",
+      "JUNCTION-128"
+    ]
+  },
+  "leak_instrument": {
+    "status": "VALIDATION INSTRUMENT, not a calibrated field leakage model (brief 18). Half-pipe-length weights, single closed-form global scale, exponent 0.5 from the file's [OPTIONS].",
+    "sizing": {
+      "global_scale_k_gpm_per_ft_per_psi_alpha": 7.13768134008582e-05,
+      "sum_w_p_alpha": 1187270.5037860267,
+      "target_leak_gpm": 84.74358520507813,
+      "n_junctions_with_emitter": 126,
+      "coefficient_min": 0.0019985507752240295,
+      "coefficient_max": 0.44900598527335517,
+      "alpha": 0.5,
+      "closed_form": "k = target / sum_j (w_j * p_baseline_j^alpha); single evaluation, no optimisation of any kind."
+    }
+  },
+  "action_space_reference": {
+    "source": "docs/PHASE6_ACTION_SPACE_SPEC.md (D-P6-001/002/003, FROZEN)",
+    "prv_bounds_psi": {
+      "VALVE-173": [
+        54.5,
+        100.0
+      ],
+      "VALVE-175": [
+        21.5,
+        110.0
+      ],
+      "VALVE-176": [
+        20.0,
+        59.524
+      ],
+      "VALVE-177": [
+        20.0,
+        90.0
+      ],
+      "VALVE-178": [
+        20.0,
+        74.0
+      ]
+    },
+    "pump_bounds_rel_speed": {
+      "PUMP-170": [
+        0.82,
+        1.1
+      ],
+      "PUMP-172": [
+        0.77,
+        1.1
+      ]
+    }
+  },
+  "candidate_reward_components": [
+    "leakage_gpm",
+    "served_demand_gpm",
+    "requested_demand_gpm",
+    "unserved_demand_gpm",
+    "dsr",
+    "pressure_deficit_psi_nodesum",
+    "n_service_nodes_below_20psi",
+    "min_service_pressure_psi",
+    "n_service_nodes_negative",
+    "pump_hydraulic_power_kw"
+  ],
+  "n_configurations": 19,
+  "configurations": {
+    "reference_nominal": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "component_stats": {
+        "leakage_gpm": {
+          "n": 193,
+          "mean": 84.72988433677985,
+          "median": 84.72533900666167,
+          "std": 0.1809096520410652,
+          "min": 84.32972762925336,
+          "max": 85.09742373105372,
+          "p5": 84.42524549177287,
+          "p25": 84.59754099494104,
+          "p75": 84.89138560424529,
+          "p95": 84.99549749097153,
+          "mean_abs_step_diff": 0.028990249314871486
+        },
+        "served_demand_gpm": {
+          "n": 193,
+          "mean": 891.4138978885177,
+          "median": 760.29880089973,
+          "std": 568.5936701057002,
+          "min": 27.87490382009412,
+          "max": 2689.1801063966504,
+          "p5": 89.07072461704114,
+          "p25": 445.1037137503651,
+          "p75": 1244.699238193882,
+          "p95": 1882.088327108062,
+          "mean_abs_step_diff": 173.84764083064624
+        },
+        "requested_demand_gpm": {
+          "n": 193,
+          "mean": 906.3987348621764,
+          "median": 774.0061991800001,
+          "std": 578.2023762676808,
+          "min": 28.31729997,
+          "max": 2736.8742972699997,
+          "p5": 90.61535990400002,
+          "p25": 453.07679952,
+          "p75": 1264.37469883,
+          "p95": 1913.7847781419985,
+          "mean_abs_step_diff": 176.96376231958334
+        },
+        "unserved_demand_gpm": {
+          "n": 193,
+          "mean": 14.984836973658497,
+          "median": 12.69149329039908,
+          "std": 9.678009581491741,
+          "min": 0.4418613743031088,
+          "max": 47.69468511950345,
+          "p5": 1.5445460252736498,
+          "p25": 7.973030826589991,
+          "p75": 20.019883772443563,
+          "p95": 33.3759008325282,
+          "mean_abs_step_diff": 3.16275247549245
+        },
+        "dsr": {
+          "n": 193,
+          "mean": 0.9833370137001072,
+          "median": 0.9827456964434144,
+          "std": 0.0012990032158141497,
+          "min": 0.9818777132257851,
+          "max": 0.9889640950881299,
+          "p5": 0.982158013514419,
+          "p25": 0.9823453795774576,
+          "p75": 0.9842531094240103,
+          "p95": 0.9857290426820103,
+          "mean_abs_step_diff": 0.0004457815914275468
+        },
+        "pressure_deficit_psi_nodesum": {
+          "n": 193,
+          "mean": 18.141106363405218,
+          "median": 18.15964698791504,
+          "std": 0.5406963096977725,
+          "min": 17.332889556884766,
+          "max": 19.182348251342773,
+          "p5": 17.390372467041015,
+          "p25": 17.63204002380371,
+          "p75": 18.60787582397461,
+          "p95": 18.99239311218262,
+          "mean_abs_step_diff": 0.06159026424090067
+        },
+        "n_service_nodes_below_20psi": {
+          "n": 193,
+          "mean": 2.0,
+          "median": 2.0,
+          "std": 0.0,
+          "min": 2.0,
+          "max": 2.0,
+          "p5": 2.0,
+          "p25": 2.0,
+          "p75": 2.0,
+          "p95": 2.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "min_service_pressure_psi": {
+          "n": 193,
+          "mean": 5.120162521619253,
+          "median": 5.129264831542969,
+          "std": 0.5329517086964507,
+          "min": 4.16452169418335,
+          "max": 5.90568208694458,
+          "p5": 4.270768070220948,
+          "p25": 4.663885116577148,
+          "p75": 5.63510799407959,
+          "p95": 5.854724979400634,
+          "mean_abs_step_diff": 0.060049754877885185
+        },
+        "n_service_nodes_negative": {
+          "n": 193,
+          "mean": 0.0,
+          "median": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "p95": 0.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "pump_hydraulic_power_kw": {
+          "n": 193,
+          "mean": 88.10062475649187,
+          "median": 0.0,
+          "std": 112.90416713400154,
+          "min": 0.0,
+          "max": 253.135498046875,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 199.7068328857422,
+          "p95": 252.7855194091797,
+          "mean_abs_step_diff": 9.226616541544596
+        }
+      },
+      "validated_accounting": {
+        "leakage_mean_gpm": 84.72988433677985,
+        "served_demand_mean_gpm": 891.4138978885177,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 0.9833370137001072,
+        "dsr_min": 0.9818777132257851,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 4.4856480485577777e-07
+      },
+      "per_timestep_vs_accounting_cross_check": {
+        "leakage_mean_abs_diff_gpm": 0.0,
+        "served_mean_abs_diff_gpm": 0.0,
+        "dsr_mean_abs_diff": 0.0
+      },
+      "all_finite": true
+    },
+    "prv_all_lower": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 54.5,
+          "VALVE-175": 21.5,
+          "VALVE-176": 20.0,
+          "VALVE-177": 20.0,
+          "VALVE-178": 20.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "component_stats": {
+        "leakage_gpm": {
+          "n": 193,
+          "mean": 81.38381870141156,
+          "median": 81.38146184975619,
+          "std": 0.17473062957600277,
+          "min": 80.92180509297009,
+          "max": 81.75021261883325,
+          "p5": 81.08978063198569,
+          "p25": 81.26022693881464,
+          "p75": 81.5365921801131,
+          "p95": 81.64306307697511,
+          "mean_abs_step_diff": 0.027793013797036654
+        },
+        "served_demand_gpm": {
+          "n": 193,
+          "mean": 834.5520090776172,
+          "median": 712.4737686455575,
+          "std": 532.9696053036935,
+          "min": 25.94869640102911,
+          "max": 2515.08558892285,
+          "p5": 82.91962979241687,
+          "p25": 414.375704645725,
+          "p75": 1169.8566968435762,
+          "p95": 1763.3688048705435,
+          "mean_abs_step_diff": 162.3303112309425
+        },
+        "requested_demand_gpm": {
+          "n": 193,
+          "mean": 906.3987348621764,
+          "median": 774.0061991800001,
+          "std": 578.2023762676808,
+          "min": 28.31729997,
+          "max": 2736.8742972699997,
+          "p5": 90.61535990400002,
+          "p25": 453.07679952,
+          "p75": 1264.37469883,
+          "p95": 1913.7847781419985,
+          "mean_abs_step_diff": 176.96376231958334
+        },
+        "unserved_demand_gpm": {
+          "n": 193,
+          "mean": 71.84672578455903,
+          "median": 61.330369033534794,
+          "std": 45.554356774215655,
+          "min": 2.3680710000671112,
+          "max": 221.78951056609503,
+          "p5": 7.6956507148727304,
+          "p25": 38.70088116890304,
+          "p75": 96.13943801443588,
+          "p95": 158.0793018511466,
+          "mean_abs_step_diff": 14.853038428761954
+        },
+        "dsr": {
+          "n": 193,
+          "mean": 0.9193996684666168,
+          "median": 0.9150467816237445,
+          "std": 0.006430672639943274,
+          "min": 0.9141988299525465,
+          "max": 0.946152605345897,
+          "p5": 0.9143959919763591,
+          "p25": 0.9145353026082427,
+          "p75": 0.9244006261002484,
+          "p95": 0.9309823632707881,
+          "mean_abs_step_diff": 0.0017128378599064232
+        },
+        "pressure_deficit_psi_nodesum": {
+          "n": 193,
+          "mean": 27.860197571275148,
+          "median": 27.859785079956055,
+          "std": 0.5222489827393801,
+          "min": 27.1008358001709,
+          "max": 28.83759307861328,
+          "p5": 27.144379806518554,
+          "p25": 27.357315063476562,
+          "p75": 28.323671340942383,
+          "p95": 28.723251724243163,
+          "mean_abs_step_diff": 0.05971268812815348
+        },
+        "n_service_nodes_below_20psi": {
+          "n": 193,
+          "mean": 2.0,
+          "median": 2.0,
+          "std": 0.0,
+          "min": 2.0,
+          "max": 2.0,
+          "p5": 2.0,
+          "p25": 2.0,
+          "p75": 2.0,
+          "p95": 2.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "min_service_pressure_psi": {
+          "n": 193,
+          "mean": 5.149613254428528,
+          "median": 5.156610488891602,
+          "std": 0.5190944048101903,
+          "min": 4.189884185791016,
+          "max": 5.9025349617004395,
+          "p5": 4.284091949462891,
+          "p25": 4.694166660308838,
+          "p75": 5.645712852478027,
+          "p95": 5.861940002441406,
+          "mean_abs_step_diff": 0.05916446695725123
+        },
+        "n_service_nodes_negative": {
+          "n": 193,
+          "mean": 0.0,
+          "median": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "p95": 0.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "pump_hydraulic_power_kw": {
+          "n": 193,
+          "mean": 82.93665337439027,
+          "median": 0.0,
+          "std": 110.7702136943556,
+          "min": 0.0,
+          "max": 253.13864135742188,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 199.68174743652344,
+          "p95": 252.77149353027343,
+          "mean_abs_step_diff": 9.225815773010254
+        }
+      },
+      "validated_accounting": {
+        "leakage_mean_gpm": 81.38381870141156,
+        "served_demand_mean_gpm": 834.5520090776172,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 0.9193996684666168,
+        "dsr_min": 0.9141988299525465,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 4.1188485511156614e-07
+      },
+      "per_timestep_vs_accounting_cross_check": {
+        "leakage_mean_abs_diff_gpm": 0.0,
+        "served_mean_abs_diff_gpm": 0.0,
+        "dsr_mean_abs_diff": 0.0
+      },
+      "all_finite": true
+    },
+    "prv_all_upper": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 100.0,
+          "VALVE-175": 110.0,
+          "VALVE-176": 59.524,
+          "VALVE-177": 90.0,
+          "VALVE-178": 74.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "component_stats": {
+        "leakage_gpm": {
+          "n": 193,
+          "mean": 89.7592331333586,
+          "median": 89.75460310483518,
+          "std": 0.182828558172438,
+          "min": 89.3500276246954,
+          "max": 90.1276477181771,
+          "p5": 89.44691226628889,
+          "p25": 89.62221912144823,
+          "p75": 89.92011808537855,
+          "p95": 90.02577093916763,
+          "mean_abs_step_diff": 0.029312058939273095
+        },
+        "served_demand_gpm": {
+          "n": 193,
+          "mean": 906.4686005107375,
+          "median": 774.0753319724963,
+          "std": 578.2027300568162,
+          "min": 28.386318171032244,
+          "max": 2736.944682996763,
+          "p5": 90.6846042208546,
+          "p25": 453.1463732568858,
+          "p75": 1264.4449220103022,
+          "p95": 1913.8554562455333,
+          "mean_abs_step_diff": 176.96383201978884
+        },
+        "requested_demand_gpm": {
+          "n": 193,
+          "mean": 906.3987348621764,
+          "median": 774.0061991800001,
+          "std": 578.2023762676808,
+          "min": 28.31729997,
+          "max": 2736.8742972699997,
+          "p5": 90.61535990400002,
+          "p25": 453.07679952,
+          "p75": 1264.37469883,
+          "p95": 1913.7847781419985,
+          "mean_abs_step_diff": 176.96376231958334
+        },
+        "unserved_demand_gpm": {
+          "n": 193,
+          "mean": -0.0698656485613146,
+          "median": -0.06963451384797281,
+          "std": 0.00065007585573259,
+          "min": -0.07140540036880338,
+          "max": -0.0687718699521156,
+          "p5": -0.07094046840632018,
+          "p25": -0.07044370292760505,
+          "p75": -0.06936057542793606,
+          "p95": -0.06901779579644085,
+          "mean_abs_step_diff": 0.00021662074045014634
+        },
+        "dsr": {
+          "n": 193,
+          "mean": 1.000180882194326,
+          "median": 1.0000899724867005,
+          "std": 0.0003126336910397135,
+          "min": 1.000025631009172,
+          "max": 1.0024569279459368,
+          "p5": 1.0000368704138562,
+          "p25": 1.000055259640807,
+          "p75": 1.0001537974050965,
+          "p95": 1.000767274580574,
+          "mean_abs_step_diff": 7.794534226083251e-05
+        },
+        "pressure_deficit_psi_nodesum": {
+          "n": 193,
+          "mean": 14.887982714361478,
+          "median": 14.882688522338867,
+          "std": 0.5340603055244325,
+          "min": 14.10055923461914,
+          "max": 15.832965850830078,
+          "p5": 14.15265350341797,
+          "p25": 14.378776550292969,
+          "p75": 15.343122482299805,
+          "p95": 15.72166862487793,
+          "mean_abs_step_diff": 0.05967371662457784
+        },
+        "n_service_nodes_below_20psi": {
+          "n": 193,
+          "mean": 1.0,
+          "median": 1.0,
+          "std": 0.0,
+          "min": 1.0,
+          "max": 1.0,
+          "p5": 1.0,
+          "p25": 1.0,
+          "p75": 1.0,
+          "p95": 1.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "min_service_pressure_psi": {
+          "n": 193,
+          "mean": 5.11201724857864,
+          "median": 5.117311000823975,
+          "std": 0.5340602295981562,
+          "min": 4.167034149169922,
+          "max": 5.899440288543701,
+          "p5": 4.278331851959228,
+          "p25": 4.656877040863037,
+          "p75": 5.621223449707031,
+          "p95": 5.847346210479737,
+          "mean_abs_step_diff": 0.05967371165752411
+        },
+        "n_service_nodes_negative": {
+          "n": 193,
+          "mean": 0.0,
+          "median": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "p95": 0.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "pump_hydraulic_power_kw": {
+          "n": 193,
+          "mean": 88.10092637452436,
+          "median": 0.0,
+          "std": 112.90482211453372,
+          "min": 0.0,
+          "max": 253.13601684570312,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 199.705078125,
+          "p95": 252.78998718261718,
+          "mean_abs_step_diff": 9.226747353871664
+        }
+      },
+      "validated_accounting": {
+        "leakage_mean_gpm": 89.7592331333586,
+        "served_demand_mean_gpm": 906.4686005107375,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 1.000180882194326,
+        "dsr_min": 1.000025631009172,
+        "n_node_timesteps_below_20psi": 193,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 2.171016831198358e-06
+      },
+      "per_timestep_vs_accounting_cross_check": {
+        "leakage_mean_abs_diff_gpm": 0.0,
+        "served_mean_abs_diff_gpm": 0.0,
+        "dsr_mean_abs_diff": 0.0
+      },
+      "all_finite": true
+    },
+    "prv_173_lower": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 54.5,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "component_stats": {
+        "leakage_gpm": {
+          "n": 193,
+          "mean": 84.45235543743065,
+          "median": 84.44819602300626,
+          "std": 0.18095386859089116,
+          "min": 84.05276901896767,
+          "max": 84.82085515864452,
+          "p5": 84.14588358272879,
+          "p25": 84.32122189590068,
+          "p75": 84.61370050017956,
+          "p95": 84.7190072830513,
+          "mean_abs_step_diff": 0.02903827942071535
+        },
+        "served_demand_gpm": {
+          "n": 193,
+          "mean": 891.4132436463462,
+          "median": 760.2982269236188,
+          "std": 568.5936504994522,
+          "min": 27.874252166459826,
+          "max": 2689.179229717422,
+          "p5": 89.07006837087378,
+          "p25": 445.1029502008136,
+          "p75": 1244.6985848974723,
+          "p95": 1882.0880397337098,
+          "mean_abs_step_diff": 173.84761919683547
+        },
+        "requested_demand_gpm": {
+          "n": 193,
+          "mean": 906.3987348621764,
+          "median": 774.0061991800001,
+          "std": 578.2023762676808,
+          "min": 28.31729997,
+          "max": 2736.8742972699997,
+          "p5": 90.61535990400002,
+          "p25": 453.07679952,
+          "p75": 1264.37469883,
+          "p95": 1913.7847781419985,
+          "mean_abs_step_diff": 176.96376231958334
+        },
+        "unserved_demand_gpm": {
+          "n": 193,
+          "mean": 14.9854912158299,
+          "median": 12.692086286735162,
+          "std": 9.67803090742111,
+          "min": 0.44248561115026774,
+          "max": 47.69515740211773,
+          "p5": 1.5451895367977586,
+          "p25": 7.973745363388105,
+          "p75": 20.020787817277096,
+          "p95": 33.376794195107585,
+          "mean_abs_step_diff": 3.1627788612572147
+        },
+        "dsr": {
+          "n": 193,
+          "mean": 0.9833353350813864,
+          "median": 0.9827414294790474,
+          "std": 0.0012991063209363612,
+          "min": 0.9818773088922598,
+          "max": 0.9889626285467815,
+          "p5": 0.9821573370576459,
+          "p25": 0.9823443609827311,
+          "p75": 0.9842525233527061,
+          "p95": 0.985728342838818,
+          "mean_abs_step_diff": 0.00044508419950507636
+        },
+        "pressure_deficit_psi_nodesum": {
+          "n": 193,
+          "mean": 18.142030261341155,
+          "median": 18.159223556518555,
+          "std": 0.5398143184583526,
+          "min": 17.340532302856445,
+          "max": 19.181501388549805,
+          "p5": 17.3937744140625,
+          "p25": 17.630359649658203,
+          "p75": 18.615692138671875,
+          "p95": 18.99260482788086,
+          "mean_abs_step_diff": 0.06142549713452657
+        },
+        "n_service_nodes_below_20psi": {
+          "n": 193,
+          "mean": 2.0,
+          "median": 2.0,
+          "std": 0.0,
+          "min": 2.0,
+          "max": 2.0,
+          "p5": 2.0,
+          "p25": 2.0,
+          "p75": 2.0,
+          "p95": 2.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "min_service_pressure_psi": {
+          "n": 193,
+          "mean": 5.119238670625835,
+          "median": 5.129661560058594,
+          "std": 0.5320434185817992,
+          "min": 4.16536808013916,
+          "max": 5.906925678253174,
+          "p5": 4.272233200073242,
+          "p25": 4.665815830230713,
+          "p75": 5.636350631713867,
+          "p95": 5.853016662597656,
+          "mean_abs_step_diff": 0.05988501260677973
+        },
+        "n_service_nodes_negative": {
+          "n": 193,
+          "mean": 0.0,
+          "median": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "p95": 0.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "pump_hydraulic_power_kw": {
+          "n": 193,
+          "mean": 88.10087791008036,
+          "median": 0.0,
+          "std": 112.90449962547962,
+          "min": 0.0,
+          "max": 253.13546752929688,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 199.70765686035156,
+          "p95": 252.7864196777344,
+          "mean_abs_step_diff": 9.226647853851318
+        }
+      },
+      "validated_accounting": {
+        "leakage_mean_gpm": 84.45235543743065,
+        "served_demand_mean_gpm": 891.4132436463462,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 0.9833353350813864,
+        "dsr_min": 0.9818773088922598,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 5.000963483325904e-07
+      },
+      "per_timestep_vs_accounting_cross_check": {
+        "leakage_mean_abs_diff_gpm": 0.0,
+        "served_mean_abs_diff_gpm": 0.0,
+        "dsr_mean_abs_diff": 0.0
+      },
+      "all_finite": true
+    },
+    "prv_173_upper": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 100.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "component_stats": {
+        "leakage_gpm": {
+          "n": 193,
+          "mean": 85.20620777209052,
+          "median": 85.2013990368834,
+          "std": 0.18117037125385482,
+          "min": 84.8054688230105,
+          "max": 85.57722416402939,
+          "p5": 84.90018266757419,
+          "p25": 85.072618509613,
+          "p75": 85.36631283564324,
+          "p95": 85.47284627375961,
+          "mean_abs_step_diff": 0.029094665809528575
+        },
+        "served_demand_gpm": {
+          "n": 193,
+          "mean": 891.4151221728956,
+          "median": 760.3001642192655,
+          "std": 568.5936460099458,
+          "min": 27.87612721792607,
+          "max": 2689.1811622542195,
+          "p5": 89.07196148058264,
+          "p25": 445.1049066557747,
+          "p75": 1244.700277428295,
+          "p95": 1882.0896778491897,
+          "mean_abs_step_diff": 173.84762299086614
+        },
+        "requested_demand_gpm": {
+          "n": 193,
+          "mean": 906.3987348621764,
+          "median": 774.0061991800001,
+          "std": 578.2023762676808,
+          "min": 28.31729997,
+          "max": 2736.8742972699997,
+          "p5": 90.61535990400002,
+          "p25": 453.07679952,
+          "p75": 1264.37469883,
+          "p95": 1913.7847781419985,
+          "mean_abs_step_diff": 176.96376231958334
+        },
+        "unserved_demand_gpm": {
+          "n": 193,
+          "mean": 14.983612689280555,
+          "median": 12.690283023373354,
+          "std": 9.678032347095167,
+          "min": 0.4406053345168104,
+          "max": 47.69337901285735,
+          "p5": 1.543282157597625,
+          "p25": 7.971854553459536,
+          "p75": 20.01883976576937,
+          "p95": 33.374923207789095,
+          "mean_abs_step_diff": 3.1627704880114997
+        },
+        "dsr": {
+          "n": 193,
+          "mean": 0.9833402453337868,
+          "median": 0.9827553155597105,
+          "std": 0.001298814150622191,
+          "min": 0.9818783064338611,
+          "max": 0.9889670168888416,
+          "p5": 0.9821588976038218,
+          "p25": 0.9823475796311325,
+          "p75": 0.9842539501841364,
+          "p95": 0.9857304147223919,
+          "mean_abs_step_diff": 0.0004471933773556186
+        },
+        "pressure_deficit_psi_nodesum": {
+          "n": 193,
+          "mean": 18.140792016538313,
+          "median": 18.16033363342285,
+          "std": 0.5392726195900975,
+          "min": 17.33672332763672,
+          "max": 19.183828353881836,
+          "p5": 17.389632797241212,
+          "p25": 17.634552001953125,
+          "p75": 18.608339309692383,
+          "p95": 18.986465454101562,
+          "mean_abs_step_diff": 0.061275094747543335
+        },
+        "n_service_nodes_below_20psi": {
+          "n": 193,
+          "mean": 2.0,
+          "median": 2.0,
+          "std": 0.0,
+          "min": 2.0,
+          "max": 2.0,
+          "p5": 2.0,
+          "p25": 2.0,
+          "p75": 2.0,
+          "p95": 2.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "min_service_pressure_psi": {
+          "n": 193,
+          "mean": 5.120476846250227,
+          "median": 5.128603935241699,
+          "std": 0.5314353049040642,
+          "min": 4.1630144119262695,
+          "max": 5.90338134765625,
+          "p5": 4.278929424285889,
+          "p25": 4.675891876220703,
+          "p75": 5.629368782043457,
+          "p95": 5.855888843536377,
+          "mean_abs_step_diff": 0.05973486602306366
+        },
+        "n_service_nodes_negative": {
+          "n": 193,
+          "mean": 0.0,
+          "median": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "p95": 0.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "pump_hydraulic_power_kw": {
+          "n": 193,
+          "mean": 88.10141109802562,
+          "median": 0.0,
+          "std": 112.90522176834111,
+          "min": 0.0,
+          "max": 253.13546752929688,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 199.70814514160156,
+          "p95": 252.7911376953125,
+          "mean_abs_step_diff": 9.226712862650553
+        }
+      },
+      "validated_accounting": {
+        "leakage_mean_gpm": 85.20620777209052,
+        "served_demand_mean_gpm": 891.4151221728956,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 0.9833402453337868,
+        "dsr_min": 0.9818783064338611,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 6.636217335653782e-07
+      },
+      "per_timestep_vs_accounting_cross_check": {
+        "leakage_mean_abs_diff_gpm": 0.0,
+        "served_mean_abs_diff_gpm": 0.0,
+        "dsr_mean_abs_diff": 0.0
+      },
+      "all_finite": true
+    },
+    "prv_175_lower": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 21.5,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "component_stats": {
+        "leakage_gpm": {
+          "n": 193,
+          "mean": 82.84736822153799,
+          "median": 82.84336650267663,
+          "std": 0.182068529274977,
+          "min": 82.44684911387424,
+          "max": 83.2149012884178,
+          "p5": 82.54368540439707,
+          "p25": 82.715830033639,
+          "p75": 83.01058604242174,
+          "p95": 83.11497163875192,
+          "mean_abs_step_diff": 0.028953102319725216
+        },
+        "served_demand_gpm": {
+          "n": 193,
+          "mean": 891.4097342308734,
+          "median": 760.2946167451536,
+          "std": 568.5936578638494,
+          "min": 27.87073307671257,
+          "max": 2689.175740437526,
+          "p5": 89.06655338313708,
+          "p25": 445.099582242929,
+          "p75": 1244.6949673032084,
+          "p95": 1882.0843080029106,
+          "mean_abs_step_diff": 173.84762895291297
+        },
+        "requested_demand_gpm": {
+          "n": 193,
+          "mean": 906.3987348621764,
+          "median": 774.0061991800001,
+          "std": 578.2023762676808,
+          "min": 28.31729997,
+          "max": 2736.8742972699997,
+          "p5": 90.61535990400002,
+          "p25": 453.07679952,
+          "p75": 1264.37469883,
+          "p95": 1913.7847781419985,
+          "mean_abs_step_diff": 176.96376231958334
+        },
+        "unserved_demand_gpm": {
+          "n": 193,
+          "mean": 14.989000631302602,
+          "median": 12.69561956938287,
+          "std": 9.678022098138388,
+          "min": 0.44599661152752645,
+          "max": 47.698709615300686,
+          "p5": 1.5486745717573942,
+          "p25": 7.977088206740291,
+          "p75": 20.023985866679595,
+          "p95": 33.38036678548791,
+          "mean_abs_step_diff": 3.162775453908258
+        },
+        "dsr": {
+          "n": 193,
+          "mean": 0.9833261937519474,
+          "median": 0.9827145186873989,
+          "std": 0.0012997601586987304,
+          "min": 0.9818755476752279,
+          "max": 0.9889546955295875,
+          "p5": 0.982154530663276,
+          "p25": 0.9823385460528349,
+          "p75": 0.9842496723978942,
+          "p95": 0.9857239519428815,
+          "mean_abs_step_diff": 0.0004411797434383166
+        },
+        "pressure_deficit_psi_nodesum": {
+          "n": 193,
+          "mean": 18.1368440025211,
+          "median": 18.156843185424805,
+          "std": 0.5404995853197799,
+          "min": 17.33302116394043,
+          "max": 19.176555633544922,
+          "p5": 17.39019317626953,
+          "p25": 17.622175216674805,
+          "p75": 18.605310440063477,
+          "p95": 18.99225769042969,
+          "mean_abs_step_diff": 0.061722745498021446
+        },
+        "n_service_nodes_below_20psi": {
+          "n": 193,
+          "mean": 2.0,
+          "median": 2.0,
+          "std": 0.0,
+          "min": 2.0,
+          "max": 2.0,
+          "p5": 2.0,
+          "p25": 2.0,
+          "p75": 2.0,
+          "p95": 2.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "min_service_pressure_psi": {
+          "n": 193,
+          "mean": 5.124424924504572,
+          "median": 5.131936073303223,
+          "std": 0.532795292585436,
+          "min": 4.170419216156006,
+          "max": 5.914436340332031,
+          "p5": 4.272576999664307,
+          "p25": 4.663462162017822,
+          "p75": 5.641825199127197,
+          "p95": 5.855063247680664,
+          "mean_abs_step_diff": 0.06018115828434626
+        },
+        "n_service_nodes_negative": {
+          "n": 193,
+          "mean": 0.0,
+          "median": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "p95": 0.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "pump_hydraulic_power_kw": {
+          "n": 193,
+          "mean": 87.06832245347414,
+          "median": 0.0,
+          "std": 112.30397264265615,
+          "min": 0.0,
+          "max": 253.13555908203125,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 199.6898956298828,
+          "p95": 252.78451232910157,
+          "mean_abs_step_diff": 9.226637999216715
+        }
+      },
+      "validated_accounting": {
+        "leakage_mean_gpm": 82.84736822153799,
+        "served_demand_mean_gpm": 891.4097342308734,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 0.9833261937519474,
+        "dsr_min": 0.9818755476752279,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 1.1551954912647489e-06
+      },
+      "per_timestep_vs_accounting_cross_check": {
+        "leakage_mean_abs_diff_gpm": 0.0,
+        "served_mean_abs_diff_gpm": 0.0,
+        "dsr_mean_abs_diff": 0.0
+      },
+      "all_finite": true
+    },
+    "prv_175_upper": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 110.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "component_stats": {
+        "leakage_gpm": {
+          "n": 193,
+          "mean": 87.13235299397107,
+          "median": 87.12736311414803,
+          "std": 0.18090244350861615,
+          "min": 86.73183069613593,
+          "max": 87.49893510853228,
+          "p5": 86.82716521374775,
+          "p25": 87.00002965338462,
+          "p75": 87.2926139030127,
+          "p95": 87.3971239615523,
+          "mean_abs_step_diff": 0.02886411792818529
+        },
+        "served_demand_gpm": {
+          "n": 193,
+          "mean": 891.4207456945004,
+          "median": 760.3056390883063,
+          "std": 568.593668264329,
+          "min": 27.881695575912147,
+          "max": 2689.1869342906493,
+          "p5": 89.07753628577211,
+          "p25": 445.1105455835783,
+          "p75": 1244.705984664689,
+          "p95": 1882.095491642071,
+          "mean_abs_step_diff": 173.84763292556318
+        },
+        "requested_demand_gpm": {
+          "n": 193,
+          "mean": 906.3987348621764,
+          "median": 774.0061991800001,
+          "std": 578.2023762676808,
+          "min": 28.31729997,
+          "max": 2736.8742972699997,
+          "p5": 90.61535990400002,
+          "p25": 453.07679952,
+          "p75": 1264.37469883,
+          "p95": 1913.7847781419985,
+          "mean_abs_step_diff": 176.96376231958334
+        },
+        "unserved_demand_gpm": {
+          "n": 193,
+          "mean": 14.97798916767572,
+          "median": 12.684603447767131,
+          "std": 9.678010402220547,
+          "min": 0.43503318056998097,
+          "max": 47.68779169907384,
+          "p5": 1.5377191682736882,
+          "p25": 7.966203246148552,
+          "p75": 20.013176728862163,
+          "p95": 33.36933005224222,
+          "mean_abs_step_diff": 3.162766095028086
+        },
+        "dsr": {
+          "n": 193,
+          "mean": 0.9833548023633046,
+          "median": 0.9827980489779263,
+          "std": 0.001298337459862796,
+          "min": 0.9818814856090196,
+          "max": 0.9889800914896474,
+          "p5": 0.9821638298068279,
+          "p25": 0.9823568182256913,
+          "p75": 0.9842580274790372,
+          "p95": 0.9857372131970252,
+          "mean_abs_step_diff": 0.0004533536098801037
+        },
+        "pressure_deficit_psi_nodesum": {
+          "n": 193,
+          "mean": 18.143540080964875,
+          "median": 18.163217544555664,
+          "std": 0.5416682356024964,
+          "min": 17.33643341064453,
+          "max": 19.18975257873535,
+          "p5": 17.392345809936522,
+          "p25": 17.629314422607422,
+          "p75": 18.612995147705078,
+          "p95": 18.992525482177733,
+          "mean_abs_step_diff": 0.061467498540878296
+        },
+        "n_service_nodes_below_20psi": {
+          "n": 193,
+          "mean": 2.0,
+          "median": 2.0,
+          "std": 0.0,
+          "min": 2.0,
+          "max": 2.0,
+          "p5": 2.0,
+          "p25": 2.0,
+          "p75": 2.0,
+          "p95": 2.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "min_service_pressure_psi": {
+          "n": 193,
+          "mean": 5.117728873238045,
+          "median": 5.125853538513184,
+          "std": 0.5339186260655463,
+          "min": 4.156958103179932,
+          "max": 5.902455806732178,
+          "p5": 4.269657325744629,
+          "p25": 4.662298679351807,
+          "p75": 5.637487888336182,
+          "p95": 5.852106952667237,
+          "mean_abs_step_diff": 0.05992867052555084
+        },
+        "n_service_nodes_negative": {
+          "n": 193,
+          "mean": 0.0,
+          "median": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "p95": 0.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "pump_hydraulic_power_kw": {
+          "n": 193,
+          "mean": 88.10024826761355,
+          "median": 0.0,
+          "std": 112.90369532943296,
+          "min": 0.0,
+          "max": 253.13539123535156,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 199.70767211914062,
+          "p95": 252.78481750488282,
+          "mean_abs_step_diff": 9.226583560307821
+        }
+      },
+      "validated_accounting": {
+        "leakage_mean_gpm": 87.13235299397107,
+        "served_demand_mean_gpm": 891.4207456945004,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 0.9833548023633046,
+        "dsr_min": 0.9818814856090196,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 4.53617616358315e-07
+      },
+      "per_timestep_vs_accounting_cross_check": {
+        "leakage_mean_abs_diff_gpm": 0.0,
+        "served_mean_abs_diff_gpm": 0.0,
+        "dsr_mean_abs_diff": 0.0
+      },
+      "all_finite": true
+    },
+    "prv_176_lower": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 20.0,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "component_stats": {
+        "leakage_gpm": {
+          "n": 193,
+          "mean": 84.0976963769298,
+          "median": 84.09421243340292,
+          "std": 0.17571596936968056,
+          "min": 83.63701847550192,
+          "max": 84.46218047641437,
+          "p5": 83.802550222774,
+          "p25": 83.9734407005452,
+          "p75": 84.24984008502892,
+          "p95": 84.3596753828448,
+          "mean_abs_step_diff": 0.028138049543484422
+        },
+        "served_demand_gpm": {
+          "n": 193,
+          "mean": 834.5577323365377,
+          "median": 712.4794769698652,
+          "std": 532.9696544480688,
+          "min": 25.954408867456124,
+          "max": 2515.091239378884,
+          "p5": 82.9252925869375,
+          "p25": 414.3813747502077,
+          "p75": 1169.862658938772,
+          "p95": 1763.3746627790204,
+          "mean_abs_step_diff": 162.3303359874715
+        },
+        "requested_demand_gpm": {
+          "n": 193,
+          "mean": 906.3987348621764,
+          "median": 774.0061991800001,
+          "std": 578.2023762676808,
+          "min": 28.31729997,
+          "max": 2736.8742972699997,
+          "p5": 90.61535990400002,
+          "p25": 453.07679952,
+          "p75": 1264.37469883,
+          "p95": 1913.7847781419985,
+          "mean_abs_step_diff": 176.96376231958334
+        },
+        "unserved_demand_gpm": {
+          "n": 193,
+          "mean": 71.84100252563852,
+          "median": 61.32482799401123,
+          "std": 45.554309728426254,
+          "min": 2.3623810423536113,
+          "max": 221.78328840175163,
+          "p5": 7.689965272417676,
+          "p25": 38.69529834209595,
+          "p75": 96.13380623293119,
+          "p95": 158.07373677398908,
+          "mean_abs_step_diff": 14.853022120957926
+        },
+        "dsr": {
+          "n": 193,
+          "mean": 0.919414472007267,
+          "median": 0.9151067612600325,
+          "std": 0.006424925411305574,
+          "min": 0.9142019653118791,
+          "max": 0.9461656869730535,
+          "p5": 0.9144010846879008,
+          "p25": 0.9145447722051792,
+          "p75": 0.9244047935307542,
+          "p95": 0.9309894163580034,
+          "mean_abs_step_diff": 0.001719119332355001
+        },
+        "pressure_deficit_psi_nodesum": {
+          "n": 193,
+          "mean": 27.864614704112316,
+          "median": 27.86256217956543,
+          "std": 0.5222442943468376,
+          "min": 27.089622497558594,
+          "max": 28.844390869140625,
+          "p5": 27.148511123657226,
+          "p25": 27.360870361328125,
+          "p75": 28.324424743652344,
+          "p95": 28.722188568115236,
+          "mean_abs_step_diff": 0.05977495511372884
+        },
+        "n_service_nodes_below_20psi": {
+          "n": 193,
+          "mean": 2.0,
+          "median": 2.0,
+          "std": 0.0,
+          "min": 2.0,
+          "max": 2.0,
+          "p5": 2.0,
+          "p25": 2.0,
+          "p75": 2.0,
+          "p95": 2.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "min_service_pressure_psi": {
+          "n": 193,
+          "mean": 5.14519601535303,
+          "median": 5.142646789550781,
+          "std": 0.5190757699121902,
+          "min": 4.183087348937988,
+          "max": 5.914859294891357,
+          "p5": 4.281743335723877,
+          "p25": 4.68803071975708,
+          "p75": 5.645078182220459,
+          "p95": 5.856988811492919,
+          "mean_abs_step_diff": 0.05922674387693405
+        },
+        "n_service_nodes_negative": {
+          "n": 193,
+          "mean": 0.0,
+          "median": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "p95": 0.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "pump_hydraulic_power_kw": {
+          "n": 193,
+          "mean": 83.9716830080655,
+          "median": 0.0,
+          "std": 110.92372682234183,
+          "min": 0.0,
+          "max": 253.13973999023438,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 199.68287658691406,
+          "p95": 252.77535400390624,
+          "mean_abs_step_diff": 9.226233641306559
+        }
+      },
+      "validated_accounting": {
+        "leakage_mean_gpm": 84.0976963769298,
+        "served_demand_mean_gpm": 834.5577323365377,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 0.919414472007267,
+        "dsr_min": 0.9142019653118791,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 4.7569076855324965e-07
+      },
+      "per_timestep_vs_accounting_cross_check": {
+        "leakage_mean_abs_diff_gpm": 0.0,
+        "served_mean_abs_diff_gpm": 0.0,
+        "dsr_mean_abs_diff": 0.0
+      },
+      "all_finite": true
+    },
+    "prv_176_upper": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 59.524,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "component_stats": {
+        "leakage_gpm": {
+          "n": 193,
+          "mean": 86.04414134540062,
+          "median": 86.0400818966041,
+          "std": 0.18285481687740937,
+          "min": 85.6357415973552,
+          "max": 86.41257505501999,
+          "p5": 85.73311612537468,
+          "p25": 85.90917107122804,
+          "p75": 86.20550137642282,
+          "p95": 86.30945557440653,
+          "mean_abs_step_diff": 0.029347509650531938
+        },
+        "served_demand_gpm": {
+          "n": 193,
+          "mean": 906.4588244334839,
+          "median": 774.0657505621098,
+          "std": 578.2026885498847,
+          "min": 28.376534495178205,
+          "max": 2736.935046810089,
+          "p5": 90.67480019084317,
+          "p25": 453.13648158694497,
+          "p75": 1264.435181021921,
+          "p95": 1913.845457802405,
+          "mean_abs_step_diff": 176.9638159815945
+        },
+        "requested_demand_gpm": {
+          "n": 193,
+          "mean": 906.3987348621764,
+          "median": 774.0061991800001,
+          "std": 578.2023762676808,
+          "min": 28.31729997,
+          "max": 2736.8742972699997,
+          "p5": 90.61535990400002,
+          "p25": 453.07679952,
+          "p75": 1264.37469883,
+          "p95": 1913.7847781419985,
+          "mean_abs_step_diff": 176.96376231958334
+        },
+        "unserved_demand_gpm": {
+          "n": 193,
+          "mean": -0.06008957130770657,
+          "median": -0.05988256237861833,
+          "std": 0.0006547095552741465,
+          "min": -0.06151067611722283,
+          "max": -0.05879696935971879,
+          "p5": -0.06115250844310367,
+          "p25": -0.060699032192587765,
+          "p75": -0.05959412423987942,
+          "p95": -0.05921871854443452,
+          "mean_abs_step_diff": 0.00019510437760931568
+        },
+        "dsr": {
+          "n": 193,
+          "mean": 1.0001554532187218,
+          "median": 1.0000777203974487,
+          "std": 0.00026849343335468327,
+          "min": 1.0000219220394089,
+          "max": 1.002111410094061,
+          "p5": 1.0000314280737574,
+          "p25": 1.0000475613530426,
+          "p75": 1.0001321686796634,
+          "p95": 1.000658958127541,
+          "mean_abs_step_diff": 6.697230325378283e-05
+        },
+        "pressure_deficit_psi_nodesum": {
+          "n": 193,
+          "mean": 14.884929335796771,
+          "median": 14.879356384277344,
+          "std": 0.5353390405913817,
+          "min": 14.096460342407227,
+          "max": 15.834446907043457,
+          "p5": 14.149717712402344,
+          "p25": 14.365606307983398,
+          "p75": 15.335136413574219,
+          "p95": 15.71885414123535,
+          "mean_abs_step_diff": 0.059741621216138206
+        },
+        "n_service_nodes_below_20psi": {
+          "n": 193,
+          "mean": 1.0,
+          "median": 1.0,
+          "std": 0.0,
+          "min": 1.0,
+          "max": 1.0,
+          "p5": 1.0,
+          "p25": 1.0,
+          "p75": 1.0,
+          "p95": 1.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "min_service_pressure_psi": {
+          "n": 193,
+          "mean": 5.1150706543205935,
+          "median": 5.120643138885498,
+          "std": 0.5353390206168941,
+          "min": 4.165553092956543,
+          "max": 5.903540134429932,
+          "p5": 4.2811455726623535,
+          "p25": 4.664863586425781,
+          "p75": 5.634393692016602,
+          "p95": 5.850282192230225,
+          "mean_abs_step_diff": 0.059741621216138206
+        },
+        "n_service_nodes_negative": {
+          "n": 193,
+          "mean": 0.0,
+          "median": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "p95": 0.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "pump_hydraulic_power_kw": {
+          "n": 193,
+          "mean": 88.10038259239394,
+          "median": 0.0,
+          "std": 112.90401977809873,
+          "min": 0.0,
+          "max": 253.13442993164062,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 199.7054443359375,
+          "p95": 252.78781433105468,
+          "mean_abs_step_diff": 9.226657708485922
+        }
+      },
+      "validated_accounting": {
+        "leakage_mean_gpm": 86.04414134540062,
+        "served_demand_mean_gpm": 906.4588244334839,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 1.0001554532187218,
+        "dsr_min": 1.0000219220394089,
+        "n_node_timesteps_below_20psi": 193,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 2.731296490310342e-06
+      },
+      "per_timestep_vs_accounting_cross_check": {
+        "leakage_mean_abs_diff_gpm": 0.0,
+        "served_mean_abs_diff_gpm": 0.0,
+        "dsr_mean_abs_diff": 0.0
+      },
+      "all_finite": true
+    },
+    "prv_177_lower": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 20.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "component_stats": {
+        "leakage_gpm": {
+          "n": 193,
+          "mean": 84.38431390582902,
+          "median": 84.37975964627236,
+          "std": 0.18080344619580785,
+          "min": 83.98420386441057,
+          "max": 84.75204724475904,
+          "p5": 84.07989190824117,
+          "p25": 84.25118850066086,
+          "p75": 84.54593403401634,
+          "p95": 84.64860856680919,
+          "mean_abs_step_diff": 0.028970610523645062
+        },
+        "served_demand_gpm": {
+          "n": 193,
+          "mean": 891.4133684659528,
+          "median": 760.2984463611491,
+          "std": 568.5936686560377,
+          "min": 27.874406592112578,
+          "max": 2689.1796472830056,
+          "p5": 89.07020337028689,
+          "p25": 445.10316104695954,
+          "p75": 1244.6987055426816,
+          "p95": 1882.0878415868253,
+          "mean_abs_step_diff": 173.84764367734158
+        },
+        "requested_demand_gpm": {
+          "n": 193,
+          "mean": 906.3987348621764,
+          "median": 774.0061991800001,
+          "std": 578.2023762676808,
+          "min": 28.31729997,
+          "max": 2736.8742972699997,
+          "p5": 90.61535990400002,
+          "p25": 453.07679952,
+          "p75": 1264.37469883,
+          "p95": 1913.7847781419985,
+          "mean_abs_step_diff": 176.96376231958334
+        },
+        "unserved_demand_gpm": {
+          "n": 193,
+          "mean": 14.985366396223293,
+          "median": 12.691980695684379,
+          "std": 9.678010250267587,
+          "min": 0.44233174068254044,
+          "max": 47.69479845119258,
+          "p5": 1.545055960739771,
+          "p25": 7.973548342978006,
+          "p75": 20.02046564338775,
+          "p95": 33.37656047878303,
+          "mean_abs_step_diff": 3.162748237182923
+        },
+        "dsr": {
+          "n": 193,
+          "mean": 0.9833356662928353,
+          "median": 0.9827417732542095,
+          "std": 0.0012990855402564088,
+          "min": 0.9818773019178878,
+          "max": 0.9889629946328324,
+          "p5": 0.9821574352386513,
+          "p25": 0.9823445632190576,
+          "p75": 0.9842527537877717,
+          "p95": 0.9857282972035812,
+          "mean_abs_step_diff": 0.0004452260772168746
+        },
+        "pressure_deficit_psi_nodesum": {
+          "n": 193,
+          "mean": 18.14115137880948,
+          "median": 18.15964698791504,
+          "std": 0.5408251687495849,
+          "min": 17.332836151123047,
+          "max": 19.182348251342773,
+          "p5": 17.390361785888672,
+          "p25": 17.628746032714844,
+          "p75": 18.60784912109375,
+          "p95": 18.989414978027344,
+          "mean_abs_step_diff": 0.061624109745025635
+        },
+        "n_service_nodes_below_20psi": {
+          "n": 193,
+          "mean": 2.0,
+          "median": 2.0,
+          "std": 0.0,
+          "min": 2.0,
+          "max": 2.0,
+          "p5": 2.0,
+          "p25": 2.0,
+          "p75": 2.0,
+          "p95": 2.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "min_service_pressure_psi": {
+          "n": 193,
+          "mean": 5.120117570452122,
+          "median": 5.129291534423828,
+          "std": 0.53310853863292,
+          "min": 4.16452169418335,
+          "max": 5.905735015869141,
+          "p5": 4.273746013641357,
+          "p25": 4.668804168701172,
+          "p75": 5.638334274291992,
+          "p95": 5.854746150970459,
+          "mean_abs_step_diff": 0.06008363515138626
+        },
+        "n_service_nodes_negative": {
+          "n": 193,
+          "mean": 0.0,
+          "median": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "p95": 0.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "pump_hydraulic_power_kw": {
+          "n": 193,
+          "mean": 88.10053565465107,
+          "median": 0.0,
+          "std": 112.90409350613464,
+          "min": 0.0,
+          "max": 253.1343536376953,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 199.704345703125,
+          "p95": 252.78829345703124,
+          "mean_abs_step_diff": 9.226624250411987
+        }
+      },
+      "validated_accounting": {
+        "leakage_mean_gpm": 84.38431390582902,
+        "served_demand_mean_gpm": 891.4133684659528,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 0.9833356662928353,
+        "dsr_min": 0.9818773019178878,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 4.500717238897778e-07
+      },
+      "per_timestep_vs_accounting_cross_check": {
+        "leakage_mean_abs_diff_gpm": 0.0,
+        "served_mean_abs_diff_gpm": 0.0,
+        "dsr_mean_abs_diff": 0.0
+      },
+      "all_finite": true
+    },
+    "prv_177_upper": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 90.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "component_stats": {
+        "leakage_gpm": {
+          "n": 193,
+          "mean": 85.21270621999568,
+          "median": 85.20779431251519,
+          "std": 0.1807577719189243,
+          "min": 84.8121005230705,
+          "max": 85.5832815680172,
+          "p5": 84.90672661684378,
+          "p25": 85.07913320445127,
+          "p75": 85.3728935265519,
+          "p95": 85.47947665273968,
+          "mean_abs_step_diff": 0.02873396564774759
+        },
+        "served_demand_gpm": {
+          "n": 193,
+          "mean": 891.4148119150356,
+          "median": 760.2998519188235,
+          "std": 568.5936611386828,
+          "min": 27.875830479630764,
+          "max": 2689.18085252956,
+          "p5": 89.07163896681172,
+          "p25": 445.1046203180431,
+          "p75": 1244.7001456976568,
+          "p95": 1882.089336299151,
+          "mean_abs_step_diff": 173.84762438442854
+        },
+        "requested_demand_gpm": {
+          "n": 193,
+          "mean": 906.3987348621764,
+          "median": 774.0061991800001,
+          "std": 578.2023762676808,
+          "min": 28.31729997,
+          "max": 2736.8742972699997,
+          "p5": 90.61535990400002,
+          "p25": 453.07679952,
+          "p75": 1264.37469883,
+          "p95": 1913.7847781419985,
+          "mean_abs_step_diff": 176.96376231958334
+        },
+        "unserved_demand_gpm": {
+          "n": 193,
+          "mean": 14.983922947140595,
+          "median": 12.69057436707601,
+          "std": 9.678016975046031,
+          "min": 0.44094907419005125,
+          "max": 47.69375472497768,
+          "p5": 1.5435943838962631,
+          "p25": 7.972119449404886,
+          "p75": 20.01920200795348,
+          "p95": 33.37496397366748,
+          "mean_abs_step_diff": 3.162761679022799
+        },
+        "dsr": {
+          "n": 193,
+          "mean": 0.9833394153777071,
+          "median": 0.9827526783668247,
+          "std": 0.0012988604242259014,
+          "min": 0.9818781904890725,
+          "max": 0.9889662279172764,
+          "p5": 0.9821586623210969,
+          "p25": 0.9823469355109011,
+          "p75": 0.9842535809432064,
+          "p95": 0.9857301613699626,
+          "mean_abs_step_diff": 0.00044682519683141947
+        },
+        "pressure_deficit_psi_nodesum": {
+          "n": 193,
+          "mean": 18.14090211897934,
+          "median": 18.15964698791504,
+          "std": 0.5401772585172336,
+          "min": 17.33775520324707,
+          "max": 19.187267303466797,
+          "p5": 17.389881134033203,
+          "p25": 17.63201332092285,
+          "p75": 18.60818099975586,
+          "p95": 18.988108825683593,
+          "mean_abs_step_diff": 0.06139602263768514
+        },
+        "n_service_nodes_below_20psi": {
+          "n": 193,
+          "mean": 2.0,
+          "median": 2.0,
+          "std": 0.0,
+          "min": 2.0,
+          "max": 2.0,
+          "p5": 2.0,
+          "p25": 2.0,
+          "p75": 2.0,
+          "p95": 2.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "min_service_pressure_psi": {
+          "n": 193,
+          "mean": 5.12036685251819,
+          "median": 5.129264831542969,
+          "std": 0.5323537366113321,
+          "min": 4.159602642059326,
+          "max": 5.905655860900879,
+          "p5": 4.274962615966797,
+          "p25": 4.669571399688721,
+          "p75": 5.630162239074707,
+          "p95": 5.856216716766357,
+          "mean_abs_step_diff": 0.05985553562641144
+        },
+        "n_service_nodes_negative": {
+          "n": 193,
+          "mean": 0.0,
+          "median": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "p95": 0.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "pump_hydraulic_power_kw": {
+          "n": 193,
+          "mean": 88.37819883119256,
+          "median": 0.0,
+          "std": 112.75363226579861,
+          "min": 0.0,
+          "max": 253.13711547851562,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 199.7081756591797,
+          "p95": 252.78566284179686,
+          "mean_abs_step_diff": 9.226664861043295
+        }
+      },
+      "validated_accounting": {
+        "leakage_mean_gpm": 85.21270621999568,
+        "served_demand_mean_gpm": 891.4148119150356,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 0.9833394153777071,
+        "dsr_min": 0.9818781904890725,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 4.378013329642272e-07
+      },
+      "per_timestep_vs_accounting_cross_check": {
+        "leakage_mean_abs_diff_gpm": 0.0,
+        "served_mean_abs_diff_gpm": 0.0,
+        "dsr_mean_abs_diff": 0.0
+      },
+      "all_finite": true
+    },
+    "prv_178_lower": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 20.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "component_stats": {
+        "leakage_gpm": {
+          "n": 193,
+          "mean": 84.52139871313871,
+          "median": 84.51655706607045,
+          "std": 0.1809743379723271,
+          "min": 84.12097474190575,
+          "max": 84.88876899251197,
+          "p5": 84.21659700804972,
+          "p25": 84.39005616543041,
+          "p75": 84.68267642250589,
+          "p95": 84.78749889076363,
+          "mean_abs_step_diff": 0.028995857667085973
+        },
+        "served_demand_gpm": {
+          "n": 193,
+          "mean": 891.4135465070178,
+          "median": 760.2984850141488,
+          "std": 568.59366130812,
+          "min": 27.874556849575,
+          "max": 2689.179624047668,
+          "p5": 89.07036633534341,
+          "p25": 445.1034016116339,
+          "p75": 1244.6989453053884,
+          "p95": 1882.0879763982025,
+          "mean_abs_step_diff": 173.84764150250587
+        },
+        "requested_demand_gpm": {
+          "n": 193,
+          "mean": 906.3987348621764,
+          "median": 774.0061991800001,
+          "std": 578.2023762676808,
+          "min": 28.31729997,
+          "max": 2736.8742972699997,
+          "p5": 90.61535990400002,
+          "p25": 453.07679952,
+          "p75": 1264.37469883,
+          "p95": 1913.7847781419985,
+          "mean_abs_step_diff": 176.96376231958334
+        },
+        "unserved_demand_gpm": {
+          "n": 193,
+          "mean": 14.985188355158217,
+          "median": 12.691815379022728,
+          "std": 9.678018151284451,
+          "min": 0.4421901345318915,
+          "max": 47.69478490095253,
+          "p5": 1.5448910419863553,
+          "p25": 7.973358722321279,
+          "p75": 20.02026839343057,
+          "p95": 33.37627190507563,
+          "mean_abs_step_diff": 3.1627563249892794
+        },
+        "dsr": {
+          "n": 193,
+          "mean": 0.9833361062054394,
+          "median": 0.9827431197803808,
+          "std": 0.0012990577596570026,
+          "min": 0.9818774919623489,
+          "max": 0.9889633786362223,
+          "p5": 0.9821575556357687,
+          "p25": 0.9823448462927526,
+          "p75": 0.9842529289094719,
+          "p95": 0.9857286293836862,
+          "mean_abs_step_diff": 0.0004453876227190473
+        },
+        "pressure_deficit_psi_nodesum": {
+          "n": 193,
+          "mean": 18.140192950945444,
+          "median": 18.15964698791504,
+          "std": 0.5407920245546368,
+          "min": 17.332836151123047,
+          "max": 19.182348251342773,
+          "p5": 17.390361785888672,
+          "p25": 17.62885093688965,
+          "p75": 18.60784912109375,
+          "p95": 18.99236640930176,
+          "mean_abs_step_diff": 0.061564634243647255
+        },
+        "n_service_nodes_below_20psi": {
+          "n": 193,
+          "mean": 2.0,
+          "median": 2.0,
+          "std": 0.0,
+          "min": 2.0,
+          "max": 2.0,
+          "p5": 2.0,
+          "p25": 2.0,
+          "p75": 2.0,
+          "p95": 2.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "min_service_pressure_psi": {
+          "n": 193,
+          "mean": 5.121075946432321,
+          "median": 5.129264831542969,
+          "std": 0.5330503257299611,
+          "min": 4.16452169418335,
+          "max": 5.905735015869141,
+          "p5": 4.270784091949463,
+          "p25": 4.663911819458008,
+          "p75": 5.638281345367432,
+          "p95": 5.854746150970459,
+          "mean_abs_step_diff": 0.060024129847685494
+        },
+        "n_service_nodes_negative": {
+          "n": 193,
+          "mean": 0.0,
+          "median": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "p95": 0.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "pump_hydraulic_power_kw": {
+          "n": 193,
+          "mean": 88.10080209050153,
+          "median": 0.0,
+          "std": 112.90439938884462,
+          "min": 0.0,
+          "max": 253.1354522705078,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 199.70802307128906,
+          "p95": 252.78453979492187,
+          "mean_abs_step_diff": 9.226643006006876
+        }
+      },
+      "validated_accounting": {
+        "leakage_mean_gpm": 84.52139871313871,
+        "served_demand_mean_gpm": 891.4135465070178,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 0.9833361062054394,
+        "dsr_min": 0.9818774919623489,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 5.847042530149338e-07
+      },
+      "per_timestep_vs_accounting_cross_check": {
+        "leakage_mean_abs_diff_gpm": 0.0,
+        "served_mean_abs_diff_gpm": 0.0,
+        "dsr_mean_abs_diff": 0.0
+      },
+      "all_finite": true
+    },
+    "prv_178_upper": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 74.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "n_timesteps": 193,
+      "component_stats": {
+        "leakage_gpm": {
+          "n": 193,
+          "mean": 85.08425874567963,
+          "median": 85.07929768803305,
+          "std": 0.18073122419112472,
+          "min": 84.6836354799945,
+          "max": 85.45488070017028,
+          "p5": 84.77833951530863,
+          "p25": 84.95126560720317,
+          "p75": 85.24444241914951,
+          "p95": 85.34860143918209,
+          "mean_abs_step_diff": 0.028672015894694924
+        },
+        "served_demand_gpm": {
+          "n": 193,
+          "mean": 891.4146582360719,
+          "median": 760.2997917415206,
+          "std": 568.5936604107633,
+          "min": 27.875675071203915,
+          "max": 2689.180857469978,
+          "p5": 89.07148994805384,
+          "p25": 445.10452295046514,
+          "p75": 1244.7000230319545,
+          "p95": 1882.0892338898127,
+          "mean_abs_step_diff": 173.84762833914866
+        },
+        "requested_demand_gpm": {
+          "n": 193,
+          "mean": 906.3987348621764,
+          "median": 774.0061991800001,
+          "std": 578.2023762676808,
+          "min": 28.31729997,
+          "max": 2736.8742972699997,
+          "p5": 90.61535990400002,
+          "p25": 453.07679952,
+          "p75": 1264.37469883,
+          "p95": 1913.7847781419985,
+          "mean_abs_step_diff": 176.96376231958334
+        },
+        "unserved_demand_gpm": {
+          "n": 193,
+          "mean": 14.984076626104365,
+          "median": 12.690647601560727,
+          "std": 9.678018215331305,
+          "min": 0.4411174116098451,
+          "max": 47.693549696496575,
+          "p5": 1.5437700443132687,
+          "p25": 7.972225605069525,
+          "p75": 20.019224922010153,
+          "p95": 33.375212883127126,
+          "mean_abs_step_diff": 3.1627591260777534
+        },
+        "dsr": {
+          "n": 193,
+          "mean": 0.9833390014559413,
+          "median": 0.9827516890586926,
+          "std": 0.0012988783451181698,
+          "min": 0.9818780659438033,
+          "max": 0.9889658372273985,
+          "p5": 0.9821584930930604,
+          "p25": 0.982346785695613,
+          "p75": 0.9842534815254175,
+          "p95": 0.9857299406706752,
+          "mean_abs_step_diff": 0.0004466227031940135
+        },
+        "pressure_deficit_psi_nodesum": {
+          "n": 193,
+          "mean": 18.14086976323103,
+          "median": 18.15964698791504,
+          "std": 0.5415222500767367,
+          "min": 17.336591720581055,
+          "max": 19.187240600585938,
+          "p5": 17.389833831787108,
+          "p25": 17.623058319091797,
+          "p75": 18.61263656616211,
+          "p95": 18.991741943359376,
+          "mean_abs_step_diff": 0.0615866482257843
+        },
+        "n_service_nodes_below_20psi": {
+          "n": 193,
+          "mean": 2.0,
+          "median": 2.0,
+          "std": 0.0,
+          "min": 2.0,
+          "max": 2.0,
+          "p5": 2.0,
+          "p25": 2.0,
+          "p75": 2.0,
+          "p95": 2.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "min_service_pressure_psi": {
+          "n": 193,
+          "mean": 5.120399146500029,
+          "median": 5.129264831542969,
+          "std": 0.5337835475078625,
+          "min": 4.1596293449401855,
+          "max": 5.909437656402588,
+          "p5": 4.272265148162842,
+          "p25": 4.669650554656982,
+          "p75": 5.638360500335693,
+          "p95": 5.856872463226318,
+          "mean_abs_step_diff": 0.060046171148618065
+        },
+        "n_service_nodes_negative": {
+          "n": 193,
+          "mean": 0.0,
+          "median": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "p95": 0.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "pump_hydraulic_power_kw": {
+          "n": 193,
+          "mean": 88.37747949392684,
+          "median": 0.0,
+          "std": 112.75268316632739,
+          "min": 0.0,
+          "max": 253.13558959960938,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 199.70574951171875,
+          "p95": 252.78359375,
+          "mean_abs_step_diff": 9.226573626200357
+        }
+      },
+      "validated_accounting": {
+        "leakage_mean_gpm": 85.08425874567963,
+        "served_demand_mean_gpm": 891.4146582360719,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 0.9833390014559413,
+        "dsr_min": 0.9818780659438033,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 3.716907031048322e-07
+      },
+      "per_timestep_vs_accounting_cross_check": {
+        "leakage_mean_abs_diff_gpm": 0.0,
+        "served_mean_abs_diff_gpm": 0.0,
+        "dsr_mean_abs_diff": 0.0
+      },
+      "all_finite": true
+    },
+    "pump_all_lower": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 0.82,
+          "PUMP-172": 0.77
+        }
+      },
+      "n_timesteps": 193,
+      "component_stats": {
+        "leakage_gpm": {
+          "n": 193,
+          "mean": 83.89757280762403,
+          "median": 83.7436454681788,
+          "std": 0.4737694697479956,
+          "min": 83.17210453274923,
+          "max": 84.78390211111358,
+          "p5": 83.33914300019681,
+          "p25": 83.438172711548,
+          "p75": 84.29270470947176,
+          "p95": 84.67717286710702,
+          "mean_abs_step_diff": 0.012655993074622321
+        },
+        "served_demand_gpm": {
+          "n": 193,
+          "mean": 891.3696161391937,
+          "median": 760.2967538186184,
+          "std": 568.5085639717502,
+          "min": 27.87328964408225,
+          "max": 2689.179275469465,
+          "p5": 89.06941568746856,
+          "p25": 445.1012761357707,
+          "p75": 1244.697659687194,
+          "p95": 1882.087441739179,
+          "mean_abs_step_diff": 173.84912920933075
+        },
+        "requested_demand_gpm": {
+          "n": 193,
+          "mean": 906.3987348621764,
+          "median": 774.0061991800001,
+          "std": 578.2023762676808,
+          "min": 28.31729997,
+          "max": 2736.8742972699997,
+          "p5": 90.61535990400002,
+          "p25": 453.07679952,
+          "p75": 1264.37469883,
+          "p95": 1913.7847781419985,
+          "mean_abs_step_diff": 176.96376231958334
+        },
+        "unserved_demand_gpm": {
+          "n": 193,
+          "mean": 15.029118722982384,
+          "median": 12.692911480676003,
+          "std": 9.768786536299693,
+          "min": 0.4425286124786325,
+          "max": 47.696768646744204,
+          "p5": 1.5456196509739046,
+          "p25": 7.974686593922229,
+          "p75": 20.02148772849523,
+          "p95": 33.377696005625225,
+          "mean_abs_step_diff": 3.1612641760913447
+        },
+        "dsr": {
+          "n": 193,
+          "mean": 0.9833122550840635,
+          "median": 0.9825725395227976,
+          "std": 0.001309063642993139,
+          "min": 0.9817583659478964,
+          "max": 0.988963431535099,
+          "p5": 0.9821283109840789,
+          "p25": 0.9823403427164104,
+          "p75": 0.9842525095430367,
+          "p95": 0.985727924821378,
+          "mean_abs_step_diff": 0.0004428238365957425
+        },
+        "pressure_deficit_psi_nodesum": {
+          "n": 193,
+          "mean": 20.42229414233272,
+          "median": 20.858951568603516,
+          "std": 1.334891319690601,
+          "min": 17.763120651245117,
+          "max": 22.761716842651367,
+          "p5": 18.18851318359375,
+          "p25": 19.23733139038086,
+          "p75": 21.724838256835938,
+          "p95": 21.925004959106445,
+          "mean_abs_step_diff": 0.030985653400421143
+        },
+        "n_service_nodes_below_20psi": {
+          "n": 193,
+          "mean": 2.0259067357512954,
+          "median": 2.0,
+          "std": 0.15885709551042376,
+          "min": 2.0,
+          "max": 3.0,
+          "p5": 2.0,
+          "p25": 2.0,
+          "p75": 2.0,
+          "p95": 2.0,
+          "mean_abs_step_diff": 0.005208333333333333
+        },
+        "min_service_pressure_psi": {
+          "n": 193,
+          "mean": 2.847501316836461,
+          "median": 2.4303433895111084,
+          "std": 1.3203625082572399,
+          "min": 1.1432963609695435,
+          "max": 5.526174545288086,
+          "p5": 1.3382126092910767,
+          "p25": 1.6583690643310547,
+          "p75": 4.145876884460449,
+          "p95": 5.052797317504883,
+          "mean_abs_step_diff": 0.027810454989473026
+        },
+        "n_service_nodes_negative": {
+          "n": 193,
+          "mean": 0.0,
+          "median": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "p95": 0.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "pump_hydraulic_power_kw": {
+          "n": 193,
+          "mean": 40.224706817785076,
+          "median": 39.03156280517578,
+          "std": 5.9724670462035965,
+          "min": 30.73149871826172,
+          "max": 52.632171630859375,
+          "p5": 32.31087417602539,
+          "p25": 35.34076690673828,
+          "p75": 44.39962387084961,
+          "p95": 50.11800689697265,
+          "mean_abs_step_diff": 0.14757049083709717
+        }
+      },
+      "validated_accounting": {
+        "leakage_mean_gpm": 83.89757280762403,
+        "served_demand_mean_gpm": 891.3696161391937,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 0.9833122550840635,
+        "dsr_min": 0.9817583659478964,
+        "n_node_timesteps_below_20psi": 391,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 1.0162847274841624e-06
+      },
+      "per_timestep_vs_accounting_cross_check": {
+        "leakage_mean_abs_diff_gpm": 0.0,
+        "served_mean_abs_diff_gpm": 0.0,
+        "dsr_mean_abs_diff": 0.0
+      },
+      "all_finite": true
+    },
+    "pump_all_upper": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.1,
+          "PUMP-172": 1.1
+        }
+      },
+      "n_timesteps": 193,
+      "component_stats": {
+        "leakage_gpm": {
+          "n": 193,
+          "mean": 84.72650138783735,
+          "median": 84.71652453683149,
+          "std": 0.1864023940768936,
+          "min": 84.32874435362272,
+          "max": 85.12059644920708,
+          "p5": 84.42357070657643,
+          "p25": 84.577593079988,
+          "p75": 84.88414083831796,
+          "p95": 85.03070637449848,
+          "mean_abs_step_diff": 0.02933903303663173
+        },
+        "served_demand_gpm": {
+          "n": 193,
+          "mean": 891.4138868242185,
+          "median": 760.2988378606283,
+          "std": 568.5936688644357,
+          "min": 27.87486899267813,
+          "max": 2689.179856767724,
+          "p5": 89.07067733855901,
+          "p25": 445.1036181743114,
+          "p75": 1244.6993275623845,
+          "p95": 1882.0886466017755,
+          "mean_abs_step_diff": 173.84763581713037
+        },
+        "requested_demand_gpm": {
+          "n": 193,
+          "mean": 906.3987348621764,
+          "median": 774.0061991800001,
+          "std": 578.2023762676808,
+          "min": 28.31729997,
+          "max": 2736.8742972699997,
+          "p5": 90.61535990400002,
+          "p25": 453.07679952,
+          "p75": 1264.37469883,
+          "p95": 1913.7847781419985,
+          "mean_abs_step_diff": 176.96376231958334
+        },
+        "unserved_demand_gpm": {
+          "n": 193,
+          "mean": 14.984848037957775,
+          "median": 12.691439611580677,
+          "std": 9.678011772574827,
+          "min": 0.441843935131665,
+          "max": 47.69456014711932,
+          "p5": 1.5445638824607586,
+          "p25": 7.972959244125832,
+          "p75": 20.02001564794864,
+          "p95": 33.37627258997526,
+          "mean_abs_step_diff": 3.1627692880249083
+        },
+        "dsr": {
+          "n": 193,
+          "mean": 0.9833369629319946,
+          "median": 0.9827462743511535,
+          "std": 0.001299014225240762,
+          "min": 0.9818776951563651,
+          "max": 0.9889641647829218,
+          "p5": 0.9821579799505928,
+          "p25": 0.98234547886271,
+          "p75": 0.9842528957564906,
+          "p95": 0.9857289713740274,
+          "mean_abs_step_diff": 0.0004457688889766137
+        },
+        "pressure_deficit_psi_nodesum": {
+          "n": 193,
+          "mean": 18.156140668404536,
+          "median": 18.196897506713867,
+          "std": 0.5449850335665256,
+          "min": 17.325510025024414,
+          "max": 19.185546875,
+          "p5": 17.387247467041014,
+          "p25": 17.63103485107422,
+          "p75": 18.61660385131836,
+          "p95": 18.998644638061524,
+          "mean_abs_step_diff": 0.062016824881235756
+        },
+        "n_service_nodes_below_20psi": {
+          "n": 193,
+          "mean": 2.0,
+          "median": 2.0,
+          "std": 0.0,
+          "min": 2.0,
+          "max": 2.0,
+          "p5": 2.0,
+          "p25": 2.0,
+          "p75": 2.0,
+          "p95": 2.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "min_service_pressure_psi": {
+          "n": 193,
+          "mean": 5.105128261091796,
+          "median": 5.080867767333984,
+          "std": 0.5374920870253396,
+          "min": 4.161321640014648,
+          "max": 5.929166793823242,
+          "p5": 4.268789863586425,
+          "p25": 4.650688648223877,
+          "p75": 5.616224765777588,
+          "p95": 5.853254508972168,
+          "mean_abs_step_diff": 0.06041710823774338
+        },
+        "n_service_nodes_negative": {
+          "n": 193,
+          "mean": 0.0,
+          "median": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "p95": 0.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "pump_hydraulic_power_kw": {
+          "n": 193,
+          "mean": 88.82491636523311,
+          "median": 0.0,
+          "std": 114.3425297245495,
+          "min": 0.0,
+          "max": 323.56512451171875,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 199.72032165527344,
+          "p95": 252.78053588867186,
+          "mean_abs_step_diff": 9.594947497049967
+        }
+      },
+      "validated_accounting": {
+        "leakage_mean_gpm": 84.72650138783735,
+        "served_demand_mean_gpm": 891.4138868242185,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 0.9833369629319946,
+        "dsr_min": 0.9818776951563651,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 5.807276579616882e-07
+      },
+      "per_timestep_vs_accounting_cross_check": {
+        "leakage_mean_abs_diff_gpm": 0.0,
+        "served_mean_abs_diff_gpm": 0.0,
+        "dsr_mean_abs_diff": 0.0
+      },
+      "all_finite": true
+    },
+    "prv_lower_pump_lower": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 54.5,
+          "VALVE-175": 21.5,
+          "VALVE-176": 20.0,
+          "VALVE-177": 20.0,
+          "VALVE-178": 20.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 0.82,
+          "PUMP-172": 0.77
+        }
+      },
+      "n_timesteps": 193,
+      "component_stats": {
+        "leakage_gpm": {
+          "n": 193,
+          "mean": 80.61786635451655,
+          "median": 80.48844859814561,
+          "std": 0.4434507575219607,
+          "min": 79.91541642179445,
+          "max": 81.43561491972075,
+          "p5": 80.07599086065056,
+          "p25": 80.19845733360806,
+          "p75": 80.98906353627495,
+          "p95": 81.33601188555951,
+          "mean_abs_step_diff": 0.01150637986939107
+        },
+        "served_demand_gpm": {
+          "n": 193,
+          "mean": 834.5507518427517,
+          "median": 712.472825321303,
+          "std": 532.9696855708438,
+          "min": 25.947301009096563,
+          "max": 2515.0846049631386,
+          "p5": 82.91844680451226,
+          "p25": 414.3734174806725,
+          "p75": 1169.8558574464191,
+          "p95": 1763.3680804991457,
+          "mean_abs_step_diff": 162.33032060909704
+        },
+        "requested_demand_gpm": {
+          "n": 193,
+          "mean": 906.3987348621764,
+          "median": 774.0061991800001,
+          "std": 578.2023762676808,
+          "min": 28.31729997,
+          "max": 2736.8742972699997,
+          "p5": 90.61535990400002,
+          "p25": 453.07679952,
+          "p75": 1264.37469883,
+          "p95": 1913.7847781419985,
+          "mean_abs_step_diff": 176.96376231958334
+        },
+        "unserved_demand_gpm": {
+          "n": 193,
+          "mean": 71.84798301942457,
+          "median": 61.33175843009644,
+          "std": 45.55430138807506,
+          "min": 2.3686654799070155,
+          "max": 221.79086443890174,
+          "p5": 7.696640470110647,
+          "p25": 38.70243647797929,
+          "p75": 96.14105199249025,
+          "p95": 158.08076488511833,
+          "mean_abs_step_diff": 14.853033506477539
+        },
+        "dsr": {
+          "n": 193,
+          "mean": 0.9193965586241878,
+          "median": 0.9150303590107665,
+          "std": 0.006432083671642055,
+          "min": 0.9141979346467793,
+          "max": 0.9461517306955648,
+          "p5": 0.9143944747630096,
+          "p25": 0.9145348427407896,
+          "p75": 0.9244001498580625,
+          "p95": 0.9309812515156722,
+          "mean_abs_step_diff": 0.0017116391080609663
+        },
+        "pressure_deficit_psi_nodesum": {
+          "n": 193,
+          "mean": 29.9646483208849,
+          "median": 30.313520431518555,
+          "std": 1.2557724972524724,
+          "min": 27.494426727294922,
+          "max": 31.727617263793945,
+          "p5": 27.90483703613281,
+          "p25": 28.784622192382812,
+          "p75": 31.074018478393555,
+          "p95": 31.46847915649414,
+          "mean_abs_step_diff": 0.026032259066899616
+        },
+        "n_service_nodes_below_20psi": {
+          "n": 193,
+          "mean": 2.0,
+          "median": 2.0,
+          "std": 0.0,
+          "min": 2.0,
+          "max": 2.0,
+          "p5": 2.0,
+          "p25": 2.0,
+          "p75": 2.0,
+          "p95": 2.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "min_service_pressure_psi": {
+          "n": 193,
+          "mean": 3.0451624368756547,
+          "median": 2.7087724208831787,
+          "std": 1.2548200564579235,
+          "min": 1.2946763038635254,
+          "max": 5.527866840362549,
+          "p5": 1.5368947744369508,
+          "p25": 1.990087866783142,
+          "p75": 4.279484748840332,
+          "p95": 5.096085262298583,
+          "mean_abs_step_diff": 0.026125319302082062
+        },
+        "n_service_nodes_negative": {
+          "n": 193,
+          "mean": 0.0,
+          "median": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "p95": 0.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "pump_hydraulic_power_kw": {
+          "n": 193,
+          "mean": 39.40504362669633,
+          "median": 38.975887298583984,
+          "std": 5.187911764648812,
+          "min": 30.645305633544922,
+          "max": 50.32141876220703,
+          "p5": 32.17560577392578,
+          "p25": 35.095062255859375,
+          "p75": 42.45030975341797,
+          "p95": 47.81136779785156,
+          "mean_abs_step_diff": 0.13596425453821817
+        }
+      },
+      "validated_accounting": {
+        "leakage_mean_gpm": 80.61786635451655,
+        "served_demand_mean_gpm": 834.5507518427517,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 0.9193965586241878,
+        "dsr_min": 0.9141979346467793,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 4.014771946003748e-07
+      },
+      "per_timestep_vs_accounting_cross_check": {
+        "leakage_mean_abs_diff_gpm": 0.0,
+        "served_mean_abs_diff_gpm": 0.0,
+        "dsr_mean_abs_diff": 0.0
+      },
+      "all_finite": true
+    },
+    "prv_upper_pump_upper": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 100.0,
+          "VALVE-175": 110.0,
+          "VALVE-176": 59.524,
+          "VALVE-177": 90.0,
+          "VALVE-178": 74.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.1,
+          "PUMP-172": 1.1
+        }
+      },
+      "n_timesteps": 193,
+      "component_stats": {
+        "leakage_gpm": {
+          "n": 193,
+          "mean": 89.75527817309793,
+          "median": 89.74440021533123,
+          "std": 0.18753019665480694,
+          "min": 89.34482583011149,
+          "max": 90.14959532741754,
+          "p5": 89.45245164897531,
+          "p25": 89.60123420357027,
+          "p75": 89.91657190966117,
+          "p95": 90.06144131794551,
+          "mean_abs_step_diff": 0.030140160190600025
+        },
+        "served_demand_gpm": {
+          "n": 193,
+          "mean": 906.4685798053671,
+          "median": 774.0754827937869,
+          "std": 578.2027445458732,
+          "min": 28.386252154978465,
+          "max": 2736.9451401438882,
+          "p5": 90.68449840538298,
+          "p25": 453.1463125151505,
+          "p75": 1264.4449813689425,
+          "p95": 1913.8553052190282,
+          "mean_abs_step_diff": 176.963822563129
+        },
+        "requested_demand_gpm": {
+          "n": 193,
+          "mean": 906.3987348621764,
+          "median": 774.0061991800001,
+          "std": 578.2023762676808,
+          "min": 28.31729997,
+          "max": 2736.8742972699997,
+          "p5": 90.61535990400002,
+          "p25": 453.07679952,
+          "p75": 1264.37469883,
+          "p95": 1913.7847781419985,
+          "mean_abs_step_diff": 176.96376231958334
+        },
+        "unserved_demand_gpm": {
+          "n": 193,
+          "mean": -0.06984494319092525,
+          "median": -0.06963030380845225,
+          "std": 0.0006554800026882626,
+          "min": -0.07140458070762179,
+          "max": -0.06840381855795385,
+          "p5": -0.07085291977800807,
+          "p25": -0.07043030321301558,
+          "p75": -0.06933354082775622,
+          "p95": -0.068939314219881,
+          "mean_abs_step_diff": 0.00018551901449119038
+        },
+        "dsr": {
+          "n": 193,
+          "mean": 1.0001808024664087,
+          "median": 1.0000900896462637,
+          "std": 0.0003124951712748453,
+          "min": 1.0000257945036348,
+          "max": 1.0024575301455059,
+          "p5": 1.0000368515365452,
+          "p25": 1.000055227525146,
+          "p75": 1.0001537073821762,
+          "p95": 1.0007668076409593,
+          "mean_abs_step_diff": 7.793191500998428e-05
+        },
+        "pressure_deficit_psi_nodesum": {
+          "n": 193,
+          "mean": 14.90579510723371,
+          "median": 14.946213722229004,
+          "std": 0.5418617515718483,
+          "min": 14.07815933227539,
+          "max": 15.8360595703125,
+          "p5": 14.149311065673828,
+          "p25": 14.382081985473633,
+          "p75": 15.360710144042969,
+          "p95": 15.746295356750489,
+          "mean_abs_step_diff": 0.060092429320017494
+        },
+        "n_service_nodes_below_20psi": {
+          "n": 193,
+          "mean": 1.0,
+          "median": 1.0,
+          "std": 0.0,
+          "min": 1.0,
+          "max": 1.0,
+          "p5": 1.0,
+          "p25": 1.0,
+          "p75": 1.0,
+          "p95": 1.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "min_service_pressure_psi": {
+          "n": 193,
+          "mean": 5.094204892766291,
+          "median": 5.053786277770996,
+          "std": 0.5418617418711624,
+          "min": 4.163939952850342,
+          "max": 5.921841144561768,
+          "p5": 4.253704833984375,
+          "p25": 4.639289855957031,
+          "p75": 5.617917537689209,
+          "p95": 5.850689220428467,
+          "mean_abs_step_diff": 0.06009244670470556
+        },
+        "n_service_nodes_negative": {
+          "n": 193,
+          "mean": 0.0,
+          "median": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "p95": 0.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "pump_hydraulic_power_kw": {
+          "n": 193,
+          "mean": 89.58067638021677,
+          "median": 0.0,
+          "std": 114.58822075832606,
+          "min": 0.0,
+          "max": 323.56072998046875,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 199.71188354492188,
+          "p95": 252.78057250976562,
+          "mean_abs_step_diff": 9.595106601715088
+        }
+      },
+      "validated_accounting": {
+        "leakage_mean_gpm": 89.75527817309793,
+        "served_demand_mean_gpm": 906.4685798053671,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 1.0001808024664087,
+        "dsr_min": 1.0000257945036348,
+        "n_node_timesteps_below_20psi": 193,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 2.5519984774291515e-06
+      },
+      "per_timestep_vs_accounting_cross_check": {
+        "leakage_mean_abs_diff_gpm": 0.0,
+        "served_mean_abs_diff_gpm": 0.0,
+        "dsr_mean_abs_diff": 0.0
+      },
+      "all_finite": true
+    },
+    "prv_lower_pump_upper": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 54.5,
+          "VALVE-175": 21.5,
+          "VALVE-176": 20.0,
+          "VALVE-177": 20.0,
+          "VALVE-178": 20.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.1,
+          "PUMP-172": 1.1
+        }
+      },
+      "n_timesteps": 193,
+      "component_stats": {
+        "leakage_gpm": {
+          "n": 193,
+          "mean": 81.37969065716081,
+          "median": 81.37631635854508,
+          "std": 0.1764451353114756,
+          "min": 81.01717830254977,
+          "max": 81.75979335195197,
+          "p5": 81.08692595539794,
+          "p25": 81.24252180077407,
+          "p75": 81.53405013739398,
+          "p95": 81.65444132292757,
+          "mean_abs_step_diff": 0.026518658687467722
+        },
+        "served_demand_gpm": {
+          "n": 193,
+          "mean": 834.5520261827235,
+          "median": 712.4736497678558,
+          "std": 532.9696138047536,
+          "min": 25.94870025262142,
+          "max": 2515.085538795421,
+          "p5": 82.9195852870043,
+          "p25": 414.3757443758632,
+          "p75": 1169.8568217416587,
+          "p95": 1763.3689223761967,
+          "mean_abs_step_diff": 162.33030513030096
+        },
+        "requested_demand_gpm": {
+          "n": 193,
+          "mean": 906.3987348621764,
+          "median": 774.0061991800001,
+          "std": 578.2023762676808,
+          "min": 28.31729997,
+          "max": 2736.8742972699997,
+          "p5": 90.61535990400002,
+          "p25": 453.07679952,
+          "p75": 1264.37469883,
+          "p95": 1913.7847781419985,
+          "mean_abs_step_diff": 176.96376231958334
+        },
+        "unserved_demand_gpm": {
+          "n": 193,
+          "mean": 71.84670867945275,
+          "median": 61.3303278472107,
+          "std": 45.554350125294,
+          "min": 2.3680626409926973,
+          "max": 221.78951389650274,
+          "p5": 7.695671619186889,
+          "p25": 38.70096773586317,
+          "p75": 96.13949997506074,
+          "p95": 158.07954832592793,
+          "mean_abs_step_diff": 14.85304941557041
+        },
+        "dsr": {
+          "n": 193,
+          "mean": 0.9193996688508628,
+          "median": 0.9150460378799589,
+          "std": 0.006430690478387163,
+          "min": 0.9141988908250871,
+          "max": 0.9461523472599809,
+          "p5": 0.9143961345683059,
+          "p25": 0.9145353911018383,
+          "p75": 0.9244007331221527,
+          "p95": 0.9309824719697641,
+          "mean_abs_step_diff": 0.0017128496211799293
+        },
+        "pressure_deficit_psi_nodesum": {
+          "n": 193,
+          "mean": 27.876045138107063,
+          "median": 27.87548065185547,
+          "std": 0.526960633064625,
+          "min": 27.095731735229492,
+          "max": 28.85848617553711,
+          "p5": 27.147062301635742,
+          "p25": 27.36469268798828,
+          "p75": 28.33267593383789,
+          "p95": 28.719279098510743,
+          "mean_abs_step_diff": 0.059935430685679116
+        },
+        "n_service_nodes_below_20psi": {
+          "n": 193,
+          "mean": 2.0,
+          "median": 2.0,
+          "std": 0.0,
+          "min": 2.0,
+          "max": 2.0,
+          "p5": 2.0,
+          "p25": 2.0,
+          "p75": 2.0,
+          "p95": 2.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "min_service_pressure_psi": {
+          "n": 193,
+          "mean": 5.133765623359483,
+          "median": 5.128048419952393,
+          "std": 0.5239036290682666,
+          "min": 4.179490566253662,
+          "max": 5.904624938964844,
+          "p5": 4.298965358734131,
+          "p25": 4.683931827545166,
+          "p75": 5.637514591217041,
+          "p95": 5.853894615173339,
+          "mean_abs_step_diff": 0.05936903009812037
+        },
+        "n_service_nodes_negative": {
+          "n": 193,
+          "mean": 0.0,
+          "median": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "p95": 0.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "pump_hydraulic_power_kw": {
+          "n": 193,
+          "mean": 83.13142792301474,
+          "median": 0.0,
+          "std": 112.09373624639785,
+          "min": 0.0,
+          "max": 323.5826110839844,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 199.65965270996094,
+          "p95": 252.76376037597657,
+          "mean_abs_step_diff": 9.594357132911682
+        }
+      },
+      "validated_accounting": {
+        "leakage_mean_gpm": 81.37969065716081,
+        "served_demand_mean_gpm": 834.5520261827235,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 0.9193996688508628,
+        "dsr_min": 0.9141988908250871,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 1.0373139502917184e-06
+      },
+      "per_timestep_vs_accounting_cross_check": {
+        "leakage_mean_abs_diff_gpm": 0.0,
+        "served_mean_abs_diff_gpm": 0.0,
+        "dsr_mean_abs_diff": 0.0
+      },
+      "all_finite": true
+    },
+    "prv_upper_pump_lower": {
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 100.0,
+          "VALVE-175": 110.0,
+          "VALVE-176": 59.524,
+          "VALVE-177": 90.0,
+          "VALVE-178": 74.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 0.82,
+          "PUMP-172": 0.77
+        }
+      },
+      "n_timesteps": 193,
+      "component_stats": {
+        "leakage_gpm": {
+          "n": 193,
+          "mean": 88.90600569174825,
+          "median": 88.74432174009627,
+          "std": 0.48350062134250676,
+          "min": 88.17383736877706,
+          "max": 89.81567479159749,
+          "p5": 88.34032268393234,
+          "p25": 88.4372501795618,
+          "p75": 89.30887321652872,
+          "p95": 89.70547576179544,
+          "mean_abs_step_diff": 0.012825768170781293
+        },
+        "served_demand_gpm": {
+          "n": 193,
+          "mean": 906.3334866159246,
+          "median": 774.0731521145706,
+          "std": 577.9672777300525,
+          "min": 28.384689676301534,
+          "max": 2736.944250160038,
+          "p5": 90.68327663782873,
+          "p25": 453.1438163979975,
+          "p75": 1264.4434994365874,
+          "p95": 1913.8543309042732,
+          "mean_abs_step_diff": 176.94635132781528
+        },
+        "requested_demand_gpm": {
+          "n": 193,
+          "mean": 906.3987348621764,
+          "median": 774.0061991800001,
+          "std": 578.2023762676808,
+          "min": 28.31729997,
+          "max": 2736.8742972699997,
+          "p5": 90.61535990400002,
+          "p25": 453.07679952,
+          "p75": 1264.37469883,
+          "p95": 1913.7847781419985,
+          "mean_abs_step_diff": 176.96376231958334
+        },
+        "unserved_demand_gpm": {
+          "n": 193,
+          "mean": 0.0652482462515686,
+          "median": -0.06842357985669878,
+          "std": 0.6974955681431211,
+          "min": -0.07094127355412638,
+          "max": 5.120675112527806,
+          "p5": -0.07048280243025147,
+          "p25": -0.06896983133697177,
+          "p75": -0.06733791239312836,
+          "p95": 0.14236358655207004,
+          "mean_abs_step_diff": 0.031144240617579182
+        },
+        "dsr": {
+          "n": 193,
+          "mean": 1.0001006281225637,
+          "median": 1.0000825681125094,
+          "std": 0.0004910681557281224,
+          "min": 0.997328145555563,
+          "max": 1.0024334682862355,
+          "p5": 0.9997404028285773,
+          "p25": 1.0000514248054033,
+          "p75": 1.0001293639187112,
+          "p95": 1.0007543555125862,
+          "mean_abs_step_diff": 9.035450104150367e-05
+        },
+        "pressure_deficit_psi_nodesum": {
+          "n": 193,
+          "mean": 17.244893474282378,
+          "median": 17.660341262817383,
+          "std": 1.3811004779999723,
+          "min": 14.474353790283203,
+          "max": 20.007410049438477,
+          "p5": 14.960721588134765,
+          "p25": 15.89913558959961,
+          "p75": 18.42583656311035,
+          "p95": 18.75237693786621,
+          "mean_abs_step_diff": 0.03346682588259379
+        },
+        "n_service_nodes_below_20psi": {
+          "n": 193,
+          "mean": 1.067357512953368,
+          "median": 1.0,
+          "std": 0.25064013725280465,
+          "min": 1.0,
+          "max": 2.0,
+          "p5": 1.0,
+          "p25": 1.0,
+          "p75": 1.0,
+          "p95": 2.0,
+          "mean_abs_step_diff": 0.005208333333333333
+        },
+        "min_service_pressure_psi": {
+          "n": 193,
+          "mean": 2.7846978056616116,
+          "median": 2.339658260345459,
+          "std": 1.340982871971217,
+          "min": 1.0896363258361816,
+          "max": 5.525645732879639,
+          "p5": 1.268758726119995,
+          "p25": 1.5741631984710693,
+          "p75": 4.100864887237549,
+          "p95": 5.039277935028076,
+          "mean_abs_step_diff": 0.028343381981054943
+        },
+        "n_service_nodes_negative": {
+          "n": 193,
+          "mean": 0.0,
+          "median": 0.0,
+          "std": 0.0,
+          "min": 0.0,
+          "max": 0.0,
+          "p5": 0.0,
+          "p25": 0.0,
+          "p75": 0.0,
+          "p95": 0.0,
+          "mean_abs_step_diff": 0.0
+        },
+        "pump_hydraulic_power_kw": {
+          "n": 193,
+          "mean": 40.530077613079484,
+          "median": 39.01276397705078,
+          "std": 6.22799272752909,
+          "min": 30.76104164123535,
+          "max": 53.32976150512695,
+          "p5": 32.35780410766601,
+          "p25": 35.431297302246094,
+          "p75": 45.24589920043945,
+          "p95": 50.81155700683593,
+          "mean_abs_step_diff": 0.15143673618634543
+        }
+      },
+      "validated_accounting": {
+        "leakage_mean_gpm": 88.90600569174825,
+        "served_demand_mean_gpm": 906.3334866159246,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 1.0001006281225637,
+        "dsr_min": 0.997328145555563,
+        "n_node_timesteps_below_20psi": 206,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 1.2197044725326123e-06
+      },
+      "per_timestep_vs_accounting_cross_check": {
+        "leakage_mean_abs_diff_gpm": 0.0,
+        "served_mean_abs_diff_gpm": 0.0,
+        "dsr_mean_abs_diff": 0.0
+      },
+      "all_finite": true
+    }
+  },
+  "pooled_component_stats": {
+    "leakage_gpm": {
+      "n": 3667,
+      "mean": 84.95466584081781,
+      "median": 84.68276454297536,
+      "std": 2.5183286168590873,
+      "min": 79.91541642179445,
+      "max": 90.14959532741754,
+      "p5": 81.13865569725102,
+      "p25": 83.95087525695342,
+      "p75": 85.90837777835532,
+      "p95": 89.77928016697048,
+      "mean_abs_step_diff": 0.04375633354318132
+    },
+    "served_demand_gpm": {
+      "n": 3667,
+      "mean": 882.6028759224089,
+      "median": 753.4393536721641,
+      "std": 563.9044879520479,
+      "min": 25.947301009096563,
+      "max": 2736.9451401438882,
+      "p5": 85.02104148480237,
+      "p25": 434.2681743990165,
+      "p75": 1232.9661489191556,
+      "p95": 1887.4260595475444,
+      "mean_abs_step_diff": 171.50215489659493
+    },
+    "requested_demand_gpm": {
+      "n": 3667,
+      "mean": 906.3987348621761,
+      "median": 774.0061991800001,
+      "std": 578.2023762676808,
+      "min": 28.31729997,
+      "max": 2736.8742972699997,
+      "p5": 84.95189991000001,
+      "p25": 453.07679952,
+      "p75": 1264.37469883,
+      "p95": 1953.4289981,
+      "mean_abs_step_diff": 176.09487314289143
+    },
+    "unserved_demand_gpm": {
+      "n": 3667,
+      "mean": 23.79585893976739,
+      "median": 11.850715845196078,
+      "std": 33.789687779544614,
+      "min": -0.07140540036880338,
+      "max": 221.79086443890174,
+      "p5": -0.06990147296065743,
+      "p25": 1.611739515411628,
+      "p75": 26.434745819299224,
+      "p95": 96.9489819126117,
+      "mean_abs_step_diff": 5.2041906142908
+    },
+    "dsr": {
+      "n": 3667,
+      "mean": 0.9734169016594456,
+      "median": 0.9827188625375808,
+      "std": 0.028833862699044338,
+      "min": 0.9141979346467793,
+      "max": 1.0024575301455059,
+      "p5": 0.9145350342228891,
+      "p25": 0.9821957556555823,
+      "p75": 0.985499096481484,
+      "p95": 1.0001439794661497,
+      "mean_abs_step_diff": 0.0007971306316183938
+    },
+    "pressure_deficit_psi_nodesum": {
+      "n": 3667,
+      "mean": 19.859735269132997,
+      "median": 18.311899185180664,
+      "std": 4.673523126210727,
+      "min": 14.07815933227539,
+      "max": 31.727617263793945,
+      "p5": 14.462136268615723,
+      "p25": 17.451401710510254,
+      "p75": 19.36495876312256,
+      "p95": 28.671793365478514,
+      "mean_abs_step_diff": 0.08640352468703916
+    },
+    "n_service_nodes_below_20psi": {
+      "n": 3667,
+      "mean": 1.794382328879193,
+      "median": 2.0,
+      "std": 0.40751204799317114,
+      "min": 1.0,
+      "max": 3.0,
+      "p5": 1.0,
+      "p25": 2.0,
+      "p75": 2.0,
+      "p95": 2.0,
+      "mean_abs_step_diff": 0.002727768685215494
+    },
+    "min_service_pressure_psi": {
+      "n": 3667,
+      "mean": 4.76928151902172,
+      "median": 4.933772087097168,
+      "std": 1.0816040237440314,
+      "min": 1.0896363258361816,
+      "max": 5.929166793823242,
+      "p5": 1.870565366744995,
+      "p25": 4.481205940246582,
+      "p75": 5.5668625831604,
+      "p95": 5.8476166248321535,
+      "mean_abs_step_diff": 0.05942397031768449
+    },
+    "n_service_nodes_negative": {
+      "n": 3667,
+      "mean": 0.0,
+      "median": 0.0,
+      "std": 0.0,
+      "min": 0.0,
+      "max": 0.0,
+      "p5": 0.0,
+      "p25": 0.0,
+      "p75": 0.0,
+      "p95": 0.0,
+      "mean_abs_step_diff": 0.0
+    },
+    "pump_hydraulic_power_kw": {
+      "n": 3667,
+      "mean": 79.85447340165038,
+      "median": 0.0,
+      "std": 104.92346671651174,
+      "min": 0.0,
+      "max": 323.5826110839844,
+      "p5": 0.0,
+      "p25": 0.0,
+      "p75": 199.62670135498047,
+      "p95": 252.77397613525392,
+      "mean_abs_step_diff": 8.902607489594722
+    }
+  },
+  "temporal_variability": {
+    "leakage_gpm": {
+      "mean_within_config_std": 0.22613158913677675,
+      "mean_within_config_abs_step_diff": 0.026204709972948406
+    },
+    "served_demand_gpm": {
+      "mean_within_config_std": 563.0999566896344,
+      "mean_within_config_abs_step_diff": 172.0781338250973
+    },
+    "requested_demand_gpm": {
+      "mean_within_config_std": 578.2023762676807,
+      "mean_within_config_abs_step_diff": 176.9637623195833
+    },
+    "unserved_demand_gpm": {
+      "mean_within_config_std": 15.23503900456519,
+      "mean_within_config_abs_step_diff": 4.9596203769265506
+    },
+    "dsr": {
+      "mean_within_config_std": 0.002179054941900055,
+      "mean_within_config_abs_step_diff": 0.0006355208858004631
+    },
+    "pressure_deficit_psi_nodesum": {
+      "mean_within_config_std": 0.6613016898376195,
+      "mean_within_config_abs_step_diff": 0.05605710101755042
+    },
+    "n_service_nodes_below_20psi": {
+      "mean_within_config_std": 0.02155248593490676,
+      "mean_within_config_abs_step_diff": 0.0005482456140350877
+    },
+    "min_service_pressure_psi": {
+      "mean_within_config_std": 0.6538122536265237,
+      "mean_within_config_abs_step_diff": 0.054723853637513364
+    },
+    "n_service_nodes_negative": {
+      "mean_within_config_std": 0.0,
+      "mean_within_config_abs_step_diff": 0.0
+    },
+    "pump_hydraulic_power_kw": {
+      "mean_within_config_std": 95.85010555284218,
+      "mean_within_config_abs_step_diff": 7.850765355323491
+    }
+  },
+  "cross_component_correlation": {
+    "labels": [
+      "leakage_gpm",
+      "served_demand_gpm",
+      "requested_demand_gpm",
+      "unserved_demand_gpm",
+      "dsr",
+      "pressure_deficit_psi_nodesum",
+      "n_service_nodes_below_20psi",
+      "min_service_pressure_psi",
+      "n_service_nodes_negative",
+      "pump_hydraulic_power_kw"
+    ],
+    "matrix": [
+      [
+        1.0,
+        -0.0007,
+        -0.0348,
+        -0.5847,
+        0.7497,
+        -0.7735,
+        -0.7419,
+        0.0958,
+        0.0,
+        0.0314
+      ],
+      [
+        -0.0007,
+        1.0,
+        0.9986,
+        0.3985,
+        0.0625,
+        -0.0023,
+        -0.0086,
+        -0.1598,
+        0.0,
+        0.0611
+      ],
+      [
+        -0.0348,
+        0.9986,
+        1.0,
+        0.4471,
+        0.0179,
+        0.0416,
+        0.0127,
+        -0.1613,
+        0.0,
+        0.059
+      ],
+      [
+        -0.5847,
+        0.3985,
+        0.4471,
+        1.0,
+        -0.7359,
+        0.751,
+        0.36,
+        -0.093,
+        0.0,
+        -0.0098
+      ],
+      [
+        0.7497,
+        0.0625,
+        0.0179,
+        -0.7359,
+        1.0,
+        -0.9653,
+        -0.4703,
+        0.0294,
+        0.0,
+        0.0428
+      ],
+      [
+        -0.7735,
+        -0.0023,
+        0.0416,
+        0.751,
+        -0.9653,
+        1.0,
+        0.4844,
+        -0.2616,
+        0.0,
+        -0.0154
+      ],
+      [
+        -0.7419,
+        -0.0086,
+        0.0127,
+        0.36,
+        -0.4703,
+        0.4844,
+        1.0,
+        0.0777,
+        0.0,
+        0.0129
+      ],
+      [
+        0.0958,
+        -0.1598,
+        -0.1613,
+        -0.093,
+        0.0294,
+        -0.2616,
+        0.0777,
+        1.0,
+        0.0,
+        -0.0505
+      ],
+      [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0
+      ],
+      [
+        0.0314,
+        0.0611,
+        0.059,
+        -0.0098,
+        0.0428,
+        -0.0154,
+        0.0129,
+        -0.0505,
+        0.0,
+        1.0
+      ]
+    ]
+  },
+  "actuator_effort_analytic": {
+    "action_dim": 7,
+    "normalized_encoding": "a_i in [-1,1]; per-step delta_a_i in [-2,2]",
+    "max_per_step_abs_delta_per_dim": 2.0,
+    "max_per_step_L1_movement": 14.0,
+    "max_per_step_L2sq_movement": 28.0,
+    "max_per_step_L2_movement": 5.291502622129181,
+    "physical_span_per_actuator": {
+      "VALVE-173": 45.5,
+      "VALVE-175": 88.5,
+      "VALVE-176": 39.524,
+      "VALVE-177": 70.0,
+      "VALVE-178": 54.0,
+      "PUMP-170": 0.28000000000000014,
+      "PUMP-172": 0.33000000000000007
+    },
+    "note": "Static runs have zero step-to-step movement, so the REALISED movement/smoothness scale depends on the (not-yet-existing) policy action sequence and is a training-time HYPOTHESIS. The effort term MUST be computed on the COMMANDED normalised action (not realised pump speed, which the native STATUS rule can reset to 1.0 or 0 -> reward-hacking / closed-pump ambiguity)."
+  },
+  "proposed_normalization_constants": {
+    "leak_ref_gpm": 84.72988433677985,
+    "req_ref_gpm": 906.3987348621764,
+    "deficit_ref_psi_nodesum": 28.671793365478514,
+    "power_ref_kw": 88.10062475649187,
+    "movement_L2sq_max": 28.0,
+    "note": "FIXED constants measured once (baseline reference run / this analysis) and frozen; NOT per-episode running statistics -> no train/eval leakage. deficit_ref guards against a ~0 baseline deficit by taking max(baseline mean, pooled p95)."
+  },
+  "pathology_checks": {
+    "leakage_only_collapses_service": {
+      "description": "A leakage-ONLY reward pushes pressure to the PRV lower bound; measure whether service degrades there.",
+      "reference_leak_gpm": 84.72988433677985,
+      "all_lower_leak_gpm": 81.38381870141156,
+      "leak_reduction_gpm": 3.3460656353682907,
+      "reference_dsr_mean": 0.9833370137001072,
+      "all_lower_dsr_mean": 0.9193996684666168,
+      "reference_min_service_psi": 4.16452169418335,
+      "all_lower_min_service_psi": 4.189884185791016,
+      "all_lower_new_node_timesteps_below_20psi": 0,
+      "verdict": "service must be protected explicitly; a leakage-only reward is not safe by construction (see boundary check)."
+    },
+    "pressure_only_raises_leakage": {
+      "reference_leak_gpm": 84.72988433677985,
+      "all_upper_leak_gpm": 89.7592331333586,
+      "leak_increase_gpm": 5.029348796578759,
+      "verdict": "maximising pressure inflates leakage; objectives oppose."
+    },
+    "scale_imbalance": {
+      "pooled_median_abs_magnitude": {
+        "leakage_gpm": 84.68276454297536,
+        "served_demand_gpm": 753.4393536721641,
+        "requested_demand_gpm": 774.0061991800001,
+        "unserved_demand_gpm": 11.850715845196078,
+        "dsr": 0.9827188625375808,
+        "pressure_deficit_psi_nodesum": 18.311899185180664,
+        "n_service_nodes_below_20psi": 2.0,
+        "min_service_pressure_psi": 4.933772087097168,
+        "n_service_nodes_negative": 0.0,
+        "pump_hydraulic_power_kw": 0.0
+      },
+      "penalty_terms_max_over_min_ratio": 7.145793186603424,
+      "verdict": "raw components span very different magnitudes; a raw weighted sum is dominated by the largest -> fixed normalisation is required before weighting."
+    },
+    "sparse_or_degenerate_signal": {
+      "frac_timesteps_zero_negative_nodes": 1.0,
+      "frac_timesteps_zero_below20_nodes": 0.0,
+      "n_negative_pool_max": 0.0,
+      "dsr_pool_std": 0.028833862699044338,
+      "verdict": "negative-pressure count is (near-)always zero in bounds -> a pure hard-violation term is sparse; the smooth deficit / min-pressure terms carry the dense safety signal."
+    },
+    "actuator_penalty_domination": {
+      "max_per_step_L2sq_movement_unnormalised": 28.0,
+      "verdict": "unnormalised movement (L2^2 up to 28) would dominate normalised leakage/service terms (~O(1)); the effort term MUST be normalised by its analytic maximum."
+    },
+    "reward_hacking_closed_pump_ambiguity": {
+      "verdict": "effort/smoothness MUST use the COMMANDED normalised action; realised pump speed is reset to 1.0 by STATUS-IS-OPEN or 0 when closed (G12), so penalising realised speed is gameable and mis-attributes native-rule behaviour."
+    },
+    "boundary_seeking_safety": {
+      "leak_min_corner_is_prv_all_lower": true,
+      "all_lower_n_node_timesteps_negative": 0,
+      "all_lower_min_service_psi": 4.189884185791016,
+      "all_lower_new_node_timesteps_below_20psi": 0,
+      "verdict": "the leakage optimum sits at the PRV lower bound; this single corner is characterised here only. Exhaustive joint in-box safety is a STEP-9 (safety layer) + STEP-12 (tests) job; a safety term/clamp is required, not optional."
+    }
+  },
+  "proposed_formulations": [
+    {
+      "name": "normalized_weighted_sum",
+      "status": "PROPOSED",
+      "formula": "r_t = - w_L*(leak_t/leak_ref) - w_U*(unserved_t/req_ref) - w_P*(deficit_t/deficit_ref) - w_A*(||da_t||^2 / L2sq_max) [- w_E*(power_t/power_ref)]",
+      "weights_placeholder": {
+        "w_L": 1.0,
+        "w_U": 1.0,
+        "w_P": 1.0,
+        "w_A": 1.0,
+        "w_E": 0.0
+      },
+      "note": "dense, differentiable; every term normalised to ~O(1). Weights NOT tuned here."
+    },
+    {
+      "name": "constrained_penalty_service_protected",
+      "status": "PROPOSED",
+      "formula": "r_t = -(leak_t/leak_ref) - LAMBDA*(deficit_t/deficit_ref) - BIG*max(0, n_below20_t) ; LAMBDA >> 1, BIG >> LAMBDA",
+      "note": "minimise leakage subject to a large, explicit service/safety penalty; service is protected by construction."
+    },
+    {
+      "name": "baseline_relative_improvement",
+      "status": "PROPOSED",
+      "formula": "r_t = (leak_ref - leak_t)/leak_ref - w_U*(unserved_t - unserved_ref)_+ / req_ref - safety_penalty",
+      "note": "interpretable as fractional leakage reduction vs the NATIVE controller; naturally zero-centred at the baseline."
+    },
+    {
+      "name": "safety_first_lexicographic",
+      "status": "PROPOSED",
+      "formula": "if any svc node < 20 psi (or < 0): dominant negative penalty; else minimise leak_t/leak_ref; effort as tie-break",
+      "note": "encodes the priority hierarchy safety > service > leakage > effort; typically realised via masking / large penalties and pairs with the STEP-9 safety clamp."
+    },
+    {
+      "name": "fixed_normalization_constants_used_by_all_proposals",
+      "status": "PROPOSED",
+      "constants": {
+        "leak_ref_gpm": 84.72988433677985,
+        "req_ref_gpm": 906.3987348621764,
+        "deficit_ref_psi_nodesum": 28.671793365478514,
+        "power_ref_kw": 88.10062475649187,
+        "movement_L2sq_max": 28.0,
+        "note": "FIXED constants measured once (baseline reference run / this analysis) and frozen; NOT per-episode running statistics -> no train/eval leakage. deficit_ref guards against a ~0 baseline deficit by taking max(baseline mean, pooled p95)."
+      }
+    }
+  ],
+  "integrity": {
+    "working_inp_sha256": "53015ba9212e46bec731d190971819996233996b498bc269e828f992830a20a9",
+    "topology": {
+      "n_junctions": 126,
+      "n_service_junctions": 121,
+      "n_connector_junctions": 5,
+      "n_reservoirs": 1,
+      "n_tanks": 2,
+      "n_pumps": 2,
+      "n_valves": 8,
+      "n_pipes": 168,
+      "n_native_controls": 5
+    },
+    "native_controls_unchanged_in_every_config": true,
+    "solver_policy_asserted_every_load": true,
+    "solver_policy": {
+      "accuracy": 1e-05,
+      "trials": 2000,
+      "rule_timestep_s": 180.0,
+      "report_timestep_s": 1800.0,
+      "demand_model": "PDA",
+      "required_pressure_psi": 20.0,
+      "minimum_pressure_psi": 0.0,
+      "pressure_exponent": 0.5
+    },
+    "all_component_values_finite": true,
+    "per_timestep_vs_validated_accounting_max_abs_diff": 0.0,
+    "no_topology_or_native_rule_change": true,
+    "no_future_information_used": true
+  },
+  "limitations": [
+    "Static-command runs: realised actuator MOVEMENT is 0, so the effort/smoothness scale is analytic (from bounds), not measured - HYPOTHESIS.",
+    "Leakage is a VALIDATION instrument, not field-calibrated; only RELATIVE leakage response is meaningful, never an absolute leakage claim.",
+    "Component scales measured on a representative in-bounds set (reference, corners, per-PRV edges); interior/mixed-corner joint safety is a STEP-9/STEP-12 job, NOT claimed here.",
+    "Pump power is HYDRAULIC (rho*g*Q*dH), no efficiency curve; an energy term is optional and clearly labelled."
+  ],
+  "next_step": "Researcher review of the PROPOSED formulations and of the measured scales; then select ONE formulation + weights as a separate approved decision. STEP 9 safety layer must supply the hard clamp the boundary-seeking check shows is required."
+}

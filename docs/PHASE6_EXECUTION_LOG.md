@@ -358,3 +358,85 @@ RESEARCH ASSUMPTION · HYPOTHESIS TO TEST · DECISION REQUIRED.
 - **Next action:** Present D-P6-004 to the researcher for approval of the 5 review
   points; on approval freeze the layout, then STEP 8 (reward).
 
+---
+
+## WU-9 — STEP 8: reward-component scale analysis (2026-09-27, current session)
+
+- **Objective:** EMPIRICALLY MEASURE the natural scale / variability / temporal
+  behaviour / cross-correlation of every candidate reward component under
+  representative in-bounds trajectories, run the reward-pathology checks against
+  measured evidence, and PROPOSE a small set of principled reward formulations.
+  This step MEASURES only — it chooses NO weights, selects NO formulation, and
+  trains NO PPO (§5–§12, §16). Register as D-P6-005 (Level-2), keep PROPOSED.
+- **Starting state:** Action space APPROVED & FROZEN (D-P6-001/002/003, commit
+  e91c363); observation APPROVED & FROZEN (D-P6-004, observation_dim=139, commit
+  0cd7f2e). No reward defined. Sim stack present (wntr/epyt/numpy) → not dep-blocked.
+- **Evidence inspected:** approved action bounds (7-D) and 121 service / 5 connector
+  policy via `p6_s3.service_nodes`; the Phase-5 leak/PDA instrument `g6_g7_g8_leak_pda`
+  (signed emitter law, k=7.13768e-05, PDA 20/0/0.5); solver policy (1e-5/2000/180s/1800s);
+  frozen reference (`p6_s3_prv_finechar.json`: leak 84.730, DSR 0.98334, 386 ts<20psi, 0 neg).
+- **Action taken:** Wrote and ran `src/validation/p6_s8_reward_scale_analysis.py`.
+  19 static full-96 h EPS configurations (reference_nominal; prv_all_lower/upper; each
+  PRV edge singly ×10; pump_all_lower/upper; 4 mixed PRV×pump corners), each setting all
+  5 PRV setpoints + both pump speeds explicitly, native STATUS rules/topology untouched.
+  Per report timestep (193/config → 3667 pooled instants) extracted 10 candidate
+  components: leakage_gpm, served/requested/unserved_demand_gpm, dsr,
+  pressure_deficit_psi_nodesum, n_service_nodes_below_20psi, min_service_pressure_psi,
+  n_service_nodes_negative, pump_hydraulic_power_kw. Computed pooled + within-config
+  mean/median/std/min/max, mean |step-to-step Δ|, 10×10 Pearson correlation, pathology
+  checks, and analytic actuator-effort ceiling from the frozen `[-1,1]^7` box. Fixed the
+  normalisation constants once from the baseline/pooled stats. Wrote
+  `docs/PHASE6_REWARD_SPEC.md` (§8.1–§8.8) and the 12-test battery
+  `tests/test_reward_scale_analysis.py`.
+- **Result (measured; per-ts extraction reproduces validated water balance to 0.0 GPM;
+  reference reproduces frozen baseline exactly):**
+  - Pooled scales: leakage 84.95 GPM mean (79.92–90.15, ±~6% band); requested ~906 GPM
+    (median 774) ≈10× leakage; DSR 0.9734 (0.9142–1.00246); deficit 19.86 psi·nodes
+    (max 31.73); min svc pressure 4.77 psi (1.09–5.93); n_negative identically 0;
+    pump power mean ~80 kW, median 0 (bimodal, native-STATUS-driven).
+  - Correlations: leak↔dsr +0.750, leak↔deficit −0.774, leak↔n_below20 −0.742,
+    dsr↔deficit −0.965, served↔requested +0.999 — objectives GENUINELY OPPOSE.
+  - Pathologies confirmed on measured evidence: (1) leakage-only (prv_all_lower) cuts
+    leak −4.0% but drops DSR 0.98334→0.91940 (−6.4 pts) → service must be protected;
+    (2) pressure-only (prv_all_upper) +5.9% leakage; (3) scale imbalance ratio 7.15 →
+    fixed normalisation mandatory; (4) hard-violation term degenerate (0 at 100% of
+    instants) → dense safety = deficit/min-pressure; (5) actuator L2² up to 28 would
+    dominate → effort ÷ 28 and use COMMANDED action (closed-pump reset ambiguity);
+    (6) leakage optimum sits at the PRV lower bound → STEP-9 hard clamp REQUIRED.
+  - Fixed normalisation constants (frozen, no running stats): leak_ref 84.72988,
+    req_ref 906.39873, deficit_ref 28.67179 (=max(baseline mean, pooled p95)),
+    power_ref 88.10062, movement_L2sq_max 28.0.
+  - 4 PROPOSED formulations: F1 normalised weighted sum, F2 constrained penalty
+    (service protected by construction), F3 baseline-relative improvement,
+    F4 safety-first lexicographic. All status "PROPOSED".
+- **Failures / negatives NOT hidden (§7):** the controllable leakage signal is small in
+  absolute terms (±~6% band) → absolute-GPM objective is weak, argues for normalised /
+  baseline-relative; actuator movement is 0 in every static run → its scale is ANALYTIC,
+  a training-time HYPOTHESIS, not a measured fact; only ONE joint corner (prv_all_lower)
+  is characterised → full interior/joint safety NOT claimed (STEP-9/STEP-12).
+- **Decision:** Reward formulation PROPOSED as **D-P6-005** — measurement complete,
+  formulation and weights NOT selected. PENDING RESEARCHER SELECTION of ONE formulation
+  + weights, plus the STEP-9 hard safety clamp the boundary-seeking check proves is required.
+- **Decision class:** VALIDATED FACT (measured scales/correlations/pathologies) +
+  ENGINEERING DECISION (candidate set, normalisation constants, proposed formulations) +
+  DECISION REQUIRED (researcher selection of formulation + weights).
+- **Files changed:** src/validation/p6_s8_reward_scale_analysis.py (new);
+  results/phase6/p6_s8_reward_scale_analysis.json (new); docs/PHASE6_REWARD_SPEC.md (new);
+  tests/test_reward_scale_analysis.py (new); PROJECT_STATE.yaml;
+  docs/PHASE6_DECISION_REGISTER.md; docs/PHASE6_EVIDENCE_INDEX.md; docs/RECOVERY.md;
+  docs/PHASE6_EXECUTION_LOG.md. NO action-space/observation file reopened; NO
+  reward-function env code (that is STEP 11); NO PPO.
+- **Tests:** `.venv/Scripts/python.exe -m unittest discover -s tests -v` → 21 ok
+  (12 STEP 8 + 9 STEP 7): pure-helper determinism, 10 components, analytic effort
+  (dim 7 / L1 14 / L2² 28), integrity flags, service set 121/5, per-ts vs validated
+  accounting <1e-6, reference reproduces baseline, every config finite & 193 ts,
+  10×10 correlation matrix, pooled stats finite, formulations PROPOSED not APPROVED.
+- **Risks/caveats:** leak instrument uncalibrated → RELATIVE response only, never a
+  calibrated leakage claim (R3); actuator-effort scale analytic (realised movement is a
+  HYPOTHESIS TO TEST); scales cover a representative in-bounds set, not the full joint
+  interior (R1b → STEP-9/STEP-12); weight choice can still induce reward hacking → must
+  be validated after selection. Deps for PPO still missing (R4). Nothing frozen.
+- **Next action:** researcher reviews D-P6-005 and selects ONE formulation + weights
+  (separate approved decision); then STEP 9 hard safety clamp (clamp to approved bounds,
+  protect worst-node pressure); reward function itself is STEP 11. DO NOT start PPO (§16).
+

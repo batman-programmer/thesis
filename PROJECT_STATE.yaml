@@ -122,7 +122,12 @@ phase6:
       evidence: ["results/phase6/p6_s7_state_spec.json"]
       deliverables: ["docs/PHASE6_STATE_SPEC.md", "src/env/state_builder.py", "src/env/__init__.py", "tests/test_state_builder.py", "src/validation/p6_s7_state_spec.py", "results/phase6/p6_s7_state_spec.json"]
       result: "Observation = 121 service-node pressures + 2 tank levels + 5 prev-cmd PRV setpoints + 5 PRV is_active flags + 2 prev-cmd pump speeds + 2 pump realized speeds + 2 time-of-day (sin,cos) = 139 dims. Demand Option A (no explicit demand; agent must NEVER see future demand). Fixed physical normalization only (no data-derived running stats). Connectors 105/106/109/110/128 excluded from features, kept in model. POMDP / approximately-Markov (not forced). 9/9 tests pass. APPROVED & FROZEN 2026-09-27 (D-P6-004)."
-    step8_reward_design: {status: "NOT STARTED"}
+    step8_reward_design:
+      status: "MEASUREMENT COMPLETE 2026-09-27 (D-P6-005 PROPOSED). Component scales/variability/correlations measured; pathology checks run; 4 formulations PROPOSED (none selected, no weights, no PPO). See reward: block."
+      register_id: "D-P6-005 (PROPOSED)"
+      evidence: ["results/phase6/p6_s8_reward_scale_analysis.json"]
+      deliverables: ["docs/PHASE6_REWARD_SPEC.md", "src/validation/p6_s8_reward_scale_analysis.py", "results/phase6/p6_s8_reward_scale_analysis.json", "tests/test_reward_scale_analysis.py"]
+      result: "10 candidate components measured over 19 in-bounds configs x 193 steps. Objectives oppose (leak vs dsr +0.75); leakage-only collapses service (dsr -6.4 pts); scale imbalance 7.15x -> fixed normalisation mandatory; boundary-seeking optimum at PRV lower bound -> STEP-9 hard clamp required; effort must use commanded action. 4 PROPOSED formulations + fixed normalisation constants. 21/21 tests pass."
     step9_safety_action_mapping: {status: "NOT STARTED", note: "must hard-clamp VALVE-179 <= 44.7 psi if 179 ever controllable; 179 currently EXCLUDED"}
     step10_demand_uncertainty_and_splits: {status: "NOT STARTED"}
     step11_env_implementation: {status: "BLOCKED (deps)", modules_planned: ["bwsn_env","epanet_adapter","state_builder","action_mapper","safety","reward","demand_scenarios","metrics"]}
@@ -229,8 +234,41 @@ state_space:
   note: "Deterministic, side-effect-free builder src/env/state_builder.py (numpy only; NO reward/PPO/demand/gymnasium/wntr). Raw evidence results/phase6/p6_s7_state_spec.json (consistency_with_frozen_spec all true; sample checks all true). Reward/safety/demand-model/env are LATER steps (8/9/10/11)."
 
 reward:
-  status: "NOT STARTED (step8)"
-  note: "Measure component scales (leakage, service/pressure-deficit, actuation) on-network BEFORE choosing weights. No weights chosen yet."
+  status: "STEP 8 MEASUREMENT COMPLETE (2026-09-27). Component scales/variability/correlations measured on-network; pathology checks run; 4 formulations PROPOSED (D-P6-005 PROPOSED). NO weights chosen, NO PPO trained, observation (STEP 7) and action space (STEP 6) unchanged."
+  register_id: "D-P6-005 (PROPOSED — reward formulation; awaiting researcher selection of ONE formulation + weights)"
+  deliverables: ["docs/PHASE6_REWARD_SPEC.md", "src/validation/p6_s8_reward_scale_analysis.py", "results/phase6/p6_s8_reward_scale_analysis.json", "tests/test_reward_scale_analysis.py"]
+  evidence: ["results/phase6/p6_s8_reward_scale_analysis.json"]
+  method: "19 static in-bounds configs (reference, all-lower, all-upper, 10 per-PRV edges, pump edges, 4 mixed corners) x 193 report timesteps = 3667 pooled instants; same 96h EPS + solver policy + leak/PDA instrument as p6_s3/g6_g7_g8. Per-timestep extraction reproduces the validated water balance to 0.0 GPM; reference reproduces the frozen baseline exactly (leak 84.730, dsr 0.98334, 386 <20psi, 0 neg)."
+  candidate_components: ["leakage_gpm","served_demand_gpm","requested_demand_gpm","unserved_demand_gpm","dsr","pressure_deficit_psi_nodesum","n_service_nodes_below_20psi","min_service_pressure_psi","n_service_nodes_negative","pump_hydraulic_power_kw (optional energy)"]
+  measured_scales_pooled:    # VALIDATED_FACT (pooled mean over 3667 in-bounds instants)
+    leakage_gpm: {mean: 84.95, median: 84.68, std: 2.52, min: 79.92, max: 90.15}
+    requested_demand_gpm: {mean: 906.4, median: 774.0}
+    dsr: {mean: 0.9734, min: 0.9142, max: 1.00246}
+    pressure_deficit_psi_nodesum: {mean: 19.86, min: 14.08, max: 31.73}
+    min_service_pressure_psi: {mean: 4.77, min: 1.09, max: 5.93}
+    n_service_nodes_negative: {mean: 0.0, note: "identically 0 in-bounds -> hard-violation term is degenerate/sparse"}
+    pump_hydraulic_power_kw: {mean: 79.85, median: 0.0, max: 323.6, note: "bimodal, native-STATUS-driven; energy term optional"}
+  key_findings:              # VALIDATED_FACT unless noted
+    objectives_oppose: "leakage vs dsr corr +0.750; leakage vs pressure_deficit -0.774; leakage vs n_below20 -0.742 -> pressing leakage down erodes service; service MUST be protected."
+    leak_only_collapses_service: "prv_all_lower: leak 84.73->81.38 gpm (-4.0%) but dsr 0.98334->0.91940 (-6.4 pts), 0 new nodes <20; leakage-only reward is unsafe."
+    pressure_only_raises_leak: "prv_all_upper: leak 84.73->89.76 gpm (+5.9%); maximising pressure inflates leakage."
+    scale_imbalance: "penalty-term median max/min ratio 7.15; raw leak(~85) >> deficit(~18) >> effort(O(1)) -> FIXED normalisation mandatory before weighting."
+    boundary_seeking: "leakage optimum sits AT the PRV lower bound; only this single corner characterised -> STEP-9 hard safety clamp REQUIRED, not optional (R1b)."
+    effort_term_rule: "effort/smoothness MUST use COMMANDED normalised action (realised pump speed is reset to 1.0/0 by native STATUS rules -> gameable). Static runs have 0 movement -> effort scale analytic (L1<=14, L2sq<=28, L2<=5.29); realised movement is a HYPOTHESIS_TO_TEST."
+  proposed_formulations:     # ENGINEERING_DECISION; all PROPOSED, none selected, no weights tuned
+    F1_normalized_weighted_sum: "-w_L*(leak/leak_ref) -w_U*(unserved/req_ref) -w_P*(deficit/deficit_ref) -w_A*(||da||^2/L2sq_max) [-w_E*(power/power_ref)]"
+    F2_constrained_penalty: "-(leak/leak_ref) - LAMBDA*(deficit/deficit_ref) - BIG*max(0,n_below20); service protected by construction"
+    F3_baseline_relative: "(leak_ref-leak)/leak_ref - w_U*max(0,unserved-unserved_ref)/req_ref - safety_penalty; zero-centred at native controller"
+    F4_safety_first_lexicographic: "if svc<20 (or <0): dominant penalty; else minimise leak/leak_ref; effort tie-break; pairs with STEP-9 clamp"
+  fixed_normalization_constants:   # ENGINEERING_DECISION; measured once and frozen (no train/eval leakage)
+    leak_ref_gpm: 84.72988433677985
+    req_ref_gpm: 906.3987348621764
+    deficit_ref_psi_nodesum: 28.671793365478514
+    power_ref_kw: 88.10062475649187
+    movement_L2sq_max: 28.0
+  tests: "tests/test_reward_scale_analysis.py — 12/12 STEP 8 + 9/9 STEP 7 = 21/21 passing (stdlib unittest + numpy)."
+  limitations: "Static-command runs (effort scale analytic, HYPOTHESIS). Leak instrument uncalibrated (relative response only). Representative in-bounds set only (interior/mixed-corner joint safety = STEP-9/STEP-12). Pump power hydraulic-only."
+  next: "Researcher selects ONE formulation + weights (resolve D-P6-005) and STEP 9 implements the hard safety clamp the boundary-seeking check proves is required. No weights chosen here; no PPO training."
 
 demand_uncertainty:
   status: "NOT STARTED (step10)"
@@ -268,16 +306,16 @@ dependencies:
 
 git:
   branch: "main"
-  head_commit: "f7ce429"
-  head_subject: "phase6: add STEP 7 DRL observation/state design (D-P6-004, PROPOSED)"
+  head_commit: "0cd7f2e"
+  head_subject: "phase6: approve observation specification (D-P6-004 APPROVED & FROZEN)"
   recent_commits:
-    - "f7ce429 phase6: add STEP 7 DRL observation/state design (D-P6-004, PROPOSED) — observation_dim=139, 9/9 tests, PROPOSED not frozen"
+    - "0cd7f2e phase6: approve observation specification (D-P6-004 APPROVED & FROZEN)"
+    - "8b66147 phase6: record STEP 7 commit hash in PROJECT_STATE (checkpoint)"
+    - "f7ce429 phase6: add STEP 7 DRL observation/state design (D-P6-004, PROPOSED)"
     - "6c34ab9 phase6: record action-space approval commit hash (checkpoint B)"
     - "e91c363 phase6: approve drl actuator action space (action-space APPROVAL checkpoint A)"
-    - "8c89ba2 phase6: add VALVE-173 low-side refinement evidence (step6b)"
-    - "627567b phase6: characterize per-prv action bounds"
-  working_tree_note: "results/phase5/_tmp/ scratch (~600 files) + src/**/__pycache__/*.pyc left untracked (pre-existing debt, deliberately NOT committed). STEP 7 commit staged only the specific deliverable + doc paths."
-  next_commit_subject: "STEP 8 reward design (only after D-P6-004 observation is approved)"
+  working_tree_note: "results/phase5/_tmp/ scratch (~600 files) + src/**/__pycache__/*.pyc left untracked (pre-existing debt, deliberately NOT committed). STEP 8 commit stages only the specific deliverable + doc paths."
+  next_commit_subject: "phase6: add STEP 8 reward-component scale analysis (D-P6-005, PROPOSED)"
 
 risks:
   - "R1 (MEASURED, was HYPOTHESIS): driving PRV setpoints low DOES cause <20 psi service violations for 175 (<21.5), 176 (<20; negative <13), 177 (<20), 178 (<20). VALVE-173 is exempt (inert). Per-valve service-clean lower bounds now measured (step6, D-P6-003); a STEP-9 safety layer should still clamp to the approved bounds."
@@ -305,9 +343,9 @@ next_action:
 session_checkpoint:          # brief s.20 - on-disk, not chat-only
   date_utc: "2026-09-27"
   current_phase: "Phase 6 - DRL environment design/validation"
-  current_step: "STEP 8 — REWARD DESIGN (measure component scales first; NOT training). D-P6-004 observation APPROVED & FROZEN 2026-09-27 (observation_dim=139). Action space APPROVED & FROZEN 2026-09-27 (D-P6-001/002/003). Both git-checkpointed."
-  completed: ["G5 action space", "G12 pump control", "STEP 6 PRV per-valve characterization (measured)", "STEP 6 four-question decision-review brief (no re-run)", "STEP 6b focused VALVE-173 (50,60] refinement (measured)", "STEP 6 A/B/C terminology correction", "Action-space APPROVAL persisted (D-P6-001/002/003) + docs/PHASE6_ACTION_SPACE_SPEC.md created + git checkpoint A", "STEP 7 observation design deliverables (docs/PHASE6_STATE_SPEC.md, src/env/state_builder.py + 9/9 tests, results/phase6/p6_s7_state_spec.json) — design PROPOSED as D-P6-004, awaiting approval"]
-  not_completed: ["STEP 8 reward FORMULATION approval (component scales to be measured; formulations PROPOSED not approved)", "STEP 9-15"]
+  current_step: "STEP 8 — REWARD DESIGN: MEASUREMENT COMPLETE 2026-09-27 (D-P6-005 PROPOSED). Component scales measured, pathologies checked, 4 formulations PROPOSED (no weights, no PPO). D-P6-004 observation APPROVED & FROZEN (139-dim). Action space APPROVED & FROZEN (D-P6-001/002/003). NEXT: researcher selects a formulation+weights; then STEP 9 safety clamp."
+  completed: ["G5 action space", "G12 pump control", "STEP 6 PRV per-valve characterization (measured)", "STEP 6 four-question decision-review brief (no re-run)", "STEP 6b focused VALVE-173 (50,60] refinement (measured)", "STEP 6 A/B/C terminology correction", "Action-space APPROVAL persisted (D-P6-001/002/003) + docs/PHASE6_ACTION_SPACE_SPEC.md created + git checkpoint A", "STEP 7 observation design APPROVED & FROZEN (D-P6-004): docs/PHASE6_STATE_SPEC.md, src/env/state_builder.py + 9/9 tests, results/phase6/p6_s7_state_spec.json", "STEP 8 reward-component scale MEASUREMENT (D-P6-005 PROPOSED): docs/PHASE6_REWARD_SPEC.md, src/validation/p6_s8_reward_scale_analysis.py, results/phase6/p6_s8_reward_scale_analysis.json, tests/test_reward_scale_analysis.py (21/21 tests)"]
+  not_completed: ["STEP 8 reward FORMULATION selection + weights (D-P6-005 resolution; formulations PROPOSED not approved)", "STEP 9-15"]
   pending_research_decisions: ["STEP 8 reward formulation: components (leakage / service-DSR / pressure-safety / actuator effort+smoothness / optional energy) to be scale-measured; a small set of principled formulations (normalized weighted sum / constrained-penalty / baseline-relative / safety-first-lexicographic) will be PROPOSED, NOT approved, pending measured-scale evidence and researcher sign-off. No weights chosen prematurely.", "Open non-blocking items: joint 5-D box safety (R1b, STEP-9/12), leak calibration (R3), DRL dependency install (R4)."]
   step7_2026_09_27:              # WU-8 checkpoint (this session). STEP-6 detail below preserved as history.
     unit: "WU-8 — STEP 7 DRL state/observation design"
@@ -346,7 +384,7 @@ session_checkpoint:          # brief s.20 - on-disk, not chat-only
   tests_run: "step6b run: reference reproduced exactly (mean 94.787 / 386 <20psi / 0 negative / 84.730 gpm); 14 setpoints in (50,60], all solver-clean, 0 negative, 0 new <20psi."
   files_changed: ["src/validation/p6_s6b_v173_lowside_refine.py", "results/phase6/p6_s6b_v173_lowside_refine.json", "docs/PHASE6_DECISION_REGISTER.md", "docs/PHASE6_EXECUTION_LOG.md", "docs/PHASE6_EVIDENCE_INDEX.md", "docs/RECOVERY.md", "PROJECT_STATE.yaml"]
   git_commit: "STEP 6 characterization committed at 627567b; step6b + clarification docs update in checkpoint A (approval); STEP 7 checkpoints follow."
-  exact_next_action: "D-P6-004 observation APPROVED & FROZEN 2026-09-27 (5/5 review points accepted; 139-dim layout frozen). NEXT: STEP 8 reward design — first MEASURE the natural scale/variability of each candidate reward component (leakage, service/DSR, pressure-safety deficit, actuator effort/smoothness, optional energy) over representative in-bounds trajectories via src/validation/p6_s8_reward_scale_analysis.py (reuses S3/L leakage+PDA+service-node tooling; writes results/phase6/p6_s8_reward_scale_analysis.json + docs/PHASE6_REWARD_SPEC.md). Run pathology checks; PROPOSE (not approve) a small set of principled formulations. Do NOT choose final weights. Do NOT start PPO training. Do NOT reopen D-P6-001/002/003 or D-P6-004."
+  exact_next_action: "STEP 8 reward-component scale MEASUREMENT COMPLETE 2026-09-27 (D-P6-005 PROPOSED): src/validation/p6_s8_reward_scale_analysis.py wrote results/phase6/p6_s8_reward_scale_analysis.json; docs/PHASE6_REWARD_SPEC.md documents scales/correlations/pathologies + 4 PROPOSED formulations + fixed normalisation constants; tests/test_reward_scale_analysis.py 21/21 pass. NEXT (researcher decision, do NOT do silently): review measured scales + pathology evidence, select ONE formulation (F1-F4) + weights to resolve D-P6-005, then STEP 9 implements the hard safety clamp the boundary-seeking check proves is required (clamp to approved bounds). Do NOT choose weights unilaterally. Do NOT start PPO training. Do NOT reopen D-P6-001/002/003 or D-P6-004."
   recovery_file: "docs/RECOVERY.md"
 
 

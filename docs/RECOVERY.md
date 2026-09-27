@@ -8,7 +8,8 @@ chat.**
 Last updated: 2026-09-27 (UTC) by Claude Opus 4.8. **Action space APPROVED & FROZEN
 2026-09-27 (D-P6-001/002/003); STEP 7 observation design APPROVED & FROZEN 2026-09-27
 (D-P6-004, observation_dim=139); STEP 8 (reward design — MEASURE component scales, do
-NOT train) IN PROGRESS.**
+NOT train) MEASUREMENT COMPLETE 2026-09-27 (D-P6-005 PROPOSED — formulation & weights
+NOT selected).**
 
 ---
 
@@ -119,14 +120,27 @@ Source `results/phase5/g3_pump_speed.json`:
   psi); demand = Option A (no explicit demand; time-of-day diurnal prior; future demand
   FORBIDDEN); POMDP (approximate Markov; tanks = observed memory). 5/5 review points
   accepted in D-P6-004. STEP 8 (reward) reads this state but MUST NOT alter it.
-- **STEP 8 reward design — IN PROGRESS (measure, not train).** Objective: EMPIRICALLY
-  MEASURE the natural scale/variability of each candidate reward component (leakage,
-  service/DSR, pressure-safety deficit, actuator effort/smoothness, optional energy)
-  over representative in-bounds trajectories BEFORE any weights are chosen; run pathology
-  checks; PROPOSE (not approve) a small set of principled formulations. Tooling reuses
-  the Phase-5 leakage/PDA instrument (`g6_g7_g8_leak_pda.py`) and service-node/solver
-  policy (`p6_s3_prv_finechar.py`). Needs WNTR/EPANET + numpy (present) → not dep-blocked.
-  Do NOT choose final weights, do NOT start PPO training.
+- **STEP 8 reward design — MEASUREMENT COMPLETE 2026-09-27 (D-P6-005 PROPOSED).**
+  Empirically MEASURED the natural scale/variability/temporal behaviour/cross-correlation
+  of 10 candidate reward components over 19 static in-bounds configs × 193 report ts
+  (3667 pooled instants), ran the reward-pathology checks against measured evidence, and
+  PROPOSED 4 principled formulations. **No weights chosen, no formulation selected, no PPO
+  trained.** On disk: `docs/PHASE6_REWARD_SPEC.md` (§8.1–§8.8),
+  `src/validation/p6_s8_reward_scale_analysis.py`,
+  `results/phase6/p6_s8_reward_scale_analysis.json`,
+  `tests/test_reward_scale_analysis.py` (21/21: 12 STEP 8 + 9 STEP 7). Key measured
+  findings: leakage 84.95 GPM mean (79.92–90.15, ±~6% band) ≈10× smaller than demand
+  (~906 GPM); objectives GENUINELY OPPOSE (leak↔dsr +0.750, leak↔deficit −0.774,
+  dsr↔deficit −0.965); leakage-only (prv_all_lower) cuts leak −4.0% but drops DSR −6.4 pts
+  → service must be protected explicitly; scale imbalance ratio 7.15 → fixed normalisation
+  mandatory; hard-violation term degenerate (0 at 100% of instants) → dense safety =
+  deficit/min-pressure; actuator L2² up to 28 → effort ÷ 28 and use COMMANDED action;
+  leakage optimum at the PRV lower bound → STEP-9 hard clamp REQUIRED. Fixed normalisation
+  constants (frozen, no running stats): leak_ref 84.72988, req_ref 906.39873, deficit_ref
+  28.67179, power_ref 88.10062, movement_L2sq_max 28.0. 4 PROPOSED formulations: F1
+  normalised weighted sum, F2 constrained penalty (service protected by construction), F3
+  baseline-relative improvement, F4 safety-first lexicographic. NEXT: researcher selects
+  ONE formulation + weights (resolves D-P6-005). Do NOT choose final weights, do NOT start PPO.
 - STEP 9 safety layer, STEP 10 demand uncertainty/splits: NOT STARTED.
   STEP-9 must hard-clamp to the approved bounds.
 - STEP 11 `src/env/` (8 modules) + STEP 12 `tests/` (16 tests) + STEP 13 SB3
@@ -163,6 +177,15 @@ result is written to `results/phase6/` as JSON (raw + summary + interpretation).
 - **DO NOT** re-run the VALVE-173 (50,60] low-side refinement — done in
   `p6_s6b_v173_lowside_refine.json` (2026-09-27). Measured: fully closed to 54.25 psi,
   fully active from 54.5 psi. Practical regulating lower edge = 54.5 psi.
+- **DO NOT** re-run the STEP 8 reward-component scale analysis
+  (`src/validation/p6_s8_reward_scale_analysis.py`) or rewrite `docs/PHASE6_REWARD_SPEC.md`
+  — the measurement is on disk (`results/phase6/p6_s8_reward_scale_analysis.json`, 19 configs
+  × 193 ts, 21/21 tests). It is **D-P6-005, PROPOSED 2026-09-27**. The measured scales,
+  correlations, pathology evidence, fixed normalisation constants, and 4 PROPOSED
+  formulations are frozen as evidence; re-run only if the leak instrument, solver policy,
+  action bounds, or 121-service-node set changes. Do NOT choose reward weights, do NOT
+  select a formulation, and do NOT implement `src/env/reward.py` (STEP 11) without the
+  researcher's D-P6-005 selection. Do NOT start scientific PPO training.
 - **DO NOT** start scientific PPO training. A tiny smoke test is allowed ONLY after
   the env is implemented and validated, and only to prove the loop runs.
 - **DO NOT** auto-install gymnasium / stable_baselines3 / torch.

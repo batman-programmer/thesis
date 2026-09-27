@@ -126,10 +126,44 @@ approved. Raw evidence: `results/phase6/p6_s7_state_spec.json`; tests
 | Connector exclusion enforced | tests/test_state_builder.py | test_8_connector_exclusion |
 | Prev-commanded vs realized kept distinct | tests/test_state_builder.py | test_9_prev_action_semantics |
 
+## STEP 8 — reward-component scale analysis (D-P6-005, PROPOSED)
+
+Spec: `docs/PHASE6_REWARD_SPEC.md` (§8.1–§8.8). Register: D-P6-005 (PROPOSED) in
+`docs/PHASE6_DECISION_REGISTER.md`. State: `PROJECT_STATE.yaml :: reward` and
+`session_checkpoint`. Raw evidence: `results/phase6/p6_s8_reward_scale_analysis.json`;
+generator `src/validation/p6_s8_reward_scale_analysis.py`; tests
+`tests/test_reward_scale_analysis.py`. **This step MEASURES only** — no weights
+chosen, no PPO trained. 19 static in-bounds configs × 193 report ts = 3667 pooled instants.
+
+| Claim | Section/Key | Result | Interpretation |
+|---|---|---|---|
+| Per-ts extraction == validated water balance | integrity.per_timestep_vs_validated_accounting_max_abs_diff | 0.0 GPM | reward components read the SAME instrument as Phase-5 accounting |
+| Reference reproduces frozen baseline | configurations.reference_nominal.validated_accounting | leak 84.730, DSR 0.98334, 386 ts<20psi, 0 neg | measurement anchored to the frozen reference |
+| 10 candidate components, 121 svc / 5 connector | service_node_policy | n_service_junctions 121, n_connector_junctions 5 | safety terms use 121 service nodes only |
+| Leakage natural scale | pooled_component_stats.leakage_gpm | mean 84.95, median 84.68, std 2.52, [79.92, 90.15] | narrow ±~6% band → baseline-relative/normalised objective |
+| Requested-demand scale | pooled_component_stats.requested_demand_gpm | median 774.0 (mean 906.4) | ~10× leakage → raw sum dominated by demand |
+| DSR discriminating | pooled_component_stats.dsr | mean 0.9734, [0.9142, 1.00246] | dense usable service signal (clip unserved≥0) |
+| Pressure deficit scale | pooled_component_stats.pressure_deficit_psi_nodesum | mean 19.86, max 31.73 | dense safety signal |
+| Min service pressure | pooled_component_stats.min_service_pressure_psi | mean 4.77, [1.09, 5.93] | worst-node dense safety signal |
+| Hard-violation degenerate | pooled_component_stats.n_service_nodes_negative | identically 0 (frac_zero 1.0) | pure hard-violation term sparse → dense safety needed |
+| Pump power bimodal | pooled_component_stats.pump_hydraulic_power_kw | mean 79.85, median 0.0, max 323.6 | native-STATUS-driven; energy term optional, hydraulic-only |
+| Objectives oppose | cross_component_correlation | leak↔dsr +0.750, leak↔deficit −0.774, leak↔n_below20 −0.742, dsr↔deficit −0.965 | pressing leakage down erodes service → protect service explicitly |
+| Leakage-only collapses service | pathology_checks (prv_all_lower) | leak 84.73→81.38 (−4.0%), DSR 0.98334→0.91940 (−6.4 pts) | leakage-only unsafe |
+| Pressure-only raises leakage | pathology_checks (prv_all_upper) | leak 84.73→89.76 (+5.9%), n_below20 386→193 | objectives oppose |
+| Scale imbalance | pathology_checks | penalty-term median max/min ratio 7.15 | fixed normalisation mandatory |
+| Actuator effort (analytic) | actuator_effort_analytic | dim 7, L1 max 14.0, L2² max 28.0, L2 max 5.2915 | static runs = 0 movement → analytic ceiling; effort ÷ 28 |
+| Boundary-seeking optimum | pathology_checks | leak optimum at PRV lower bound; worst pooled min svc 1.09 psi | STEP-9 hard clamp REQUIRED |
+| Fixed normalisation constants | proposed_normalization_constants | leak_ref 84.72988, req_ref 906.39873, deficit_ref 28.67179, power_ref 88.10062, L2sq_max 28.0 | frozen once, no running stats → no train/eval leakage |
+| 4 formulations all PROPOSED | proposed_formulations[].status | F1 norm-weighted-sum, F2 constrained-penalty, F3 baseline-relative, F4 safety-first-lexicographic | none selected; weights NOT chosen |
+| Determinism + integrity | integrity | all finite; no topology/native-rule change; no future info; native controls unchanged | reproducible, no leakage |
+| Test battery | tests/test_reward_scale_analysis.py | 12 STEP 8 + 9 STEP 7 = 21/21 ok | pure helpers + artefact checks |
+
 ## Still-missing evidence (drives next action)
 
 | Needed claim | Why missing | How to obtain |
 |---|---|---|
 | Joint 5-D action-box safety (mixed corners/interior/pump+demand) | only single lower-corner tested (R1b) | STEP 9 safety layer + STEP 12 automated joint tests |
+| Reward formulation + weights (D-P6-005 selection) | STEP 8 MEASURES scales/pathologies and PROPOSES F1–F4 only; no weights chosen | researcher selects ONE formulation + weights (resolves D-P6-005); STEP 11 implements `src/env/reward.py` |
+| Realised actuator-movement distribution | static runs = 0 movement; effort scale is analytic (R5-effort, HYPOTHESIS) | measured at training time once a policy trajectory exists |
 | Leak calibration | instrument uncalibrated (R3) | out of Phase 6 scope; relative response only |
 | Observation/state design | DELIVERABLES PRODUCED; D-P6-004 PROPOSED — awaiting researcher approval (not frozen) | researcher sign-off on the 5 review points → freeze 139-dim layout |

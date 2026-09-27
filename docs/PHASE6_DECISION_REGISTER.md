@@ -6,6 +6,7 @@ Validation. Resolved decisions from Deliverable A are recorded first for
 traceability; live decisions (D-P6-001..003) follow.
 
 Status vocabulary: OPEN · RECOMMENDED (pending researcher confirmation) ·
+PROPOSED (measured/designed, awaiting researcher selection) ·
 APPROVED · IMPLEMENTED · SUPERSEDED.
 
 ---
@@ -512,5 +513,82 @@ ablations, not silent changes.
   demand/Markov framing are now FROZEN. STEP 8 (reward) reads the environment state but
   MUST NOT alter the observation specification. Reopen only on new contradictory evidence,
   registered as a superseding decision.
+
+---
+
+## D-P6-005 — Reward formulation (STEP 8)  [PROPOSED 2026-09-27 — measurement complete, formulation not selected]
+
+- **Date:** 2026-09-27
+- **Topic:** How the per-step scalar reward is composed from the candidate
+  components (STEP 8). **This decision is PROPOSED only** — STEP 8 MEASURES the
+  natural scale/variability/correlation of every candidate component and PROPOSES
+  formulations; it does NOT select one, choose weights, or train PPO.
+- **Question:** Which reward formulation and normalisation should PPO optimise so
+  that leakage is reduced **without** sacrificing service or safety, with all
+  terms on a comparable scale and no train/eval leakage?
+- **Level:** 2 (research-impacting — objective definition). Register before locking.
+- **Evidence:** `results/phase6/p6_s8_reward_scale_analysis.json` (generator
+  `src/validation/p6_s8_reward_scale_analysis.py`; tests
+  `tests/test_reward_scale_analysis.py`, 12/12 STEP 8 + 9/9 STEP 7). 19 static
+  in-bounds configurations × 193 report timesteps (3667 pooled instants), same
+  96 h EPS + solver policy + leak/PDA instrument as `p6_s3`/`g6_g7_g8`.
+  Per-timestep extraction reproduces the validated water balance to **0.0 GPM**;
+  `reference_nominal` reproduces the frozen baseline exactly (leak 84.730 GPM,
+  DSR 0.98334, 386 node-timesteps <20 psi, 0 negative).
+- **Measured natural scales (pooled):** leakage 84.95 GPM mean (79.92–90.15, ±~6%
+  band); requested demand ~906 GPM; DSR 0.9734 (0.914–1.002); pressure deficit
+  19.86 psi·nodes (14.08–31.73); min service pressure 4.77 psi (1.09–5.93);
+  negative-node count **identically 0** in-bounds; hydraulic pump power mean ~80
+  kW, median 0 (bimodal, native-STATUS-driven).
+- **Measured pathologies (evidence, not assertion):**
+  1. **Objectives oppose:** leakage↔DSR r=+0.750, leakage↔deficit r=−0.774,
+     leakage↔n_below20 r=−0.742 — pushing leakage down erodes service.
+  2. **Leakage-only collapses service:** `prv_all_lower` cuts leak −4.0% but drops
+     DSR 0.98334→0.91940 (−6.4 pts) → service must be protected explicitly.
+  3. **Pressure-only raises leakage:** `prv_all_upper` +5.9% leakage.
+  4. **Scale imbalance:** penalty-term median max/min ratio 7.15 → **fixed
+     normalisation mandatory** before weighting.
+  5. **Sparse hard signal:** negative-pressure term is 0 at 100% of in-bounds
+     instants → dense safety must come from deficit / min-pressure.
+  6. **Actuator-penalty domination + closed-pump ambiguity:** unnormalised L2²
+     movement up to 28 would dominate; effort MUST use the COMMANDED normalised
+     action (realised pump speed is reset to 1.0/0 by native STATUS rules).
+  7. **Boundary-seeking:** the leakage optimum sits at the PRV lower bound; only
+     this single corner is characterised → a STEP-9 hard safety clamp is REQUIRED.
+- **Options (all PROPOSED, none selected):**
+  - **F1 Normalised weighted sum** — dense, differentiable; every term ÷ its fixed
+    reference: `−w_L(leak/leak_ref) − w_U(unserved/req_ref) − w_P(deficit/deficit_ref) − w_A(‖da‖²/L2sq_max) [− w_E(power/power_ref)]`.
+  - **F2 Constrained penalty (service protected by construction):**
+    `−(leak/leak_ref) − Λ(deficit/deficit_ref) − BIG·max(0,n_below20)`, Λ≫1, BIG≫Λ.
+  - **F3 Baseline-relative improvement:** fractional leakage reduction vs the
+    native controller, zero-centred at baseline, with a service floor + safety term.
+  - **F4 Safety-first lexicographic:** safety > service > leakage > effort, via
+    masking / large penalties; pairs with the STEP-9 clamp.
+- **Fixed normalisation constants (measured once, frozen — no running stats):**
+  `leak_ref=84.72988 GPM`, `req_ref=906.39873 GPM`,
+  `deficit_ref=28.67179 psi·nodes` (=max(baseline mean, pooled p95)),
+  `power_ref=88.10062 kW`, `movement_L2sq_max=28.0`.
+- **Recommendation (for researcher review, NOT adopted):** the evidence favours a
+  **normalised, service-protecting** objective (F1 or F2) paired with the STEP-9
+  hard safety clamp; F3 is attractive for interpretability given the narrow
+  absolute leakage band. **No weights are recommended** — they must be chosen by
+  the researcher, ideally with a small sensitivity sweep, as a separate decision.
+- **Counter-arguments / risks:** static-run effort scale is analytic (realised
+  movement is a HYPOTHESIS TO TEST); the leak instrument is uncalibrated (relative
+  response only); scales cover a representative in-bounds set, not the full joint
+  interior (STEP-9/STEP-12). Weight choice can still induce reward hacking — must
+  be validated after selection.
+- **Status:** **PROPOSED** — measurement complete; formulation and weights NOT
+  selected. Awaiting researcher decision.
+- **Approval:** PENDING. Researcher to select ONE formulation + weights (this
+  resolves D-P6-005) after reviewing the measured scales and pathology evidence.
+- **Implementation:** measurement instrument + evidence + spec on disk
+  (`src/validation/p6_s8_reward_scale_analysis.py`,
+  `results/phase6/p6_s8_reward_scale_analysis.json`,
+  `docs/PHASE6_REWARD_SPEC.md`). The reward function itself
+  (`src/env/reward.py`) is STEP 11 and is NOT implemented here.
+- **Validation:** `tests/test_reward_scale_analysis.py` 21/21 pass; integrity
+  flags all true (finite, no topology/native-rule change, no future information,
+  per-timestep vs validated accounting max abs diff 0.0).
 
 
