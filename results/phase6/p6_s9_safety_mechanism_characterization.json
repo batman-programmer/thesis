@@ -1,0 +1,4074 @@
+{
+  "experiment_metadata": {
+    "work_unit": "WU-15",
+    "purpose": "EMPIRICAL characterization of candidate state-dependent safety mechanisms S1-S4 and action-handling policies H1-H3; evidence only, no selection/ordering/scoring/recommendation",
+    "generated_utc": "2026-09-27T22:49:42.560503+00:00",
+    "instrument": "p6_s8_reward_scale_analysis (validated, reused unchanged)",
+    "working_inp_sha256": "53015ba9212e46bec731d190971819996233996b498bc269e828f992830a20a9",
+    "protocol": {
+      "eps_hours": 96,
+      "hydraulic_timestep_s": 1800,
+      "native_rule_timestep_s": 180,
+      "report_instants": 193,
+      "pda_required_psi": 20.0,
+      "pda_min_psi": 0.0,
+      "pda_exponent": 0.5
+    },
+    "action_dim": 7,
+    "actuator_order": [
+      "VALVE-173",
+      "VALVE-175",
+      "VALVE-176",
+      "VALVE-177",
+      "VALVE-178",
+      "PUMP-170",
+      "PUMP-172"
+    ],
+    "action_bounds": {
+      "VALVE-173": [
+        54.5,
+        100.0
+      ],
+      "VALVE-175": [
+        21.5,
+        110.0
+      ],
+      "VALVE-176": [
+        20.0,
+        59.524
+      ],
+      "VALVE-177": [
+        20.0,
+        90.0
+      ],
+      "VALVE-178": [
+        20.0,
+        74.0
+      ],
+      "PUMP-170": [
+        0.82,
+        1.1
+      ],
+      "PUMP-172": [
+        0.77,
+        1.1
+      ]
+    },
+    "observation_dim": 139,
+    "n_service_junctions": 121,
+    "n_connector_junctions": 5,
+    "n_native_controls": 5,
+    "reward_layer_frozen": "D-P6-005 C-A_F1_balanced_dense (NOT modified here)",
+    "solver_policy": {
+      "accuracy": 1e-05,
+      "trials": 2000,
+      "rule_timestep_s": 180.0,
+      "report_timestep_s": 1800.0,
+      "demand_model": "PDA",
+      "required_pressure_psi": 20.0,
+      "minimum_pressure_psi": 0.0,
+      "pressure_exponent": 0.5
+    }
+  },
+  "metric_definitions": {
+    "p_i": {
+      "math": "service pressure at node i",
+      "unit": "psi",
+      "interpretation": "121 service-junction pressures"
+    },
+    "p_min": {
+      "math": "min_i p_i(t)",
+      "unit": "psi",
+      "interpretation": "worst-node service pressure"
+    },
+    "dp_min": {
+      "math": "p_min(post) - p_min(current)",
+      "unit": "psi",
+      "interpretation": "worst-node change (post-action)"
+    },
+    "D": {
+      "math": "sum_i max(0, 20 - p_i)",
+      "unit": "psi_nodesum",
+      "interpretation": "aggregate pressure deficit vs 20 psi"
+    },
+    "dD": {
+      "math": "D(post) - D(current)",
+      "unit": "psi_nodesum",
+      "interpretation": "aggregate deficit change"
+    },
+    "N_neg": {
+      "math": "sum_i I[p_i < 0]",
+      "unit": "count",
+      "interpretation": "negative-pressure service nodes"
+    },
+    "N_20": {
+      "math": "sum_i I[p_i < 20]",
+      "unit": "count",
+      "interpretation": "DESCRIPTIVE sub-20-psi count (not an oracle)"
+    },
+    "Q_req": {
+      "math": "sum requested demand",
+      "unit": "gpm",
+      "interpretation": "requested demand"
+    },
+    "Q_served": {
+      "math": "sum served demand (PDA)",
+      "unit": "gpm",
+      "interpretation": "PDA-served demand"
+    },
+    "Q_unserved": {
+      "math": "max(0, Q_req - Q_served)",
+      "unit": "gpm",
+      "interpretation": "clipped unserved demand"
+    },
+    "DSR": {
+      "math": "Q_served / Q_req",
+      "unit": "ratio",
+      "interpretation": "demand satisfaction ratio"
+    },
+    "Q_leak": {
+      "math": "sum_j sign(p_j) C_j |p_j|^0.5",
+      "unit": "gpm",
+      "interpretation": "emitter leakage (NOT calibrated)"
+    },
+    "dQ_leak": {
+      "math": "Q_leak(post) - Q_leak(current)",
+      "unit": "gpm",
+      "interpretation": "leakage change"
+    },
+    "dDSR": {
+      "math": "DSR(post) - DSR(current)",
+      "unit": "ratio",
+      "interpretation": "DSR change"
+    },
+    "dQ_unserved": {
+      "math": "Q_unserved(post) - Q_unserved(current)",
+      "unit": "gpm",
+      "interpretation": "unserved change"
+    },
+    "movement_L2sq": {
+      "math": "||da_t||^2 on COMMANDED action",
+      "unit": "-",
+      "interpretation": "reward effort term input (frozen)"
+    },
+    "action_deviation_L2": {
+      "math": "||a_exec - a_prop||",
+      "unit": "-",
+      "interpretation": "executed-vs-proposed gap"
+    },
+    "I_modified": {
+      "math": "I[||a_exec - a_prop|| > tol]",
+      "unit": "bool",
+      "interpretation": "executed != proposed (tol 1e-09)"
+    },
+    "I_reject": {
+      "math": "I[action rejected to a_prev/fallback]",
+      "unit": "bool",
+      "interpretation": "hard rejection flag"
+    }
+  },
+  "candidates": {
+    "S1": {
+      "exact_rule": "SAFE iff p_min(post) >= theta_p",
+      "signal": "absolute_worst_node_pressure",
+      "information_required": "post-action worst-node pressure (look-ahead)",
+      "requires_look_ahead": true,
+      "requires_extra_solve": true,
+      "baseline_relation": "absolute",
+      "note": "theta_p provisional; theta_p=20 psi vs chronic baseline (worst node ~4.16 psi) examined empirically below"
+    },
+    "S2": {
+      "exact_rule": "SAFE iff p_min(post) - p_min(current) >= -eps_p",
+      "signal": "worst_node_degradation_vs_current",
+      "information_required": "current + post worst-node pressure",
+      "requires_look_ahead": true,
+      "requires_extra_solve": true,
+      "baseline_relation": "relative",
+      "note": "eps_p provisional; relative, gives no absolute-min guarantee"
+    },
+    "S3": {
+      "exact_rule": "SAFE iff D(post) - D(current) <= eps_D",
+      "signal": "aggregate_deficit_increase",
+      "information_required": "current + post deficit nodesum",
+      "requires_look_ahead": true,
+      "requires_extra_solve": true,
+      "baseline_relation": "relative_aggregate",
+      "note": "eps_D provisional; aggregate can mask localised collapse"
+    },
+    "S4": {
+      "exact_rule": "SAFE iff N_neg(post) == 0",
+      "signal": "negative_pressure_hard_backstop",
+      "information_required": "post negative-node count",
+      "requires_look_ahead": true,
+      "requires_extra_solve": true,
+      "baseline_relation": "absolute_negative_only",
+      "note": "only well-posed HARD absolute gate; not a 20-psi guarantee"
+    }
+  },
+  "provisional_thresholds": {
+    "S1_theta_p_psi": [
+      0.0,
+      5.0,
+      10.0,
+      15.0,
+      20.0
+    ],
+    "S2_eps_p_psi": [
+      0.0,
+      2.0,
+      5.0
+    ],
+    "S3_eps_D_psi_nodesum": [
+      0.0,
+      2.0,
+      5.0
+    ],
+    "H2_alpha_grid": [
+      0.0,
+      0.25,
+      0.5,
+      0.75,
+      1.0
+    ],
+    "note": "PROVISIONAL documented sets; NOT selected or tuned to an objective"
+  },
+  "test_case_classes": {
+    "A_reference": "native-control reference/baseline state",
+    "B_severe_degradation": "previously observed near-collapse (min svc ~1.29 psi)",
+    "C_intermediate_control": "regulation without Class B extremes",
+    "reference_high_pressure_state": "distinct high-pressure current state",
+    "note": "no class is claimed universally safe or unsafe (PART 5/6)"
+  },
+  "tested_states": {
+    "reference_nominal": {
+      "test_case_class": "A_reference",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 70.0,
+          "VALVE-175": 55.0,
+          "VALVE-176": 29.762,
+          "VALVE-177": 45.0,
+          "VALVE-178": 37.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "normalized_action": [
+        -0.31868131868131866,
+        -0.24293785310734461,
+        -0.5060216577269507,
+        -0.2857142857142857,
+        -0.37037037037037035,
+        0.28571428571428537,
+        0.3939393939393936
+      ],
+      "n_timesteps": 193,
+      "validated_accounting": {
+        "leakage_mean_gpm": 84.72988433677985,
+        "served_demand_mean_gpm": 891.4138978885177,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 0.9833370137001072,
+        "dsr_min": 0.9818777132257851,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 4.4856480485577777e-07
+      },
+      "all_finite": true,
+      "wall_clock_s": 0.8847463000001881
+    },
+    "prv_all_lower": {
+      "test_case_class": "C_intermediate_control",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 54.5,
+          "VALVE-175": 21.5,
+          "VALVE-176": 20.0,
+          "VALVE-177": 20.0,
+          "VALVE-178": 20.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "normalized_action": [
+        -1.0,
+        -1.0,
+        -1.0,
+        -1.0,
+        -1.0,
+        0.28571428571428537,
+        0.3939393939393936
+      ],
+      "n_timesteps": 193,
+      "validated_accounting": {
+        "leakage_mean_gpm": 81.38381870141156,
+        "served_demand_mean_gpm": 834.5520090776172,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 0.9193996684666168,
+        "dsr_min": 0.9141988299525465,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 4.1188485511156614e-07
+      },
+      "all_finite": true,
+      "wall_clock_s": 0.8204855999997562
+    },
+    "prv_all_upper": {
+      "test_case_class": "reference_high_pressure_state",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 100.0,
+          "VALVE-175": 110.0,
+          "VALVE-176": 59.524,
+          "VALVE-177": 90.0,
+          "VALVE-178": 74.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 1.0,
+          "PUMP-172": 1.0
+        }
+      },
+      "normalized_action": [
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        1.0,
+        0.28571428571428537,
+        0.3939393939393936
+      ],
+      "n_timesteps": 193,
+      "validated_accounting": {
+        "leakage_mean_gpm": 89.7592331333586,
+        "served_demand_mean_gpm": 906.4686005107375,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 1.000180882194326,
+        "dsr_min": 1.000025631009172,
+        "n_node_timesteps_below_20psi": 193,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 2.171016831198358e-06
+      },
+      "all_finite": true,
+      "wall_clock_s": 0.7865568000001986
+    },
+    "prv_lower_pump_lower": {
+      "test_case_class": "B_severe_degradation",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 54.5,
+          "VALVE-175": 21.5,
+          "VALVE-176": 20.0,
+          "VALVE-177": 20.0,
+          "VALVE-178": 20.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 0.82,
+          "PUMP-172": 0.77
+        }
+      },
+      "normalized_action": [
+        -1.0,
+        -1.0,
+        -1.0,
+        -1.0,
+        -1.0,
+        -1.0,
+        -1.0
+      ],
+      "n_timesteps": 193,
+      "validated_accounting": {
+        "leakage_mean_gpm": 80.61786635451655,
+        "served_demand_mean_gpm": 834.5507518427517,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 0.9193965586241878,
+        "dsr_min": 0.9141979346467793,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 4.014771946003748e-07
+      },
+      "all_finite": true,
+      "wall_clock_s": 0.7266758000000664
+    },
+    "ref_sev_alpha0.25": {
+      "test_case_class": "h2_interpolation",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 66.125,
+          "VALVE-175": 46.625,
+          "VALVE-176": 27.3215,
+          "VALVE-177": 38.75,
+          "VALVE-178": 32.75
+        },
+        "pump_speeds": {
+          "PUMP-170": 0.955,
+          "PUMP-172": 0.9425
+        }
+      },
+      "normalized_action": [
+        -0.48901098901098905,
+        -0.43220338983050843,
+        -0.629516243295213,
+        -0.4642857142857143,
+        -0.5277777777777778,
+        -0.03571428571428614,
+        0.04545454545454519
+      ],
+      "n_timesteps": 193,
+      "validated_accounting": {
+        "leakage_mean_gpm": 83.97383325991932,
+        "served_demand_mean_gpm": 879.252207555523,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 0.969661893430032,
+        "dsr_min": 0.9674020601979101,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 4.514027125424036e-07
+      },
+      "all_finite": true,
+      "wall_clock_s": 0.7275719999997818
+    },
+    "ref_sev_alpha0.50": {
+      "test_case_class": "h2_interpolation",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 62.25,
+          "VALVE-175": 38.25,
+          "VALVE-176": 24.881,
+          "VALVE-177": 32.5,
+          "VALVE-178": 28.5
+        },
+        "pump_speeds": {
+          "PUMP-170": 0.9099999999999999,
+          "PUMP-172": 0.885
+        }
+      },
+      "normalized_action": [
+        -0.6593406593406593,
+        -0.6214689265536724,
+        -0.7530108288634754,
+        -0.6428571428571428,
+        -0.6851851851851851,
+        -0.35714285714285765,
+        -0.3030303030303032
+      ],
+      "n_timesteps": 193,
+      "validated_accounting": {
+        "leakage_mean_gpm": 83.1729980876446,
+        "served_demand_mean_gpm": 866.002291283826,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 0.9547632572802225,
+        "dsr_min": 0.9516316814799116,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 4.798665713678929e-07
+      },
+      "all_finite": true,
+      "wall_clock_s": 0.7649812000004204
+    },
+    "ref_sev_alpha0.75": {
+      "test_case_class": "h2_interpolation",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 58.375,
+          "VALVE-175": 29.875,
+          "VALVE-176": 22.4405,
+          "VALVE-177": 26.25,
+          "VALVE-178": 24.25
+        },
+        "pump_speeds": {
+          "PUMP-170": 0.865,
+          "PUMP-172": 0.8275
+        }
+      },
+      "normalized_action": [
+        -0.8296703296703296,
+        -0.8107344632768362,
+        -0.8765054144317377,
+        -0.8214285714285714,
+        -0.8425925925925926,
+        -0.6785714285714284,
+        -0.6515151515151516
+      ],
+      "n_timesteps": 193,
+      "validated_accounting": {
+        "leakage_mean_gpm": 82.3364970225332,
+        "served_demand_mean_gpm": 851.3062913654176,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 0.9382389067767891,
+        "dsr_min": 0.9341400160031296,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 3.9154468822744093e-07
+      },
+      "all_finite": true,
+      "wall_clock_s": 0.7548416999998153
+    },
+    "hi_sev_alpha0.25": {
+      "test_case_class": "h2_interpolation",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 88.625,
+          "VALVE-175": 87.875,
+          "VALVE-176": 49.643,
+          "VALVE-177": 72.5,
+          "VALVE-178": 60.5
+        },
+        "pump_speeds": {
+          "PUMP-170": 0.955,
+          "PUMP-172": 0.9425
+        }
+      },
+      "normalized_action": [
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        0.5,
+        -0.03571428571428614,
+        0.04545454545454519
+      ],
+      "n_timesteps": 193,
+      "validated_accounting": {
+        "leakage_mean_gpm": 88.02412350491535,
+        "served_demand_mean_gpm": 906.4645006330027,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 1.000170328651505,
+        "dsr_min": 1.0000237250971002,
+        "n_node_timesteps_below_20psi": 193,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 1.906625016090402e-06
+      },
+      "all_finite": true,
+      "wall_clock_s": 0.8128530999997565
+    },
+    "hi_sev_alpha0.50": {
+      "test_case_class": "h2_interpolation",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 77.25,
+          "VALVE-175": 65.75,
+          "VALVE-176": 39.762,
+          "VALVE-177": 55.0,
+          "VALVE-178": 47.0
+        },
+        "pump_speeds": {
+          "PUMP-170": 0.9099999999999999,
+          "PUMP-172": 0.885
+        }
+      },
+      "normalized_action": [
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        0.0,
+        -0.35714285714285765,
+        -0.3030303030303032
+      ],
+      "n_timesteps": 193,
+      "validated_accounting": {
+        "leakage_mean_gpm": 86.11382659877141,
+        "served_demand_mean_gpm": 906.4604361487214,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 1.0001598027077476,
+        "dsr_min": 1.0000226385380202,
+        "n_node_timesteps_below_20psi": 193,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 1.0819884437296423e-06
+      },
+      "all_finite": true,
+      "wall_clock_s": 0.9354290000001129
+    },
+    "hi_sev_alpha0.75": {
+      "test_case_class": "h2_interpolation",
+      "commanded": {
+        "prv_setpoints_psi": {
+          "VALVE-173": 65.875,
+          "VALVE-175": 43.625,
+          "VALVE-176": 29.881,
+          "VALVE-177": 37.5,
+          "VALVE-178": 33.5
+        },
+        "pump_speeds": {
+          "PUMP-170": 0.865,
+          "PUMP-172": 0.8275
+        }
+      },
+      "normalized_action": [
+        -0.5,
+        -0.5,
+        -0.5,
+        -0.5,
+        -0.5,
+        -0.6785714285714284,
+        -0.6515151515151516
+      ],
+      "n_timesteps": 193,
+      "validated_accounting": {
+        "leakage_mean_gpm": 83.97566062773421,
+        "served_demand_mean_gpm": 891.981597408983,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 0.9839730296506461,
+        "dsr_min": 0.9825544477179036,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 4.841782583753229e-07
+      },
+      "all_finite": true,
+      "wall_clock_s": 0.9303270000000339
+    }
+  },
+  "tested_actions": {
+    "reference_nominal": [
+      -0.31868131868131866,
+      -0.24293785310734461,
+      -0.5060216577269507,
+      -0.2857142857142857,
+      -0.37037037037037035,
+      0.28571428571428537,
+      0.3939393939393936
+    ],
+    "prv_all_lower": [
+      -1.0,
+      -1.0,
+      -1.0,
+      -1.0,
+      -1.0,
+      0.28571428571428537,
+      0.3939393939393936
+    ],
+    "prv_all_upper": [
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      1.0,
+      0.28571428571428537,
+      0.3939393939393936
+    ],
+    "prv_lower_pump_lower": [
+      -1.0,
+      -1.0,
+      -1.0,
+      -1.0,
+      -1.0,
+      -1.0,
+      -1.0
+    ],
+    "ref_sev_alpha0.25": [
+      -0.48901098901098905,
+      -0.43220338983050843,
+      -0.629516243295213,
+      -0.4642857142857143,
+      -0.5277777777777778,
+      -0.03571428571428614,
+      0.04545454545454519
+    ],
+    "ref_sev_alpha0.50": [
+      -0.6593406593406593,
+      -0.6214689265536724,
+      -0.7530108288634754,
+      -0.6428571428571428,
+      -0.6851851851851851,
+      -0.35714285714285765,
+      -0.3030303030303032
+    ],
+    "ref_sev_alpha0.75": [
+      -0.8296703296703296,
+      -0.8107344632768362,
+      -0.8765054144317377,
+      -0.8214285714285714,
+      -0.8425925925925926,
+      -0.6785714285714284,
+      -0.6515151515151516
+    ],
+    "hi_sev_alpha0.25": [
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      0.5,
+      -0.03571428571428614,
+      0.04545454545454519
+    ],
+    "hi_sev_alpha0.50": [
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      0.0,
+      -0.35714285714285765,
+      -0.3030303030303032
+    ],
+    "hi_sev_alpha0.75": [
+      -0.5,
+      -0.5,
+      -0.5,
+      -0.5,
+      -0.5,
+      -0.6785714285714284,
+      -0.6515151515151516
+    ]
+  },
+  "transitions": {
+    "T0_reference_to_reference": {
+      "current_label": "reference_nominal",
+      "proposed_label": "reference_nominal",
+      "transition_class": "identity_hold",
+      "n_shared_timesteps": 193,
+      "shared_initial_state": {
+        "report_index": 0,
+        "current_state_metrics": {
+          "p_min": 5.538022518157959,
+          "D": 17.751272201538086,
+          "N_neg": 0.0,
+          "N_20": 2.0,
+          "DSR": 0.9838075930556937,
+          "Q_unserved": 26.43409783435709,
+          "Q_leak": 84.93913806623227,
+          "Q_req": 1632.4995984399998,
+          "Q_served": 1606.0655006056427
+        },
+        "post_action_metrics": {
+          "p_min": 5.538022518157959,
+          "D": 17.751272201538086,
+          "N_neg": 0.0,
+          "N_20": 2.0,
+          "DSR": 0.9838075930556937,
+          "Q_unserved": 26.43409783435709,
+          "Q_leak": 84.93913806623227,
+          "Q_req": 1632.4995984399998,
+          "Q_served": 1606.0655006056427
+        },
+        "delta_metrics": {
+          "dp_min": 0.0,
+          "dD": 0.0,
+          "dQ_leak": 0.0,
+          "dDSR": 0.0,
+          "dQ_unserved": 0.0
+        }
+      },
+      "sustained_horizon": {
+        "note": "per-instant over full horizon; includes tank-trajectory divergence, NOT a strict single-step look-ahead",
+        "post_action_distribution": {
+          "p_min": {
+            "min": 4.16452169418335,
+            "mean": 5.120162521619253,
+            "max": 5.90568208694458
+          },
+          "D": {
+            "min": 17.332889556884766,
+            "mean": 18.141106363405218,
+            "max": 19.182348251342773
+          },
+          "N_neg": {
+            "min": 0.0,
+            "mean": 0.0,
+            "max": 0.0
+          },
+          "N_20": {
+            "min": 2.0,
+            "mean": 2.0,
+            "max": 2.0
+          },
+          "DSR": {
+            "min": 0.9818777132257851,
+            "mean": 0.9833370137001072,
+            "max": 0.9889640950881299
+          },
+          "Q_unserved": {
+            "min": 0.4418613743031088,
+            "mean": 14.984836973658497,
+            "max": 47.69468511950345
+          },
+          "Q_leak": {
+            "min": 84.32972762925336,
+            "mean": 84.72988433677985,
+            "max": 85.09742373105372
+          }
+        },
+        "delta_distribution": {
+          "dp_min": {
+            "min": 0.0,
+            "mean": 0.0,
+            "max": 0.0
+          },
+          "dD": {
+            "min": 0.0,
+            "mean": 0.0,
+            "max": 0.0
+          },
+          "dQ_leak": {
+            "min": 0.0,
+            "mean": 0.0,
+            "max": 0.0
+          },
+          "dDSR": {
+            "min": 0.0,
+            "mean": 0.0,
+            "max": 0.0
+          },
+          "dQ_unserved": {
+            "min": 0.0,
+            "mean": 0.0,
+            "max": 0.0
+          }
+        },
+        "worst_post_p_min_instant": {
+          "report_index": 49,
+          "current_state_metrics": {
+            "p_min": 4.16452169418335,
+            "D": 19.136409759521484,
+            "N_neg": 0.0,
+            "N_20": 2.0,
+            "DSR": 0.9835766541213288,
+            "Q_unserved": 29.601494422516453,
+            "Q_leak": 84.46396530314162,
+            "Q_req": 1802.40339826,
+            "Q_served": 1772.8019038374835
+          },
+          "post_action_metrics": {
+            "p_min": 4.16452169418335,
+            "D": 19.136409759521484,
+            "N_neg": 0.0,
+            "N_20": 2.0,
+            "DSR": 0.9835766541213288,
+            "Q_unserved": 29.601494422516453,
+            "Q_leak": 84.46396530314162,
+            "Q_req": 1802.40339826,
+            "Q_served": 1772.8019038374835
+          },
+          "delta_metrics": {
+            "dp_min": 0.0,
+            "dD": 0.0,
+            "dQ_leak": 0.0,
+            "dDSR": 0.0,
+            "dQ_unserved": 0.0
+          }
+        },
+        "max_deficit_increase_instant": {
+          "report_index": 0,
+          "current_state_metrics": {
+            "p_min": 5.538022518157959,
+            "D": 17.751272201538086,
+            "N_neg": 0.0,
+            "N_20": 2.0,
+            "DSR": 0.9838075930556937,
+            "Q_unserved": 26.43409783435709,
+            "Q_leak": 84.93913806623227,
+            "Q_req": 1632.4995984399998,
+            "Q_served": 1606.0655006056427
+          },
+          "post_action_metrics": {
+            "p_min": 5.538022518157959,
+            "D": 17.751272201538086,
+            "N_neg": 0.0,
+            "N_20": 2.0,
+            "DSR": 0.9838075930556937,
+            "Q_unserved": 26.43409783435709,
+            "Q_leak": 84.93913806623227,
+            "Q_req": 1632.4995984399998,
+            "Q_served": 1606.0655006056427
+          },
+          "delta_metrics": {
+            "dp_min": 0.0,
+            "dD": 0.0,
+            "dQ_leak": 0.0,
+            "dDSR": 0.0,
+            "dQ_unserved": 0.0
+          }
+        }
+      }
+    },
+    "T1_reference_to_severe": {
+      "current_label": "reference_nominal",
+      "proposed_label": "prv_lower_pump_lower",
+      "transition_class": "reference_to_severe",
+      "n_shared_timesteps": 193,
+      "shared_initial_state": {
+        "report_index": 0,
+        "current_state_metrics": {
+          "p_min": 5.538022518157959,
+          "D": 17.751272201538086,
+          "N_neg": 0.0,
+          "N_20": 2.0,
+          "DSR": 0.9838075930556937,
+          "Q_unserved": 26.43409783435709,
+          "Q_leak": 84.93913806623227,
+          "Q_req": 1632.4995984399998,
+          "Q_served": 1606.0655006056427
+        },
+        "post_action_metrics": {
+          "p_min": 5.527866840362549,
+          "D": 27.494426727294922,
+          "N_neg": 0.0,
+          "N_20": 2.0,
+          "DSR": 0.9227158066978032,
+          "Q_unserved": 126.16641453159559,
+          "Q_leak": 81.43561491972075,
+          "Q_req": 1632.4995984399998,
+          "Q_served": 1506.3331839084042
+        },
+        "delta_metrics": {
+          "dp_min": -0.010155677795410156,
+          "dD": 9.743154525756836,
+          "dQ_leak": -3.503523146511526,
+          "dDSR": -0.061091786357890476,
+          "dQ_unserved": 99.7323166972385
+        }
+      },
+      "sustained_horizon": {
+        "note": "per-instant over full horizon; includes tank-trajectory divergence, NOT a strict single-step look-ahead",
+        "post_action_distribution": {
+          "p_min": {
+            "min": 1.2946763038635254,
+            "mean": 3.0451624368756547,
+            "max": 5.527866840362549
+          },
+          "D": {
+            "min": 27.494426727294922,
+            "mean": 29.9646483208849,
+            "max": 31.727617263793945
+          },
+          "N_neg": {
+            "min": 0.0,
+            "mean": 0.0,
+            "max": 0.0
+          },
+          "N_20": {
+            "min": 2.0,
+            "mean": 2.0,
+            "max": 2.0
+          },
+          "DSR": {
+            "min": 0.9141979346467793,
+            "mean": 0.9193965586241878,
+            "max": 0.9461517306955648
+          },
+          "Q_unserved": {
+            "min": 2.3686654799070155,
+            "mean": 71.84798301942457,
+            "max": 221.79086443890174
+          },
+          "Q_leak": {
+            "min": 79.91541642179445,
+            "mean": 80.61786635451655,
+            "max": 81.43561491972075
+          }
+        },
+        "delta_distribution": {
+          "dp_min": {
+            "min": -4.30070948600769,
+            "mean": -2.0750000847435985,
+            "max": 0.07862520217895508
+          },
+          "dD": {
+            "min": 9.602273941040039,
+            "mean": 11.823541957479684,
+            "max": 14.057708740234375
+          },
+          "dQ_leak": {
+            "min": -4.974122118840768,
+            "mean": -4.112017982263292,
+            "max": -3.288325736931526
+          },
+          "dDSR": {
+            "min": -0.0680904460751216,
+            "mean": -0.06394045507591924,
+            "max": -0.04281236439256508
+          },
+          "dQ_unserved": {
+            "min": 1.9262693300011335,
+            "mean": 56.86314604576607,
+            "max": 174.09667356555246
+          }
+        },
+        "worst_post_p_min_instant": {
+          "report_index": 192,
+          "current_state_metrics": {
+            "p_min": 4.926605224609375,
+            "D": 18.362689971923828,
+            "N_neg": 0.0,
+            "N_20": 2.0,
+            "DSR": 0.9838070176347955,
+            "Q_unserved": 26.435037208742415,
+            "Q_leak": 84.56288017499259,
+            "Q_req": 1632.4995984399998,
+            "Q_served": 1606.0645612312574
+          },
+          "post_action_metrics": {
+            "p_min": 1.2946763038635254,
+            "D": 31.727617263793945,
+            "N_neg": 0.0,
+            "N_20": 2.0,
+            "DSR": 0.9227144699022674,
+            "Q_unserved": 126.16859684977112,
+            "Q_leak": 79.92559020664626,
+            "Q_req": 1632.4995984399998,
+            "Q_served": 1506.3310015902287
+          },
+          "delta_metrics": {
+            "dp_min": -3.6319289207458496,
+            "dD": 13.364927291870117,
+            "dQ_leak": -4.637289968346323,
+            "dDSR": -0.061092547732528146,
+            "dQ_unserved": 99.7335596410287
+          }
+        },
+        "max_deficit_increase_instant": {
+          "report_index": 177,
+          "current_state_metrics": {
+            "p_min": 5.898833274841309,
+            "D": 17.34719467163086,
+            "N_neg": 0.0,
+            "N_20": 2.0,
+            "DSR": 0.9823588742164445,
+            "Q_unserved": 9.990981012428847,
+            "Q_leak": 84.94490837024114,
+            "Q_req": 566.3459994000002,
+            "Q_served": 556.3550183875714
+          },
+          "post_action_metrics": {
+            "p_min": 1.5981237888336182,
+            "D": 31.404903411865234,
+            "N_neg": 0.0,
+            "N_20": 2.0,
+            "DSR": 0.9145421369010719,
+            "Q_unserved": 48.39871888335085,
+            "Q_leak": 80.08940161225692,
+            "Q_req": 566.3459994000002,
+            "Q_served": 517.9472805166494
+          },
+          "delta_metrics": {
+            "dp_min": -4.30070948600769,
+            "dD": 14.057708740234375,
+            "dQ_leak": -4.855506757984216,
+            "dDSR": -0.06781673731537263,
+            "dQ_unserved": 38.407737870922006
+          }
+        }
+      }
+    },
+    "T2_reference_to_intermediate": {
+      "current_label": "reference_nominal",
+      "proposed_label": "prv_all_lower",
+      "transition_class": "reference_to_intermediate",
+      "n_shared_timesteps": 193,
+      "shared_initial_state": {
+        "report_index": 0,
+        "current_state_metrics": {
+          "p_min": 5.538022518157959,
+          "D": 17.751272201538086,
+          "N_neg": 0.0,
+          "N_20": 2.0,
+          "DSR": 0.9838075930556937,
+          "Q_unserved": 26.43409783435709,
+          "Q_leak": 84.93913806623227,
+          "Q_req": 1632.4995984399998,
+          "Q_served": 1606.0655006056427
+        },
+        "post_action_metrics": {
+          "p_min": 5.538657188415527,
+          "D": 27.48363494873047,
+          "N_neg": 0.0,
+          "N_20": 2.0,
+          "DSR": 0.9227162212741903,
+          "Q_unserved": 126.16573773581013,
+          "Q_leak": 81.59118812393545,
+          "Q_req": 1632.4995984399998,
+          "Q_served": 1506.3338607041896
+        },
+        "delta_metrics": {
+          "dp_min": 0.0006346702575683594,
+          "dD": 9.732362747192383,
+          "dQ_leak": -3.3479499422968217,
+          "dDSR": -0.06109137178150337,
+          "dQ_unserved": 99.73163990145304
+        }
+      },
+      "sustained_horizon": {
+        "note": "per-instant over full horizon; includes tank-trajectory divergence, NOT a strict single-step look-ahead",
+        "post_action_distribution": {
+          "p_min": {
+            "min": 4.189884185791016,
+            "mean": 5.149613254428528,
+            "max": 5.9025349617004395
+          },
+          "D": {
+            "min": 27.1008358001709,
+            "mean": 27.860197571275148,
+            "max": 28.83759307861328
+          },
+          "N_neg": {
+            "min": 0.0,
+            "mean": 0.0,
+            "max": 0.0
+          },
+          "N_20": {
+            "min": 2.0,
+            "mean": 2.0,
+            "max": 2.0
+          },
+          "DSR": {
+            "min": 0.9141988299525465,
+            "mean": 0.9193996684666168,
+            "max": 0.946152605345897
+          },
+          "Q_unserved": {
+            "min": 2.3680710000671112,
+            "mean": 71.84672578455903,
+            "max": 221.78951056609503
+          },
+          "Q_leak": {
+            "min": 80.92180509297009,
+            "mean": 81.38381870141156,
+            "max": 81.75021261883325
+          }
+        },
+        "delta_distribution": {
+          "dp_min": {
+            "min": -0.044404029846191406,
+            "mean": 0.029450732809274308,
+            "max": 0.13366079330444336
+          },
+          "dD": {
+            "min": 9.619451522827148,
+            "mean": 9.71909120786993,
+            "max": 9.798467636108398
+          },
+          "dQ_leak": {
+            "min": -3.5064515740682936,
+            "mean": -3.346065635368296,
+            "max": -3.310222485314199
+          },
+          "dDSR": {
+            "min": -0.06802236187082356,
+            "mean": -0.06393734523349012,
+            "max": -0.04281148974223292
+          },
+          "dQ_unserved": {
+            "min": 1.9262074190650083,
+            "mean": 56.86188881090054,
+            "max": 174.09482544659159
+          }
+        },
+        "worst_post_p_min_instant": {
+          "report_index": 49,
+          "current_state_metrics": {
+            "p_min": 4.16452169418335,
+            "D": 19.136409759521484,
+            "N_neg": 0.0,
+            "N_20": 2.0,
+            "DSR": 0.9835766541213288,
+            "Q_unserved": 29.601494422516453,
+            "Q_leak": 84.46396530314162,
+            "Q_req": 1802.40339826,
+            "Q_served": 1772.8019038374835
+          },
+          "post_action_metrics": {
+            "p_min": 4.189884185791016,
+            "D": 28.83759307861328,
+            "N_neg": 0.0,
+            "N_20": 2.0,
+            "DSR": 0.9218786765015478,
+            "Q_unserved": 140.80613895017905,
+            "Q_leak": 81.1249086589291,
+            "Q_req": 1802.40339826,
+            "Q_served": 1661.5972593098209
+          },
+          "delta_metrics": {
+            "dp_min": 0.025362491607666016,
+            "dD": 9.701183319091797,
+            "dQ_leak": -3.339056644212519,
+            "dDSR": -0.06169797761978102,
+            "dQ_unserved": 111.2046445276626
+          }
+        },
+        "max_deficit_increase_instant": {
+          "report_index": 75,
+          "current_state_metrics": {
+            "p_min": 5.87082576751709,
+            "D": 17.375770568847656,
+            "N_neg": 0.0,
+            "N_20": 2.0,
+            "DSR": 0.9823523369047116,
+            "Q_unserved": 10.327839505868155,
+            "Q_leak": 84.9304223524306,
+            "Q_req": 585.2241993800001,
+            "Q_served": 574.8963598741319
+          },
+          "post_action_metrics": {
+            "p_min": 5.829040050506592,
+            "D": 27.174238204956055,
+            "N_neg": 0.0,
+            "N_20": 2.0,
+            "DSR": 0.9145409269624155,
+            "Q_unserved": 50.012717598177346,
+            "Q_leak": 81.56256606973973,
+            "Q_req": 585.2241993800001,
+            "Q_served": 535.2114817818227
+          },
+          "delta_metrics": {
+            "dp_min": -0.04178571701049805,
+            "dD": 9.798467636108398,
+            "dQ_leak": -3.367856282690866,
+            "dDSR": -0.06781140994229606,
+            "dQ_unserved": 39.68487809230919
+          }
+        }
+      }
+    },
+    "T3_high_pressure_to_severe": {
+      "current_label": "prv_all_upper",
+      "proposed_label": "prv_lower_pump_lower",
+      "transition_class": "high_pressure_to_severe",
+      "n_shared_timesteps": 193,
+      "shared_initial_state": {
+        "report_index": 0,
+        "current_state_metrics": {
+          "p_min": 5.537863731384277,
+          "D": 14.462136268615723,
+          "N_neg": 0.0,
+          "N_20": 1.0,
+          "DSR": 1.0000436393510699,
+          "Q_unserved": 0.0,
+          "Q_leak": 89.97090838377747,
+          "Q_req": 1632.4995984399998,
+          "Q_served": 1632.5708396630976
+        },
+        "post_action_metrics": {
+          "p_min": 5.527866840362549,
+          "D": 27.494426727294922,
+          "N_neg": 0.0,
+          "N_20": 2.0,
+          "DSR": 0.9227158066978032,
+          "Q_unserved": 126.16641453159559,
+          "Q_leak": 81.43561491972075,
+          "Q_req": 1632.4995984399998,
+          "Q_served": 1506.3331839084042
+        },
+        "delta_metrics": {
+          "dp_min": -0.009996891021728516,
+          "dD": 13.0322904586792,
+          "dQ_leak": -8.535293464056721,
+          "dDSR": -0.0773278326532667,
+          "dQ_unserved": 126.16641453159559
+        }
+      },
+      "sustained_horizon": {
+        "note": "per-instant over full horizon; includes tank-trajectory divergence, NOT a strict single-step look-ahead",
+        "post_action_distribution": {
+          "p_min": {
+            "min": 1.2946763038635254,
+            "mean": 3.0451624368756547,
+            "max": 5.527866840362549
+          },
+          "D": {
+            "min": 27.494426727294922,
+            "mean": 29.9646483208849,
+            "max": 31.727617263793945
+          },
+          "N_neg": {
+            "min": 0.0,
+            "mean": 0.0,
+            "max": 0.0
+          },
+          "N_20": {
+            "min": 2.0,
+            "mean": 2.0,
+            "max": 2.0
+          },
+          "DSR": {
+            "min": 0.9141979346467793,
+            "mean": 0.9193965586241878,
+            "max": 0.9461517306955648
+          },
+          "Q_unserved": {
+            "min": 2.3686654799070155,
+            "mean": 71.84798301942457,
+            "max": 221.79086443890174
+          },
+          "Q_leak": {
+            "min": 79.91541642179445,
+            "mean": 80.61786635451655,
+            "max": 81.43561491972075
+          }
+        },
+        "delta_distribution": {
+          "dp_min": {
+            "min": -4.2937538623809814,
+            "mean": -2.066854811702985,
+            "max": 0.07743549346923828
+          },
+          "dD": {
+            "min": 12.952804565429688,
+            "mean": 15.076665606523425,
+            "max": 17.296781539916992
+          },
+          "dQ_leak": {
+            "min": -10.008597084349574,
+            "mean": -9.141366778842057,
+            "max": -8.30862573237357
+          },
+          "dDSR": {
+            "min": -0.08615131135870102,
+            "mean": -0.08078432357013832,
+            "max": -0.05401188547434532
+          },
+          "dQ_unserved": {
+            "min": 2.3686654799070155,
+            "mean": 71.84798301942457,
+            "max": 221.79086443890174
+          }
+        },
+        "worst_post_p_min_instant": {
+          "report_index": 192,
+          "current_state_metrics": {
+            "p_min": 4.8964033126831055,
+            "D": 15.103596687316895,
+            "N_neg": 0.0,
+            "N_20": 1.0,
+            "DSR": 1.000043502316093,
+            "Q_unserved": 0.0,
+            "Q_leak": 89.58490162457214,
+            "Q_req": 1632.4995984399998,
+            "Q_served": 1632.5706159535528
+          },
+          "post_action_metrics": {
+            "p_min": 1.2946763038635254,
+            "D": 31.727617263793945,
+            "N_neg": 0.0,
+            "N_20": 2.0,
+            "DSR": 0.9227144699022674,
+            "Q_unserved": 126.16859684977112,
+            "Q_leak": 79.92559020664626,
+            "Q_req": 1632.4995984399998,
+            "Q_served": 1506.3310015902287
+          },
+          "delta_metrics": {
+            "dp_min": -3.60172700881958,
+            "dD": 16.62402057647705,
+            "dQ_leak": -9.659311417925878,
+            "dDSR": -0.0773290324138256,
+            "dQ_unserved": 126.16859684977112
+          }
+        },
+        "max_deficit_increase_instant": {
+          "report_index": 177,
+          "current_state_metrics": {
+            "p_min": 5.8918776512146,
+            "D": 14.108121871948242,
+            "N_neg": 0.0,
+            "N_20": 1.0,
+            "DSR": 1.0001231346214532,
+            "Q_unserved": 0.0,
+            "Q_leak": 89.97501087006454,
+            "Q_req": 566.3459994000002,
+            "Q_served": 566.4157362002479
+          },
+          "post_action_metrics": {
+            "p_min": 1.5981237888336182,
+            "D": 31.404903411865234,
+            "N_neg": 0.0,
+            "N_20": 2.0,
+            "DSR": 0.9145421369010719,
+            "Q_unserved": 48.39871888335085,
+            "Q_leak": 80.08940161225692,
+            "Q_req": 566.3459994000002,
+            "Q_served": 517.9472805166494
+          },
+          "delta_metrics": {
+            "dp_min": -4.2937538623809814,
+            "dD": 17.296781539916992,
+            "dQ_leak": -9.885609257807616,
+            "dDSR": -0.0855809977203813,
+            "dQ_unserved": 48.39871888335085
+          }
+        }
+      }
+    },
+    "T4_high_pressure_to_intermediate": {
+      "current_label": "prv_all_upper",
+      "proposed_label": "prv_all_lower",
+      "transition_class": "high_pressure_to_intermediate",
+      "n_shared_timesteps": 193,
+      "shared_initial_state": {
+        "report_index": 0,
+        "current_state_metrics": {
+          "p_min": 5.537863731384277,
+          "D": 14.462136268615723,
+          "N_neg": 0.0,
+          "N_20": 1.0,
+          "DSR": 1.0000436393510699,
+          "Q_unserved": 0.0,
+          "Q_leak": 89.97090838377747,
+          "Q_req": 1632.4995984399998,
+          "Q_served": 1632.5708396630976
+        },
+        "post_action_metrics": {
+          "p_min": 5.538657188415527,
+          "D": 27.48363494873047,
+          "N_neg": 0.0,
+          "N_20": 2.0,
+          "DSR": 0.9227162212741903,
+          "Q_unserved": 126.16573773581013,
+          "Q_leak": 81.59118812393545,
+          "Q_req": 1632.4995984399998,
+          "Q_served": 1506.3338607041896
+        },
+        "delta_metrics": {
+          "dp_min": 0.00079345703125,
+          "dD": 13.021498680114746,
+          "dQ_leak": -8.379720259842017,
+          "dDSR": -0.0773274180768796,
+          "dQ_unserved": 126.16573773581013
+        }
+      },
+      "sustained_horizon": {
+        "note": "per-instant over full horizon; includes tank-trajectory divergence, NOT a strict single-step look-ahead",
+        "post_action_distribution": {
+          "p_min": {
+            "min": 4.189884185791016,
+            "mean": 5.149613254428528,
+            "max": 5.9025349617004395
+          },
+          "D": {
+            "min": 27.1008358001709,
+            "mean": 27.860197571275148,
+            "max": 28.83759307861328
+          },
+          "N_neg": {
+            "min": 0.0,
+            "mean": 0.0,
+            "max": 0.0
+          },
+          "N_20": {
+            "min": 2.0,
+            "mean": 2.0,
+            "max": 2.0
+          },
+          "DSR": {
+            "min": 0.9141988299525465,
+            "mean": 0.9193996684666168,
+            "max": 0.946152605345897
+          },
+          "Q_unserved": {
+            "min": 2.3680710000671112,
+            "mean": 71.84672578455903,
+            "max": 221.78951056609503
+          },
+          "Q_leak": {
+            "min": 80.92180509297009,
+            "mean": 81.38381870141156,
+            "max": 81.75021261883325
+          }
+        },
+        "delta_distribution": {
+          "dp_min": {
+            "min": -0.07743549346923828,
+            "mean": 0.03759600584988767,
+            "max": 0.16373014450073242
+          },
+          "dD": {
+            "min": 12.842405319213867,
+            "mean": 12.97221485691367,
+            "max": 13.086718559265137
+          },
+          "dQ_leak": {
+            "min": -8.52811657637946,
+            "mean": -8.375414431947062,
+            "max": -8.33252989137712
+          },
+          "dDSR": {
+            "min": -0.08608322715440297,
+            "mean": -0.0807812137277092,
+            "max": -0.05401101082401316
+          },
+          "dQ_unserved": {
+            "min": 2.3680710000671112,
+            "mean": 71.84672578455903,
+            "max": 221.78951056609503
+          }
+        },
+        "worst_post_p_min_instant": {
+          "report_index": 49,
+          "current_state_metrics": {
+            "p_min": 4.167034149169922,
+            "D": 15.832965850830078,
+            "N_neg": 0.0,
+            "N_20": 1.0,
+            "DSR": 1.0000393084344863,
+            "Q_unserved": 0.0,
+            "Q_leak": 89.49694349035174,
+            "Q_req": 1802.40339826,
+            "Q_served": 1802.4742479158983
+          },
+          "post_action_metrics": {
+            "p_min": 4.189884185791016,
+            "D": 28.83759307861328,
+            "N_neg": 0.0,
+            "N_20": 2.0,
+            "DSR": 0.9218786765015478,
+            "Q_unserved": 140.80613895017905,
+            "Q_leak": 81.1249086589291,
+            "Q_req": 1802.40339826,
+            "Q_served": 1661.5972593098209
+          },
+          "delta_metrics": {
+            "dp_min": 0.02285003662109375,
+            "dD": 13.004627227783203,
+            "dQ_leak": -8.372034831422638,
+            "dDSR": -0.07816063193293854,
+            "dQ_unserved": 140.80613895017905
+          }
+        },
+        "max_deficit_increase_instant": {
+          "report_index": 158,
+          "current_state_metrics": {
+            "p_min": 4.292681694030762,
+            "D": 15.707318305969238,
+            "N_neg": 0.0,
+            "N_20": 1.0,
+            "DSR": 1.0000636959963407,
+            "Q_unserved": 0.0,
+            "Q_leak": 89.5998865480559,
+            "Q_req": 1103.9099989999997,
+            "Q_served": 1103.9803136472565
+          },
+          "post_action_metrics": {
+            "p_min": 4.215246200561523,
+            "D": 28.794036865234375,
+            "N_neg": 0.0,
+            "N_20": 2.0,
+            "DSR": 0.9268531020707894,
+            "Q_unserved": 80.74759201988797,
+            "Q_leak": 81.1929396995757,
+            "Q_req": 1103.9099989999997,
+            "Q_served": 1023.1624069801118
+          },
+          "delta_metrics": {
+            "dp_min": -0.07743549346923828,
+            "dD": 13.086718559265137,
+            "dQ_leak": -8.406946848480203,
+            "dDSR": -0.07321059392555129,
+            "dQ_unserved": 80.74759201988797
+          }
+        }
+      }
+    }
+  },
+  "current_state_metrics": {
+    "T0_reference_to_reference": {
+      "p_min": 5.538022518157959,
+      "D": 17.751272201538086,
+      "N_neg": 0.0,
+      "N_20": 2.0,
+      "DSR": 0.9838075930556937,
+      "Q_unserved": 26.43409783435709,
+      "Q_leak": 84.93913806623227,
+      "Q_req": 1632.4995984399998,
+      "Q_served": 1606.0655006056427
+    },
+    "T1_reference_to_severe": {
+      "p_min": 5.538022518157959,
+      "D": 17.751272201538086,
+      "N_neg": 0.0,
+      "N_20": 2.0,
+      "DSR": 0.9838075930556937,
+      "Q_unserved": 26.43409783435709,
+      "Q_leak": 84.93913806623227,
+      "Q_req": 1632.4995984399998,
+      "Q_served": 1606.0655006056427
+    },
+    "T2_reference_to_intermediate": {
+      "p_min": 5.538022518157959,
+      "D": 17.751272201538086,
+      "N_neg": 0.0,
+      "N_20": 2.0,
+      "DSR": 0.9838075930556937,
+      "Q_unserved": 26.43409783435709,
+      "Q_leak": 84.93913806623227,
+      "Q_req": 1632.4995984399998,
+      "Q_served": 1606.0655006056427
+    },
+    "T3_high_pressure_to_severe": {
+      "p_min": 5.537863731384277,
+      "D": 14.462136268615723,
+      "N_neg": 0.0,
+      "N_20": 1.0,
+      "DSR": 1.0000436393510699,
+      "Q_unserved": 0.0,
+      "Q_leak": 89.97090838377747,
+      "Q_req": 1632.4995984399998,
+      "Q_served": 1632.5708396630976
+    },
+    "T4_high_pressure_to_intermediate": {
+      "p_min": 5.537863731384277,
+      "D": 14.462136268615723,
+      "N_neg": 0.0,
+      "N_20": 1.0,
+      "DSR": 1.0000436393510699,
+      "Q_unserved": 0.0,
+      "Q_leak": 89.97090838377747,
+      "Q_req": 1632.4995984399998,
+      "Q_served": 1632.5708396630976
+    }
+  },
+  "proposed_action_metrics": {
+    "T0_reference_to_reference": {
+      "p_min": 5.538022518157959,
+      "D": 17.751272201538086,
+      "N_neg": 0.0,
+      "N_20": 2.0,
+      "DSR": 0.9838075930556937,
+      "Q_unserved": 26.43409783435709,
+      "Q_leak": 84.93913806623227,
+      "Q_req": 1632.4995984399998,
+      "Q_served": 1606.0655006056427
+    },
+    "T1_reference_to_severe": {
+      "p_min": 5.527866840362549,
+      "D": 27.494426727294922,
+      "N_neg": 0.0,
+      "N_20": 2.0,
+      "DSR": 0.9227158066978032,
+      "Q_unserved": 126.16641453159559,
+      "Q_leak": 81.43561491972075,
+      "Q_req": 1632.4995984399998,
+      "Q_served": 1506.3331839084042
+    },
+    "T2_reference_to_intermediate": {
+      "p_min": 5.538657188415527,
+      "D": 27.48363494873047,
+      "N_neg": 0.0,
+      "N_20": 2.0,
+      "DSR": 0.9227162212741903,
+      "Q_unserved": 126.16573773581013,
+      "Q_leak": 81.59118812393545,
+      "Q_req": 1632.4995984399998,
+      "Q_served": 1506.3338607041896
+    },
+    "T3_high_pressure_to_severe": {
+      "p_min": 5.527866840362549,
+      "D": 27.494426727294922,
+      "N_neg": 0.0,
+      "N_20": 2.0,
+      "DSR": 0.9227158066978032,
+      "Q_unserved": 126.16641453159559,
+      "Q_leak": 81.43561491972075,
+      "Q_req": 1632.4995984399998,
+      "Q_served": 1506.3331839084042
+    },
+    "T4_high_pressure_to_intermediate": {
+      "p_min": 5.538657188415527,
+      "D": 27.48363494873047,
+      "N_neg": 0.0,
+      "N_20": 2.0,
+      "DSR": 0.9227162212741903,
+      "Q_unserved": 126.16573773581013,
+      "Q_leak": 81.59118812393545,
+      "Q_req": 1632.4995984399998,
+      "Q_served": 1506.3338607041896
+    }
+  },
+  "post_action_metrics": {
+    "note": "raw transitions apply no intervention, so post == proposed here; executed post-intervention states are under handling_policy_outputs",
+    "by_transition_shared_initial": {
+      "T0_reference_to_reference": {
+        "p_min": 5.538022518157959,
+        "D": 17.751272201538086,
+        "N_neg": 0.0,
+        "N_20": 2.0,
+        "DSR": 0.9838075930556937,
+        "Q_unserved": 26.43409783435709,
+        "Q_leak": 84.93913806623227,
+        "Q_req": 1632.4995984399998,
+        "Q_served": 1606.0655006056427
+      },
+      "T1_reference_to_severe": {
+        "p_min": 5.527866840362549,
+        "D": 27.494426727294922,
+        "N_neg": 0.0,
+        "N_20": 2.0,
+        "DSR": 0.9227158066978032,
+        "Q_unserved": 126.16641453159559,
+        "Q_leak": 81.43561491972075,
+        "Q_req": 1632.4995984399998,
+        "Q_served": 1506.3331839084042
+      },
+      "T2_reference_to_intermediate": {
+        "p_min": 5.538657188415527,
+        "D": 27.48363494873047,
+        "N_neg": 0.0,
+        "N_20": 2.0,
+        "DSR": 0.9227162212741903,
+        "Q_unserved": 126.16573773581013,
+        "Q_leak": 81.59118812393545,
+        "Q_req": 1632.4995984399998,
+        "Q_served": 1506.3338607041896
+      },
+      "T3_high_pressure_to_severe": {
+        "p_min": 5.527866840362549,
+        "D": 27.494426727294922,
+        "N_neg": 0.0,
+        "N_20": 2.0,
+        "DSR": 0.9227158066978032,
+        "Q_unserved": 126.16641453159559,
+        "Q_leak": 81.43561491972075,
+        "Q_req": 1632.4995984399998,
+        "Q_served": 1506.3331839084042
+      },
+      "T4_high_pressure_to_intermediate": {
+        "p_min": 5.538657188415527,
+        "D": 27.48363494873047,
+        "N_neg": 0.0,
+        "N_20": 2.0,
+        "DSR": 0.9227162212741903,
+        "Q_unserved": 126.16573773581013,
+        "Q_leak": 81.59118812393545,
+        "Q_req": 1632.4995984399998,
+        "Q_served": 1506.3338607041896
+      }
+    }
+  },
+  "delta_metrics": {
+    "T0_reference_to_reference": {
+      "dp_min": 0.0,
+      "dD": 0.0,
+      "dQ_leak": 0.0,
+      "dDSR": 0.0,
+      "dQ_unserved": 0.0
+    },
+    "T1_reference_to_severe": {
+      "dp_min": -0.010155677795410156,
+      "dD": 9.743154525756836,
+      "dQ_leak": -3.503523146511526,
+      "dDSR": -0.061091786357890476,
+      "dQ_unserved": 99.7323166972385
+    },
+    "T2_reference_to_intermediate": {
+      "dp_min": 0.0006346702575683594,
+      "dD": 9.732362747192383,
+      "dQ_leak": -3.3479499422968217,
+      "dDSR": -0.06109137178150337,
+      "dQ_unserved": 99.73163990145304
+    },
+    "T3_high_pressure_to_severe": {
+      "dp_min": -0.009996891021728516,
+      "dD": 13.0322904586792,
+      "dQ_leak": -8.535293464056721,
+      "dDSR": -0.0773278326532667,
+      "dQ_unserved": 126.16641453159559
+    },
+    "T4_high_pressure_to_intermediate": {
+      "dp_min": 0.00079345703125,
+      "dD": 13.021498680114746,
+      "dQ_leak": -8.379720259842017,
+      "dDSR": -0.0773274180768796,
+      "dQ_unserved": 126.16573773581013
+    }
+  },
+  "safety_rule_outputs": {
+    "T0_reference_to_reference": {
+      "S1": {
+        "theta_p_psi=0": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        },
+        "theta_p_psi=5": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.45077720207253885,
+          "n_activations_sustained": 87,
+          "n_instants": 193
+        },
+        "theta_p_psi=10": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        },
+        "theta_p_psi=15": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        },
+        "theta_p_psi=20": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        }
+      },
+      "S2": {
+        "eps_p_psi=0": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        },
+        "eps_p_psi=2": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        },
+        "eps_p_psi=5": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        }
+      },
+      "S3": {
+        "eps_D_psi_nodesum=0": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        },
+        "eps_D_psi_nodesum=2": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        },
+        "eps_D_psi_nodesum=5": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        }
+      },
+      "S4": {
+        "hard_backstop": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        }
+      }
+    },
+    "T1_reference_to_severe": {
+      "S1": {
+        "theta_p_psi=0": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        },
+        "theta_p_psi=5": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.9326424870466321,
+          "n_activations_sustained": 180,
+          "n_instants": 193
+        },
+        "theta_p_psi=10": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        },
+        "theta_p_psi=15": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        },
+        "theta_p_psi=20": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        }
+      },
+      "S2": {
+        "eps_p_psi=0": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 0.9792746113989638,
+          "n_activations_sustained": 189,
+          "n_instants": 193
+        },
+        "eps_p_psi=2": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.5803108808290155,
+          "n_activations_sustained": 112,
+          "n_instants": 193
+        },
+        "eps_p_psi=5": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        }
+      },
+      "S3": {
+        "eps_D_psi_nodesum=0": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        },
+        "eps_D_psi_nodesum=2": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        },
+        "eps_D_psi_nodesum=5": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        }
+      },
+      "S4": {
+        "hard_backstop": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        }
+      }
+    },
+    "T2_reference_to_intermediate": {
+      "S1": {
+        "theta_p_psi=0": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        },
+        "theta_p_psi=5": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.42487046632124353,
+          "n_activations_sustained": 82,
+          "n_instants": 193
+        },
+        "theta_p_psi=10": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        },
+        "theta_p_psi=15": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        },
+        "theta_p_psi=20": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        }
+      },
+      "S2": {
+        "eps_p_psi=0": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.3005181347150259,
+          "n_activations_sustained": 58,
+          "n_instants": 193
+        },
+        "eps_p_psi=2": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        },
+        "eps_p_psi=5": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        }
+      },
+      "S3": {
+        "eps_D_psi_nodesum=0": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        },
+        "eps_D_psi_nodesum=2": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        },
+        "eps_D_psi_nodesum=5": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        }
+      },
+      "S4": {
+        "hard_backstop": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        }
+      }
+    },
+    "T3_high_pressure_to_severe": {
+      "S1": {
+        "theta_p_psi=0": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        },
+        "theta_p_psi=5": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.9326424870466321,
+          "n_activations_sustained": 180,
+          "n_instants": 193
+        },
+        "theta_p_psi=10": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        },
+        "theta_p_psi=15": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        },
+        "theta_p_psi=20": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        }
+      },
+      "S2": {
+        "eps_p_psi=0": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 0.9740932642487047,
+          "n_activations_sustained": 188,
+          "n_instants": 193
+        },
+        "eps_p_psi=2": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.5854922279792746,
+          "n_activations_sustained": 113,
+          "n_instants": 193
+        },
+        "eps_p_psi=5": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        }
+      },
+      "S3": {
+        "eps_D_psi_nodesum=0": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        },
+        "eps_D_psi_nodesum=2": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        },
+        "eps_D_psi_nodesum=5": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        }
+      },
+      "S4": {
+        "hard_backstop": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        }
+      }
+    },
+    "T4_high_pressure_to_intermediate": {
+      "S1": {
+        "theta_p_psi=0": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        },
+        "theta_p_psi=5": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.42487046632124353,
+          "n_activations_sustained": 82,
+          "n_instants": 193
+        },
+        "theta_p_psi=10": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        },
+        "theta_p_psi=15": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        },
+        "theta_p_psi=20": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        }
+      },
+      "S2": {
+        "eps_p_psi=0": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.26424870466321243,
+          "n_activations_sustained": 51,
+          "n_instants": 193
+        },
+        "eps_p_psi=2": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        },
+        "eps_p_psi=5": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        }
+      },
+      "S3": {
+        "eps_D_psi_nodesum=0": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        },
+        "eps_D_psi_nodesum=2": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        },
+        "eps_D_psi_nodesum=5": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        }
+      },
+      "S4": {
+        "hard_backstop": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        }
+      }
+    }
+  },
+  "empirical_separation_question": {
+    "from_reference_state": {
+      "S1": {
+        "theta_p_psi=0": {
+          "activates_on_severe_shared_initial": false,
+          "activates_on_intermediate_shared_initial": false,
+          "blocks_severe_and_spares_intermediate_shared_initial": false,
+          "activates_on_severe_sustained": false,
+          "activates_on_intermediate_sustained": false,
+          "blocks_severe_and_spares_intermediate_sustained": false
+        },
+        "theta_p_psi=5": {
+          "activates_on_severe_shared_initial": false,
+          "activates_on_intermediate_shared_initial": false,
+          "blocks_severe_and_spares_intermediate_shared_initial": false,
+          "activates_on_severe_sustained": true,
+          "activates_on_intermediate_sustained": true,
+          "blocks_severe_and_spares_intermediate_sustained": false
+        },
+        "theta_p_psi=10": {
+          "activates_on_severe_shared_initial": true,
+          "activates_on_intermediate_shared_initial": true,
+          "blocks_severe_and_spares_intermediate_shared_initial": false,
+          "activates_on_severe_sustained": true,
+          "activates_on_intermediate_sustained": true,
+          "blocks_severe_and_spares_intermediate_sustained": false
+        },
+        "theta_p_psi=15": {
+          "activates_on_severe_shared_initial": true,
+          "activates_on_intermediate_shared_initial": true,
+          "blocks_severe_and_spares_intermediate_shared_initial": false,
+          "activates_on_severe_sustained": true,
+          "activates_on_intermediate_sustained": true,
+          "blocks_severe_and_spares_intermediate_sustained": false
+        },
+        "theta_p_psi=20": {
+          "activates_on_severe_shared_initial": true,
+          "activates_on_intermediate_shared_initial": true,
+          "blocks_severe_and_spares_intermediate_shared_initial": false,
+          "activates_on_severe_sustained": true,
+          "activates_on_intermediate_sustained": true,
+          "blocks_severe_and_spares_intermediate_sustained": false
+        }
+      },
+      "S2": {
+        "eps_p_psi=0": {
+          "activates_on_severe_shared_initial": true,
+          "activates_on_intermediate_shared_initial": false,
+          "blocks_severe_and_spares_intermediate_shared_initial": true,
+          "activates_on_severe_sustained": true,
+          "activates_on_intermediate_sustained": true,
+          "blocks_severe_and_spares_intermediate_sustained": false
+        },
+        "eps_p_psi=2": {
+          "activates_on_severe_shared_initial": false,
+          "activates_on_intermediate_shared_initial": false,
+          "blocks_severe_and_spares_intermediate_shared_initial": false,
+          "activates_on_severe_sustained": true,
+          "activates_on_intermediate_sustained": false,
+          "blocks_severe_and_spares_intermediate_sustained": true
+        },
+        "eps_p_psi=5": {
+          "activates_on_severe_shared_initial": false,
+          "activates_on_intermediate_shared_initial": false,
+          "blocks_severe_and_spares_intermediate_shared_initial": false,
+          "activates_on_severe_sustained": false,
+          "activates_on_intermediate_sustained": false,
+          "blocks_severe_and_spares_intermediate_sustained": false
+        }
+      },
+      "S3": {
+        "eps_D_psi_nodesum=0": {
+          "activates_on_severe_shared_initial": true,
+          "activates_on_intermediate_shared_initial": true,
+          "blocks_severe_and_spares_intermediate_shared_initial": false,
+          "activates_on_severe_sustained": true,
+          "activates_on_intermediate_sustained": true,
+          "blocks_severe_and_spares_intermediate_sustained": false
+        },
+        "eps_D_psi_nodesum=2": {
+          "activates_on_severe_shared_initial": true,
+          "activates_on_intermediate_shared_initial": true,
+          "blocks_severe_and_spares_intermediate_shared_initial": false,
+          "activates_on_severe_sustained": true,
+          "activates_on_intermediate_sustained": true,
+          "blocks_severe_and_spares_intermediate_sustained": false
+        },
+        "eps_D_psi_nodesum=5": {
+          "activates_on_severe_shared_initial": true,
+          "activates_on_intermediate_shared_initial": true,
+          "blocks_severe_and_spares_intermediate_shared_initial": false,
+          "activates_on_severe_sustained": true,
+          "activates_on_intermediate_sustained": true,
+          "blocks_severe_and_spares_intermediate_sustained": false
+        }
+      },
+      "S4": {
+        "hard_backstop": {
+          "activates_on_severe_shared_initial": false,
+          "activates_on_intermediate_shared_initial": false,
+          "blocks_severe_and_spares_intermediate_shared_initial": false,
+          "activates_on_severe_sustained": false,
+          "activates_on_intermediate_sustained": false,
+          "blocks_severe_and_spares_intermediate_sustained": false
+        }
+      }
+    },
+    "from_high_pressure_state": {
+      "S1": {
+        "theta_p_psi=0": {
+          "activates_on_severe_shared_initial": false,
+          "activates_on_intermediate_shared_initial": false,
+          "blocks_severe_and_spares_intermediate_shared_initial": false,
+          "activates_on_severe_sustained": false,
+          "activates_on_intermediate_sustained": false,
+          "blocks_severe_and_spares_intermediate_sustained": false
+        },
+        "theta_p_psi=5": {
+          "activates_on_severe_shared_initial": false,
+          "activates_on_intermediate_shared_initial": false,
+          "blocks_severe_and_spares_intermediate_shared_initial": false,
+          "activates_on_severe_sustained": true,
+          "activates_on_intermediate_sustained": true,
+          "blocks_severe_and_spares_intermediate_sustained": false
+        },
+        "theta_p_psi=10": {
+          "activates_on_severe_shared_initial": true,
+          "activates_on_intermediate_shared_initial": true,
+          "blocks_severe_and_spares_intermediate_shared_initial": false,
+          "activates_on_severe_sustained": true,
+          "activates_on_intermediate_sustained": true,
+          "blocks_severe_and_spares_intermediate_sustained": false
+        },
+        "theta_p_psi=15": {
+          "activates_on_severe_shared_initial": true,
+          "activates_on_intermediate_shared_initial": true,
+          "blocks_severe_and_spares_intermediate_shared_initial": false,
+          "activates_on_severe_sustained": true,
+          "activates_on_intermediate_sustained": true,
+          "blocks_severe_and_spares_intermediate_sustained": false
+        },
+        "theta_p_psi=20": {
+          "activates_on_severe_shared_initial": true,
+          "activates_on_intermediate_shared_initial": true,
+          "blocks_severe_and_spares_intermediate_shared_initial": false,
+          "activates_on_severe_sustained": true,
+          "activates_on_intermediate_sustained": true,
+          "blocks_severe_and_spares_intermediate_sustained": false
+        }
+      },
+      "S2": {
+        "eps_p_psi=0": {
+          "activates_on_severe_shared_initial": true,
+          "activates_on_intermediate_shared_initial": false,
+          "blocks_severe_and_spares_intermediate_shared_initial": true,
+          "activates_on_severe_sustained": true,
+          "activates_on_intermediate_sustained": true,
+          "blocks_severe_and_spares_intermediate_sustained": false
+        },
+        "eps_p_psi=2": {
+          "activates_on_severe_shared_initial": false,
+          "activates_on_intermediate_shared_initial": false,
+          "blocks_severe_and_spares_intermediate_shared_initial": false,
+          "activates_on_severe_sustained": true,
+          "activates_on_intermediate_sustained": false,
+          "blocks_severe_and_spares_intermediate_sustained": true
+        },
+        "eps_p_psi=5": {
+          "activates_on_severe_shared_initial": false,
+          "activates_on_intermediate_shared_initial": false,
+          "blocks_severe_and_spares_intermediate_shared_initial": false,
+          "activates_on_severe_sustained": false,
+          "activates_on_intermediate_sustained": false,
+          "blocks_severe_and_spares_intermediate_sustained": false
+        }
+      },
+      "S3": {
+        "eps_D_psi_nodesum=0": {
+          "activates_on_severe_shared_initial": true,
+          "activates_on_intermediate_shared_initial": true,
+          "blocks_severe_and_spares_intermediate_shared_initial": false,
+          "activates_on_severe_sustained": true,
+          "activates_on_intermediate_sustained": true,
+          "blocks_severe_and_spares_intermediate_sustained": false
+        },
+        "eps_D_psi_nodesum=2": {
+          "activates_on_severe_shared_initial": true,
+          "activates_on_intermediate_shared_initial": true,
+          "blocks_severe_and_spares_intermediate_shared_initial": false,
+          "activates_on_severe_sustained": true,
+          "activates_on_intermediate_sustained": true,
+          "blocks_severe_and_spares_intermediate_sustained": false
+        },
+        "eps_D_psi_nodesum=5": {
+          "activates_on_severe_shared_initial": true,
+          "activates_on_intermediate_shared_initial": true,
+          "blocks_severe_and_spares_intermediate_shared_initial": false,
+          "activates_on_severe_sustained": true,
+          "activates_on_intermediate_sustained": true,
+          "blocks_severe_and_spares_intermediate_sustained": false
+        }
+      },
+      "S4": {
+        "hard_backstop": {
+          "activates_on_severe_shared_initial": false,
+          "activates_on_intermediate_shared_initial": false,
+          "blocks_severe_and_spares_intermediate_shared_initial": false,
+          "activates_on_severe_sustained": false,
+          "activates_on_intermediate_sustained": false,
+          "blocks_severe_and_spares_intermediate_sustained": false
+        }
+      }
+    }
+  },
+  "handling_policy_outputs": {
+    "reference_to_severe": {
+      "H1": {
+        "proposed_action": [
+          -1.0,
+          -1.0,
+          -1.0,
+          -1.0,
+          -1.0,
+          -1.0,
+          -1.0
+        ],
+        "executed_action": [
+          -0.31868131868131866,
+          -0.24293785310734461,
+          -0.5060216577269507,
+          -0.2857142857142857,
+          -0.37037037037037035,
+          0.28571428571428537,
+          0.3939393939393936
+        ],
+        "action_deviation_L2": 2.4050194704019527,
+        "action_deviation_L2sq": 5.78411865301249,
+        "I_modified": true,
+        "I_reject": true,
+        "post_intervention_shared_initial": {
+          "p_min": 5.538022518157959,
+          "D": 17.751272201538086,
+          "N_neg": 0.0,
+          "N_20": 2.0,
+          "DSR": 0.9838075930556937,
+          "Q_unserved": 26.43409783435709,
+          "Q_leak": 84.93913806623227
+        },
+        "executed_action_source": "previous_action_a_prev",
+        "n_extra_hydraulic_evals": 0
+      },
+      "H2": {
+        "policy": "clip_toward_previous",
+        "per_rule_admissible_alpha": {
+          "S1": {
+            "theta_p_psi=0": {
+              "proposed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "executed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "action_deviation_L2": 0.0,
+              "action_deviation_L2sq": 0.0,
+              "I_modified": false,
+              "I_reject": false,
+              "post_intervention_shared_initial": {
+                "p_min": 5.527866840362549,
+                "D": 27.494426727294922,
+                "N_neg": 0.0,
+                "N_20": 2.0,
+                "DSR": 0.9227158066978032,
+                "Q_unserved": 126.16641453159559,
+                "Q_leak": 81.43561491972075
+              },
+              "executed_alpha": 1.0,
+              "n_extra_hydraulic_evals": 5
+            },
+            "theta_p_psi=5": {
+              "proposed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "executed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "action_deviation_L2": 0.0,
+              "action_deviation_L2sq": 0.0,
+              "I_modified": false,
+              "I_reject": false,
+              "post_intervention_shared_initial": {
+                "p_min": 5.527866840362549,
+                "D": 27.494426727294922,
+                "N_neg": 0.0,
+                "N_20": 2.0,
+                "DSR": 0.9227158066978032,
+                "Q_unserved": 126.16641453159559,
+                "Q_leak": 81.43561491972075
+              },
+              "executed_alpha": 1.0,
+              "n_extra_hydraulic_evals": 5
+            },
+            "theta_p_psi=10": {
+              "proposed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "executed_action": [
+                -0.31868131868131866,
+                -0.24293785310734461,
+                -0.5060216577269507,
+                -0.2857142857142857,
+                -0.37037037037037035,
+                0.28571428571428537,
+                0.3939393939393936
+              ],
+              "action_deviation_L2": 2.4050194704019527,
+              "action_deviation_L2sq": 5.78411865301249,
+              "I_modified": true,
+              "I_reject": true,
+              "post_intervention_shared_initial": {
+                "p_min": 5.538022518157959,
+                "D": 17.751272201538086,
+                "N_neg": 0.0,
+                "N_20": 2.0,
+                "DSR": 0.9838075930556937,
+                "Q_unserved": 26.43409783435709,
+                "Q_leak": 84.93913806623227
+              },
+              "executed_alpha": 0.0,
+              "n_extra_hydraulic_evals": 5
+            },
+            "theta_p_psi=15": {
+              "proposed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "executed_action": [
+                -0.31868131868131866,
+                -0.24293785310734461,
+                -0.5060216577269507,
+                -0.2857142857142857,
+                -0.37037037037037035,
+                0.28571428571428537,
+                0.3939393939393936
+              ],
+              "action_deviation_L2": 2.4050194704019527,
+              "action_deviation_L2sq": 5.78411865301249,
+              "I_modified": true,
+              "I_reject": true,
+              "post_intervention_shared_initial": {
+                "p_min": 5.538022518157959,
+                "D": 17.751272201538086,
+                "N_neg": 0.0,
+                "N_20": 2.0,
+                "DSR": 0.9838075930556937,
+                "Q_unserved": 26.43409783435709,
+                "Q_leak": 84.93913806623227
+              },
+              "executed_alpha": 0.0,
+              "n_extra_hydraulic_evals": 5
+            },
+            "theta_p_psi=20": {
+              "proposed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "executed_action": [
+                -0.31868131868131866,
+                -0.24293785310734461,
+                -0.5060216577269507,
+                -0.2857142857142857,
+                -0.37037037037037035,
+                0.28571428571428537,
+                0.3939393939393936
+              ],
+              "action_deviation_L2": 2.4050194704019527,
+              "action_deviation_L2sq": 5.78411865301249,
+              "I_modified": true,
+              "I_reject": true,
+              "post_intervention_shared_initial": {
+                "p_min": 5.538022518157959,
+                "D": 17.751272201538086,
+                "N_neg": 0.0,
+                "N_20": 2.0,
+                "DSR": 0.9838075930556937,
+                "Q_unserved": 26.43409783435709,
+                "Q_leak": 84.93913806623227
+              },
+              "executed_alpha": 0.0,
+              "n_extra_hydraulic_evals": 5
+            }
+          },
+          "S2": {
+            "eps_p_psi=0": {
+              "proposed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "executed_action": [
+                -0.31868131868131866,
+                -0.24293785310734461,
+                -0.5060216577269507,
+                -0.2857142857142857,
+                -0.37037037037037035,
+                0.28571428571428537,
+                0.3939393939393936
+              ],
+              "action_deviation_L2": 2.4050194704019527,
+              "action_deviation_L2sq": 5.78411865301249,
+              "I_modified": true,
+              "I_reject": true,
+              "post_intervention_shared_initial": {
+                "p_min": 5.538022518157959,
+                "D": 17.751272201538086,
+                "N_neg": 0.0,
+                "N_20": 2.0,
+                "DSR": 0.9838075930556937,
+                "Q_unserved": 26.43409783435709,
+                "Q_leak": 84.93913806623227
+              },
+              "executed_alpha": 0.0,
+              "n_extra_hydraulic_evals": 5
+            },
+            "eps_p_psi=2": {
+              "proposed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "executed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "action_deviation_L2": 0.0,
+              "action_deviation_L2sq": 0.0,
+              "I_modified": false,
+              "I_reject": false,
+              "post_intervention_shared_initial": {
+                "p_min": 5.527866840362549,
+                "D": 27.494426727294922,
+                "N_neg": 0.0,
+                "N_20": 2.0,
+                "DSR": 0.9227158066978032,
+                "Q_unserved": 126.16641453159559,
+                "Q_leak": 81.43561491972075
+              },
+              "executed_alpha": 1.0,
+              "n_extra_hydraulic_evals": 5
+            },
+            "eps_p_psi=5": {
+              "proposed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "executed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "action_deviation_L2": 0.0,
+              "action_deviation_L2sq": 0.0,
+              "I_modified": false,
+              "I_reject": false,
+              "post_intervention_shared_initial": {
+                "p_min": 5.527866840362549,
+                "D": 27.494426727294922,
+                "N_neg": 0.0,
+                "N_20": 2.0,
+                "DSR": 0.9227158066978032,
+                "Q_unserved": 126.16641453159559,
+                "Q_leak": 81.43561491972075
+              },
+              "executed_alpha": 1.0,
+              "n_extra_hydraulic_evals": 5
+            }
+          },
+          "S3": {
+            "eps_D_psi_nodesum=0": {
+              "proposed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "executed_action": [
+                -0.31868131868131866,
+                -0.24293785310734461,
+                -0.5060216577269507,
+                -0.2857142857142857,
+                -0.37037037037037035,
+                0.28571428571428537,
+                0.3939393939393936
+              ],
+              "action_deviation_L2": 2.4050194704019527,
+              "action_deviation_L2sq": 5.78411865301249,
+              "I_modified": true,
+              "I_reject": true,
+              "post_intervention_shared_initial": {
+                "p_min": 5.538022518157959,
+                "D": 17.751272201538086,
+                "N_neg": 0.0,
+                "N_20": 2.0,
+                "DSR": 0.9838075930556937,
+                "Q_unserved": 26.43409783435709,
+                "Q_leak": 84.93913806623227
+              },
+              "executed_alpha": 0.0,
+              "n_extra_hydraulic_evals": 5
+            },
+            "eps_D_psi_nodesum=2": {
+              "proposed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "executed_action": [
+                -0.31868131868131866,
+                -0.24293785310734461,
+                -0.5060216577269507,
+                -0.2857142857142857,
+                -0.37037037037037035,
+                0.28571428571428537,
+                0.3939393939393936
+              ],
+              "action_deviation_L2": 2.4050194704019527,
+              "action_deviation_L2sq": 5.78411865301249,
+              "I_modified": true,
+              "I_reject": true,
+              "post_intervention_shared_initial": {
+                "p_min": 5.538022518157959,
+                "D": 17.751272201538086,
+                "N_neg": 0.0,
+                "N_20": 2.0,
+                "DSR": 0.9838075930556937,
+                "Q_unserved": 26.43409783435709,
+                "Q_leak": 84.93913806623227
+              },
+              "executed_alpha": 0.0,
+              "n_extra_hydraulic_evals": 5
+            },
+            "eps_D_psi_nodesum=5": {
+              "proposed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "executed_action": [
+                -0.6593406593406593,
+                -0.6214689265536724,
+                -0.7530108288634754,
+                -0.6428571428571428,
+                -0.6851851851851851,
+                -0.35714285714285765,
+                -0.3030303030303032
+              ],
+              "action_deviation_L2": 1.2025097352009761,
+              "action_deviation_L2sq": 1.446029663253122,
+              "I_modified": true,
+              "I_reject": false,
+              "post_intervention_shared_initial": {
+                "p_min": 5.536779403686523,
+                "D": 22.619232177734375,
+                "N_neg": 0.0,
+                "N_20": 2.0,
+                "DSR": 0.9565055106594446,
+                "Q_unserved": 71.0047363828096,
+                "Q_leak": 83.2926135287473
+              },
+              "executed_alpha": 0.5,
+              "n_extra_hydraulic_evals": 5
+            }
+          },
+          "S4": {
+            "hard_backstop": {
+              "proposed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "executed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "action_deviation_L2": 0.0,
+              "action_deviation_L2sq": 0.0,
+              "I_modified": false,
+              "I_reject": false,
+              "post_intervention_shared_initial": {
+                "p_min": 5.527866840362549,
+                "D": 27.494426727294922,
+                "N_neg": 0.0,
+                "N_20": 2.0,
+                "DSR": 0.9227158066978032,
+                "Q_unserved": 126.16641453159559,
+                "Q_leak": 81.43561491972075
+              },
+              "executed_alpha": 1.0,
+              "n_extra_hydraulic_evals": 5
+            }
+          }
+        }
+      },
+      "H3": {
+        "proposed_action": [
+          -1.0,
+          -1.0,
+          -1.0,
+          -1.0,
+          -1.0,
+          -1.0,
+          -1.0
+        ],
+        "executed_action": [
+          -0.31868131868131866,
+          -0.24293785310734461,
+          -0.5060216577269507,
+          -0.2857142857142857,
+          -0.37037037037037035,
+          0.28571428571428537,
+          0.3939393939393936
+        ],
+        "action_deviation_L2": 2.4050194704019527,
+        "action_deviation_L2sq": 5.78411865301249,
+        "I_modified": true,
+        "I_reject": true,
+        "post_intervention_shared_initial": {
+          "p_min": 5.538022518157959,
+          "D": 17.751272201538086,
+          "N_neg": 0.0,
+          "N_20": 2.0,
+          "DSR": 0.9838075930556937,
+          "Q_unserved": 26.43409783435709,
+          "Q_leak": 84.93913806623227
+        },
+        "executed_action_source": "documented_fallback",
+        "fallback_definition": "reference_nominal native PRV/pump setpoints",
+        "n_extra_hydraulic_evals": 0
+      }
+    },
+    "high_pressure_to_severe": {
+      "H1": {
+        "proposed_action": [
+          -1.0,
+          -1.0,
+          -1.0,
+          -1.0,
+          -1.0,
+          -1.0,
+          -1.0
+        ],
+        "executed_action": [
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          1.0,
+          0.28571428571428537,
+          0.3939393939393936
+        ],
+        "action_deviation_L2": 4.857584611560145,
+        "action_deviation_L2sq": 23.59612825846592,
+        "I_modified": true,
+        "I_reject": true,
+        "post_intervention_shared_initial": {
+          "p_min": 5.537863731384277,
+          "D": 14.462136268615723,
+          "N_neg": 0.0,
+          "N_20": 1.0,
+          "DSR": 1.0000436393510699,
+          "Q_unserved": 0.0,
+          "Q_leak": 89.97090838377747
+        },
+        "executed_action_source": "previous_action_a_prev",
+        "n_extra_hydraulic_evals": 0
+      },
+      "H2": {
+        "policy": "clip_toward_previous",
+        "per_rule_admissible_alpha": {
+          "S1": {
+            "theta_p_psi=0": {
+              "proposed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "executed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "action_deviation_L2": 0.0,
+              "action_deviation_L2sq": 0.0,
+              "I_modified": false,
+              "I_reject": false,
+              "post_intervention_shared_initial": {
+                "p_min": 5.527866840362549,
+                "D": 27.494426727294922,
+                "N_neg": 0.0,
+                "N_20": 2.0,
+                "DSR": 0.9227158066978032,
+                "Q_unserved": 126.16641453159559,
+                "Q_leak": 81.43561491972075
+              },
+              "executed_alpha": 1.0,
+              "n_extra_hydraulic_evals": 5
+            },
+            "theta_p_psi=5": {
+              "proposed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "executed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "action_deviation_L2": 0.0,
+              "action_deviation_L2sq": 0.0,
+              "I_modified": false,
+              "I_reject": false,
+              "post_intervention_shared_initial": {
+                "p_min": 5.527866840362549,
+                "D": 27.494426727294922,
+                "N_neg": 0.0,
+                "N_20": 2.0,
+                "DSR": 0.9227158066978032,
+                "Q_unserved": 126.16641453159559,
+                "Q_leak": 81.43561491972075
+              },
+              "executed_alpha": 1.0,
+              "n_extra_hydraulic_evals": 5
+            },
+            "theta_p_psi=10": {
+              "proposed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "executed_action": [
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                0.28571428571428537,
+                0.3939393939393936
+              ],
+              "action_deviation_L2": 4.857584611560145,
+              "action_deviation_L2sq": 23.59612825846592,
+              "I_modified": true,
+              "I_reject": true,
+              "post_intervention_shared_initial": {
+                "p_min": 5.537863731384277,
+                "D": 14.462136268615723,
+                "N_neg": 0.0,
+                "N_20": 1.0,
+                "DSR": 1.0000436393510699,
+                "Q_unserved": 0.0,
+                "Q_leak": 89.97090838377747
+              },
+              "executed_alpha": 0.0,
+              "n_extra_hydraulic_evals": 5
+            },
+            "theta_p_psi=15": {
+              "proposed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "executed_action": [
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                0.28571428571428537,
+                0.3939393939393936
+              ],
+              "action_deviation_L2": 4.857584611560145,
+              "action_deviation_L2sq": 23.59612825846592,
+              "I_modified": true,
+              "I_reject": true,
+              "post_intervention_shared_initial": {
+                "p_min": 5.537863731384277,
+                "D": 14.462136268615723,
+                "N_neg": 0.0,
+                "N_20": 1.0,
+                "DSR": 1.0000436393510699,
+                "Q_unserved": 0.0,
+                "Q_leak": 89.97090838377747
+              },
+              "executed_alpha": 0.0,
+              "n_extra_hydraulic_evals": 5
+            },
+            "theta_p_psi=20": {
+              "proposed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "executed_action": [
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                0.28571428571428537,
+                0.3939393939393936
+              ],
+              "action_deviation_L2": 4.857584611560145,
+              "action_deviation_L2sq": 23.59612825846592,
+              "I_modified": true,
+              "I_reject": true,
+              "post_intervention_shared_initial": {
+                "p_min": 5.537863731384277,
+                "D": 14.462136268615723,
+                "N_neg": 0.0,
+                "N_20": 1.0,
+                "DSR": 1.0000436393510699,
+                "Q_unserved": 0.0,
+                "Q_leak": 89.97090838377747
+              },
+              "executed_alpha": 0.0,
+              "n_extra_hydraulic_evals": 5
+            }
+          },
+          "S2": {
+            "eps_p_psi=0": {
+              "proposed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "executed_action": [
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                0.28571428571428537,
+                0.3939393939393936
+              ],
+              "action_deviation_L2": 4.857584611560145,
+              "action_deviation_L2sq": 23.59612825846592,
+              "I_modified": true,
+              "I_reject": true,
+              "post_intervention_shared_initial": {
+                "p_min": 5.537863731384277,
+                "D": 14.462136268615723,
+                "N_neg": 0.0,
+                "N_20": 1.0,
+                "DSR": 1.0000436393510699,
+                "Q_unserved": 0.0,
+                "Q_leak": 89.97090838377747
+              },
+              "executed_alpha": 0.0,
+              "n_extra_hydraulic_evals": 5
+            },
+            "eps_p_psi=2": {
+              "proposed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "executed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "action_deviation_L2": 0.0,
+              "action_deviation_L2sq": 0.0,
+              "I_modified": false,
+              "I_reject": false,
+              "post_intervention_shared_initial": {
+                "p_min": 5.527866840362549,
+                "D": 27.494426727294922,
+                "N_neg": 0.0,
+                "N_20": 2.0,
+                "DSR": 0.9227158066978032,
+                "Q_unserved": 126.16641453159559,
+                "Q_leak": 81.43561491972075
+              },
+              "executed_alpha": 1.0,
+              "n_extra_hydraulic_evals": 5
+            },
+            "eps_p_psi=5": {
+              "proposed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "executed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "action_deviation_L2": 0.0,
+              "action_deviation_L2sq": 0.0,
+              "I_modified": false,
+              "I_reject": false,
+              "post_intervention_shared_initial": {
+                "p_min": 5.527866840362549,
+                "D": 27.494426727294922,
+                "N_neg": 0.0,
+                "N_20": 2.0,
+                "DSR": 0.9227158066978032,
+                "Q_unserved": 126.16641453159559,
+                "Q_leak": 81.43561491972075
+              },
+              "executed_alpha": 1.0,
+              "n_extra_hydraulic_evals": 5
+            }
+          },
+          "S3": {
+            "eps_D_psi_nodesum=0": {
+              "proposed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "executed_action": [
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                1.0,
+                0.28571428571428537,
+                0.3939393939393936
+              ],
+              "action_deviation_L2": 4.857584611560145,
+              "action_deviation_L2sq": 23.59612825846592,
+              "I_modified": true,
+              "I_reject": true,
+              "post_intervention_shared_initial": {
+                "p_min": 5.537863731384277,
+                "D": 14.462136268615723,
+                "N_neg": 0.0,
+                "N_20": 1.0,
+                "DSR": 1.0000436393510699,
+                "Q_unserved": 0.0,
+                "Q_leak": 89.97090838377747
+              },
+              "executed_alpha": 0.0,
+              "n_extra_hydraulic_evals": 5
+            },
+            "eps_D_psi_nodesum=2": {
+              "proposed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "executed_action": [
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                0.0,
+                -0.35714285714285765,
+                -0.3030303030303032
+              ],
+              "action_deviation_L2": 2.428792305780072,
+              "action_deviation_L2sq": 5.899032064616479,
+              "I_modified": true,
+              "I_reject": false,
+              "post_intervention_shared_initial": {
+                "p_min": 5.536462306976318,
+                "D": 14.463537216186523,
+                "N_neg": 0.0,
+                "N_20": 1.0,
+                "DSR": 1.0000383215603872,
+                "Q_unserved": 0.0,
+                "Q_leak": 86.2349607686814
+              },
+              "executed_alpha": 0.5,
+              "n_extra_hydraulic_evals": 5
+            },
+            "eps_D_psi_nodesum=5": {
+              "proposed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "executed_action": [
+                -0.5,
+                -0.5,
+                -0.5,
+                -0.5,
+                -0.5,
+                -0.6785714285714284,
+                -0.6515151515151516
+              ],
+              "action_deviation_L2": 1.2143961528900362,
+              "action_deviation_L2sq": 1.47475801615412,
+              "I_modified": true,
+              "I_reject": false,
+              "post_intervention_shared_initial": {
+                "p_min": 5.5341877937316895,
+                "D": 17.636442184448242,
+                "N_neg": 0.0,
+                "N_20": 2.0,
+                "DSR": 0.9844179669895254,
+                "Q_unserved": 25.437662632478578,
+                "Q_leak": 84.04426536435383
+              },
+              "executed_alpha": 0.75,
+              "n_extra_hydraulic_evals": 5
+            }
+          },
+          "S4": {
+            "hard_backstop": {
+              "proposed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "executed_action": [
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0,
+                -1.0
+              ],
+              "action_deviation_L2": 0.0,
+              "action_deviation_L2sq": 0.0,
+              "I_modified": false,
+              "I_reject": false,
+              "post_intervention_shared_initial": {
+                "p_min": 5.527866840362549,
+                "D": 27.494426727294922,
+                "N_neg": 0.0,
+                "N_20": 2.0,
+                "DSR": 0.9227158066978032,
+                "Q_unserved": 126.16641453159559,
+                "Q_leak": 81.43561491972075
+              },
+              "executed_alpha": 1.0,
+              "n_extra_hydraulic_evals": 5
+            }
+          }
+        }
+      },
+      "H3": {
+        "proposed_action": [
+          -1.0,
+          -1.0,
+          -1.0,
+          -1.0,
+          -1.0,
+          -1.0,
+          -1.0
+        ],
+        "executed_action": [
+          -0.31868131868131866,
+          -0.24293785310734461,
+          -0.5060216577269507,
+          -0.2857142857142857,
+          -0.37037037037037035,
+          0.28571428571428537,
+          0.3939393939393936
+        ],
+        "action_deviation_L2": 2.4050194704019527,
+        "action_deviation_L2sq": 5.78411865301249,
+        "I_modified": true,
+        "I_reject": true,
+        "post_intervention_shared_initial": {
+          "p_min": 5.538022518157959,
+          "D": 17.751272201538086,
+          "N_neg": 0.0,
+          "N_20": 2.0,
+          "DSR": 0.9838075930556937,
+          "Q_unserved": 26.43409783435709,
+          "Q_leak": 84.93913806623227
+        },
+        "executed_action_source": "documented_fallback",
+        "fallback_definition": "reference_nominal native PRV/pump setpoints",
+        "n_extra_hydraulic_evals": 0
+      }
+    }
+  },
+  "intervention_metrics": {
+    "reference_to_severe": {
+      "H1": {
+        "I_modified": true,
+        "I_reject": true,
+        "action_deviation_L2": 2.4050194704019527,
+        "action_deviation_L2sq": 5.78411865301249
+      },
+      "H3": {
+        "I_modified": true,
+        "I_reject": true,
+        "action_deviation_L2": 2.4050194704019527,
+        "action_deviation_L2sq": 5.78411865301249
+      },
+      "H2_per_rule_executed_alpha": {
+        "S1": {
+          "theta_p_psi=0": 1.0,
+          "theta_p_psi=5": 1.0,
+          "theta_p_psi=10": 0.0,
+          "theta_p_psi=15": 0.0,
+          "theta_p_psi=20": 0.0
+        },
+        "S2": {
+          "eps_p_psi=0": 0.0,
+          "eps_p_psi=2": 1.0,
+          "eps_p_psi=5": 1.0
+        },
+        "S3": {
+          "eps_D_psi_nodesum=0": 0.0,
+          "eps_D_psi_nodesum=2": 0.0,
+          "eps_D_psi_nodesum=5": 0.5
+        },
+        "S4": {
+          "hard_backstop": 1.0
+        }
+      }
+    },
+    "high_pressure_to_severe": {
+      "H1": {
+        "I_modified": true,
+        "I_reject": true,
+        "action_deviation_L2": 4.857584611560145,
+        "action_deviation_L2sq": 23.59612825846592
+      },
+      "H3": {
+        "I_modified": true,
+        "I_reject": true,
+        "action_deviation_L2": 2.4050194704019527,
+        "action_deviation_L2sq": 5.78411865301249
+      },
+      "H2_per_rule_executed_alpha": {
+        "S1": {
+          "theta_p_psi=0": 1.0,
+          "theta_p_psi=5": 1.0,
+          "theta_p_psi=10": 0.0,
+          "theta_p_psi=15": 0.0,
+          "theta_p_psi=20": 0.0
+        },
+        "S2": {
+          "eps_p_psi=0": 0.0,
+          "eps_p_psi=2": 1.0,
+          "eps_p_psi=5": 1.0
+        },
+        "S3": {
+          "eps_D_psi_nodesum=0": 0.0,
+          "eps_D_psi_nodesum=2": 0.5,
+          "eps_D_psi_nodesum=5": 0.75
+        },
+        "S4": {
+          "hard_backstop": 1.0
+        }
+      }
+    }
+  },
+  "baseline_compatibility": {
+    "identity_hold_rule_activation": {
+      "S1": {
+        "theta_p_psi=0": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        },
+        "theta_p_psi=5": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.45077720207253885,
+          "n_activations_sustained": 87,
+          "n_instants": 193
+        },
+        "theta_p_psi=10": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        },
+        "theta_p_psi=15": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        },
+        "theta_p_psi=20": {
+          "rule_activates_at_shared_initial": true,
+          "activation_fraction_sustained": 1.0,
+          "n_activations_sustained": 193,
+          "n_instants": 193
+        }
+      },
+      "S2": {
+        "eps_p_psi=0": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        },
+        "eps_p_psi=2": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        },
+        "eps_p_psi=5": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        }
+      },
+      "S3": {
+        "eps_D_psi_nodesum=0": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        },
+        "eps_D_psi_nodesum=2": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        },
+        "eps_D_psi_nodesum=5": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        }
+      },
+      "S4": {
+        "hard_backstop": {
+          "rule_activates_at_shared_initial": false,
+          "activation_fraction_sustained": 0.0,
+          "n_activations_sustained": 0,
+          "n_instants": 193
+        }
+      }
+    },
+    "note": "S1 flags the chronic baseline for theta_p above the baseline worst node (~4.16 psi); S2/S3 never activate on an unchanged hold (dp_min=0, dD=0); S4 never activates (0 negative nodes)."
+  },
+  "severe_degradation_cases": {
+    "prv_lower_pump_lower": {
+      "test_case_class": "B_severe_degradation",
+      "validated_accounting": {
+        "leakage_mean_gpm": 80.61786635451655,
+        "served_demand_mean_gpm": 834.5507518427517,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 0.9193965586241878,
+        "dsr_min": 0.9141979346467793,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 4.014771946003748e-07
+      },
+      "sustained_worst_post_p_min": {
+        "report_index": 192,
+        "current_state_metrics": {
+          "p_min": 4.926605224609375,
+          "D": 18.362689971923828,
+          "N_neg": 0.0,
+          "N_20": 2.0,
+          "DSR": 0.9838070176347955,
+          "Q_unserved": 26.435037208742415,
+          "Q_leak": 84.56288017499259,
+          "Q_req": 1632.4995984399998,
+          "Q_served": 1606.0645612312574
+        },
+        "post_action_metrics": {
+          "p_min": 1.2946763038635254,
+          "D": 31.727617263793945,
+          "N_neg": 0.0,
+          "N_20": 2.0,
+          "DSR": 0.9227144699022674,
+          "Q_unserved": 126.16859684977112,
+          "Q_leak": 79.92559020664626,
+          "Q_req": 1632.4995984399998,
+          "Q_served": 1506.3310015902287
+        },
+        "delta_metrics": {
+          "dp_min": -3.6319289207458496,
+          "dD": 13.364927291870117,
+          "dQ_leak": -4.637289968346323,
+          "dDSR": -0.061092547732528146,
+          "dQ_unserved": 99.7335596410287
+        }
+      },
+      "reference_to_severe_rule_activation": {
+        "S1": {
+          "theta_p_psi=0": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          },
+          "theta_p_psi=5": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.9326424870466321,
+            "n_activations_sustained": 180,
+            "n_instants": 193
+          },
+          "theta_p_psi=10": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "theta_p_psi=15": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "theta_p_psi=20": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          }
+        },
+        "S2": {
+          "eps_p_psi=0": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 0.9792746113989638,
+            "n_activations_sustained": 189,
+            "n_instants": 193
+          },
+          "eps_p_psi=2": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.5803108808290155,
+            "n_activations_sustained": 112,
+            "n_instants": 193
+          },
+          "eps_p_psi=5": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          }
+        },
+        "S3": {
+          "eps_D_psi_nodesum=0": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "eps_D_psi_nodesum=2": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "eps_D_psi_nodesum=5": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          }
+        },
+        "S4": {
+          "hard_backstop": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          }
+        }
+      },
+      "high_pressure_to_severe_rule_activation": {
+        "S1": {
+          "theta_p_psi=0": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          },
+          "theta_p_psi=5": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.9326424870466321,
+            "n_activations_sustained": 180,
+            "n_instants": 193
+          },
+          "theta_p_psi=10": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "theta_p_psi=15": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "theta_p_psi=20": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          }
+        },
+        "S2": {
+          "eps_p_psi=0": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 0.9740932642487047,
+            "n_activations_sustained": 188,
+            "n_instants": 193
+          },
+          "eps_p_psi=2": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.5854922279792746,
+            "n_activations_sustained": 113,
+            "n_instants": 193
+          },
+          "eps_p_psi=5": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          }
+        },
+        "S3": {
+          "eps_D_psi_nodesum=0": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "eps_D_psi_nodesum=2": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "eps_D_psi_nodesum=5": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          }
+        },
+        "S4": {
+          "hard_backstop": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          }
+        }
+      }
+    }
+  },
+  "intermediate_control_cases": {
+    "prv_all_lower": {
+      "test_case_class": "C_intermediate_control",
+      "validated_accounting": {
+        "leakage_mean_gpm": 81.38381870141156,
+        "served_demand_mean_gpm": 834.5520090776172,
+        "requested_demand_mean_gpm": 906.3987348621764,
+        "dsr_mean": 0.9193996684666168,
+        "dsr_min": 0.9141988299525465,
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative_pressure": 0,
+        "continuity_residual_rel_max": 4.1188485511156614e-07
+      },
+      "reference_to_intermediate_rule_activation": {
+        "S1": {
+          "theta_p_psi=0": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          },
+          "theta_p_psi=5": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.42487046632124353,
+            "n_activations_sustained": 82,
+            "n_instants": 193
+          },
+          "theta_p_psi=10": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "theta_p_psi=15": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "theta_p_psi=20": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          }
+        },
+        "S2": {
+          "eps_p_psi=0": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.3005181347150259,
+            "n_activations_sustained": 58,
+            "n_instants": 193
+          },
+          "eps_p_psi=2": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          },
+          "eps_p_psi=5": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          }
+        },
+        "S3": {
+          "eps_D_psi_nodesum=0": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "eps_D_psi_nodesum=2": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "eps_D_psi_nodesum=5": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          }
+        },
+        "S4": {
+          "hard_backstop": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          }
+        }
+      },
+      "high_pressure_to_intermediate_rule_activation": {
+        "S1": {
+          "theta_p_psi=0": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          },
+          "theta_p_psi=5": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.42487046632124353,
+            "n_activations_sustained": 82,
+            "n_instants": 193
+          },
+          "theta_p_psi=10": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "theta_p_psi=15": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "theta_p_psi=20": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          }
+        },
+        "S2": {
+          "eps_p_psi=0": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.26424870466321243,
+            "n_activations_sustained": 51,
+            "n_instants": 193
+          },
+          "eps_p_psi=2": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          },
+          "eps_p_psi=5": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          }
+        },
+        "S3": {
+          "eps_D_psi_nodesum=0": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "eps_D_psi_nodesum=2": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "eps_D_psi_nodesum=5": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          }
+        },
+        "S4": {
+          "hard_backstop": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          }
+        }
+      }
+    }
+  },
+  "local_collapse_examples": {
+    "reference_to_severe": {
+      "current_label": "reference_nominal",
+      "proposed_label": "prv_lower_pump_lower",
+      "most_negative_dp_min_instant": {
+        "report_index": 177,
+        "dp_min": -4.30070948600769,
+        "dD": 14.057708740234375
+      },
+      "min_deficit_increase_among_negative_dp_min_instants": {
+        "report_index": 45,
+        "dp_min": -0.0056858062744140625,
+        "dD": 9.724376678466797
+      },
+      "n_negative_dp_min_instants": 189,
+      "n_instants": 193
+    },
+    "high_pressure_to_severe": {
+      "current_label": "prv_all_upper",
+      "proposed_label": "prv_lower_pump_lower",
+      "most_negative_dp_min_instant": {
+        "report_index": 177,
+        "dp_min": -4.2937538623809814,
+        "dD": 17.296781539916992
+      },
+      "min_deficit_increase_among_negative_dp_min_instants": {
+        "report_index": 44,
+        "dp_min": -0.003094196319580078,
+        "dD": 13.0209321975708
+      },
+      "n_negative_dp_min_instants": 188,
+      "n_instants": 193
+    }
+  },
+  "computational_cost": {
+    "n_epanet_solves_total": 10,
+    "n_operating_points_measured": 10,
+    "wall_clock_s_per_run": {
+      "reference_nominal": 0.8847463000001881,
+      "prv_all_lower": 0.8204855999997562,
+      "prv_all_upper": 0.7865568000001986,
+      "prv_lower_pump_lower": 0.7266758000000664,
+      "ref_sev_alpha0.25": 0.7275719999997818,
+      "ref_sev_alpha0.50": 0.7649812000004204,
+      "ref_sev_alpha0.75": 0.7548416999998153,
+      "hi_sev_alpha0.25": 0.8128530999997565,
+      "hi_sev_alpha0.50": 0.9354290000001129,
+      "hi_sev_alpha0.75": 0.9303270000000339
+    },
+    "wall_clock_s_total": 8.14446850000013,
+    "hydraulic_evals_per_proposed_action_look_ahead": 1,
+    "h2_alpha_grid_evals_per_transition": 5,
+    "determinism": "EPANET deterministic: re-running reproduces every value; JSON carries a generated_utc stamp so it is NOT byte-identical across runs",
+    "note": "each rule needs one post-action look-ahead solve per proposed action; H2 needs one solve per alpha-grid point inspected."
+  },
+  "PPO_compatibility": {
+    "S1": {
+      "deterministic": true,
+      "continuous_action_preserved_under_clip": true,
+      "differentiable": false,
+      "discontinuous_under_reject": true,
+      "requires_look_ahead": true,
+      "requires_extra_epanet_solve": true,
+      "compatible_30min_interval": true,
+      "introduces_proposed_vs_executed_mismatch_under_intervention": true,
+      "layer_need_not_be_differentiable": true
+    },
+    "S2": {
+      "deterministic": true,
+      "continuous_action_preserved_under_clip": true,
+      "differentiable": false,
+      "discontinuous_under_reject": true,
+      "requires_look_ahead": true,
+      "requires_extra_epanet_solve": true,
+      "compatible_30min_interval": true,
+      "introduces_proposed_vs_executed_mismatch_under_intervention": true,
+      "layer_need_not_be_differentiable": true
+    },
+    "S3": {
+      "deterministic": true,
+      "continuous_action_preserved_under_clip": true,
+      "differentiable": false,
+      "discontinuous_under_reject": true,
+      "requires_look_ahead": true,
+      "requires_extra_epanet_solve": true,
+      "compatible_30min_interval": true,
+      "introduces_proposed_vs_executed_mismatch_under_intervention": true,
+      "layer_need_not_be_differentiable": true
+    },
+    "S4": {
+      "deterministic": true,
+      "continuous_action_preserved_under_clip": true,
+      "differentiable": false,
+      "discontinuous_under_reject": true,
+      "requires_look_ahead": true,
+      "requires_extra_epanet_solve": true,
+      "compatible_30min_interval": true,
+      "introduces_proposed_vs_executed_mismatch_under_intervention": true,
+      "layer_need_not_be_differentiable": true
+    }
+  },
+  "limitations": [
+    "R1b: only the single lower corner (prv_lower / prv_lower_pump_lower) has measured near-collapse worst-node pressure; interior points, mixed PRV corners, and joint action x uncertain-demand space are NOT characterised.",
+    "No validated safe/unsafe oracle exists; activation counts are DESCRIPTIVE and are NOT false-positive/false-negative rates or classification accuracy.",
+    "sustained_horizon deltas include tank-trajectory divergence and are NOT a strict single-step look-ahead; only shared_initial_state (report index 0) is a pure command-effect one-step look-ahead.",
+    "H2 alpha grid is coarse (0, 0.25, 0.5, 0.75, 1.0) and is demonstrated only on the reference->severe transition; not an exhaustive alpha search.",
+    "Do NOT claim the 7-D action box is globally or jointly safe (STEP-9 mechanism + STEP-12 test job).",
+    "Leakage emitter instrument is NOT field-calibrated; leak values are internally consistent evidence, not calibrated predictions.",
+    "EVIDENCE ONLY: no mechanism/policy selected, ranked, scored, or recommended; no production wrapper, no reward.py, no PPO training."
+  ],
+  "researcher_selection": null
+}

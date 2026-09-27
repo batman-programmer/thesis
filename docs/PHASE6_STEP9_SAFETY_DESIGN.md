@@ -149,3 +149,157 @@ researcher_selection = null** as frozen pre-decision evidence; the APPROVED reco
 Select (or compose) a STEP-9 mechanism from S1–S4, fix its threshold/tolerance and its
 clip-vs-reject handling, then implement and test the production wrapper. **None of that is performed
 in this work unit** — this is characterisation only.
+
+---
+
+# PHASE 6 — STEP 9 (WU-15): Empirical Characterisation of Candidate Safety Mechanisms & Action-Handling Policies
+
+**Status:** EMPIRICAL EVIDENCE ONLY — candidate mechanisms **S1–S4** and candidate action-handling
+policies **H1–H3** are *measured* on the frozen network so the researcher can make the STEP-9
+decision **later**. **No mechanism or policy is selected, ranked, scored, or recommended**
+(`researcher_selection = null`). No production safety wrapper, no `reward.py`, no PPO. This section is
+**appended below** the WU-14 conceptual analysis (§1–§9 above) and does **not** replace it.
+
+**Date:** 2026-09-28 · **Work unit:** WU-15 · **Preceded by:** WU-14 design analysis (§1–§9) and
+D-P6-005 = APPROVED (C-A_F1_balanced_dense).
+
+## Artefacts (WU-15)
+
+| Artefact | Path |
+|---|---|
+| Machine-readable characterisation | `results/phase6/p6_s9_safety_mechanism_characterization.json` |
+| Measurement generator | `src/validation/p6_s9_safety_mechanism_characterization.py` |
+| Test battery | `tests/test_safety_mechanism_characterization.py` (26 tests) |
+
+The generator **reuses the validated WU-8 instrument** (`p6_s8_reward_scale_analysis.py`) unchanged
+for every hydraulic solve — same working INP (`sha256 53015ba9…20a9`), same PDA accounting, same
+service mask (121 service / 5 connector junctions). It runs **10 EPANET solves** (4 base operating
+points + 6 H2 α-interpolation points), ~8 s wall-clock, no RNG, no PPO. EPANET is deterministic, so
+the numeric values reproduce on re-run; the JSON carries a `generated_utc` stamp and is therefore
+**not** byte-reproduced (this deliberately differs from the frozen WU-11/WU-12 pre-decision JSONs).
+
+## 10.1 Metric definitions (PART 4 / PART 23)
+
+| Symbol | Definition | Note |
+|---|---|---|
+| `p_i` | PDA service pressure at junction `i` (psi) | 121 service nodes only |
+| `p_min` | `min_i p_i` over service nodes | worst-node signal |
+| `Δp_min` | `p_min(post) − p_min(current)` | relative worst-node change |
+| `D` | `Σ_i max(0, 20 − p_i)` (psi·node) | aggregate deficit; `deficit_ref ≈ 28.67` |
+| `ΔD` | `D(post) − D(current)` | aggregate deficit change |
+| `N_neg` | `Σ_i I[p_i < 0]` | negative-pressure node count |
+| `N_20` | `Σ_i I[p_i < 20]` | **descriptive only — not a safety oracle** |
+| `Q_leak` | `Σ sign(p)·C·|p|^0.5` (gpm) | pressure-driven; **NOT calibrated** |
+| `DSR` | `Q_served / Q_req` (PDA) | demand-satisfaction ratio |
+| `Q_unserved` | `max(0, Q_req − Q_served)` (gpm) | PDA shortfall |
+| `‖Δa‖²` | squared L2 of **commanded** normalized action step | reward-effort term uses COMMANDED |
+| `action_deviation_L2` | `‖a_exec − a_prop‖` | executed-vs-proposed gap |
+
+## 10.2 Candidate safety rules (PART 7 / PART 23) — SAFE means "do NOT intervene"
+
+| Cand. | Rule (SAFE condition) | Type | Provisional grid measured |
+|---|---|---|---|
+| **S1** | `p_min(post) ≥ θ_p` | absolute worst-node | `θ_p ∈ {0, 5, 10, 15, 20}` psi |
+| **S2** | `Δp_min ≥ −ε_p` | relative worst-node | `ε_p ∈ {0, 2, 5}` psi |
+| **S3** | `ΔD ≤ ε_D` | aggregate deficit | `ε_D ∈ {0, 2, 5}` psi·node |
+| **S4** | `N_neg(post) = 0` | negative-pressure hard backstop | (no threshold) |
+
+The S1→S4 order is **definitional, not evaluative**. Each threshold value is **provisional** — swept
+to expose behaviour, **not** tuned or selected. `safety_rule_outputs` reports, per rule × threshold,
+only DESCRIPTIVE fields: `rule_activates_at_shared_initial`, `activation_fraction_sustained`,
+`n_activations_sustained`, `n_instants`. Because there is **no validated safe/unsafe oracle**
+(PART 5), **no** false-positive / false-negative rate or classification accuracy is computed.
+
+## 10.3 Candidate action-handling policies (PART 12 / PART 23)
+
+| Pol. | Executed action `a_exec` | Look-ahead cost | Determinism |
+|---|---|---|---|
+| **H1** | REJECT → previous action (`a_exec = a_prev`) | 0 extra solves (uses observed prev state) | deterministic |
+| **H2** | CLIP toward previous: `a_exec = a_prev + α(a_prop − a_prev)`, largest `α` on grid `{0,¼,½,¾,1}` satisfying the rule | ≤ 5 solves per rule (one per grid α) | deterministic |
+| **H3** | FALLBACK → documented reference action (`reference_nominal`, persisted) | 0 extra solves | deterministic |
+
+Policies are **characterised, not auto-selected**. H2's admissible `α` is reported **per rule**
+(`per_rule_admissible_alpha`) because the largest safe step depends on which rule is active.
+
+## 10.4 Two look-ahead views per transition (honest severity accounting)
+
+Every (current → proposed) transition is measured in **two** distinct ways:
+
+- **`shared_initial_state` (report index 0):** a **strict single-step 30-min look-ahead** — every
+  configuration shares *identical* initial tank levels at `t=0`, so `Δ`-metrics are a **pure command
+  effect** with no tank-trajectory divergence.
+- **`sustained_horizon` (per-instant over all 193 report instants):** descriptive distribution over
+  the full 96 h EPS, explicitly **including tank-trajectory divergence** — **not** a strict
+  single-step look-ahead.
+
+**Key measured caveat.** For the severe command (`prv_lower_pump_lower`), the worst-node service
+pressure at the shared-initial instant is **≈ 5.53 psi**, but its **sustained** worst-node minimum is
+**≈ 1.29 psi** (tanks drain over the horizon). A naive single-step look-ahead at the decision instant
+therefore **substantially understates** the command's sustained-horizon danger. Any look-ahead-based
+STEP-9 mechanism inherits this gap; both views are persisted so the effect is visible, not hidden.
+
+## 10.5 The most important empirical question (PART 18) — reported as a fact table
+
+Can a candidate, at the shared-initial instant, BOTH (A) activate on the previously observed severe
+degradation AND (B) *not* activate on legitimate intermediate control? Measured (booleans only — **no
+selection**):
+
+- **S4** activates on **neither** (no swept in-bounds config produced a negative-pressure node — see
+  §10.6), so standalone it gives **no 20-psi protection**.
+- **S1** at `θ_p ≥ 10` psi activates on **both** the severe and the intermediate transition at the
+  shared-initial instant.
+- **S3** at the measured `ε_D` grid activates on **both**.
+- Only **S2 at `ε_p = 0`** activates on the severe transition while sparing the intermediate one at
+  the shared-initial instant, and only by a **razor-thin margin** (severe `Δp_min ≈ −0.0102` psi vs
+  intermediate `Δp_min ≈ +0.0006` psi). This separation is **not** claimed to generalise: it rests on
+  a ~0.01 psi gap at a single instant on a single action corner.
+
+This is **evidence, not a verdict**. The generator records the booleans; it does not conclude that any
+candidate "passes" or "wins".
+
+## 10.6 Baseline compatibility (PART 8 / §4 recap, now measured on identity hold)
+
+The identity hold (`reference → reference`, `a_exec = a_prev`) reproduces the chronic-baseline
+ill-posedness:
+
+| Rule / threshold | `activation_fraction_sustained` on identity hold |
+|---|---|
+| S1 `θ_p = 20` | **1.0** (flags the native baseline at *every* instant) |
+| S1 `θ_p = 5` | ≈ 0.451 |
+| S1 `θ_p ≤ 4.16` | 0.0 (below the baseline worst node) |
+| S2 (all `ε_p`) | **0.0** (relative rule never rejects an unchanged hold) |
+| S3 (all `ε_D`) | **0.0** |
+| S4 | **0.0** |
+
+Confirms §4: a HARD absolute-20 gate penalises the baseline itself; relative (S2/S3) and
+negative-keyed (S4) gates are baseline-compatible on the hold.
+
+## 10.7 Aggregate-vs-worst-node interaction & local collapse (PART 10)
+
+On the severe transition the aggregate deficit and worst-node signals **move together**: the
+most-negative-worst-node instant shows `Δp_min ≈ −4.30` psi with `ΔD ≈ +14.06`, and the smallest
+deficit-increase among negative-`Δp_min` instants is still `ΔD ≈ +9.72` (at `Δp_min ≈ −0.006`). So on
+the *tested* corner, S3 (aggregate) is not observed to **mask** a worst-node collapse — but this is a
+property of the single measured corner, **not** a general guarantee (see §10.8 / §6 R1b). The
+"small ΔD hiding a large local collapse" failure mode is **conceptually possible** (§5 above) and was
+simply **not exhibited** on the tested transitions; absence of evidence is recorded as such.
+
+## 10.8 State-dependence of handling (PART 14)
+
+The same proposed severe command handled from **two** current states yields **different** executed
+actions: H1/H3 **coincide** on `reference → severe` (the current state *is* the documented fallback),
+but **differ** on `high_pressure → severe` (previous-action fallback ≠ fixed reference fallback). This
+directly demonstrates that action-handling output is **state-dependent**, as required.
+
+## 10.9 Limitations carried forward (PART 19 / R1b)
+
+- **Coverage:** only 4 base operating points + 6 α-interpolants on the PRV/pump corners are measured;
+  interior points, mixed PRV corners, and the joint (action × uncertain-demand) space are **not**
+  characterised. **Do NOT claim the 7-D action box is globally safe.**
+- **No oracle:** no validated safe/unsafe ground truth ⇒ no FP/FN/accuracy (PART 5).
+- **Look-ahead gap:** strict single-step look-ahead understates sustained danger (§10.4).
+- **Coarse H2 grid:** `α ∈ {0,¼,½,¾,1}` — admissible-`α` values are lower bounds on the true largest
+  safe step, not exact.
+- **Uncalibrated leak:** `Q_leak` uses an uncalibrated emitter coefficient (relative use only).
+- **Evidence only:** `researcher_selection = null`; mechanism/policy selection + production wrapper +
+  `reward.py` + PPO are **out of scope** and deferred to the researcher (§9).
