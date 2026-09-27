@@ -306,8 +306,10 @@ RESEARCH ASSUMPTION · HYPOTHESIS TO TEST · DECISION REQUIRED.
 - **Risks/caveats:** joint 5-D box safety still UNTESTED (R1b); leak instrument
   uncalibrated (R3); deps still missing (R4). Approval freezes per-actuator bounds
   ONLY, not exhaustive joint safety.
-- **Git checkpoint:** commit `phase6: approve drl actuator action space` — hash
-  recorded here and in PROJECT_STATE.yaml / RECOVERY.md after the commit
-  (scratch `results/phase5/_tmp/*` deliberately excluded).
+- **Git checkpoint:** commit **e91c363** `phase6: approve drl actuator action space`
+  (docs + PROJECT_STATE + spec). Supporting VALVE-173 step6b evidence committed
+  first at **8c89ba2** `phase6: add VALVE-173 low-side refinement evidence (step6b)`
+  so the cited evidence lands before the decision. Scratch `results/phase5/_tmp/*`
+  and `__pycache__/*.pyc` deliberately excluded.
 - **Next action:** STEP 7 — DRL state/observation design (WU-8).
 

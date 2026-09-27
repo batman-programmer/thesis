@@ -44,7 +44,10 @@ snapshot) with the live root `PROJECT_STATE.yaml` (this workflow's state file).
 
 ## 2. Verified current state (from on-disk evidence, 2026-09-26 audit)
 
-- Git: branch `main`, working tree clean, HEAD `8dc8151`.
+- Git: branch `main`, HEAD `e91c363` (`phase6: approve drl actuator action space`).
+  Preceding: `8c89ba2` (step6b VALVE-173 evidence), `627567b` (step6 bounds). Working
+  tree carries only untracked `results/phase5/_tmp/*` scratch + `__pycache__/*.pyc`
+  (pre-existing debt, not committed).
 - Phase 5: COMPLETE. Do not rerun its gates.
 - Phase 6 Deliverable A COMPLETE: **G5 (action space)** and **G12 (pump speed
   persistence)** both RESOLVED with measured evidence in

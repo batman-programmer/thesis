@@ -131,7 +131,7 @@ action_space:
   approved:                  # APPROVED 2026-09-27 by researcher. FROZEN. Provenance PROPOSED (2026-09-26/27) -> REVIEWED (four-question + clarification pass) -> APPROVED. Earlier proposed/reviewed values retained below and in docs/PHASE6_DECISION_REGISTER.md; do NOT erase.
     approved_utc: "2026-09-27"
     frozen: true
-    approval_commit: "PENDING (recorded after the approval git checkpoint)"
+    approval_commit: "e91c363 (phase6: approve drl actuator action space). Supporting VALVE-173 step6b evidence committed at 8c89ba2."
     spec_doc: "docs/PHASE6_ACTION_SPACE_SPEC.md"
     encoding:                # D-P6-001 APPROVED: absolute
       type: "ABSOLUTE"
@@ -243,10 +243,14 @@ dependencies:
 
 git:
   branch: "main"
-  head_commit: "627567b"
-  head_subject: "phase6: characterize per-prv action bounds"
-  working_tree_at_audit: "STEP 6 artifacts committed at 627567b; results/phase5/_tmp/ scratch left untracked (pre-existing debt, not part of this commit)"
-  next_commit_subject: "phase6: approve drl actuator action space (approval checkpoint A); then STEP 7 state-spec checkpoints"
+  head_commit: "e91c363"
+  head_subject: "phase6: approve drl actuator action space"
+  recent_commits:
+    - "e91c363 phase6: approve drl actuator action space (action-space APPROVAL checkpoint A)"
+    - "8c89ba2 phase6: add VALVE-173 low-side refinement evidence (step6b)"
+    - "627567b phase6: characterize per-prv action bounds"
+  working_tree_note: "results/phase5/_tmp/ scratch (~600 files) + src/validation/__pycache__/*.pyc left untracked (pre-existing debt, deliberately NOT committed)."
+  next_commit_subject: "phase6: record action-space approval commit hash (checkpoint B); then STEP 7 state-spec checkpoints"
 
 risks:
   - "R1 (MEASURED, was HYPOTHESIS): driving PRV setpoints low DOES cause <20 psi service violations for 175 (<21.5), 176 (<20; negative <13), 177 (<20), 178 (<20). VALVE-173 is exempt (inert). Per-valve service-clean lower bounds now measured (step6, D-P6-003); a STEP-9 safety layer should still clamp to the approved bounds."
