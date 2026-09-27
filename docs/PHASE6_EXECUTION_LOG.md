@@ -608,4 +608,110 @@ RESEARCH ASSUMPTION · HYPOTHESIS TO TEST · DECISION REQUIRED.
 - **Next action:** researcher completes the §G decision form (selects ONE formulation + parameters,
   resolves D-P6-005); then STEP 9 safety clamp; reward function is STEP 11. DO NOT start PPO (§16).
 
+---
+
+## WU-13 — Record D-P6-005 = APPROVED (researcher selected C-A_F1_balanced_dense) — 2026-09-27
+
+- **Objective:** Record the researcher's explicit D-P6-005 decision. The researcher selected
+  **C-A_F1_balanced_dense** (Formulation F1 — normalized weighted sum) with weights
+  `w_L=1.0, w_U=1.0, w_P=1.0, w_A=0.1, w_E=0.0`. DOCUMENTATION ONLY — verify the selection is
+  internally consistent with the frozen repository, record it in the authoritative state/register/
+  human-readable docs, preserve all evidence; select/score/rank NOTHING new, implement no reward.py,
+  start no PPO.
+- **Starting state:** HEAD `4f20a3a`; STEP 8 WU-9/WU-10/WU-11/WU-12 COMPLETE; D-P6-004 APPROVED &
+  FROZEN; D-P6-005 **PROPOSED / researcher_selection=null**; action space APPROVED & FROZEN.
+- **Evidence inspected:** `results/phase6/p6_d_p6_005_decision_brief.json`
+  `candidate_parameterizations[C-A_F1_balanced_dense]` (equation, constants,
+  `provisional_weights` w_A=0.1/w_E=0.0) and `normalization_constants_frozen`
+  (leak_ref 84.72988433677985, req_ref 906.3987348621764, deficit_ref 28.671793365478514,
+  power_ref 88.10062475649187, movement_L2sq_max 28.0); `PROJECT_STATE.yaml`
+  `reward.fixed_normalization_constants`; `docs/PHASE6_DECISION_REGISTER.md` D-P6-005 section.
+- **Action taken:** (1) Verified the researcher's approved equation, weights and five constants equal
+  the on-disk `C-A_F1_balanced_dense` candidate and the frozen normalisation block **exactly** — no
+  contradiction, so §1's "do not alter unless a contradiction is found" holds and no value was changed.
+  (2) Recorded `D-P6-005 = APPROVED` in `PROJECT_STATE.yaml` (`reward.approved` block +
+  `reward.status`/`register_id`/`next`; `step8_reward_design`→APPROVED; `step9`→IN PROGRESS;
+  `next_action`/`still_open`/`session_checkpoint`). (3) Appended a
+  "**D-P6-005 — RESOLUTION: APPROVED (C-A_F1_balanced_dense)**" section to
+  `docs/PHASE6_DECISION_REGISTER.md` (factual rationale; C-B/C-C/C-D retained as unselected; both
+  C-C `unserved_ref` values preserved with provenance as non-blocking debt; evidence-preservation
+  note). (4) Added RESOLUTION banners + filled the decision forms in
+  `docs/PHASE6_D_P6_005_DECISION_BRIEF.md` (§11) and `docs/PHASE6_D_P6_005_RESEARCHER_SUMMARY.md` (§G).
+  (5) **Left UNCHANGED** the WU-11/WU-12 generated JSON snapshots, their pure generators, and their
+  byte-reproduction test batteries (`tests/test_decision_brief.py`, `tests/test_researcher_summary.py`)
+  — they are the frozen pre-decision evidence (status PROPOSED, researcher_selection=null) and are
+  intentionally not rewritten (CLAUDE.md §11/§12).
+- **Result:** D-P6-005 resolved. Approved reward (per-step NEGATIVE cost, higher = better):
+  `r_t = -w_L*(leak_t/leak_ref) -w_U*(unserved_t^+/req_ref) -w_P*(deficit_t/deficit_ref)
+  -w_A*(||da_t||^2/movement_L2sq_max) -w_E*(power_t/power_ref)`, `unserved_t^+=max(0,unserved_t)`,
+  `da_t` on COMMANDED normalised actions (static hold → 0), `w_E=0` disables energy numerically
+  while keeping the term explicit. Authoritative machine-readable record = `reward.approved`
+  (+ the STEP-9 JSON `d_p6_005_decision` block, WU-14); authoritative human-readable record =
+  the register RESOLUTION + the two decision-doc banners.
+- **Decision:** **D-P6-005 = APPROVED (2026-09-27), C-A_F1_balanced_dense.** Approval is specific to
+  THIS thesis environment/experimental design — NOT a claim that C-A is best/optimal/superior for
+  water-network DRL in general; no formulation was scored or ranked.
+- **Decision class:** RESEARCHER DECISION (recorded) + VALIDATED FACT (consistency check vs frozen repo).
+- **Files changed:** PROJECT_STATE.yaml; docs/PHASE6_DECISION_REGISTER.md;
+  docs/PHASE6_D_P6_005_DECISION_BRIEF.md; docs/PHASE6_D_P6_005_RESEARCHER_SUMMARY.md;
+  docs/PHASE6_EXECUTION_LOG.md; docs/PHASE6_EVIDENCE_INDEX.md; docs/RECOVERY.md. UNCHANGED (deliberate):
+  results/phase6/p6_d_p6_005_decision_brief.json, results/phase6/p6_d_p6_005_researcher_summary.json,
+  their generators, tests/test_decision_brief.py, tests/test_researcher_summary.py. NO reward.py, NO
+  PPO, NO action-space/observation reopened.
+- **Tests:** existing full battery re-run after the doc edits (the byte-reproduction batteries read
+  only the untouched JSON snapshots, so they must still pass at **84 ok**); see WU-14 for the run that
+  also adds the STEP-9 tests.
+- **Risks/caveats:** the reward SHAPES toward service but does NOT enforce a pressure bound — the
+  boundary-seeking optimum at the PRV lower corner (min svc ~1.295 psi) means a state-dependent hard
+  safety mechanism is required (STEP 9). Leak instrument uncalibrated → relative response only (R3);
+  effort scale analytic in statics (HYPOTHESIS); joint 5-D box safety single-corner only (R1b);
+  C-C `unserved_ref` discrepancy documented non-blocking (C-A/F1 does not use it); PPO deps missing (R4).
+- **Next action:** WU-14 — STEP 9 state-dependent safety-mechanism DESIGN ANALYSIS (characterise
+  S1-S4, NOT ranked; no production wrapper; no reward.py; no PPO).
+
+---
+
+## WU-14 — STEP 9 state-dependent safety-mechanism DESIGN ANALYSIS (characterisation only) — 2026-09-27
+
+- **Objective:** Begin STEP 9 — design (not implement) a state-dependent safety mechanism that
+  protects the hydraulic system from unsafe consequences of DRL actions, kept DISTINCT from the frozen
+  action-space bounds. Characterise four candidate admissibility mechanisms against measured evidence,
+  report each on a fixed schema, test baseline-compatibility, and state action-space-coverage limits.
+  **Do NOT rank the candidates, do NOT choose the final rule, do NOT implement the production wrapper,
+  do NOT implement reward.py, do NOT start PPO.**
+- **Starting state:** D-P6-005 APPROVED (WU-13, C-A_F1_balanced_dense). No STEP-9 artefacts existed.
+- **Evidence inspected (LOADED, not re-measured):** `results/phase6/p6_d_p6_005_decision_brief.json`
+  (`chronic_baseline_service_issue`: 386 node-ts <20psi, 0 negative, frac_ts_any<20psi=1.0, min svc
+  4.16452169418335 psi; `pathology_results_wu10.A_leakage_only_collapses_service`: leak-only argmax
+  `prv_lower_pump_lower`, min svc 1.2946763038635254 psi; `threshold_handling_options`),
+  `results/phase6/p6_s8_reward_scale_analysis.json` (frozen constants; boundary-seeking finding),
+  `results/phase6/p6_s7_state_spec.json` (observation_dim 139, service mask 121/5), and the frozen
+  action space (action_dim 7, bounds, ordering).
+- **Action taken:** Wrote a PURE aggregator `src/validation/p6_s9_safety_design_analysis.py` (no
+  EPANET / PPO / RNG / new measurement) that RE-LOADS the measured evidence, characterises
+  **S1** (absolute worst-node pressure threshold), **S2** (min-pressure degradation vs current state),
+  **S3** (pressure-deficit increase vs current state), **S4** (negative-pressure hard backstop) on a
+  fixed 11-field schema (exact rule · information required · computational cost · baseline
+  compatibility · false-positive risk · false-negative risk · PPO compatibility · 30-min-interval
+  compatibility · requires-hydraulic-look-ahead · preserves-determinism · notes), records the §12
+  baseline-compatibility verdicts and §13 action-space-coverage limits, embeds the `d_p6_005_decision`
+  block (C-A, APPROVED), and runs self-checks (action_dim 7, observation_dim 139, D-P6-005 equation
+  consistent with C-A, all values finite, forbidden-key-token scan). Emitted
+  `results/phase6/p6_s9_safety_design_analysis.json` (deterministic byte-reproduce). Authored
+  `docs/PHASE6_STEP9_SAFETY_DESIGN.md`. Added `tests/test_safety_design_analysis.py`.
+- **Result:** (to be finalised in this work unit; see the JSON + doc for the characterisation).
+- **Decision class:** DESIGN ANALYSIS (characterisation only; no mechanism selected or ranked).
+- **Files changed:** src/validation/p6_s9_safety_design_analysis.py (new);
+  results/phase6/p6_s9_safety_design_analysis.json (new); docs/PHASE6_STEP9_SAFETY_DESIGN.md (new);
+  tests/test_safety_design_analysis.py (new); PROJECT_STATE.yaml; docs/PHASE6_EVIDENCE_INDEX.md;
+  docs/RECOVERY.md; docs/PHASE6_EXECUTION_LOG.md.
+- **Tests:** `.venv/Scripts/python.exe -m unittest discover -s tests -v` → full battery (84 prior +
+  STEP-9 tests).
+- **Risks/caveats:** all four candidates are action-consequence checks → each needs a one-step
+  hydraulic look-ahead (or verify-and-fallback); a naive absolute min<20 reject is ILL-POSED on the
+  chronic-sub-20 baseline; joint 5-D box safety is single-corner only (R1b) so coverage is explicitly
+  partial; no production wrapper implemented; deps for PPO still missing (R4).
+- **Next action:** researcher selects a STEP-9 mechanism; the enforced production safety wrapper and
+  reward.py are STEP 11 (deps-blocked). No PPO.
+
 

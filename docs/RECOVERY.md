@@ -7,13 +7,17 @@ chat.**
 
 Last updated: 2026-09-27 (UTC) by Claude Opus 4.8. **Action space APPROVED & FROZEN
 2026-09-27 (D-P6-001/002/003); STEP 7 observation design APPROVED & FROZEN 2026-09-27
-(D-P6-004, observation_dim=139); STEP 8 (reward design — MEASURE component scales, do
-NOT train) MEASUREMENT COMPLETE 2026-09-27 (WU-9), FORMULATION COMPARISON COMPLETE
-2026-09-27 (WU-10, evidence only), D-P6-005 DECISION BRIEF PREPARED 2026-09-27
-(WU-11), and D-P6-005 RESEARCHER SUMMARY PREPARED 2026-09-27 (WU-12, researcher-facing
-presentation — pure re-shaping of the WU-11 brief). D-P6-005 remains PROPOSED / DECISION
-PENDING RESEARCHER — formulation & weights NOT selected; researcher_selection=null; the
-researcher decision form is BLANK.**
+(D-P6-004, observation_dim=139); STEP 8 reward design D-P6-005 = APPROVED 2026-09-27 —
+researcher selected `C-A_F1_balanced_dense` (F1 normalized weighted sum; weights
+w_L=1.0, w_U=1.0, w_P=1.0, w_A=0.1, w_E=0.0; 5 frozen normalisation constants unchanged).
+The reward formulation + weights are now FROZEN (WU-13). The reward function
+`src/env/reward.py` is STEP 11 and is NOT implemented. STEP 9 (state-dependent safety
+mechanism) DESIGN ANALYSIS is IN PROGRESS (WU-14, characterisation only — S1–S4 candidates,
+NOT ranked, no production wrapper). The WU-11/WU-12 decision-preparation JSON snapshots +
+their generators + byte-reproduction tests are RETAINED UNCHANGED (still status PROPOSED /
+researcher_selection=null) as frozen pre-decision evidence; the authoritative APPROVAL record
+is `PROJECT_STATE.yaml` (`reward.approved`) + `docs/PHASE6_DECISION_REGISTER.md`
+(D-P6-005 RESOLUTION). Do NOT choose final weights differently, do NOT start PPO.**
 
 ---
 
@@ -127,7 +131,25 @@ Source `results/phase5/g3_pump_speed.json`:
   psi); demand = Option A (no explicit demand; time-of-day diurnal prior; future demand
   FORBIDDEN); POMDP (approximate Markov; tanks = observed memory). 5/5 review points
   accepted in D-P6-004. STEP 8 (reward) reads this state but MUST NOT alter it.
-- **STEP 8 reward design — MEASUREMENT COMPLETE 2026-09-27 (D-P6-005 PROPOSED).**
+- **STEP 8 reward design — D-P6-005 = APPROVED 2026-09-27 (C-A_F1_balanced_dense, F1).**
+  The researcher selected **F1 — normalized weighted sum**, candidate `C-A_F1_balanced_dense`,
+  weights `w_L=1.0, w_U=1.0, w_P=1.0, w_A=0.1, w_E=0.0`; equation
+  `r_t = -w_L*(leak/leak_ref) -w_U*(unserved^+/req_ref) -w_P*(deficit/deficit_ref)
+  -w_A*(||da||^2/movement_L2sq_max) -w_E*(power/power_ref)` (per-step NEGATIVE cost;
+  `unserved^+=max(0,unserved)`; `da` on COMMANDED normalised actions; `w_E=0` keeps the energy
+  term explicit but off). Frozen constants unchanged: leak_ref 84.72988433677985, req_ref
+  906.3987348621764, deficit_ref 28.671793365478514, power_ref 88.10062475649187,
+  movement_L2sq_max 28.0. Verified byte-identical to disk `candidate_parameterizations[C-A]` +
+  `normalization_constants_frozen` — no contradiction. Recorded (WU-13) in
+  `PROJECT_STATE.yaml` (`reward.approved`), `docs/PHASE6_DECISION_REGISTER.md` (D-P6-005
+  RESOLUTION), and RESOLUTION banners/forms in `docs/PHASE6_D_P6_005_DECISION_BRIEF.md` (§11)
+  and `docs/PHASE6_D_P6_005_RESEARCHER_SUMMARY.md` (§G). C-B/C-C/C-D retained as unselected; the
+  two C-C `unserved_ref` values (15.103309701248634 DSR-implied vs 14.98483697365873 accounting)
+  preserved as documented non-blocking debt (C-A/F1 does not use unserved_ref). The WU-11/WU-12
+  generated JSONs + generators + tests are RETAINED UNCHANGED (byte-reproducible; still PROPOSED /
+  researcher_selection=null). reward.py is STEP 11, NOT implemented; no PPO. **The STEP-8 evidence
+  base below (WU-9…WU-12) is frozen — do not re-run.**
+- **STEP 8 reward evidence base (WU-9…WU-12) — MEASUREMENT COMPLETE 2026-09-27 (frozen).**
   Empirically MEASURED the natural scale/variability/temporal behaviour/cross-correlation
   of 10 candidate reward components over 19 static in-bounds configs × 193 report ts
   (3667 pooled instants), ran the reward-pathology checks against measured evidence, and
@@ -183,8 +205,17 @@ Source `results/phase5/g3_pump_speed.json`:
   can still be scientifically wrong" analysis, and the reward-vs-STEP-9 layer separation; no
   winner/rank/score keys anywhere. NEXT: researcher completes the §G decision form (resolves
   D-P6-005). Do NOT choose final weights, do NOT start PPO.
-- STEP 9 safety layer, STEP 10 demand uncertainty/splits: NOT STARTED.
-  STEP-9 must hard-clamp to the approved bounds.
+- **STEP 9 safety layer — DESIGN ANALYSIS IN PROGRESS 2026-09-27 (WU-14).** State-dependent
+  safety mechanism, DISTINCT from the frozen action-space bounds. Characterises 4 candidate
+  admissibility mechanisms (S1 absolute worst-node threshold; S2 min-pressure degradation vs
+  current state; S3 pressure-deficit increase; S4 negative-pressure hard backstop) on measured
+  evidence — **NOT ranked**, **no production wrapper implemented yet**. Key design constraint: a
+  naive `if min_pressure<20: reject` is ILL-POSED (native baseline has 386 chronic sub-20 node-ts,
+  min svc 4.16452 psi, 0 negative); leakage-driven behaviour pushes min svc to ~1.295 psi, so a
+  state-dependent clamp is required. Artefacts: `docs/PHASE6_STEP9_SAFETY_DESIGN.md`,
+  `results/phase6/p6_s9_safety_design_analysis.json`, `src/validation/p6_s9_safety_design_analysis.py`,
+  `tests/test_safety_design_analysis.py`. STEP-9 must hard-clamp to the approved bounds and (if 179
+  ever controlled) VALVE-179 ≤ 44.7 psi. STEP 10 demand uncertainty/splits: NOT STARTED.
 - STEP 11 `src/env/` (8 modules) + STEP 12 `tests/` (16 tests) + STEP 13 SB3
   smoke test: BLOCKED — deps missing.
 

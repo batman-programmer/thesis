@@ -5,6 +5,23 @@
 **researcher_selection:** `null`
 **Prepared:** 2026-09-27 · WU-12 · this file selects/scores/ranks/recommends **nothing**.
 
+> ### ✅ RESOLUTION — D-P6-005 = APPROVED (2026-09-27): researcher selected C-A_F1_balanced_dense
+>
+> This summary was prepared as a researcher-facing **presentation** while
+> `researcher_selection` was `null`. The researcher's D-P6-005 decision, recorded **2026-09-27**,
+> is **APPROVED — `C-A_F1_balanced_dense` (Formulation F1, normalized weighted sum)**, weights
+> `w_L=1.0, w_U=1.0, w_P=1.0, w_A=0.1, w_E=0.0`. The completed decision form is in §G below.
+>
+> The companion JSON
+> [`results/phase6/p6_d_p6_005_researcher_summary.json`](../results/phase6/p6_d_p6_005_researcher_summary.json)
+> is **retained UNCHANGED** as the byte-reproducible pre-decision snapshot (still `PROPOSED`,
+> `researcher_selection: null`) per CLAUDE.md §11/§12. The authoritative resolution records are
+> `PROJECT_STATE.yaml` (`reward.approved`) and
+> [`docs/PHASE6_DECISION_REGISTER.md`](PHASE6_DECISION_REGISTER.md) (D-P6-005 RESOLUTION). Approval
+> is specific to this thesis environment/experimental design — not a claim of universal superiority;
+> no formulation was scored or ranked.
+
+
 > This document is a **presentation** of already-persisted evidence. It measures
 > nothing new (no EPANET, no PPO, no RNG). Every number is copied verbatim from
 > the WU-11 decision brief. It exists only to let the researcher make an explicit
@@ -259,28 +276,57 @@ create a safety guarantee — the STEP-9 clamp is required regardless.
 
 ---
 
-## G. Researcher decision form (D-P6-005) — **BLANK, to be completed by the researcher**
+## G. Researcher decision form (D-P6-005) — **COMPLETED 2026-09-27 (recorded from researcher decision)**
+
+*The researcher made the D-P6-005 selection on 2026-09-27; the completed form is recorded below.
+The AI did not choose the formulation or weights — it records the researcher's decision. The empty
+template is preserved as a comment for provenance.*
+
+<!-- ORIGINAL BLANK FORM (superseded by the completed form below):
+Selected formulation (F1 / F2 / F3 / F4 or a candidate C-A/C-B/C-C/C-D): ____
+Selected parameters / weights: ____
+Rationale: ____
+Any modification to the proposed candidate: ____
+Approval status (APPROVED / REJECTED / NEEDS-REVISION): ____
+Researcher: ____   Date: ____
+-->
 
 ```
-D-P6-005 — REWARD FORMULATION SELECTION
+D-P6-005 — REWARD FORMULATION SELECTION   [COMPLETED — RECORDED FROM RESEARCHER DECISION]
 ========================================
-Selected formulation (F1 / F2 / F3 / F4 or a candidate C-A/C-B/C-C/C-D): ______________________
+Selected formulation (F1 / F2 / F3 / F4 or a candidate C-A/C-B/C-C/C-D):
+  F1 — normalized weighted sum   (candidate C-A_F1_balanced_dense)
 
-Selected parameters / weights (list every weight, coefficient, threshold): ____________________
-  ____________________________________________________________________________________________
+Selected parameters / weights (list every weight, coefficient, threshold):
+  w_L = 1.0 ; w_U = 1.0 ; w_P = 1.0 ; w_A = 0.1 ; w_E = 0.0
+  Frozen normalisation constants (adopted from WU-9 as-is):
+    leak_ref = 84.72988433677985 GPM ; req_ref = 906.3987348621764 GPM ;
+    deficit_ref = 28.671793365478514 psi·nodes ; power_ref = 88.10062475649187 kW ;
+    movement_L2sq_max = 28.0
+  Reward equation:
+    r_t = - w_L*(leak_t/leak_ref) - w_U*(unserved_t^+/req_ref) - w_P*(deficit_t/deficit_ref)
+          - w_A*(||da_t||^2/movement_L2sq_max) - w_E*(power_t/power_ref)
+    unserved_t^+ = max(0, unserved_t) ; da_t on COMMANDED normalised actions (static hold -> 0).
 
-Rationale (why this formulation + these parameters, on the measured evidence): ________________
-  ____________________________________________________________________________________________
+Rationale (why this formulation + these parameters, on the measured evidence):
+  Single dense, differentiable reward jointly representing leakage management + service/unserved
+  protection + pressure-deficit protection + actuator-movement regularization, with fixed
+  normalisation and interpretable weights, grounded in the measured STEP 8 evidence. Specific to
+  this thesis environment/experimental design; not a claim of universal superiority; no ranking.
 
-Any modification to the proposed candidate (equation, constant, weight, or none): ____________
-  ____________________________________________________________________________________________
+Any modification to the proposed candidate (equation, constant, weight, or none):
+  None. Adopted exactly as candidate C-A_F1_balanced_dense (verified byte-identical to the brief;
+  no contradiction found in the repository). The enforced 20-psi pressure guarantee is delegated
+  to the STEP-9 state-dependent safety mechanism (separate layer); NO hard 20-psi reward term.
 
-Approval status (APPROVED / REJECTED / NEEDS-REVISION): _______________________________________
+Approval status (APPROVED / REJECTED / NEEDS-REVISION):  APPROVED
 
-Researcher: ______________________________       Date: ______________________________
+Researcher: (researcher, explicit selection)             Date: 2026-09-27
 ```
 
-*(No field above is filled. D-P6-005 remains PROPOSED until the researcher completes this form.)*
+*(D-P6-005 is APPROVED — C-A_F1_balanced_dense. The companion JSON snapshot is retained unchanged
+as pre-decision evidence — `PROPOSED` / `researcher_selection: null`; the authoritative resolution
+lives in `PROJECT_STATE.yaml` and `docs/PHASE6_DECISION_REGISTER.md`.)*
 
 ---
 

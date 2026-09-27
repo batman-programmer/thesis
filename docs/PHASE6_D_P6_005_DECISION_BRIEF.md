@@ -7,6 +7,24 @@
 selects ONE formulation and its parameters. Nothing here selects, ranks, scores, or
 declares a winner among F1–F4 (constitution §16; task PART 12).
 
+> ### ✅ RESOLUTION — D-P6-005 = APPROVED (2026-09-27): researcher selected C-A_F1_balanced_dense
+>
+> This brief was prepared as **decision-preparation material** (`researcher_selection` was
+> `null` at preparation time). The researcher's D-P6-005 decision, recorded **2026-09-27**, is:
+> **APPROVED — `C-A_F1_balanced_dense` (Formulation F1, normalized weighted sum)** with weights
+> `w_L=1.0, w_U=1.0, w_P=1.0, w_A=0.1, w_E=0.0`. The full recorded decision is in §11 below.
+>
+> The companion JSON
+> [`results/phase6/p6_d_p6_005_decision_brief.json`](../results/phase6/p6_d_p6_005_decision_brief.json)
+> is **retained UNCHANGED** as the byte-reproducible pre-decision snapshot (it still reads
+> `status: PROPOSED`, `researcher_selection: null`) per CLAUDE.md §11/§12; it is historical
+> decision-preparation evidence, not the resolution record. The **authoritative** records of the
+> resolution are `PROJECT_STATE.yaml` (`reward.approved`) and
+> [`docs/PHASE6_DECISION_REGISTER.md`](PHASE6_DECISION_REGISTER.md) (D-P6-005 RESOLUTION). This
+> approval is specific to this thesis environment/experimental design — **not** a claim that C-A is
+> best/optimal/superior for water-network DRL in general; no formulation was scored or ranked.
+
+
 > **This brief converts the completed STEP 8 evidence (WU-9 scale analysis + WU-10
 > formulation comparison) into a decision-ready package.** It runs no new EPANET
 > simulation, trains no PPO, adds no STEP-9 safety clamp, and modifies neither the
@@ -368,35 +386,75 @@ incentive landscape, **not** a basis for declaring any formulation superior.
 
 ## 11. Researcher decision block
 
-*To be completed by the researcher. The AI must NOT fill this in (task PART 13).*
+*Original state (preparation time): BLANK, to be completed by the researcher. The researcher
+made the D-P6-005 selection on 2026-09-27; the AI records that selection verbatim below (it did
+NOT choose the formulation or weights). The empty template is preserved as a comment for provenance.*
 
-```
-D-P6-005 — Reward formulation & parameter selection
-
-Selected formulation:        __________________________________________
-                             (F1 / F2 / F3 / F4 / a named candidate / other)
-
-Selected parameters:         __________________________________________
-                             (exact weights / Λ / BIG / θ / c_soft / c_hard / ε / w_A / w_E)
-
-Normalisation constants:     [ ] adopt frozen WU-9 constants as-is
-                             [ ] other: ___________________________________
-
-Safety-term choice (§6):     __________________________________________
-                             (dense deficit / worst-node min-pressure / baseline-relative /
-                              negative-only hard gate; NO hard 20-psi reward term)
-
-Rationale:                   __________________________________________
-
-Approval date:               __________________________________________
-
+<!-- ORIGINAL BLANK TEMPLATE (superseded by the researcher's recorded decision below):
+Selected formulation:        (F1 / F2 / F3 / F4 / a named candidate / other)
+Selected parameters:         (exact weights / Λ / BIG / θ / c_soft / c_hard / ε / w_A / w_E)
+Normalisation constants:     [ ] adopt frozen WU-9 constants as-is  [ ] other
+Safety-term choice (§6):     (dense deficit / worst-node min-pressure / baseline-relative / negative-only hard gate)
+Rationale:                   ____
+Approval date:               ____
 Approval status:             [ ] APPROVED   [ ] REVISIONS REQUESTED   [ ] REJECTED
+-->
+
 ```
+D-P6-005 — Reward formulation & parameter selection  [RECORDED FROM RESEARCHER DECISION]
+
+Selected formulation:        F1 — normalized weighted sum
+                             (candidate C-A_F1_balanced_dense)
+
+Selected parameters:         w_L = 1.0, w_U = 1.0, w_P = 1.0, w_A = 0.1, w_E = 0.0
+
+Approved equation:           r_t = - w_L*(leak_t/leak_ref)
+                                   - w_U*(unserved_t^+/req_ref)
+                                   - w_P*(deficit_t/deficit_ref)
+                                   - w_A*(||da_t||^2/movement_L2sq_max)
+                                   - w_E*(power_t/power_ref)
+                             unserved_t^+ = max(0, unserved_t)
+                             da_t = commanded_norm_action_t - previous commanded_norm_action
+                                    (static hold -> da_t = 0)
+                             w_E = 0 disables the energy term numerically but keeps it explicit.
+
+Normalisation constants:     [X] adopt frozen WU-9 constants as-is
+                             leak_ref        = 84.72988433677985  GPM
+                             req_ref         = 906.3987348621764  GPM
+                             deficit_ref     = 28.671793365478514 psi·nodes
+                             power_ref       = 88.10062475649187  kW
+                             movement_L2sq_max = 28.0
+
+Safety-term choice (§6):     dense pressure-deficit term inside the reward (w_P above);
+                             NO hard 20-psi reward term (ill-posed on the chronic-sub-20
+                             baseline). The ENFORCED pressure guarantee is delegated to the
+                             STEP-9 state-dependent safety mechanism (separate layer).
+
+Rationale:                   Single dense, differentiable reward jointly representing leakage
+                             management + service/unserved protection + pressure-deficit
+                             protection + actuator-movement regularization, with fixed
+                             normalisation and interpretable weights, built on the measured
+                             STEP 8 evidence. Specific to this thesis environment/experimental
+                             design; not a claim of universal superiority; no ranking performed.
+
+Approval date:               2026-09-27
+
+Approval status:             [X] APPROVED   [ ] REVISIONS REQUESTED   [ ] REJECTED
+```
+
+**Unselected candidates (retained, not deleted):** `C-B_F1_safety_leaning` (`w_P=2.0`),
+`C-C_F3_baseline_relative`, `C-D_dense_deficit_no_hard_count` remain on record as unselected
+provisional candidates. **C-C `unserved_ref` provenance:** the two distinct persisted values
+`15.103309701248634` (C-C DSR-implied) and `14.98483697365873` (F3 accounting) are preserved,
+not merged; since the approved formulation (F1) does not use `unserved_ref`, this is a documented
+non-blocking research-debt item.
 
 ---
 
-*End of brief. D-P6-005 remains **PROPOSED / DECISION PENDING RESEARCHER**. Nothing in this
-document selects, ranks, scores, or declares a winner among F1–F4.*
+*End of brief. D-P6-005 is **APPROVED (2026-09-27) — C-A_F1_balanced_dense**. This document was
+the decision-preparation brief; it ranked/scored/selected nothing itself — the researcher made the
+selection, recorded here. The companion JSON snapshot is retained unchanged (PROPOSED/null) as
+pre-decision evidence.*
 
 
 

@@ -233,7 +233,46 @@ new measurement; every equation/constant/weight copied verbatim (only Persian/En
 | Needed claim | Why missing | How to obtain |
 |---|---|---|
 | Joint 5-D action-box safety (mixed corners/interior/pump+demand) | only single lower-corner tested (R1b) | STEP 9 safety layer + STEP 12 automated joint tests |
-| Reward formulation + weights (D-P6-005 selection) | STEP 8 MEASURES scales/pathologies (WU-9), COMPARES F1–F4 under provisional params (WU-10), PREPARES a decision brief with 4 provisional NOT-APPROVED candidates (WU-11), and RE-SHAPES it into a researcher-facing presentation (WU-12); no formulation selected, no weights chosen | researcher completes the §G decision form in `docs/PHASE6_D_P6_005_RESEARCHER_SUMMARY.md` (or the block in `docs/PHASE6_D_P6_005_DECISION_BRIEF.md`) — selects ONE formulation + parameters, resolves D-P6-005; STEP 11 implements `src/env/reward.py` |
+| Reward formulation + weights (D-P6-005 selection) | **OBTAINED 2026-09-27 (WU-13): D-P6-005 = APPROVED, C-A_F1_balanced_dense (F1, w_L=1.0,w_U=1.0,w_P=1.0,w_A=0.1,w_E=0.0)** | recorded in `PROJECT_STATE.yaml :: reward.approved` + `docs/PHASE6_DECISION_REGISTER.md` (D-P6-005 RESOLUTION) + §11/§G banners in the two decision docs; STEP 11 implements `src/env/reward.py` (deps-blocked) |
 | Realised actuator-movement distribution | static runs = 0 movement; effort scale is analytic (R5-effort, HYPOTHESIS) | measured at training time once a policy trajectory exists |
 | Leak calibration | instrument uncalibrated (R3) | out of Phase 6 scope; relative response only |
 | Observation/state design | DELIVERABLES PRODUCED; D-P6-004 PROPOSED — awaiting researcher approval (not frozen) | researcher sign-off on the 5 review points → freeze 139-dim layout |
+
+## STEP 8 — D-P6-005 RESOLUTION (WU-13, APPROVED 2026-09-27 — C-A_F1_balanced_dense)
+
+Researcher decision recorded (AI did not select). Authoritative records:
+`PROJECT_STATE.yaml :: reward.approved` and `docs/PHASE6_DECISION_REGISTER.md` (D-P6-005
+RESOLUTION). Human-readable forms filled: `docs/PHASE6_D_P6_005_DECISION_BRIEF.md` §11 and
+`docs/PHASE6_D_P6_005_RESEARCHER_SUMMARY.md` §G (RESOLUTION banners added). The WU-11/WU-12
+generated JSON snapshots + generators + byte-reproduction tests are **retained UNCHANGED**
+(still PROPOSED / researcher_selection=null) as frozen pre-decision evidence (CLAUDE.md §11/§12).
+
+| Claim | Source | Value | Interpretation |
+|---|---|---|---|
+| Selected formulation | reward.approved.selected_candidate / formulation | C-A_F1_balanced_dense — F1 normalized weighted sum | one dense negative-cost reward (higher = better) |
+| Approved weights | reward.approved.weights | w_L=1.0, w_U=1.0, w_P=1.0, w_A=0.1, w_E=0.0 | leakage + unserved + deficit protected equally; effort lightly regularised; energy off but explicit |
+| Approved equation | reward.approved.equation | r_t = -w_L(leak/leak_ref) -w_U(unserved⁺/req_ref) -w_P(deficit/deficit_ref) -w_A(‖da‖²/movement_L2sq_max) -w_E(power/power_ref) | unserved⁺=max(0,unserved); da on COMMANDED normalised actions (static → 0) |
+| Frozen constants (adopted as-is) | reward.approved.frozen_normalization_constants | leak_ref 84.72988433677985, req_ref 906.3987348621764, deficit_ref 28.671793365478514, power_ref 88.10062475649187, movement_L2sq_max 28.0 | byte-identical to WU-9 and to brief `normalization_constants_frozen`; no drift |
+| Consistency vs frozen repo | reward.approved.consistency_check | equals `candidate_parameterizations[C-A]` (w_A=0.1,w_E=0.0) exactly | §1 "do not alter unless contradiction" satisfied — no contradiction found |
+| Unselected candidates retained | reward.approved.unselected_candidates_retained | C-B (w_P=2.0), C-C (F3), C-D — not deleted | decision history preserved |
+| C-C unserved_ref debt | reward.approved.c_c_unserved_ref_debt | 15.103309701248634 (DSR-implied) vs 14.98483697365873 (F3 accounting) preserved distinct | non-blocking (F1/C-A does not use unserved_ref) |
+| Rationale scope | reward.approved.rationale_factual | specific to this thesis env/design; no best/optimal/superior/winner; no ranking | approval is scoped, not a universal claim |
+
+## STEP 9 — state-dependent safety-mechanism DESIGN ANALYSIS (WU-14, IN PROGRESS 2026-09-27)
+
+Doc: `docs/PHASE6_STEP9_SAFETY_DESIGN.md`. Raw artefact:
+`results/phase6/p6_s9_safety_design_analysis.json`; generator
+`src/validation/p6_s9_safety_design_analysis.py`; tests `tests/test_safety_design_analysis.py`.
+**Characterisation only — candidates NOT ranked, no production wrapper implemented, no reward.py,
+no PPO.** Pure aggregator: RE-LOADS measured evidence (no new EPANET / PPO / RNG).
+
+| Claim | Section/Key | Result | Interpretation |
+|---|---|---|---|
+| Naive absolute min<20 reject is ill-posed | baseline_compatibility / chronic_baseline | 386 node-ts <20psi, 0 negative, frac_ts_any<20psi 1.0, min svc 4.16452 psi | a rule that rejects any sub-20 state would reject the native baseline itself |
+| Leakage-driven behaviour endangers service | evidence_loaded.leak_only_min_service | min svc 1.2946763038635254 psi at `prv_lower_pump_lower` | motivates a state-dependent safety mechanism distinct from the reward |
+| Four candidate mechanisms characterised (not ranked) | safety_candidates[] | S1 absolute worst-node threshold; S2 min-pressure degradation vs current; S3 deficit increase; S4 negative-pressure hard backstop | each on an 11-field schema; NO ranking/winner/score |
+| Baseline-compatibility verdicts | baseline_compatibility[] | per-candidate: does it falsely flag the chronic-sub-20 baseline as unsafe? | S1@20 flags baseline; S4 (negative-only) does not; S2/S3 depend on reference |
+| Action-space coverage limits | action_space_coverage | single lower-corner only (R1b); interior/mixed corners/pump+demand unverified | do not claim the 7-D box globally safe |
+| Frozen invariants unchanged | frozen_constraints_snapshot | action_dim 7; observation_dim 139; service mask 121/5; bounds/ordering/native rules/leak instrument | STEP-9 is an external layer; no topology/native-rule change |
+| Determinism | self_checks / (test) byte-reproduce | rebuilt JSON byte-reproduces the artefact; all values finite; no forbidden key tokens | reproducible; no RNG |
+| Test battery | tests/test_safety_design_analysis.py | STEP-9 tests + prior 84 full battery | schema/finite/no-ranking/D-P6-005-consistency/frozen-invariants/byte-reproduce |

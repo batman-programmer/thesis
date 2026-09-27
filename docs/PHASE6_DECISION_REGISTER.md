@@ -637,5 +637,79 @@ sensitivity sweeps as an incentive-direction indicator, NOT a ranking; (ix) keep
 reward (D-P6-005) separate from the STEP-9 safety clamp; (x) leaves the researcher decision
 block blank. **D-P6-005 remains PROPOSED / DECISION PENDING RESEARCHER.**
 
+### D-P6-005 — RESOLUTION: APPROVED (2026-09-27) — researcher selected C-A_F1_balanced_dense
+
+- **Decision:** **D-P6-005 = APPROVED.** The researcher selected
+  **`C-A_F1_balanced_dense`** — **Formulation F1 (normalised weighted sum)** — as the
+  reward for the DRL environment of this thesis.
+- **Approved reward equation (verbatim; a per-step NEGATIVE cost, higher = better):**
+
+  ```
+  r_t = - w_L*(leak_t/leak_ref)
+        - w_U*(unserved_t^+/req_ref)
+        - w_P*(deficit_t/deficit_ref)
+        - w_A*(||da_t||^2/movement_L2sq_max)
+        - w_E*(power_t/power_ref)
+  ```
+
+- **Approved parameters (weights):** `w_L=1.0, w_U=1.0, w_P=1.0, w_A=0.1, w_E=0.0`.
+- **Frozen normalisation constants (unchanged from WU-9; measured once, no running stats):**
+  `leak_ref=84.72988433677985 GPM`, `req_ref=906.3987348621764 GPM`,
+  `deficit_ref=28.671793365478514 psi·nodes`, `power_ref=88.10062475649187 kW`,
+  `movement_L2sq_max=28.0`.
+- **Term semantics (verbatim):** `unserved_t^+ = max(0, unserved_t)`;
+  `da_t = commanded normalised action_t − previous commanded normalised action`
+  (a static hold gives `da_t = 0`); `w_E=0` disables the energy term numerically but the
+  term stays explicitly represented for a future energy ablation.
+- **Consistency check (no repository contradiction):** the approved equation, weights and
+  constants equal `candidate_parameterizations[C-A_F1_balanced_dense]` and
+  `normalization_constants_frozen` in `results/phase6/p6_d_p6_005_decision_brief.json`
+  **exactly** (weights `w_A=0.1, w_E=0.0`; five constants byte-identical). No value was
+  altered; §1's "do not alter unless a contradiction is found" is satisfied — none was found.
+- **Rationale (factual, per researcher; NOT a claim of universal superiority):** C-A gives a
+  single dense, differentiable reward that simultaneously represents leakage management,
+  service/unserved protection, pressure-deficit protection and actuator-movement
+  regularisation, with fixed normalisation and interpretable unit-ish weights, built on the
+  existing STEP 8 measured evidence. This approval is specific to **this thesis environment
+  and experimental design**; it is **not** a finding that C-A is best/optimal/superior for
+  water-network DRL in general, and no formulation was scored or ranked to reach it.
+- **Unselected candidates (retained, NOT deleted):** `C-B_F1_safety_leaning`
+  (`w_P=2.0`), `C-C_F3_baseline_relative`, and `C-D_dense_deficit_no_hard_count` remain on
+  disk as unselected provisional candidates. They are preserved as decision history, not
+  removed.
+- **C-C `unserved_ref` provenance (§5, documented non-blocking research debt):** two
+  DISTINCT persisted values are **preserved, not merged** — `15.103309701248634` GPM
+  (C-C DSR-implied, `candidate_parameterizations[C-C].constants.unserved_ref_gpm`) vs
+  `14.98483697365873` GPM (F3-family accounting, WU-9/WU-10 `unserved_ref`). Because the
+  approved formulation is **C-A (F1)**, which does **not** use `unserved_ref`, this
+  discrepancy does **not** affect the approved reward and is recorded as a documented,
+  non-blocking research-debt item. Neither WU-9/WU-10 evidence nor either persisted value
+  was falsified or overwritten.
+- **Preserved frozen decisions (unchanged by this approval):** action space
+  D-P6-001/002/003 (encoding ABSOLUTE; PRV bounds 173[54.5,100]/175[21.5,110]/176[20,59.524]/
+  177[20,90]/178[20,74]; pump bounds P170[0.82,1.10]/P172[0.77,1.10]; order
+  [173,175,176,177,178,P170,P172]; `action_dim=7`) and observation D-P6-004
+  (`observation_dim=139`). Topology, service-node mask (121/5), native pump STATUS rules,
+  leak instrument, hydraulic/rule/report timesteps and solver settings are unchanged.
+- **Reproducibility / evidence-preservation note (disclosed, deliberate):** the
+  decision-preparation artefacts `results/phase6/p6_d_p6_005_decision_brief.json` (WU-11) and
+  `results/phase6/p6_d_p6_005_researcher_summary.json` (WU-12), together with their pure
+  generators and byte-reproduction test batteries (`tests/test_decision_brief.py`,
+  `tests/test_researcher_summary.py`), are **retained UNCHANGED** as the frozen snapshot of
+  the state *before* the decision (`status: PROPOSED`, `researcher_selection: null`). They are
+  historical decision-preparation evidence (CLAUDE.md §11/§12) and are intentionally not
+  rewritten. The **authoritative machine-readable record** of this APPROVAL is
+  `PROJECT_STATE.yaml` (`reward.approved`) plus the new STEP-9 artefact
+  `results/phase6/p6_s9_safety_design_analysis.json` (`d_p6_005_decision` block); the
+  **authoritative human-readable record** is this register entry and the RESOLUTION banners
+  added to `docs/PHASE6_D_P6_005_DECISION_BRIEF.md` (§11) and
+  `docs/PHASE6_D_P6_005_RESEARCHER_SUMMARY.md` (§G).
+- **Status:** **APPROVED 2026-09-27.** Supersedes the PROPOSED status above; the PROPOSED
+  history (and WU-9/WU-10/WU-11/WU-12 notes) is preserved intact.
+- **Approval:** researcher (explicit selection, 2026-09-27).
+- **Next:** STEP 9 — state-dependent safety mechanism (design analysis only; see
+  `docs/PHASE6_STEP9_SAFETY_DESIGN.md`). The reward function `src/env/reward.py` is STEP 11
+  and is NOT implemented by this decision. No PPO training.
+
 
 
