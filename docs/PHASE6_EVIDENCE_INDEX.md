@@ -103,10 +103,33 @@ underlying evidence.
 | Upper-bound terminology | 175/176/177/178 uppers = highest tested REGULATING, NOT ceilings | p6_s6b_v173 activity_definitions; p6_s6 high_side_regulation (four caps still Active) |
 | Joint-box safety | single lower-corner only; NOT exhaustive | p6_s6 cross_actuator_joint_lower_corner (ONE corner) → STEP-9/12 |
 
+## STEP 7 — DRL observation / state design (D-P6-004, PROPOSED)
+
+Spec: `docs/PHASE6_STATE_SPEC.md` (§7.1–§7.14). Register: D-P6-004 (PROPOSED) in
+`docs/PHASE6_DECISION_REGISTER.md`. State: `PROJECT_STATE.yaml :: state_space` and
+`session_checkpoint.step7_2026_09_27`. Design is PROPOSED, layout NOT frozen until
+approved. Raw evidence: `results/phase6/p6_s7_state_spec.json`; tests
+`tests/test_state_builder.py`.
+
+| Claim | Evidence file | Key |
+|---|---|---|
+| observation_dim = 139, float32 | p6_s7_state_spec.json | `observation_dim`, `dtype` |
+| Block layout (7 blocks, index ranges) | p6_s7_state_spec.json | `block_layout_index_ranges` |
+| 121 service nodes, 5 connectors excluded | p6_s7_state_spec.json | `service_node_count`, `connector_nodes_excluded` |
+| Tank level bounds (130 [0,32.1], 131 [0,41.9] ft) | p6_s7_state_spec.json | `tank_level_bounds_ft` |
+| Approved actuator bounds echoed consistently | p6_s7_state_spec.json | `prv_bounds_psi`, `pump_bounds_rel_speed` |
+| Pressure norm band [-20,300] psi | p6_s7_state_spec.json | `pressure_norm_band_psi` |
+| Module constants match frozen spec + live INP | p6_s7_state_spec.json | `consistency_with_frozen_spec` (all true) |
+| One genuine observation @ t=43200 s, checks pass | p6_s7_state_spec.json | `sample_observation`, `sample_checks` (all true) |
+| Deterministic builder, 9-test battery | tests/test_state_builder.py | `discover -s tests` → 9 ok |
+| No future information (contract) | tests/test_state_builder.py | test_7_no_future_information |
+| Connector exclusion enforced | tests/test_state_builder.py | test_8_connector_exclusion |
+| Prev-commanded vs realized kept distinct | tests/test_state_builder.py | test_9_prev_action_semantics |
+
 ## Still-missing evidence (drives next action)
 
 | Needed claim | Why missing | How to obtain |
 |---|---|---|
 | Joint 5-D action-box safety (mixed corners/interior/pump+demand) | only single lower-corner tested (R1b) | STEP 9 safety layer + STEP 12 automated joint tests |
 | Leak calibration | instrument uncalibrated (R3) | out of Phase 6 scope; relative response only |
-| Observation/state design | STEP 7 IN PROGRESS | STEP 7 → docs/PHASE6_STATE_SPEC.md + results/phase6/p6_s7_*.json |
+| Observation/state design | DELIVERABLES PRODUCED; D-P6-004 PROPOSED — awaiting researcher approval (not frozen) | researcher sign-off on the 5 review points → freeze 139-dim layout |

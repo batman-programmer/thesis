@@ -313,3 +313,48 @@ RESEARCH ASSUMPTION · HYPOTHESIS TO TEST · DECISION REQUIRED.
   and `__pycache__/*.pyc` deliberately excluded.
 - **Next action:** STEP 7 — DRL state/observation design (WU-8).
 
+## WU-8 — STEP 7: DRL state/observation design (2026-09-27, current session)
+
+- **Objective:** Define exactly what the PPO agent observes at each control step
+  (state design ONLY — no reward/safety/demand/env), fully justified, labelled, and
+  reproducible. Register as D-P6-004 (Level-2), keep PROPOSED (not frozen).
+- **Starting state:** Action space APPROVED & FROZEN (D-P6-001/002/003, WU-7, commit
+  e91c363). No observation defined yet. Deps: numpy present; gymnasium/torch/SB3
+  absent (state builder needs only numpy → not blocked).
+- **Evidence inspected:** approved action vector (order 173/175/176/177/178/170/172);
+  121 service nodes / 5 connectors excluded (Phase-5 gate-10 rule via `p6_s3`); tank
+  bounds (130 [0,32.1] ft, 131 [0,41.9] ft); pump STATUS reset → realized≠commanded
+  (G12, `p6_s4_pump_strategy.json`); reference safety numbers (`p6_s3_prv_finechar.json`,
+  386 nodes <20 psi, 0 negative, min 4.165 psi); measured service pressure range
+  ≈4.2–288 psi (p99 ≈184).
+- **Action taken:** Designed a 139-dim float32 observation: pressures[0:121],
+  tank_levels[121:123], prev_cmd_prv_setpoint[123:128], prv_is_active[128:133],
+  prev_cmd_pump_speed[133:135], pump_realized_speed[135:137], time_of_day sin/cos
+  [137:139]. Fixed physical normalization only (pressure band [-20,300] psi). Demand
+  = Option A (no explicit demand; time-of-day diurnal prior; future demand FORBIDDEN).
+  Wrote `docs/PHASE6_STATE_SPEC.md` (§7.1–§7.14). Implemented the pure numpy builder
+  `src/env/state_builder.py` (+ `src/env/__init__.py`), 9-test battery
+  `tests/test_state_builder.py`, and evidence generator `src/validation/p6_s7_state_spec.py`
+  → `results/phase6/p6_s7_state_spec.json`.
+- **Result:** `observation_dim = 139`; `consistency_with_frozen_spec` all true; one
+  genuine observation @ t=43200 s (5 PRVs Active → is_active=1; both pumps CLOSED →
+  realized 0; vec min/max/mean −1.0/1.0/0.359); all `sample_checks` true; 9/9 tests
+  pass. No future information; connectors excluded from features but kept in the model.
+- **Decision:** Observation design PROPOSED as **D-P6-004** — PENDING RESEARCHER
+  APPROVAL. Layout WORKING, NOT frozen until approved. 5 review points recorded.
+- **Decision class:** ENGINEERING DECISION + RESEARCH ASSUMPTION (Level-2).
+- **Files changed:** src/env/state_builder.py (new); src/env/__init__.py (new);
+  tests/test_state_builder.py (new); src/validation/p6_s7_state_spec.py (new);
+  results/phase6/p6_s7_state_spec.json (new); docs/PHASE6_STATE_SPEC.md (new);
+  PROJECT_STATE.yaml; docs/PHASE6_DECISION_REGISTER.md; docs/PHASE6_EVIDENCE_INDEX.md;
+  docs/RECOVERY.md; docs/PHASE6_EXECUTION_LOG.md. NO action-space file reopened; NO
+  reward/PPO/demand/safety code.
+- **Tests:** `.venv/Scripts/python.exe -m unittest discover -s tests -v` → 9 ok.
+- **Risks/caveats:** POMDP — approximate sufficient statistic, not exact Markov
+  (instantaneous demand hidden by design); single-step obs may under-react to fast
+  demand transients (HYPOTHESIS; remedy = Option-B inflow or frame-stack/LSTM, future).
+  Design NOT frozen until D-P6-004 approved. Joint-box safety (R1b), leak calibration
+  (R3), missing deps (R4) unchanged.
+- **Next action:** Present D-P6-004 to the researcher for approval of the 5 review
+  points; on approval freeze the layout, then STEP 8 (reward).
+

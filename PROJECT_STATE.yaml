@@ -116,7 +116,12 @@ phase6:
         B_highest_tested_regulating_psi:  {VALVE-173: 100.0, VALVE-175: 110.0, VALVE-176: 59.524, VALVE-177: 90.0, VALVE-178: 74.0}
         C_observed_active_to_open_onset_psi: {VALVE-173: 110.0, VALVE-175: "UNTESTED (still Active at cap)", VALVE-176: "UNTESTED", VALVE-177: "UNTESTED", VALVE-178: "UNTESTED"}
 
-    step7_observation_design: {status: "IN PROGRESS (2026-09-27): DRL state/observation design started after action-space approval + git checkpoint. Deliverable docs/PHASE6_STATE_SPEC.md."}
+    step7_observation_design:
+      status: "DELIVERABLES PRODUCED — DESIGN PROPOSED (2026-09-27). observation_dim=139 float32. Deliverable docs/PHASE6_STATE_SPEC.md written; deterministic builder src/env/state_builder.py + 9 tests (all pass); evidence results/phase6/p6_s7_state_spec.json. Design is D-P6-004 PROPOSED — PENDING RESEARCHER APPROVAL (Level-2, NOT frozen)."
+      register_id: "D-P6-004 (PROPOSED)"
+      evidence: ["results/phase6/p6_s7_state_spec.json"]
+      deliverables: ["docs/PHASE6_STATE_SPEC.md", "src/env/state_builder.py", "src/env/__init__.py", "tests/test_state_builder.py", "src/validation/p6_s7_state_spec.py", "results/phase6/p6_s7_state_spec.json"]
+      result: "Observation = 121 service-node pressures + 2 tank levels + 5 prev-cmd PRV setpoints + 5 PRV is_active flags + 2 prev-cmd pump speeds + 2 pump realized speeds + 2 time-of-day (sin,cos) = 139 dims. Demand Option A (no explicit demand; agent must NEVER see future demand). Fixed physical normalization only (no data-derived running stats). Connectors 105/106/109/110/128 excluded from features, kept in model. POMDP / approximately-Markov (not forced). 9/9 tests pass. PROPOSED, not frozen."
     step8_reward_design: {status: "NOT STARTED"}
     step9_safety_action_mapping: {status: "NOT STARTED", note: "must hard-clamp VALVE-179 <= 44.7 psi if 179 ever controllable; 179 currently EXCLUDED"}
     step10_demand_uncertainty_and_splits: {status: "NOT STARTED"}
@@ -202,8 +207,25 @@ action_space:
   encoding_absolute_vs_delta: "APPROVED 2026-09-27 (D-P6-001) = ABSOLUTE. See action_space.approved.encoding. Delta is a separate future ablation only."
 
 state_space:
-  status: "IN PROGRESS (step7, 2026-09-27)"
-  note: "Observation design + deterministic physical normalization being defined and justified after action-space approval. Deliverable: docs/PHASE6_STATE_SPEC.md. Optional prototype: src/env/state_builder.py (state only; NO reward/PPO/demand). Raw output: results/phase6/p6_s7_*.json. No reward/PPO logic here."
+  status: "DESIGN PROPOSED (step7, 2026-09-27) — D-P6-004 PENDING RESEARCHER APPROVAL. NOT frozen."
+  register_id: "D-P6-004 (PROPOSED)"
+  observation_dim: 139
+  dtype: "float32"
+  block_layout_index_ranges:        # FROZEN ORDER once D-P6-004 approved; env/tests/loggers MUST use this mapping
+    pressures: [0, 121]             # 121 service-junction pressures (sorted), clip (p+20)/320
+    tank_levels: [121, 123]         # TANK-130, TANK-131; per-tank (level-min)/(max-min)
+    prev_cmd_prv_setpoint: [123, 128]   # VALVE-173/175/176/177/178 commanded setpoint, per-valve approved bounds
+    prv_is_active: [128, 133]       # regulating flag {0,1} (EPANET LinkStatus Active==2)
+    prev_cmd_pump_speed: [133, 135] # PUMP-170/172 commanded speed, (v-lower)/(1.10-lower)
+    pump_realized_speed: [135, 137] # PUMP-170/172 realized speed / 1.10 (0 == closed)
+    time_of_day: [137, 139]         # sin, cos of (sim_time_s % 86400)/86400 ; range [-1,1]
+  pressure_norm_band_psi: [-20.0, 300.0]   # ENGINEERING_DECISION; brackets measured ~4-288 psi without saturating high-head nodes
+  demand_exposure: "Option A (NONE) — no explicit demand in the observation; time-of-day is the diurnal prior; pressures+tank levels are the demand consequences. Agent must NEVER receive future demand (absolute constraint). Option B (metered total inflow, 1 scalar) recorded as the first future ablation if partial observability hurts learning."
+  markov_status: "POMDP / strong approximate sufficient statistic (NOT exact Markov). Tank levels (slow memory) observed; instantaneous demand/multiplier, pipe flows, leak flow NOT observed by design. Full Markovity NOT forced. Frame-stack / recurrent policy = documented future remedy, out of current scope."
+  normalization_principle: "fixed physical normalization ONLY (physical model constants or fixed chosen bands); NO data-derived running mean/std (avoids train/eval leakage)."
+  timing_convention: "o_t built from hydraulic state AFTER sim advances to t under a_{t-1} and BEFORE a_t. 'previous commanded' fields hold a_{t-1}. At reset use native initial settings. No future information (leakage audit clean, Test 7)."
+  tests: "tests/test_state_builder.py — 9/9 passing (stdlib unittest + numpy): shape-constant, dtype-constant, no-NaN/Inf, deterministic-normalization, same-state->same-obs, different-state->expected-diff, no-future-information (contract), connector-exclusion, prev-action semantics."
+  note: "Deterministic, side-effect-free builder src/env/state_builder.py (numpy only; NO reward/PPO/demand/gymnasium/wntr). Raw evidence results/phase6/p6_s7_state_spec.json (consistency_with_frozen_spec all true; sample checks all true). Reward/safety/demand-model/env are LATER steps (8/9/10/11)."
 
 reward:
   status: "NOT STARTED (step8)"
@@ -214,15 +236,17 @@ demand_uncertainty:
   note: "train/val/test/OOD split + seed policy to be defined. No stochastic demand implemented yet."
 
 environment:
-  status: "NOT STARTED (step11) - BLOCKED on deps"
-  src_env_dir: "src/env/ (does NOT exist yet)"
-  planned_modules: ["bwsn_env.py","epanet_adapter.py","state_builder.py","action_mapper.py","safety.py","reward.py","demand_scenarios.py","metrics.py"]
+  status: "NOT STARTED (step11) - BLOCKED on deps. EXCEPTION: src/env/state_builder.py (STEP 7 observation transform, state-only) already exists and is tested; the other 7 modules and the gymnasium env itself are unbuilt."
+  src_env_dir: "src/env/ EXISTS — contains __init__.py + state_builder.py (STEP 7 only). No bwsn_env/epanet_adapter/action_mapper/safety/reward/demand_scenarios/metrics yet."
+  planned_modules: ["bwsn_env.py","epanet_adapter.py","state_builder.py (DONE, STEP 7)","action_mapper.py","safety.py","reward.py","demand_scenarios.py","metrics.py"]
   simulator_stack: "WNTR 1.5.0 (bundled EPANET 20200) primary; EPyT 2.3.5.2 (EPANET 20305) present, never cross-validated"
 
 tests:
-  status: "NOT STARTED (step12)"
-  tests_dir: "tests/ (exists, empty)"
-  planned_count: 16
+  status: "STEP 12 (env test suite) NOT STARTED. STEP 7 observation-builder tests DONE: tests/test_state_builder.py — 9/9 passing (stdlib unittest + numpy)."
+  tests_dir: "tests/ (contains test_state_builder.py; STEP-12 env tests not yet written)"
+  step7_tests: 9
+  step12_planned_count: 16
+  run_cmd: ".venv/Scripts/python.exe -m unittest discover -s tests -v"
 
 dependencies:
   present:                   # VALIDATED_FACT - imported successfully in .venv
@@ -261,8 +285,8 @@ risks:
   - "R5 (carried debt): proposal cites Hu MARL incorrectly (fix to Water Supply 23(7):2833, doi 10.2166/ws.2023.163); Negm Table 5-4 to re-verify from PDF before citing."
 
 next_action:
-  step: "STEP 7 - DRL state/observation design (IN PROGRESS). Action space APPROVED & FROZEN 2026-09-27 (D-P6-001/002/003); do NOT reopen without new contradictory evidence."
-  then: "STEP 8 reward (measure component scales first); STEP 9 safety layer (must clamp to approved bounds + address joint-box safety); STEP 10 demand uncertainty."
+  step: "STEP 7 — DRL state/observation design: DELIVERABLES PRODUCED, design PROPOSED as D-P6-004 (observation_dim=139). Awaiting researcher approval of D-P6-004 before the layout is frozen. Action space remains APPROVED & FROZEN (D-P6-001/002/003); do NOT reopen without new contradictory evidence."
+  then: "On D-P6-004 approval: freeze the 139-dim layout (like the action vector). STEP 8 reward (measure component scales first); STEP 9 safety layer (must clamp to approved bounds + address joint-box safety); STEP 10 demand uncertainty."
   guardrails: "No scientific PPO training. No silent research decisions. No reward/PPO/demand logic inside the STEP 7 state builder. Persist every result before next major step."
   resolved_by_approval_2026_09_27:
     - "D-P6-001 encoding = ABSOLUTE (approved). Delta = separate future ablation only."
@@ -270,6 +294,7 @@ next_action:
     - "D-P6-002 pump bounds APPROVED: PUMP-170 [0.82,1.10]; PUMP-172 [0.77,1.10]."
     - "Excluded {174,179,180} remain in the hydraulic model. 179 stays excluded (safety-critical)."
   still_open:
+    - "D-P6-004 (observation design, observation_dim=139) PROPOSED — PENDING RESEARCHER APPROVAL (Level-2). Layout is WORKING, not frozen, until approved."
     - "Joint 5-D action-box safety (mixed corners/interior/pump+demand) UNTESTED -> STEP-9/STEP-12 (R1b)."
     - "Leak instrument uncalibrated (R3)."
     - "DRL deps missing (R4) -> STEP 11/13 still BLOCKED. STEP 7 state builder needs only numpy (present)."
@@ -277,10 +302,24 @@ next_action:
 session_checkpoint:          # brief s.20 - on-disk, not chat-only
   date_utc: "2026-09-27"
   current_phase: "Phase 6 - DRL environment design/validation"
-  current_step: "STEP 7 - DRL state/observation design (IN PROGRESS). Action space APPROVED & FROZEN 2026-09-27 (D-P6-001/002/003) and git-checkpointed before STEP 7."
-  completed: ["G5 action space", "G12 pump control", "STEP 6 PRV per-valve characterization (measured)", "STEP 6 four-question decision-review brief (no re-run)", "STEP 6b focused VALVE-173 (50,60] refinement (measured)", "STEP 6 A/B/C terminology correction", "Action-space APPROVAL persisted (D-P6-001/002/003) + docs/PHASE6_ACTION_SPACE_SPEC.md created + git checkpoint A"]
-  not_completed: ["STEP 7 deliverables (docs/PHASE6_STATE_SPEC.md, optional state_builder.py + tests, p6_s7 raw output)", "STEP 8-15"]
-  pending_research_decisions: ["(none blocking STEP 7) - D-P6-001/002/003 APPROVED 2026-09-27. Open items are joint 5-D box safety (R1b, STEP-9/12), leak calibration (R3), and the DRL dependency install (R4)."]
+  current_step: "STEP 7 — DRL state/observation design: DELIVERABLES PRODUCED, design PROPOSED (D-P6-004, observation_dim=139, NOT frozen). Action space APPROVED & FROZEN 2026-09-27 (D-P6-001/002/003) and git-checkpointed before STEP 7."
+  completed: ["G5 action space", "G12 pump control", "STEP 6 PRV per-valve characterization (measured)", "STEP 6 four-question decision-review brief (no re-run)", "STEP 6b focused VALVE-173 (50,60] refinement (measured)", "STEP 6 A/B/C terminology correction", "Action-space APPROVAL persisted (D-P6-001/002/003) + docs/PHASE6_ACTION_SPACE_SPEC.md created + git checkpoint A", "STEP 7 observation design deliverables (docs/PHASE6_STATE_SPEC.md, src/env/state_builder.py + 9/9 tests, results/phase6/p6_s7_state_spec.json) — design PROPOSED as D-P6-004, awaiting approval"]
+  not_completed: ["Researcher approval of D-P6-004 (observation design) — layout not frozen until approved", "STEP 8-15"]
+  pending_research_decisions: ["D-P6-004 observation design (observation_dim=139) PROPOSED — PENDING RESEARCHER APPROVAL (Level-2). Points to accept/amend: full 121-node pressure observability vs sensor subset; demand Option A; fixed [-20,300] psi band vs per-node; carrying both commanded+realized actuator state; single-step MLP obs (approximate Markovity, no history).", "Open non-blocking items: joint 5-D box safety (R1b, STEP-9/12), leak calibration (R3), DRL dependency install (R4)."]
+  step7_2026_09_27:              # WU-8 checkpoint (this session). STEP-6 detail below preserved as history.
+    unit: "WU-8 — STEP 7 DRL state/observation design"
+    decision_id: "D-P6-004 (PROPOSED — PENDING RESEARCHER APPROVAL, Level-2)"
+    observation_dim: 139
+    dtype: "float32"
+    block_layout: "pressures[0:121]; tank_levels[121:123]; prev_cmd_prv_setpoint[123:128]; prv_is_active[128:133]; prev_cmd_pump_speed[133:135]; pump_realized_speed[135:137]; time_of_day(sin,cos)[137:139]"
+    demand_exposure: "Option A (no explicit demand; time-of-day diurnal prior). Future demand FORBIDDEN. Option B (metered total inflow, 1 scalar) = first documented ablation if partial observability hurts learning."
+    normalization: "fixed physical only (no data-derived running stats); pressure band [-20,300] psi -> (p+20)/320 clipped."
+    markov_status: "POMDP; approximate sufficient statistic (tank levels = observed memory; instantaneous demand hidden by design). Full Markovity NOT forced; frame-stack/LSTM = future remedy."
+    deliverables: ["docs/PHASE6_STATE_SPEC.md", "src/env/state_builder.py", "src/env/__init__.py", "tests/test_state_builder.py", "src/validation/p6_s7_state_spec.py", "results/phase6/p6_s7_state_spec.json"]
+    tests: "9/9 passing (stdlib unittest, numpy only): shape(139,), dtype float32, no NaN/Inf, deterministic normalization, same->same, diff->expected-only, no-future-info contract, connector exclusion, prev-cmd vs realized distinct."
+    evidence_checks: "p6_s7_state_spec.json consistency_with_frozen_spec all true (dim 139, 121 service nodes, 5 connectors excluded, PRV/pump bounds match approved spec); sample @ t=43200s all sample_checks true (shape/dtype/finite/within-bounds/connectors-absent)."
+    scope_guard: "STATE ONLY — no reward (STEP 8), no safety clamp (STEP 9), no demand model (STEP 10), no gymnasium env (STEP 11). Action space D-P6-001/002/003 NOT reopened."
+    status: "Deliverables on disk; design PROPOSED, layout WORKING (not frozen) until D-P6-004 approved."
   approval_2026_09_27:
     action_encoding: "D-P6-001 APPROVED = ABSOLUTE; affine map physical_i = lower_i + ((a_i+1)/2)*(upper_i-lower_i); a_i in [-1,1]. Delta = separate future ablation."
     prv_bounds_psi: {VALVE-173: [54.5, 100.0], VALVE-175: [21.5, 110.0], VALVE-176: [20.0, 59.524], VALVE-177: [20.0, 90.0], VALVE-178: [20.0, 74.0]}
@@ -304,7 +343,7 @@ session_checkpoint:          # brief s.20 - on-disk, not chat-only
   tests_run: "step6b run: reference reproduced exactly (mean 94.787 / 386 <20psi / 0 negative / 84.730 gpm); 14 setpoints in (50,60], all solver-clean, 0 negative, 0 new <20psi."
   files_changed: ["src/validation/p6_s6b_v173_lowside_refine.py", "results/phase6/p6_s6b_v173_lowside_refine.json", "docs/PHASE6_DECISION_REGISTER.md", "docs/PHASE6_EXECUTION_LOG.md", "docs/PHASE6_EVIDENCE_INDEX.md", "docs/RECOVERY.md", "PROJECT_STATE.yaml"]
   git_commit: "STEP 6 characterization committed at 627567b; step6b + clarification docs update in checkpoint A (approval); STEP 7 checkpoints follow."
-  exact_next_action: "STEP 7: design the PPO observation vector + deterministic physical normalization; write docs/PHASE6_STATE_SPEC.md; optional src/env/state_builder.py + tests; results/phase6/p6_s7_*.json; per-unit git checkpoints. D-P6-001/002/003 APPROVED - do NOT reopen without new contradictory evidence."
+  exact_next_action: "STEP 7 deliverables are on disk (design PROPOSED as D-P6-004). NEXT: present D-P6-004 to the researcher for approval of the 5 review points (121-node observability; demand Option A; [-20,300] psi band; commanded+realized dual state; single-step MLP). Do NOT freeze the 139-dim layout until approved. Do NOT reopen D-P6-001/002/003. Do NOT start STEP 8 reward / STEP 9 safety / STEP 10 demand / STEP 11 env before the observation is approved (or continue only within state scope)."
   recovery_file: "docs/RECOVERY.md"
 
 

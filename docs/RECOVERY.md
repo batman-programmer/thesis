@@ -6,7 +6,8 @@ should be able to reconstruct the whole project state from disk WITHOUT the old
 chat.**
 
 Last updated: 2026-09-27 (UTC) by Claude Opus 4.8. **Action space APPROVED & FROZEN
-2026-09-27 (D-P6-001/002/003); STEP 7 (observation design) IN PROGRESS.**
+2026-09-27 (D-P6-001/002/003); STEP 7 (observation design) DELIVERABLES PRODUCED —
+design PROPOSED as D-P6-004, PENDING RESEARCHER APPROVAL (layout NOT frozen).**
 
 ---
 
@@ -105,9 +106,18 @@ Source `results/phase5/g3_pump_speed.json`:
     No exhaustive joint-safety claim; STEP-9 (safety layer) + STEP-12 (tests) must
     cover mixed corners / interior / pump+demand (R1b). Provenance PROPOSED→REVIEWED
     →APPROVED preserved in the register + PROJECT_STATE (proposed values NOT erased).
-- **STEP 7 observation design — IN PROGRESS (2026-09-27).** Deliverable
-  `docs/PHASE6_STATE_SPEC.md` (+ optional `src/env/state_builder.py` + tests +
-  `results/phase6/p6_s7_*.json`). Needs only numpy (present) → not dep-blocked.
+- **STEP 7 observation design — DELIVERABLES PRODUCED; PROPOSED as D-P6-004
+  (2026-09-27), PENDING RESEARCHER APPROVAL — layout NOT frozen.** On disk:
+  `docs/PHASE6_STATE_SPEC.md` (§7.1–§7.14), `src/env/state_builder.py` (+ `__init__.py`),
+  `tests/test_state_builder.py` (9/9), `src/validation/p6_s7_state_spec.py`,
+  `results/phase6/p6_s7_state_spec.json`. `observation_dim = 139`, float32; blocks:
+  pressures[0:121], tank_levels[121:123], prev_cmd_prv_setpoint[123:128],
+  prv_is_active[128:133], prev_cmd_pump_speed[133:135], pump_realized_speed[135:137],
+  time_of_day sin/cos[137:139]. Fixed physical normalization (pressure band [-20,300]
+  psi); demand = Option A (no explicit demand; time-of-day diurnal prior; future demand
+  FORBIDDEN); POMDP (approximate Markov; tanks = observed memory). 5 review points in
+  D-P6-004. Needs only numpy (present) → not dep-blocked. **On approval, freeze the
+  layout (as the action vector was).**
 - STEP 8 reward, STEP 9 safety layer, STEP 10 demand uncertainty/splits: NOT STARTED.
   STEP-9 must hard-clamp to the approved bounds.
 - STEP 11 `src/env/` (8 modules) + STEP 12 `tests/` (16 tests) + STEP 13 SB3
@@ -157,4 +167,11 @@ result is written to `results/phase6/` as JSON (raw + summary + interpretation).
   ordering, or the excluded set. Excluded {174,179,180} MUST stay in the hydraulic model.
 - **DO NOT** claim exhaustive joint 5-D action-box safety — only a single lower-corner
   test exists (R1b); that is a STEP-9/STEP-12 job.
+- **DO NOT** re-run the STEP 7 observation builder or its evidence generator
+  (`src/validation/p6_s7_state_spec.py`) or rewrite `docs/PHASE6_STATE_SPEC.md` — the
+  design is on disk (`observation_dim=139`, 9/9 tests, `results/phase6/p6_s7_state_spec.json`).
+  It is PROPOSED as **D-P6-004, PENDING RESEARCHER APPROVAL** — the 139-dim layout is
+  WORKING, NOT frozen; do not treat it as final or freeze it until the researcher
+  approves the 5 review points. Do not add reward/PPO/demand/safety logic to the state
+  builder (those are STEP 8/9/10/11).
 

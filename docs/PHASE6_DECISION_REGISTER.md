@@ -399,3 +399,99 @@ pump + stochastic-demand combinations (risk R1b).
 - **Git checkpoint:** commit subject `phase6: approve drl actuator action space`
   (hash recorded in PROJECT_STATE.yaml / RECOVERY.md / PHASE6_EXECUTION_LOG.md).
 
+---
+
+## D-P6-004 — DRL observation / state design (STEP 7)
+
+- **Date:** 2026-09-27
+- **Topic:** What the PPO agent observes at each control step (state design only —
+  NOT reward, safety, demand model, or the env).
+- **Decision class:** ENGINEERING DECISION + RESEARCH ASSUMPTION (Level-2,
+  research-impacting, CLAUDE.md §3).
+- **Status:** **PROPOSED — PENDING RESEARCHER APPROVAL.** Layout is WORKING, NOT
+  frozen. Unlike D-P6-001/002/003, this is not yet approved and must not be treated
+  as final until the researcher accepts or amends it.
+
+### Question
+
+Which quantities, in which fixed order and normalization, form the observation
+vector `o_t` — such that it (a) supports the leakage objective and the ≥20 psi
+service constraint, (b) never contains future information, (c) keeps the
+"uncertain demand" framing intact, and (d) is a stable, reproducible fixed-shape
+transform?
+
+### Proposed design
+
+- `observation_dim = 139`, `float32`, fixed shape every step.
+- Block layout (frozen order once approved): pressures `[0:121]`; tank levels
+  `[121:123]`; prev-commanded PRV setpoints `[123:128]`; PRV `is_active` flags
+  `[128:133]`; prev-commanded pump speeds `[133:135]`; pump realized speeds
+  `[135:137]`; time-of-day sin/cos `[137:139]`.
+- Actuator sub-orders match the approved action vector (173/175/176/177/178;
+  170/172) so action index and observation echo align.
+- Fixed physical normalization only (no data-derived running statistics); pressure
+  band `[-20, 300]` psi → `(p+20)/320` clipped.
+- Timing: `o_t` = state after the sim advanced to `t` under `a_{t-1}`, before `a_t`;
+  "previous commanded" fields hold `a_{t-1}`; reset uses native initial settings.
+
+### Evidence
+
+- `results/phase6/p6_s7_state_spec.json` — dim 139, block layout, 121 sorted service
+  nodes, 5 connectors excluded, tank bounds, approved actuator bounds,
+  `consistency_with_frozen_spec` all true, one genuine observation @ t=43200 s with
+  all `sample_checks` true.
+- `tests/test_state_builder.py` — 9/9 passing (stdlib unittest, numpy only).
+- `docs/PHASE6_STATE_SPEC.md` — full §7.1–§7.14 justification, per-variable rationale,
+  Markov analysis, future-leakage audit.
+- Reused facts: 121 service nodes / 5 connectors (Phase-5 gate 10 rule); pump STATUS
+  reset → realized≠commanded (`p6_s4_pump_strategy.json`, G12); reference safety
+  numbers (`p6_s3_prv_finechar.json`).
+
+<!-- D-P6-004 continues below -->
+
+### Options / review points (each to accept or amend)
+
+1. **Pressure observability** — full 121-node vector (adopted baseline) vs a
+   realistic reduced sensor subset (documented future ablation, not adopted; would
+   change scope).
+2. **Demand exposure (§7.5)** — Option A: no explicit demand (adopted); B:
+   instantaneous total inflow; C: zonal; D: local nodal (rejected — leaks hidden
+   state); E: history/forecast (forecast FORBIDDEN). Time-of-day supplies the
+   diurnal prior; pressures/tanks are the demand consequences.
+3. **Normalization band** — fixed global `[-20, 300]` psi (adopted) vs per-node
+   elevation-derived bands (future refinement).
+4. **Actuator state representation** — carry BOTH prev-commanded and realized
+   (adopted; +9 dims) vs commanded-only (loses the native-override signal).
+5. **Temporal structure** — single-step MLP observation (adopted; approximate
+   Markovity, tank levels = observed memory) vs frame-stack / recurrent policy
+   (future remedy if instability appears).
+
+### Recommendation
+
+Adopt the proposed 139-dim design as the defensible baseline: full-field pressure +
+tank levels + dual (commanded/realized) actuator state + cyclical time, Option-A
+demand, fixed physical normalization. It is the standard simulation-based WDN-DRL
+observation, keeps the uncertain-demand framing, contains no future information, and
+is a bounded fixed-shape transform. Richer/leaner variants are explicit future
+ablations, not silent changes.
+
+### Reasoning / counter-arguments
+
+- Pressures are the direct signal for both objective (pressure-driven leakage) and
+  constraint (≥20 psi); tank levels are the slow memory that keeps the process
+  approximately Markov; dual actuator state exposes the native STATUS override the
+  agent must learn around. **Risk:** without any demand signal the policy may
+  under-react to fast demand transients — first documented remedy is adding metered
+  total inflow (Option B, one scalar), recorded as a future ablation.
+
+### Status / Approval / Implementation / Validation
+
+- **Status:** PROPOSED — PENDING RESEARCHER APPROVAL (not frozen).
+- **Approval:** awaiting researcher sign-off on the 5 review points above.
+- **Implementation:** `src/env/state_builder.py` (pure numpy), `ObservationConfig` +
+  `RawState` + `build_observation` + `observation_bounds`; `docs/PHASE6_STATE_SPEC.md`.
+- **Validation:** `tests/test_state_builder.py` 9/9; `results/phase6/p6_s7_state_spec.json`
+  consistency + sample checks all true.
+- **On approval:** freeze the 139-dim layout (as the action vector was), then STEP 8.
+
+
