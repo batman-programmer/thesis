@@ -8,7 +8,7 @@
 
 meta:
   file_purpose: "Primary on-disk project memory. A fresh session must reconstruct state from this + docs/RECOVERY.md + the 3 Phase 6 docs, without the old chat."
-  last_updated_utc: "2026-09-27"
+  last_updated_utc: "2026-09-28"
   last_updated_by: "Claude Opus 4.8 (claude-opus-4-8), Claude Code / Claude Desktop"
   maintained_under: ["CLAUDE.md", "AGENTS.md", "docs/PHASE6 brief"]
 
@@ -361,9 +361,10 @@ dependencies:
 
 git:
   branch: "main"
-  head_commit: "0086a0a"
-  head_subject: "phase6: analyze STEP 9 safety mechanisms"
+  head_commit: "e09264c"
+  head_subject: "phase6: characterize STEP 9 safety mechanisms empirically (WU-15)"
   recent_commits:
+    - "e09264c phase6: characterize STEP 9 safety mechanisms empirically (WU-15)"
     - "0086a0a phase6: analyze STEP 9 safety mechanisms"
     - "5085f19 phase6: record D-P6-005 approval commit hash (checkpoint)"
     - "094e50a phase6: approve D-P6-005 C-A reward"
@@ -373,9 +374,8 @@ git:
     - "56db0e5 phase6: prepare D-P6-005 reward decision brief"
     - "262b738 phase6: record reward-formulation-comparison commit hash (checkpoint)"
     - "a9654c2 phase6: compare reward formulations"
-    - "0d7dc1a phase6: record STEP 8 commit hash in PROJECT_STATE (checkpoint)"
-  working_tree_note: "results/phase5/_tmp/ scratch (~600 files) + src/**/__pycache__/*.pyc left untracked (pre-existing debt, deliberately NOT committed). WU-14 STEP-9 safety-design deliverable committed as 0086a0a (4 explicit paths only: docs/PHASE6_STEP9_SAFETY_DESIGN.md, results/phase6/p6_s9_safety_design_analysis.json, src/validation/p6_s9_safety_design_analysis.py, tests/test_safety_design_analysis.py). Pure aggregator over the WU-11 decision brief; embeds D-P6-005 = APPROVED (C-A_F1_balanced_dense) with equation/weights/constants verbatim; characterises S1-S4 on a fixed 10-field schema, NOT ranked (selection DEFERRED to researcher); no production safety wrapper, no reward.py, no PPO, no EPANET/RNG; byte-reproduces its JSON. The WU-11/WU-12 byte-reproduced JSON snapshots + generators + tests remain untouched (frozen pre-decision evidence, still PROPOSED/researcher_selection=null). Full test battery 105 OK (84 prior + 21 new STEP-9). head_commit above now records the WU-14 deliverable hash; this edit is the follow-up checkpoint commit (two-commit pattern, matching 094e50a->5085f19)."
-  next_commit_subject: "phase6: record STEP 9 safety-design commit hash (checkpoint)"
+  working_tree_note: "results/phase5/_tmp/ scratch (~600 files) + src/**/__pycache__/*.pyc left untracked (pre-existing debt, deliberately NOT committed). WU-15 STEP-9 empirical characterization committed as e09264c (4 explicit paths only: docs/PHASE6_STEP9_SAFETY_DESIGN.md [appended empirical section 10.1-10.9, WU-14 sections 1-9 preserved], results/phase6/p6_s9_safety_mechanism_characterization.json, src/validation/p6_s9_safety_mechanism_characterization.py, tests/test_safety_mechanism_characterization.py). Measures candidate mechanisms S1-S4 and handling policies H1-H3 as EVIDENCE ONLY (researcher_selection=null; nothing selected/ranked/scored/recommended); reuses the validated WU-8 instrument (p6_s8) unchanged for 10 EPANET solves (~8s, no RNG); two look-ahead views per transition (strict single-step shared_initial vs sustained 96h horizon) surface the tank-divergence caveat (severe command ~5.53 psi worst-node at shared-initial vs ~1.29 psi sustained). Descriptive activation only, no FP/FN (no oracle). No production wrapper, no reward.py, no PPO. JSON carries generated_utc so it is NOT byte-reproduced (EPANET-deterministic values do reproduce); the WU-11/WU-12/WU-14 byte-reproduced pre-decision artefacts remain untouched. Full test battery 125 OK (99 prior + 26 new WU-15: 7 pure-helper + 19 artefact). head_commit above records the WU-15 deliverable hash; this edit is the follow-up checkpoint commit (two-commit pattern, matching 0086a0a->b63ff22)."
+  next_commit_subject: "phase6: record STEP 9 characterization commit hash (checkpoint)"
 
 
 
@@ -388,7 +388,7 @@ risks:
   - "R5 (carried debt): proposal cites Hu MARL incorrectly (fix to Water Supply 23(7):2833, doi 10.2166/ws.2023.163); Negm Table 5-4 to re-verify from PDF before citing."
 
 next_action:
-  step: "STEP 9 — STATE-DEPENDENT SAFETY MECHANISM (design analysis IN PROGRESS 2026-09-27). D-P6-005 reward RESOLVED (C-A_F1_balanced_dense APPROVED 2026-09-27; F1, w_L=1,w_U=1,w_P=1,w_A=0.1,w_E=0). D-P6-004 observation APPROVED & FROZEN (observation_dim=139). Action space APPROVED & FROZEN (D-P6-001/002/003). Do NOT reopen any of these without new contradictory evidence."
+  step: "STEP 9 — STATE-DEPENDENT SAFETY MECHANISM. WU-14 design analysis DONE (0086a0a) and WU-15 empirical characterization DONE (e09264c): candidate mechanisms S1-S4 and handling policies H1-H3 are now MEASURED as evidence (results/phase6/p6_s9_safety_mechanism_characterization.json, researcher_selection=null). The PENDING gate is the researcher's explicit STEP-9 SELECTION (choose/compose a mechanism, fix threshold + clip-vs-reject handling), which is a separate decision NOT to be auto-made. D-P6-005 reward RESOLVED (C-A_F1_balanced_dense APPROVED 2026-09-27; F1, w_L=1,w_U=1,w_P=1,w_A=0.1,w_E=0). D-P6-004 observation APPROVED & FROZEN (observation_dim=139). Action space APPROVED & FROZEN (D-P6-001/002/003). Do NOT reopen any of these without new contradictory evidence."
   then: "STEP 9 characterises 4 candidate admissibility mechanisms (S1 absolute worst-node threshold; S2 min-pressure degradation vs current state; S3 pressure-deficit increase; S4 negative-pressure hard backstop) against measured evidence — NOT ranked, NO production wrapper yet — with baseline-compatibility verdicts (a naive min<20 reject is ill-posed: 386 chronic sub-20 node-ts on the native baseline) and action-space-coverage limits (single lower-corner only, R1b). Then STEP 10 demand uncertainty; the reward function reward.py + the enforced safety wrapper are STEP 11 (deps-blocked)."
   guardrails: "No scientific PPO training. No silent research decisions. No reward/PPO/demand logic inside the STEP 7 state builder. Persist every result before next major step."
   resolved_by_approval_2026_09_27:
