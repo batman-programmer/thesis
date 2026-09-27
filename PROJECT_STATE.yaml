@@ -361,9 +361,11 @@ dependencies:
 
 git:
   branch: "main"
-  head_commit: "33d795f"
-  head_subject: "phase6: prepare researcher summary for D-P6-005"
+  head_commit: "094e50a"
+  head_subject: "phase6: approve D-P6-005 C-A reward"
   recent_commits:
+    - "094e50a phase6: approve D-P6-005 C-A reward"
+    - "4f20a3a phase6: record researcher-summary commit hash (checkpoint)"
     - "33d795f phase6: prepare researcher summary for D-P6-005"
     - "1ad6392 phase6: record D-P6-005 decision-brief commit hash (checkpoint)"
     - "56db0e5 phase6: prepare D-P6-005 reward decision brief"
@@ -372,8 +374,8 @@ git:
     - "0d7dc1a phase6: record STEP 8 commit hash in PROJECT_STATE (checkpoint)"
     - "a2fab2e phase6: add STEP 8 reward-component scale analysis (D-P6-005, PROPOSED)"
     - "0cd7f2e phase6: approve observation specification (D-P6-004 APPROVED & FROZEN)"
-  working_tree_note: "results/phase5/_tmp/ scratch (~600 files) + src/**/__pycache__/*.pyc left untracked (pre-existing debt, deliberately NOT committed). WU-12 researcher-summary deliverable committed as 33d795f (8 explicit paths only: researcher-summary generator/JSON/test/MD + PROJECT_STATE.yaml, docs/PHASE6_EVIDENCE_INDEX.md, docs/PHASE6_EXECUTION_LOG.md, docs/RECOVERY.md). head_commit above now records that deliverable hash; this edit is the follow-up checkpoint commit (two-commit pattern, matching 1ad6392->56db0e5)."
-  next_commit_subject: "phase6: record researcher-summary commit hash (checkpoint)"
+  working_tree_note: "results/phase5/_tmp/ scratch (~600 files) + src/**/__pycache__/*.pyc left untracked (pre-existing debt, deliberately NOT committed). WU-13 D-P6-005-approval deliverable committed as 094e50a (7 explicit paths only: PROJECT_STATE.yaml + docs/PHASE6_DECISION_REGISTER.md, docs/PHASE6_D_P6_005_DECISION_BRIEF.md, docs/PHASE6_D_P6_005_RESEARCHER_SUMMARY.md, docs/PHASE6_EVIDENCE_INDEX.md, docs/PHASE6_EXECUTION_LOG.md, docs/RECOVERY.md). The WU-11/WU-12 byte-reproduced JSON snapshots + generators + tests were deliberately NOT touched (frozen pre-decision evidence, still PROPOSED). head_commit above now records that deliverable hash; this edit is the follow-up checkpoint commit (two-commit pattern, matching 33d795f->4f20a3a). WU-14 STEP-9 safety-design artefacts follow as the next deliverable."
+  next_commit_subject: "phase6: record D-P6-005 approval commit hash (checkpoint)"
 
 
 
