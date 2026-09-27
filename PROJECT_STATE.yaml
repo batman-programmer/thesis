@@ -8,7 +8,7 @@
 
 meta:
   file_purpose: "Primary on-disk project memory. A fresh session must reconstruct state from this + docs/RECOVERY.md + the 3 Phase 6 docs, without the old chat."
-  last_updated_utc: "2026-09-26"
+  last_updated_utc: "2026-09-27"
   last_updated_by: "Claude Opus 4.8 (claude-opus-4-8), Claude Code / Claude Desktop"
   maintained_under: ["CLAUDE.md", "AGENTS.md", "docs/PHASE6 brief"]
 
@@ -98,10 +98,12 @@ phase6:
       status: "DECISION BRIEF PREPARED - RECOMMENDED, pending researcher confirmation"
       register_id: "D-P6-001"
     step6_active_prv_and_pump_bounds:
-      status: "IN PROGRESS"
+      status: "PRV CHARACTERIZATION COMPLETE (measured); bounds PROPOSED - PENDING RESEARCHER APPROVAL. Pump upper-bound decision still pending."
       register_id: "D-P6-002 (pump), D-P6-003 (PRV)"
-      pump_bounds: "measured lower bounds available (see action_space.pump_speed); upper bound decision pending justification"
-      prv_bounds: "NOT YET fully measured for VALVE-173/175/176/177; only joint 0.75x-1.00x nominal tested. Per-valve fine sweep required (next action)."
+      evidence: ["results/phase6/p6_s6_active_prv_bounds.json"]
+      pump_bounds: "measured lower bounds available (see action_space.pump_speed); upper bound decision (D-P6-002) still pending justification"
+      prv_bounds: "MEASURED per-valve for all five RL PRVs (D-P6-003). Deterministic fine setpoint sweep, other 4 PRVs at nominal, PDA, leak instrument on, 96 h EPS. Proposed [lower, nominal] domains; PENDING APPROVAL."
+      prv_result_verbatim: "Proposed DRL domains (psi): 173 [5.0,70.0]; 175 [21.5,55.0]; 176 [20.0,29.762]; 177 [20.0,45.0]; 178 [20.0,37.0]. Only VALVE-176 has a hard negative-pressure cliff (negative <=12.75, first non-negative 13.0); the other four are limited by the softer <20 psi service criterion (service-clean lower: 175=21.5, 177=20.0, 178=20.0; 173 service-clean to the 5 psi floor because it is nearly inert). Joint lower-corner (all 5 at proposed lowers) is service-clean (0 new <20 psi, 0 negative, min 4.190 psi, leak 81.383 gpm = -3.347 vs baseline)."
     step7_observation_design: {status: "NOT STARTED"}
     step8_reward_design: {status: "NOT STARTED"}
     step9_safety_action_mapping: {status: "NOT STARTED", note: "must hard-clamp VALVE-179 <= 44.7 psi if 179 ever controllable; 179 currently EXCLUDED"}
@@ -113,15 +115,20 @@ phase6:
     step15_final_report: {status: "NOT STARTED", file: "docs/PHASE6_FINAL_REPORT.md (only at genuine final decision point)"}
 
 action_space:
-  status: "STRUCTURE FIXED (G5); numeric bounds PARTIALLY DERIVED"
-  rl_controlled_prvs:        # VALIDATED_FACT (G5) - identities fixed; bounds see below
+  status: "STRUCTURE FIXED (G5); PRV numeric bounds MEASURED and PROPOSED (D-P6-003, PENDING APPROVAL); pump upper bound still DECISION_REQUIRED (D-P6-002)"
+  rl_controlled_prvs:        # VALIDATED_FACT (G5) identities; bounds PROPOSED (D-P6-003) - PENDING APPROVAL
     count: 5
+    bounds_source: "results/phase6/p6_s6_active_prv_bounds.json"
+    bounds_status: "PROPOSED - PENDING RESEARCHER APPROVAL (D-P6-003). Do NOT treat as FINAL."
     valves:
-      VALVE-173: {nominal_setpoint_psi: 70.0,   bound_status: "NOT YET SWEPT per-valve"}
-      VALVE-175: {nominal_setpoint_psi: 55.0,   bound_status: "NOT YET SWEPT per-valve"}
-      VALVE-176: {nominal_setpoint_psi: 29.762, bound_status: "NOT YET SWEPT per-valve"}
-      VALVE-177: {nominal_setpoint_psi: 45.0,   bound_status: "NOT YET SWEPT per-valve"}
-      VALVE-178: {nominal_setpoint_psi: 37.0,   bound_status: "individual grid [27.75,32,37,42,46.25] tested in zone-interaction"}
+      # proposed_drl_domain = [service-clean lower, nominal]; observed/safe(hard)/service-clean also recorded in the JSON.
+      VALVE-173: {nominal_setpoint_psi: 70.0,   proposed_drl_domain_psi: [5.0, 70.0],    service_clean_domain_psi: [5.0, 110.0],    hard_safe_domain_psi: [5.0, 110.0],    leak_reduction_within_domain_pct: 0.329, low_side_behaviour: "closes_below_domain", caveat: "nearly inert: 4.72 gpm flow at nominal, closes below ~55 psi, leakage span 0.825 gpm; weak action dimension in isolation (HYPOTHESIS_TO_TEST)"}
+      VALVE-175: {nominal_setpoint_psi: 55.0,   proposed_drl_domain_psi: [21.5, 55.0],   service_clean_domain_psi: [21.5, 110.0],   hard_safe_domain_psi: [5.0, 110.0],    leak_reduction_within_domain_pct: 2.222, low_side_behaviour: "regulates_across_domain", note: "strongest actuator: 362.9 gpm at nominal; service transition resolved 21.25->21.5 psi"}
+      VALVE-176: {nominal_setpoint_psi: 29.762, proposed_drl_domain_psi: [20.0, 29.762], service_clean_domain_psi: [20.0, 59.524], hard_safe_domain_psi: [13.0, 59.524], leak_reduction_within_domain_pct: 0.746, low_side_behaviour: "regulates_across_domain", note: "ONLY valve with a hard negative-pressure cliff: negative <=12.75 psi, first non-negative 13.0; service transition 19.75->20.0"}
+      VALVE-177: {nominal_setpoint_psi: 45.0,   proposed_drl_domain_psi: [20.0, 45.0],   service_clean_domain_psi: [20.0, 90.0],    hard_safe_domain_psi: [5.0, 90.0],     leak_reduction_within_domain_pct: 0.408, low_side_behaviour: "regulates_across_domain", note: "service transition 19.75->20.0; no negative pressure to 5 psi"}
+      VALVE-178: {nominal_setpoint_psi: 37.0,   proposed_drl_domain_psi: [20.0, 37.0],   service_clean_domain_psi: [20.0, 74.0],    hard_safe_domain_psi: [5.0, 74.0],     leak_reduction_within_domain_pct: 0.245, low_side_behaviour: "regulates_across_domain", note: "service transition 19.75->20.0; no negative pressure to 5 psi"}
+  cross_actuator_joint_lower_corner:  # VALIDATED_FACT (brief s.10) - all 5 at proposed lowers simultaneously
+    result: "SERVICE-CLEAN: 0 new <20 psi, 0 negative, min service 4.190 psi, leak 81.383 gpm (-3.347 vs baseline). Per-valve box constraints jointly sufficient at the lower corner on the tested set."
   excluded_prvs:             # VALIDATED_FACT (G5) - each excluded on measured grounds
     VALVE-174: "reopens with adverse effect between 95->96 psi; excluded"
     VALVE-179: "safety cliff: last clean 44.7 psi, last non-negative 44.8, first negative 44.9; signed-emitter law makes negative pressure meaningless+corrupting; excluded"
@@ -184,19 +191,39 @@ dependencies:
 
 git:
   branch: "main"
-  head_commit: "8dc8151"
-  head_subject: "1405-07-03 (portable AI-knowledge backup, committed by researcher)"
-  working_tree_at_audit: "clean"
+  head_commit: "c444653"
+  head_subject: "docs(phase6): add on-disk persistence scaffolding (recovery audit)"
+  working_tree_at_audit: "clean at c444653; STEP 6 changes staged next"
+  next_commit_subject: "phase6: characterize per-prv action bounds"
 
 risks:
-  - "R1 (HYPOTHESIS_TO_TEST): agent may drive PRV setpoints low enough to cause <20 psi service violations; needs per-valve safe-lower-bound sweep (step6) + safety layer (step9)."
+  - "R1 (MEASURED, was HYPOTHESIS): driving PRV setpoints low DOES cause <20 psi service violations for 175 (<21.5), 176 (<20; negative <13), 177 (<20), 178 (<20). VALVE-173 is exempt (inert). Per-valve service-clean lower bounds now measured (step6, D-P6-003); a STEP-9 safety layer should still clamp to the approved bounds."
   - "R2 (VALIDATED_FACT): Option B pump strategy can halt the simulator mid-episode (t=79.5h). Do not use SETTING-IS rule rewrite as primary. Mitigated by Option C."
   - "R3 (RESEARCH_ASSUMPTION): leak instrument is uncalibrated; absolute leakage numbers are not field-meaningful, only relative response is."
   - "R4 (BLOCKER): DRL deps missing; env/training work cannot proceed without approved install."
   - "R5 (carried debt): proposal cites Hu MARL incorrectly (fix to Water Supply 23(7):2833, doi 10.2166/ws.2023.163); Negm Table 5-4 to re-verify from PDF before citing."
 
 next_action:
-  step: "Phase 6 STEP 6 - run per-valve fine setpoint sweep for VALVE-173/175/176/177/178 to derive defensible safe lower/upper bounds; persist to results/phase6/p6_s6_active_prv_bounds.json; register D-P6-003."
-  then: "Confirm D-P6-001 (absolute encoding) and D-P6-002 (pump upper bound=1.0) with researcher; then STEP 7 observation design."
-  guardrails: "No scientific PPO training. No silent research decisions. Persist every result before next major step."
+  step: "Researcher approval of the PROPOSED per-valve PRV bounds (D-P6-003) and the pump upper bound (D-P6-002). Bounds are PROPOSED, not FINAL, until approved."
+  then: "Confirm D-P6-001 (absolute encoding); then STEP 7 observation/state design."
+  guardrails: "No scientific PPO training. No silent research decisions. Bounds stay PROPOSED until explicit approval. Persist every result before next major step."
+  open_questions:
+    - "VALVE-173 authority: propose narrowing its domain to its regulating range (~[55,70]) or accept a large closed-valve dead-zone in [5,55]? (researcher decision)"
+    - "Upper bound = nominal (leakage-aligned) vs headroom-to-regulation-ceiling (allows service recovery but admits leakage-increasing actions)? (researcher decision)"
+    - "Pump upper bound: 1.0 (rated) vs 1.10 (measured feasible headroom)? (D-P6-002)"
+
+session_checkpoint:          # brief s.20 - on-disk, not chat-only
+  date_utc: "2026-09-27"
+  current_phase: "Phase 6 - DRL environment design/validation"
+  current_step: "STEP 6 - per-PRV operating-bound characterization"
+  completed: ["G5 action space", "G12 pump control", "STEP 6 PRV per-valve characterization (measured)"]
+  not_completed: ["researcher approval of proposed PRV/pump bounds", "STEP 5 encoding confirmation", "STEP 7-15"]
+  pending_research_decisions: ["D-P6-001 (encoding)", "D-P6-002 (pump upper bound)", "D-P6-003 (PRV bounds) - PENDING APPROVAL"]
+  results_file: "results/phase6/p6_s6_active_prv_bounds.json"
+  tests_run: "reference-nominal reproduction (mean 94.787 / min 4.165 @ JUNCTION-29 / 386 <20psi / 0 negative / 84.730 gpm) reproduced exactly twice; solver asserted 1e-5/2000/180s/1800s each load; continuity within 1e-3; no truncation; no solver errors; only intended 176 negative cliff observed."
+  files_changed: ["src/validation/p6_s6_active_prv_bounds.py", "results/phase6/p6_s6_active_prv_bounds.json", "PROJECT_STATE.yaml", "docs/RECOVERY.md", "docs/PHASE6_EXECUTION_LOG.md", "docs/PHASE6_DECISION_REGISTER.md", "docs/PHASE6_EVIDENCE_INDEX.md"]
+  git_commit: "phase6: characterize per-prv action bounds (see git.next_commit_subject)"
+  exact_next_action: "Present decision brief; await researcher approval of D-P6-003 proposed bounds; then STEP 7."
+  recovery_file: "docs/RECOVERY.md"
+
 

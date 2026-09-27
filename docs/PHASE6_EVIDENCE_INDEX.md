@@ -50,8 +50,27 @@ listed, not from memory. (instruction §7)
 | DRL deps missing | .venv import check (WU-3) | gymnasium/stable_baselines3/torch/pyyaml MISSING | STEP 11/13 BLOCKED; no auto-install |
 | Sim stack present | .venv import check (WU-3) | wntr 1.5.0, epyt 2.3.5.2, numpy 2.5.2, pandas 3.0.5, scipy 1.18.1 | characterization runs OK |
 
+## STEP 6 — per-PRV operating bounds (D-P6-003, PROPOSED)
+
+All rows from `results/phase6/p6_s6_active_prv_bounds.json`. Domains: observed (A) /
+hard-safe & service-clean (B) / proposed (C). Bounds PROPOSED — PENDING APPROVAL.
+
+| Claim | Section/Key | Result | Interpretation |
+|---|---|---|---|
+| Reference nominal reproduced | reference_nominal_case | mean 94.787, min 4.165 @ J-29, 386 <20psi, 0 neg, leak 84.730 | sweep baseline == Phase 5 reference; reproducibility anchor |
+| 173 domains + authority | proposed_bounds_table.VALVE-173 / per_valve | obs/safe/svc [5,110]; PROPOSED [5,70]; flow 4.72 gpm; save 0.329%; closes_below_domain | nearly inert; weak actuator in isolation (HYPOTHESIS) |
+| 175 domains + authority | proposed_bounds_table.VALVE-175 / per_valve | obs/safe [5,110], svc [21.5,110]; PROPOSED [21.5,55]; flow 362.91 gpm; save 2.222% | strongest actuator; service transition 21.25->21.5 |
+| 176 negative cliff | per_valve.VALVE-176.low_side_negative_transition_psi | neg <=12.75, first non-neg 13.0 (bracket 0.25) @ JUNCTION-126 | ONLY hard negative-pressure cliff; hard-safe lower = 13 |
+| 176 service + proposed | proposed_bounds_table.VALVE-176 | svc [20,59.524]; PROPOSED [20,29.762]; save 0.746% | service transition 19.75->20.0 |
+| 177 domains + authority | proposed_bounds_table.VALVE-177 / per_valve | obs/safe [5,90], svc [20,90]; PROPOSED [20,45]; flow 20.61 gpm; save 0.408% | no negative to 5 psi; service transition 19.75->20.0 |
+| 178 domains + authority | proposed_bounds_table.VALVE-178 / per_valve | obs/safe [5,74], svc [20,74]; PROPOSED [20,37]; flow 39.24 gpm; save 0.245% | no negative to 5 psi; service transition 19.75->20.0 |
+| Joint lower-corner safe | cross_actuator_joint_lower_corner | 0 neg, 0 new <20psi, min 4.190 psi, leak 81.383 gpm (−3.347) | per-valve box constraints jointly sufficient at aggressive corner |
+| Bounds are asymmetric | proposed_bounds_table.* | one-sided [svc-lower, nominal], differ per valve | no shared %-band (§7 satisfied) |
+
 ## Still-missing evidence (drives next action)
 
 | Needed claim | Why missing | How to obtain |
 |---|---|---|
-| Per-valve safe bounds for 173/175/176/177 | only joint 0.75–1.00× tested | D-P6-003 per-valve sweep -> p6_s6_active_prv_bounds.json |
+| Researcher approval of proposed PRV bounds | D-P6-003 is characterization only | explicit approval (§14) — then freeze |
+| Pump upper bound policy | D-P6-002 open | researcher choice 1.0 vs 1.10 |
+| Observation/state design | STEP 7 not started | STEP 7 |

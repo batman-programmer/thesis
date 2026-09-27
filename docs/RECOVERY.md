@@ -5,7 +5,7 @@ first, then `PROJECT_STATE.yaml`, then the three Phase 6 docs listed below. You
 should be able to reconstruct the whole project state from disk WITHOUT the old
 chat.**
 
-Last updated: 2026-09-26 (UTC) by Claude Opus 4.8.
+Last updated: 2026-09-27 (UTC) by Claude Opus 4.8.
 
 ---
 
@@ -83,11 +83,16 @@ Source `results/phase5/g3_pump_speed.json`:
   recommendation = **absolute**, PENDING researcher confirmation (D-P6-001).
 - **STEP 6** numeric action bounds:
   - Pump upper bound proposed = **1.0** (rated), PENDING confirmation (D-P6-002).
-  - **Per-valve safe setpoint bounds for VALVE-173/175/176/177 NOT yet measured**
-    — only a joint 0.75x–1.00x-nominal test exists. A per-valve fine sweep is the
-    immediate next action (D-P6-003), output -> `results/phase6/p6_s6_active_prv_bounds.json`.
+  - **Per-valve PRV setpoint bounds MEASURED (D-P6-003) — PROPOSED, PENDING
+    APPROVAL.** Evidence in `results/phase6/p6_s6_active_prv_bounds.json`. Proposed
+    DRL domains (psi): 173 [5.0,70.0]; 175 [21.5,55.0]; 176 [20.0,29.762];
+    177 [20.0,45.0]; 178 [20.0,37.0] (= [service-clean lower, nominal] per valve).
+    Only VALVE-176 has a hard negative cliff (neg <=12.75, first non-neg 13.0); the
+    other four are limited by the softer <20 psi service criterion; VALVE-173 is
+    nearly inert. Joint lower corner is service-clean (0 new <20psi, 0 negative,
+    min 4.190 psi, leak 81.383 gpm = −3.347 vs baseline). **NOT frozen** (§18).
 - STEP 7 observation design, STEP 8 reward, STEP 9 safety layer, STEP 10 demand
-  uncertainty/splits: NOT STARTED.
+  uncertainty/splits: NOT STARTED. STEP-9 must hard-clamp to the approved bounds.
 - STEP 11 `src/env/` (8 modules) + STEP 12 `tests/` (16 tests) + STEP 13 SB3
   smoke test: BLOCKED — deps missing.
 
@@ -115,6 +120,10 @@ result is written to `results/phase6/` as JSON (raw + summary + interpretation).
   44.8 (last non-negative), 44.9 (first negative). Already in `p6_s3b_v179_refine.json`.
 - **DO NOT** re-run the pump strategy A/B/C comparison — done in `p6_s4_pump_strategy.json`.
 - **DO NOT** re-measure pump feasible speed bounds — in `g3_pump_speed.json`.
+- **DO NOT** re-run the STEP 6 per-PRV setpoint sweep — done in
+  `p6_s6_active_prv_bounds.json` (D-P6-003). Proposed domains recorded; bounds are
+  PROPOSED — PENDING APPROVAL, not frozen. Re-run only if the leak instrument,
+  solver policy, or admitted PRV set changes.
 - **DO NOT** start scientific PPO training. A tiny smoke test is allowed ONLY after
   the env is implemented and validated, and only to prove the loop runs.
 - **DO NOT** auto-install gymnasium / stable_baselines3 / torch.

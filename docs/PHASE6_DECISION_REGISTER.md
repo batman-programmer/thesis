@@ -101,24 +101,73 @@ APPROVED · IMPLEMENTED · SUPERSEDED.
 
 ---
 
-## D-P6-003 — Per-valve safe setpoint bounds for the 5 RL PRVs  [OPEN — measurement pending]
+## D-P6-003 — Per-valve safe setpoint bounds for the 5 RL PRVs  [PROPOSED — PENDING RESEARCHER APPROVAL]
 
-- **Date:** 2026-09-26
+- **Date:** 2026-09-26 (opened); 2026-09-27 (measured, PROPOSED).
+- **approval_required:** true. **Do NOT mark APPROVED without explicit researcher approval (§14).**
 - **Topic:** `[lo, hi]` psi setpoint bound for each of VALVE-173/175/176/177/178.
 - **Question:** How low/high can each admitted PRV's setpoint go before it causes
   service-pressure violations (<20 psi PDA threshold) or negative pressure?
-- **Evidence gap:** only a *joint* 0.75–1.00× nominal test exists
-  (p6_s3c_zone_interaction.json); VALVE-178 has an individual grid, but
-  173/175/176/177 have **no per-valve fine sweep**. Bounds cannot be set yet.
-- **Plan (next action):** run a deterministic per-valve fine setpoint sweep
-  (leak instrument on, PDA, 96 h EPS, other PRVs at nominal), record per setting:
-  min/mean service pressure, n_node_ts<20psi, n_negative, leakage, DSR. Derive
-  each valve's safe lower bound (lowest setting with 0 negative and no increase in
-  <20 psi violations beyond the nominal 386 baseline) and a justified upper bound.
-  Output -> `results/phase6/p6_s6_active_prv_bounds.json`; script
-  `src/validation/p6_s6_active_prv_bounds.py`.
-- **Status:** OPEN — measurement not yet run. This is characterization (allowed),
-  not RL training. Result feeds D-P6-001 mapping and D-P6-002 evidence pass.
-- **Validation:** bounds must reproduce; box-constraint sufficiency to be re-checked
-  jointly if per-valve bounds widen beyond the already-tested 0.75× envelope.
+- **Method (executed):** deterministic per-valve fine setpoint sweep, leak
+  instrument on, PDA (required 20 / minimum 0 / exponent 0.5), 96 h EPS, solver
+  1e-5 / 2000 / rule 180 s / report 1800 s asserted each load, other four PRVs held
+  at nominal. Adaptive grid extended outward from nominal and refined to 0.25 psi
+  around every safety/service transition. Per setpoint recorded: commanded/echoed
+  setting + transmission error, valve state (Active/Open/Closed) + realization rate,
+  mean/min/max service pressure, n_node_ts<20psi, n_new<20psi vs baseline,
+  n_negative, valve flow, leakage, DSR, continuity residual, solver-clean flag.
+  Reference nominal reproduced EXACTLY (mean 94.787 psi, min 4.165 @ JUNCTION-29,
+  386 <20 psi, 0 negative, leak 84.730 gpm).
+- **Three separate concepts reported per valve (§8):** (A) observed domain (grid
+  actually evaluated), (B) hard-safe / service-clean supported domains (measured),
+  (C) proposed DRL domain (engineering decision, NOT automatically = B).
+- **Measured evidence** (`results/phase6/p6_s6_active_prv_bounds.json`):
+
+  | Valve | Nominal | Observed (A) | Hard-safe | Service-clean (B) | **Proposed (C)** | Flow@nom (gpm) | Leak save in domain | Low-side behaviour |
+  |---|---|---|---|---|---|---|---|---|
+  | 173 | 70.0 | [5,110] | [5,110] | [5,110] | **[5.0, 70.0]** | 4.72 | 0.279 gpm / 0.329% | closes_below_domain (inert <~55 psi) |
+  | 175 | 55.0 | [5,110] | [5,110] | [21.5,110] | **[21.5, 55.0]** | 362.91 | 1.883 gpm / 2.222% | regulates_across_domain |
+  | 176 | 29.762 | [10,59.524] | [13,59.524] | [20,59.524] | **[20.0, 29.762]** | 256.91 | 0.632 gpm / 0.746% | regulates_across_domain |
+  | 177 | 45.0 | [5,90] | [5,90] | [20,90] | **[20.0, 45.0]** | 20.61 | 0.346 gpm / 0.408% | regulates_across_domain |
+  | 178 | 37.0 | [5,74] | [5,74] | [20,74] | **[20.0, 37.0]** | 39.24 | 0.208 gpm / 0.245% | regulates_across_domain |
+
+- **Safety criterion (measured, not invented, §6):** unsafe = any negative service
+  pressure, OR any *new* <20 psi violation beyond the 386-timestep nominal baseline,
+  OR solver failure / non-convergence / discontinuity / impossible actuator state.
+  Only **VALVE-176** exhibits a hard negative-pressure cliff (negative ≤12.75 psi,
+  first non-negative 13.0 psi; localized at JUNCTION-126). The other four are limited
+  only by the softer <20 psi service criterion (service-clean lower: 175=21.5,
+  176/177/178=20.0; 173 service-clean to the 5 psi floor because it is nearly inert).
+- **Bounds are asymmetric / non-uniform (§7):** proposed domains are one-sided
+  [service-clean lower, nominal] and differ per valve; NOT a shared percentage band.
+- **Alternatives recorded per valve (not chosen by default):** permissive lower =
+  hard-safe floor (admits <20 psi violations, no negative — deferred to reward /
+  STEP-9 safety layer); headroom upper = regulation ceiling (lets the agent RAISE
+  pressure for service recovery, but admits leakage-increasing actions above nominal).
+- **Recommendation (C):** proposed domain = [service-clean lower, nominal] per valve.
+  Upper = nominal so the action space can only reduce pressure below the distributed
+  baseline and cannot command higher leakage than baseline — aligned with the
+  leakage-reduction objective.
+- **Cross-actuator check (§10):** all five PRVs at their proposed lower bounds
+  simultaneously (173=5, 175=21.5, 176=20, 177=20, 178=20) is SERVICE-CLEAN — 0
+  negative, 0 new <20 psi, min service 4.190 psi @ JUNCTION-29, leak 81.383 gpm
+  (−3.347 vs baseline). Per-valve box constraints are jointly sufficient at the
+  most aggressive tested corner.
+- **Uncertainty / caveats:** (1) leak instrument is validation-only, uncalibrated —
+  absolute leakage numbers are not field-meaningful; only relative response is used.
+  (2) Per-valve leakage savings are modest (0.2–2.2% in isolation); joint lower
+  corner saves ~3.95%. (3) VALVE-173 is nearly inert (4.72 gpm at nominal, closes
+  below ~55 psi) — weak action dimension in isolation (HYPOTHESIS TO TEST); its
+  proposed [5,70] domain carries a large closed-valve dead-zone. (4) The chronic low
+  node (JUNCTION-29 ~4.16 psi) is governed by network structure, not by these PRVs.
+  (5) Upper bound choice (nominal vs headroom) and VALVE-173 domain narrowing are
+  open researcher decisions.
+- **Status:** PROPOSED — PENDING RESEARCHER APPROVAL. This is characterization
+  (allowed), not RL training or optimization. Bounds feed D-P6-001 (mapping) and
+  the D-P6-002 evidence pass; they are NOT final and NOT frozen.
+- **Approval:** required (researcher). Not yet given.
+- **Implementation:** none. No env code, no action_mapper written. Deferred to STEP 11.
+- **Validation:** reference nominal reproduced exactly twice; every setpoint
+  solver-clean with continuity residual < 1e-3; box-constraint joint sufficiency
+  verified at the lower corner.
 
