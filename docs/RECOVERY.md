@@ -9,9 +9,11 @@ Last updated: 2026-09-27 (UTC) by Claude Opus 4.8. **Action space APPROVED & FRO
 2026-09-27 (D-P6-001/002/003); STEP 7 observation design APPROVED & FROZEN 2026-09-27
 (D-P6-004, observation_dim=139); STEP 8 (reward design — MEASURE component scales, do
 NOT train) MEASUREMENT COMPLETE 2026-09-27 (WU-9), FORMULATION COMPARISON COMPLETE
-2026-09-27 (WU-10, evidence only), and D-P6-005 DECISION BRIEF PREPARED 2026-09-27
-(WU-11). D-P6-005 remains PROPOSED / DECISION PENDING RESEARCHER — formulation & weights
-NOT selected; researcher_selection=null.**
+2026-09-27 (WU-10, evidence only), D-P6-005 DECISION BRIEF PREPARED 2026-09-27
+(WU-11), and D-P6-005 RESEARCHER SUMMARY PREPARED 2026-09-27 (WU-12, researcher-facing
+presentation — pure re-shaping of the WU-11 brief). D-P6-005 remains PROPOSED / DECISION
+PENDING RESEARCHER — formulation & weights NOT selected; researcher_selection=null; the
+researcher decision form is BLANK.**
 
 ---
 
@@ -49,10 +51,13 @@ snapshot) with the live root `PROJECT_STATE.yaml` (this workflow's state file).
 
 ## 2. Verified current state (from on-disk evidence, 2026-09-26 audit)
 
-- Git: branch `main`, HEAD `e91c363` (`phase6: approve drl actuator action space`).
-  Preceding: `8c89ba2` (step6b VALVE-173 evidence), `627567b` (step6 bounds). Working
-  tree carries only untracked `results/phase5/_tmp/*` scratch + `__pycache__/*.pyc`
-  (pre-existing debt, not committed).
+- Git: branch `main`, HEAD `1ad6392` (`phase6: record D-P6-005 decision-brief commit
+  hash (checkpoint)`). Preceding: `56db0e5` (WU-11 D-P6-005 decision brief), `262b738`
+  (WU-10 comparison checkpoint), `a9654c2` (WU-10 comparison), `0d7dc1a` (WU-9 checkpoint),
+  `a2fab2e` (WU-9 reward-scale analysis), `0cd7f2e` (D-P6-004 approval), `e91c363` (action
+  space approval). The WU-12 researcher-summary deliverable + its checkpoint commit land on
+  top of `1ad6392`. Working tree otherwise carries only untracked `results/phase5/_tmp/*`
+  scratch + `__pycache__/*.pyc` (pre-existing debt, not committed).
 - Phase 5: COMPLETE. Do not rerun its gates.
 - Phase 6 Deliverable A COMPLETE: **G5 (action space)** and **G12 (pump speed
   persistence)** both RESOLVED with measured evidence in
@@ -163,8 +168,21 @@ Source `results/phase5/g3_pump_speed.json`:
   gate); chronic-baseline finding: a HARD absolute 20-psi reward constraint is ILL-POSED
   (frac_ts_any_node_below_20psi=1.0 on the native baseline) → use dense deficit / worst-node /
   baseline-relative / negative-only gate at reward level, and leave the enforced 20-psi
-  guarantee to STEP-9. NO formulation selected/scored/ranked. NEXT: researcher completes the
-  decision block (resolves D-P6-005). Do NOT choose final weights, do NOT start PPO.
+  guarantee to STEP-9. NO formulation selected/scored/ranked. **STEP 8 D-P6-005 RESEARCHER
+  SUMMARY also done (WU-12, 2026-09-27):** the WU-11 brief was re-shaped into a concise,
+  researcher-facing decision presentation so the researcher can make an explicit D-P6-005
+  decision. On disk: `docs/PHASE6_D_P6_005_RESEARCHER_SUMMARY.md` (§A–§H, researcher §G
+  decision form BLANK), `src/validation/p6_d_p6_005_researcher_summary.py` (PURE re-shaping —
+  RE-LOADS the WU-11 brief and copies every equation/constant/weight verbatim; only Persian/
+  English prose authored; no EPANET/PPO/RNG; deterministic regeneration byte-reproduces the
+  JSON), `results/phase6/p6_d_p6_005_researcher_summary.json` (**researcher_selection=null**),
+  `tests/test_researcher_summary.py` (84/84 full battery). Preserves the two DISTINCT
+  unserved_ref values (F3 accounting 14.98483697365873 vs C-C DSR-implied 15.103309701248634),
+  all four candidates "PROVISIONAL CANDIDATE — NOT APPROVED", plain-language Persian per
+  candidate, the 12 decision dimensions (descriptive-only), the "why a leakage-reducing reward
+  can still be scientifically wrong" analysis, and the reward-vs-STEP-9 layer separation; no
+  winner/rank/score keys anywhere. NEXT: researcher completes the §G decision form (resolves
+  D-P6-005). Do NOT choose final weights, do NOT start PPO.
 - STEP 9 safety layer, STEP 10 demand uncertainty/splits: NOT STARTED.
   STEP-9 must hard-clamp to the approved bounds.
 - STEP 11 `src/env/` (8 modules) + STEP 12 `tests/` (16 tests) + STEP 13 SB3
@@ -230,6 +248,19 @@ result is written to `results/phase6/` as JSON (raw + summary + interpretation).
   researcher's decision block, do NOT set researcher_selection, do NOT implement
   `src/env/reward.py` (STEP 11) or a STEP-9 clamp, and do NOT start PPO — those await the
   researcher's D-P6-005 selection.
+- **DO NOT** re-run the STEP 8 D-P6-005 researcher-summary aggregator
+  (`src/validation/p6_d_p6_005_researcher_summary.py`) or rewrite
+  `docs/PHASE6_D_P6_005_RESEARCHER_SUMMARY.md` — the researcher summary is on disk (WU-12,
+  2026-09-27: `results/phase6/p6_d_p6_005_researcher_summary.json` with
+  **researcher_selection=null**, 84/84 tests). It is a PURE re-shaping of the WU-11 brief
+  (copies every equation/constant/weight verbatim; only Persian/English prose authored; no
+  EPANET/PPO/RNG; deterministic regeneration byte-reproduces the JSON), so re-running changes
+  nothing unless the WU-11 brief changes. The FOUR candidate formulations are "PROVISIONAL
+  CANDIDATE — NOT APPROVED" — do NOT treat any as chosen. The summary PRESENTS the D-P6-005
+  gate but does NOT resolve it: no formulation selected/scored/ranked/recommended, no weights
+  tuned. Do NOT fill in the researcher's §G decision form, do NOT set researcher_selection, do
+  NOT implement `src/env/reward.py` (STEP 11) or a STEP-9 clamp, and do NOT start PPO — those
+  await the researcher's D-P6-005 selection.
 - **DO NOT** start scientific PPO training. A tiny smoke test is allowed ONLY after
   the env is implemented and validated, and only to prove the loop runs.
 - **DO NOT** auto-install gymnasium / stable_baselines3 / torch.

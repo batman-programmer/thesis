@@ -1,0 +1,478 @@
+{
+  "decision_id": "D-P6-005",
+  "current_status": "PROPOSED / DECISION PENDING RESEARCHER",
+  "purpose": "Researcher-facing decision presentation (WU-12). PURE re-shaping of the WU-11 decision brief; measures nothing new; selects/scores/ranks/recommends no formulation; researcher_selection stays null.",
+  "generated_by": "src/validation/p6_d_p6_005_researcher_summary.py",
+  "measures_nothing_new": true,
+  "no_epanet_no_ppo_no_selection": true,
+  "source_artifacts": {
+    "wu9_scale_analysis": "results/phase6/p6_s8_reward_scale_analysis.json",
+    "wu10_formulation_comparison": "results/phase6/p6_s8_reward_formulation_comparison.json",
+    "state_spec": "results/phase6/p6_s7_state_spec.json",
+    "reward_spec_doc": "docs/PHASE6_REWARD_SPEC.md",
+    "action_space_spec_doc": "docs/PHASE6_ACTION_SPACE_SPEC.md",
+    "wu11_decision_brief": "results/phase6/p6_d_p6_005_decision_brief.json"
+  },
+  "frozen_constraints_snapshot": {
+    "action_space": {
+      "decision": "D-P6-001/002/003 APPROVED & FROZEN",
+      "action_dim": 7,
+      "encoding": "ABSOLUTE a_i in [-1,1]; physical = lower + ((a+1)/2)*(upper-lower)",
+      "ordered_bounds": [
+        {
+          "index": 0,
+          "actuator": "VALVE-173",
+          "lower": 54.5,
+          "upper": 100.0,
+          "unit": "psi"
+        },
+        {
+          "index": 1,
+          "actuator": "VALVE-175",
+          "lower": 21.5,
+          "upper": 110.0,
+          "unit": "psi"
+        },
+        {
+          "index": 2,
+          "actuator": "VALVE-176",
+          "lower": 20.0,
+          "upper": 59.524,
+          "unit": "psi"
+        },
+        {
+          "index": 3,
+          "actuator": "VALVE-177",
+          "lower": 20.0,
+          "upper": 90.0,
+          "unit": "psi"
+        },
+        {
+          "index": 4,
+          "actuator": "VALVE-178",
+          "lower": 20.0,
+          "upper": 74.0,
+          "unit": "psi"
+        },
+        {
+          "index": 5,
+          "actuator": "PUMP-170",
+          "lower": 0.82,
+          "upper": 1.1,
+          "unit": "rel_speed"
+        },
+        {
+          "index": 6,
+          "actuator": "PUMP-172",
+          "lower": 0.77,
+          "upper": 1.1,
+          "unit": "rel_speed"
+        }
+      ],
+      "excluded_valves_kept_in_model": [
+        "VALVE-174",
+        "VALVE-179",
+        "VALVE-180"
+      ],
+      "pump_strategy": "SPEED only, re-issued each step; native STATUS rules intact"
+    },
+    "observation": {
+      "decision": "D-P6-004 APPROVED & FROZEN",
+      "observation_dim": 139,
+      "dtype": "float32",
+      "reward_must_not_modify_state": true
+    },
+    "service_node_policy": {
+      "n_service_junctions": 121,
+      "n_connector_junctions_excluded": 5,
+      "connector_nodes": [
+        "JUNCTION-105",
+        "JUNCTION-106",
+        "JUNCTION-109",
+        "JUNCTION-110",
+        "JUNCTION-128"
+      ]
+    },
+    "solver_policy": {
+      "accuracy": 1e-05,
+      "trials": 2000,
+      "rule_timestep_s": 180,
+      "report_timestep_s": 1800,
+      "pda_required_psi": 20.0,
+      "pda_minimum_psi": 0.0,
+      "pda_exponent": 0.5,
+      "asserted_after_every_load": true
+    }
+  },
+  "normalization_constants_frozen": {
+    "leak_ref_gpm": 84.72988433677985,
+    "req_ref_gpm": 906.3987348621764,
+    "deficit_ref_psi_nodesum": 28.671793365478514,
+    "power_ref_kw": 88.10062475649187,
+    "movement_L2sq_max": 28.0,
+    "note": "FIXED constants measured once (baseline reference run / this analysis) and frozen; NOT per-episode running statistics -> no train/eval leakage. deficit_ref guards against a ~0 baseline deficit by taking max(baseline mean, pooled p95)."
+  },
+  "formulation_families": [
+    {
+      "id": "F1",
+      "name": "normalized_weighted_sum",
+      "sign_convention": "reward is a NEGATIVE cost; higher (less negative) is better",
+      "expression": "r_t = -w_L*(leak_t/leak_ref) - w_U*(unserved_t^+/req_ref) - w_P*(deficit_t/deficit_ref) - w_A*(||da_t||^2/L2sq_max) - w_E*(power_t/power_ref)",
+      "components": [
+        "leakage",
+        "unserved_demand",
+        "pressure_deficit",
+        "actuator_movement",
+        "pump_power(optional)"
+      ],
+      "clipping": "unserved clipped at >=0; da=0 for static holds",
+      "epsilon_handling": "all denominators are fixed nonzero constants",
+      "provisional_weights": {
+        "w_L": 1.0,
+        "w_U": 1.0,
+        "w_P": 1.0,
+        "w_A": 1.0,
+        "w_E": 0.0
+      }
+    },
+    {
+      "id": "F2",
+      "name": "constrained_penalty_service_protected",
+      "sign_convention": "reward is a NEGATIVE cost; higher (less negative) is better",
+      "expression": "r_t = -(leak_t/leak_ref) - LAMBDA*(deficit_t/deficit_ref) - BIG*max(0, n_below20_t)",
+      "components": [
+        "leakage",
+        "pressure_deficit",
+        "n_below20(hard)"
+      ],
+      "clipping": "n_below20 clipped at >=0 (a count, already >=0)",
+      "epsilon_handling": "fixed nonzero denominators",
+      "provisional_parameters": {
+        "lambda_service": 20.0,
+        "big_hard": 100.0
+      }
+    },
+    {
+      "id": "F3",
+      "name": "baseline_relative_improvement",
+      "sign_convention": "reward is a NEGATIVE cost; higher (less negative) is better",
+      "expression": "r_t = (leak_ref - leak_t)/leak_ref - w_U*max(0, unserved_t - unserved_ref)/req_ref - w_P_safety*(deficit_t/deficit_ref)",
+      "components": [
+        "fractional_leak_reduction_vs_native",
+        "excess_unserved",
+        "pressure_deficit"
+      ],
+      "clipping": "excess unserved clipped at >=0",
+      "epsilon_handling": "fixed nonzero denominators",
+      "provisional_weights": {
+        "w_U": 1.0,
+        "w_P_safety": 1.0
+      },
+      "baseline_constants": {
+        "unserved_ref_gpm": 14.98483697365873,
+        "source": "native reference req-served (frozen)"
+      }
+    },
+    {
+      "id": "F4",
+      "name": "safety_first_lexicographic",
+      "sign_convention": "reward is a NEGATIVE cost; higher (less negative) is better",
+      "expression": "if min_svc_p_t < 0: r_t = -c_hard - deficit_t/deficit_ref; elif min_svc_p_t < theta: r_t = -c_soft - deficit_t/deficit_ref; else: r_t = -(leak_t/leak_ref) - eps*(||da_t||^2/L2sq_max)",
+      "components": [
+        "safety_band(min_service_pressure)",
+        "pressure_deficit",
+        "leakage",
+        "actuator_movement(tie-break)"
+      ],
+      "clipping": "branch selection by min service pressure vs threshold",
+      "epsilon_handling": "fixed nonzero denominators; eps effort tie-break",
+      "provisional_parameters": {
+        "safety_threshold_psi": 20.0,
+        "c_soft_service": 10.0,
+        "c_hard_negative": 100.0,
+        "eps_effort": 0.01
+      }
+    }
+  ],
+  "candidate_formulations": [
+    {
+      "candidate_id": "C-A_F1_balanced_dense",
+      "status": "PROVISIONAL CANDIDATE - NOT APPROVED",
+      "base_formulation": "F1_normalized_weighted_sum",
+      "equation": "r_t = - w_L*(leak_t/leak_ref) - w_U*(unserved_t^+/req_ref) - w_P*(deficit_t/deficit_ref) - w_A*(||da_t||^2/L2sq_max) - w_E*(power_t/power_ref)",
+      "normalization_constants": {
+        "leak_ref_gpm": 84.72988433677985,
+        "req_ref_gpm": 906.3987348621764,
+        "deficit_ref_psi_nodesum": 28.671793365478514,
+        "power_ref_kw": 88.10062475649187,
+        "movement_L2sq_max": 28.0
+      },
+      "provisional_weights": {
+        "w_L": 1.0,
+        "w_U": 1.0,
+        "w_P": 1.0,
+        "w_A": 0.1,
+        "w_E": 0.0
+      },
+      "scale_derivation": "All four active terms are pre-normalised to O(1) by the FROZEN WU-9 constants, so unit weights are the neutral starting point. w_A=0.1 is read from WU-10 pathology C: the leak-term dynamic range across in-bounds commands is ~0.108, while one max-movement step costs 1.0 at w_A=1; scaling w_A to ~0.1 keeps a full-swing action step commensurate with (not dominating) the measured leakage signal. w_E=0 keeps the (optional, hydraulic-only) energy term out to avoid parameter proliferation.",
+      "plain_language_fa": {
+        "q1_encourages": "کاهش همزمان نشت، کاهش تقاضای برآورده‌نشده (unserved) و کاهش کسری فشار (deficit)، به‌علاوه‌ی یک جریمه‌ی کوچک برای تغییرِ زیادِ عملگرها. هر چهار ترم با ثابت‌های ثابت‌شده‌ی WU-9 نرمال شده‌اند تا هم‌مقیاس باشند و وزن‌های ۱ نقطه‌ی شروعِ خنثی‌اند.",
+        "q2_leak_down_service_down": "چون نشت و سرویس و فشار هر سه وزنِ ۱ دارند، بهبودِ نشت با بدترشدنِ سرویس و افزایش deficit خنثی یا حتی منفی می‌شود؛ پاداش لزوماً بهتر نمی‌شود.",
+        "q3_pressure_up": "طبق شواهد (leak↔pressure)، بالا رفتنِ فشار نشت را زیاد می‌کند پس ترمِ نشت بدتر می‌شود، هرچند deficit و unserved بهتر می‌شوند؛ نتیجه‌ی خالص به تعادلِ وزن‌ها بستگی دارد.",
+        "q4_action_moves_a_lot": "ترمِ w_A*(‖Δa‖²/28) با w_A=0.1 یک جریمه‌ی کوچک می‌گیرد؛ یک حرکتِ کاملِ کران‌به‌کران تقریباً هم‌اندازه‌ی کلِ دامنه‌ی تغییرِ نشت (~0.108) هزینه دارد، نه بیشتر."
+      },
+      "actuator_effort_role": "w_A*(||da||^2 / 28) on the COMMANDED normalised action (never realised pump speed); w_A=0.1.",
+      "service_pressure_treatment": "dense normalised pressure_deficit term (deficit/deficit_ref) with w_P=1, plus unserved^+ term with w_U=1; NO hard threshold term.",
+      "leakage_treatment": "normalised absolute leakage leak/leak_ref with w_L=1.",
+      "special_cases": "unserved clipped at >=0; da=0 for static holds; all denominators are fixed nonzero constants; energy term off (w_E=0).",
+      "evidence": {
+        "observed": "Balanced leakage/service/safety/effort; but WU-10 induced-incentive argmax under unit weights is prv_176_upper and the leak-only optimum sits at the PRV lower corner (OBSERVED) -> a STEP-9 clamp is required, not optional.",
+        "inferred": "dense, differentiable, PPO-continuous friendly (INFERRED).",
+        "unresolved_risk": "WU-10 F1_vary_w_P shows w_P=0 -> prv_175_lower; w_P>=0.5 -> prv_176_upper. w_P below ~0.5 lets the incentive drift toward the low-pressure corner.",
+        "validation_experiment": "After the STEP-9 clamp exists: short deterministic PPO smoke test to confirm the per-step reward is non-flat and finite; measure realised ||da||^2 to replace the analytic effort ceiling (HYPOTHESIS)."
+      }
+    },
+    {
+      "candidate_id": "C-B_F1_safety_leaning",
+      "status": "PROVISIONAL CANDIDATE - NOT APPROVED",
+      "base_formulation": "F1_normalized_weighted_sum",
+      "equation": "same functional form as C-A",
+      "normalization_constants": {
+        "leak_ref_gpm": 84.72988433677985,
+        "req_ref_gpm": 906.3987348621764,
+        "deficit_ref_psi_nodesum": 28.671793365478514,
+        "power_ref_kw": 88.10062475649187,
+        "movement_L2sq_max": 28.0
+      },
+      "provisional_weights": {
+        "w_L": 1.0,
+        "w_U": 1.0,
+        "w_P": 2.0,
+        "w_A": 0.1,
+        "w_E": 0.0
+      },
+      "scale_derivation": "Identical to C-A except w_P=2.0. Motivated by the measured deficit<->leak correlation -0.7735 and the dense worst-node min-pressure signal (WU-9): a heavier normalised deficit weight more strongly protects worst-node pressure. w_P=2 is still O(1) after normalisation.",
+      "plain_language_fa": {
+        "q1_encourages": "همان C-A است ولی وزنِ فشار/deficit دو برابر (w_P=2) است؛ یعنی محافظت از بدترین گرهِ فشار پررنگ‌تر می‌شود. این فقط «تأکیدِ متفاوت» است، نه رتبه‌بندی نسبت به C-A.",
+        "q2_leak_down_service_down": "چون وزنِ deficit بزرگ‌تر است، بدترشدنِ سرویس شدیدتر جریمه می‌شود؛ پس بهبودِ نشت به‌قیمتِ سرویس، پاداش را بیشتر از C-A پایین می‌آورد.",
+        "q3_pressure_up": "مثل C-A نشت بالا می‌رود و ترمِ نشت بدتر می‌شود؛ اما چون deficit وزنِ ۲ دارد، بهبودِ فشار سهمِ مثبتِ بزرگ‌تری می‌گذارد.",
+        "q4_action_moves_a_lot": "دقیقاً مثل C-A: جریمه‌ی کوچکِ w_A=0.1 روی ‖Δa‖²/28."
+      },
+      "actuator_effort_role": "identical to C-A: w_A*(||da||^2 / 28) on COMMANDED action; w_A=0.1.",
+      "service_pressure_treatment": "same dense deficit term as C-A but with heavier weight w_P=2 (still O(1) after normalisation); unserved^+ with w_U=1; NO hard threshold.",
+      "leakage_treatment": "normalised absolute leakage leak/leak_ref with w_L=1.",
+      "special_cases": "same as C-A (unserved^+ clipped; da=0 static; fixed denominators; w_E=0). Only difference vs C-A is w_P: 1 -> 2.",
+      "evidence": {
+        "observed": "More weight on pressure safety may reduce achievable leakage cuts; this is a different emphasis, NOT a ranking versus C-A.",
+        "inferred": "dense, differentiable; a safety-leaning emphasis of C-A (INFERRED).",
+        "unresolved_risk": "Over-weighting deficit could flatten the leakage gradient (leak span ~+/-6%).",
+        "validation_experiment": "Same smoke test as C-A; compare realised min-pressure margin."
+      }
+    },
+    {
+      "candidate_id": "C-C_F3_baseline_relative",
+      "status": "PROVISIONAL CANDIDATE - NOT APPROVED",
+      "base_formulation": "F3_baseline_relative_improvement",
+      "equation": "r_t = (leak_ref - leak_t)/leak_ref - w_U*max(0, unserved_t - unserved_ref)/req_ref - w_P_safety*(deficit_t/deficit_ref)",
+      "normalization_constants": {
+        "leak_ref_gpm": 84.72988433677985,
+        "req_ref_gpm": 906.3987348621764,
+        "deficit_ref_psi_nodesum": 28.671793365478514,
+        "unserved_ref_gpm": 15.103309701248634
+      },
+      "provisional_weights": {
+        "w_U": 1.0,
+        "w_P_safety": 1.0
+      },
+      "scale_derivation": "Leakage improvement term is intrinsically normalised (fraction of baseline leakage) and zero-centred at the native controller, so no leak weight is needed. unserved_ref is the baseline unserved implied by DSR=0.98334 (~15.10 GPM; the WU-9 accounting value is 14.985 GPM). w_P_safety=1 uses the FROZEN deficit_ref. WU-10 F3 sweep: w_P_safety=0 -> prv_175_lower/prv_lower_pump_lower; w_P_safety>=1 -> prv_176_upper, so keep w_P_safety>=1.",
+      "plain_language_fa": {
+        "q1_encourages": "پاداش برابرِ «کسرِ کاهشِ نشت نسبت به کنترلرِ بومی» است، منهای جریمه برای unserved اضافه‌تر از خطِ پایه و جریمه‌ی deficit. یعنی مستقیماً «بهبود نسبت به baseline» را تشویق می‌کند و در نقطه‌ی کنترلرِ بومی صفر است.",
+        "q2_leak_down_service_down": "اگر unserved از سطحِ baseline (~15.10 GPM) بیشتر شود جریمه می‌گیرد و ترمِ deficit هم جریمه دارد؛ پس بدترشدنِ سرویس، سودِ کاهشِ نشت را جبران/خنثی می‌کند.",
+        "q3_pressure_up": "بالا رفتنِ فشار نشت را زیاد می‌کند، پس ترمِ بهبودِ نشت ((leak_ref-leak)/leak_ref) کوچک یا منفی می‌شود.",
+        "q4_action_moves_a_lot": "NOT SPECIFIED IN SOURCE — خانواده‌ی F3 در منبع هیچ ترمِ حرکت/هموارسازیِ عملگر ندارد؛ تغییرِ زیادِ action مستقیماً جریمه نمی‌شود."
+      },
+      "actuator_effort_role": "NOT SPECIFIED IN SOURCE (F3 family defines no actuator-movement / smoothness term).",
+      "service_pressure_treatment": "excess-unserved penalty w_U*max(0, unserved - unserved_ref)/req_ref (only ABOVE baseline) plus dense deficit term w_P_safety*(deficit/deficit_ref).",
+      "leakage_treatment": "fractional improvement vs native baseline (leak_ref - leak)/leak_ref; intrinsically normalised, zero-centred at the native controller; no separate leak weight.",
+      "special_cases": "excess unserved clipped at >=0; unserved_ref = 15.103309701248634 GPM (DSR-implied baseline; the WU-9 accounting value is 14.98483697365873 GPM); NO hard threshold term.",
+      "evidence": {
+        "observed": "Directly answers the thesis objective (reduction vs baseline) but the leakage improvement dynamic range is small (~+/-6%), so signal-to-noise must be checked.",
+        "inferred": "interpretable as % leakage reduction vs native baseline (INFERRED).",
+        "unresolved_risk": "Small reward magnitude may need reward/advantage scaling at training time.",
+        "validation_experiment": "Smoke test: confirm advantage estimates are non-degenerate."
+      }
+    },
+    {
+      "candidate_id": "C-D_dense_deficit_no_hard_count",
+      "status": "PROVISIONAL CANDIDATE - NOT APPROVED",
+      "base_formulation": "F2/F4_family_dense_safety_variant",
+      "equation": "r_t = -(leak_t/leak_ref) - LAMBDA*(deficit_t/deficit_ref) - BIG*max(0, n_negative_t)   # hard term on NEGATIVE nodes only",
+      "normalization_constants": {
+        "leak_ref_gpm": 84.72988433677985,
+        "deficit_ref_psi_nodesum": 28.671793365478514
+      },
+      "provisional_weights": {
+        "LAMBDA_service": 5.0,
+        "BIG_hard_negative": 100.0
+      },
+      "scale_derivation": "Explicitly REPLACES the F2 hard n_below_20 term with the dense deficit term, because WU-10 pathology F/G show the 20-psi count fires on the native baseline itself (frac_ts_any_node_below_20psi = 1.0) -> a hard 20-psi term is ill-posed on this network. The hard term is retained ONLY on NEGATIVE nodes (baseline count 0, frac_negative=0.0) so it is well-posed and fires only if a control drives a node sub-zero. LAMBDA=5 keeps the normalised deficit term within ~1 order of magnitude of the O(1) leak term (deficit_ref-normalised); it is a central value in [1,10], not fitted.",
+      "plain_language_fa": {
+        "q1_encourages": "کاهشِ نشت و کاهشِ deficit (سرویس)، با یک «دروازه‌ی سختِ» جریمه فقط برای فشارِ منفی. عمداً ترمِ سختِ «۲۰ psi» حذف شده چون روی خطِ پایه هم فعال می‌شود (ill-posed).",
+        "q2_leak_down_service_down": "ترمِ deficit با وزنِ LAMBDA=5 جریمه می‌شود، پس بدترشدنِ سرویس پاداش را پایین می‌آورد؛ و اگر کنترلی گره‌ای را به فشارِ منفی ببرد جریمه‌ی بزرگِ BIG=100 فعال می‌شود.",
+        "q3_pressure_up": "نشت بالا می‌رود پس ترمِ نشت (leak/leak_ref) بدتر می‌شود؛ ترمِ منفیِ سخت فعال نمی‌شود.",
+        "q4_action_moves_a_lot": "NOT SPECIFIED IN SOURCE — این نسخه هیچ ترمِ حرکت/هموارسازی ندارد؛ تغییرِ زیادِ action مستقیماً جریمه نمی‌شود."
+      },
+      "actuator_effort_role": "NOT SPECIFIED IN SOURCE (this dense-safety variant defines no actuator-movement term).",
+      "service_pressure_treatment": "dense normalised deficit term LAMBDA*(deficit/deficit_ref) (LAMBDA=5) PLUS a hard gate BIG*max(0, n_negative) firing ONLY on negative-pressure nodes (baseline count 0).",
+      "leakage_treatment": "normalised absolute leakage leak/leak_ref (unit implicit weight).",
+      "special_cases": "REPLACES the ill-posed hard 20-psi count with dense deficit; hard term keyed on NEGATIVE nodes only (well-posed, baseline frac_negative=0.0); the 20-psi level appears only inside the smooth deficit = sum max(0, 20 - p_i), NOT as a hard gate.",
+      "evidence": {
+        "observed": "Avoids the ill-posed 20-psi penalty; but LAMBDA is unmeasured and sets the leakage/service exchange rate, which the researcher must choose.",
+        "inferred": "service protected by construction with a well-posed hard backstop (INFERRED).",
+        "unresolved_risk": "WU-10 F2 lambda/big sweep argmax is stable at prv_176_upper (incentive direction robust) but reward MAGNITUDE is untuned; a very large LAMBDA suppresses the leakage gradient.",
+        "validation_experiment": "Smoke test with STEP-9 clamp active; confirm the negative-node hard term never fires in-bounds and only activates on genuine violations."
+      }
+    }
+  ],
+  "candidate_parameters": {
+    "C-A_F1_balanced_dense": {
+      "normalization_constants": {
+        "leak_ref_gpm": 84.72988433677985,
+        "req_ref_gpm": 906.3987348621764,
+        "deficit_ref_psi_nodesum": 28.671793365478514,
+        "power_ref_kw": 88.10062475649187,
+        "movement_L2sq_max": 28.0
+      },
+      "provisional_weights": {
+        "w_L": 1.0,
+        "w_U": 1.0,
+        "w_P": 1.0,
+        "w_A": 0.1,
+        "w_E": 0.0
+      }
+    },
+    "C-B_F1_safety_leaning": {
+      "normalization_constants": {
+        "leak_ref_gpm": 84.72988433677985,
+        "req_ref_gpm": 906.3987348621764,
+        "deficit_ref_psi_nodesum": 28.671793365478514,
+        "power_ref_kw": 88.10062475649187,
+        "movement_L2sq_max": 28.0
+      },
+      "provisional_weights": {
+        "w_L": 1.0,
+        "w_U": 1.0,
+        "w_P": 2.0,
+        "w_A": 0.1,
+        "w_E": 0.0
+      }
+    },
+    "C-C_F3_baseline_relative": {
+      "normalization_constants": {
+        "leak_ref_gpm": 84.72988433677985,
+        "req_ref_gpm": 906.3987348621764,
+        "deficit_ref_psi_nodesum": 28.671793365478514,
+        "unserved_ref_gpm": 15.103309701248634
+      },
+      "provisional_weights": {
+        "w_U": 1.0,
+        "w_P_safety": 1.0
+      }
+    },
+    "C-D_dense_deficit_no_hard_count": {
+      "normalization_constants": {
+        "leak_ref_gpm": 84.72988433677985,
+        "deficit_ref_psi_nodesum": 28.671793365478514
+      },
+      "provisional_weights": {
+        "LAMBDA_service": 5.0,
+        "BIG_hard_negative": 100.0
+      }
+    }
+  },
+  "evidence_references": {
+    "wu9_scale_analysis": "results/phase6/p6_s8_reward_scale_analysis.json",
+    "wu10_formulation_comparison": "results/phase6/p6_s8_reward_formulation_comparison.json",
+    "wu11_decision_brief": "results/phase6/p6_d_p6_005_decision_brief.json",
+    "reward_spec_doc": "docs/PHASE6_REWARD_SPEC.md",
+    "action_space_spec_doc": "docs/PHASE6_ACTION_SPACE_SPEC.md",
+    "state_spec": "results/phase6/p6_s7_state_spec.json"
+  },
+  "tradeoffs": {
+    "central_tradeoff_fa": "چرا یک reward که با موفقیت نشت را کم می‌کند می‌تواند از نظر علمی برای این تز غلط باشد؟ شواهدِ اندازه‌گیری‌شده‌ی BWSN-1 نشان می‌دهد نشت و سرویس واقعاً در تضادند: هم‌بستگیِ leak<->dsr برابر +0.7497 و leak<->deficit برابر -0.7735 است، و بهینه‌ی «فقط-نشت» دقیقاً روی کرانِ پایینِ PRV می‌نشیند (prv_all_lower: نشت 84.73->81.38 GPM ولی dsr 0.98334->0.91940). یعنی یک reward که فقط نشت را می‌بیند، agent را به سمتِ پایین‌آوردنِ فشار می‌راند و سرویس را خراب می‌کند در حالی‌که عددِ نشت بهتر به‌نظر می‌رسد. افزون بر این، شبکه به‌طور مزمن در هر گامِ زمانی حداقل یک گرهِ سرویس زیرِ ۲۰ psi دارد (frac_ts_any_node_below_20psi = 1.0؛ min svc 4.16452 psi) ولی هیچ گرهِ منفی ندارد؛ پس یک قیدِ سختِ مطلقِ ۲۰ psi روی خودِ خطِ پایه هم فعال می‌شود و بد-تعریف است.",
+    "layer_separation_fa": "به همین دلیل «طراحیِ reward» (D-P6-005) و «مکانیزمِ ایمنیِ وابسته به وضعیت» (STEP-9) دو لایه‌ی جدا هستند: reward فقط رفتار را شکل می‌دهد و هیچ کرانِ فشاری را تضمین نمی‌کند؛ تضمینِ اجراییِ ۲۰ psi کارِ کلمپِ سطحِ اجرا در STEP-9 است. هیچ‌کدام از این دو لایه در این وظیفه پیاده‌سازی نمی‌شود.",
+    "decision_dimensions": {
+      "leakage_management_signal": "All candidates carry a leakage term; F1 family (C-A/C-B) and C-D use absolute normalised leak, F3 (C-C) uses fractional reduction vs baseline. Measured in-bounds leak span is small (~+/-6%, dynamic range ~0.108 across tested commands).",
+      "service_preservation": "C-A/C-B/C-D protect service via a dense deficit term; C-C penalises unserved above baseline. Measured leak<->dsr +0.7497 and leak<->deficit -0.7735 show service and leakage genuinely oppose.",
+      "pressure_safety_signal_density": "Dense channels (deficit, min-service-pressure) are active every timestep; the <0 psi hard channel is inactive in-bounds (frac_negative 0.0) and the <20 psi count is active at 100% of timesteps INCLUDING the native baseline.",
+      "signal_density_dense_vs_sparse": "C-A/C-B/C-C/C-D rely on dense terms. Any hard-count term is sparse or (at 20 psi) degenerate on this network.",
+      "scale_stability_fixed_normalisation": "Every candidate divides by the FROZEN WU-9 constants (leak_ref, req_ref, deficit_ref, movement_L2sq_max), so terms are O(1); raw penalty magnitudes otherwise span a ~7.15x ratio.",
+      "interpretability_thesis_explainability": "C-C is directly interpretable as % leakage reduction vs the native controller; C-A/C-B as a normalised weighted cost; C-D as leak+dense-service with a negative-pressure backstop.",
+      "parameter_count_and_sensitivity": "C-A/C-B expose {w_L,w_U,w_P,w_A} (w_E=0); C-C exposes {w_U,w_P_safety}; C-D exposes {LAMBDA,BIG}. Sweeps show the incentive-argmax shifts with these parameters (e.g. F1 w_P 0 -> prv_175_lower, >=0.5 -> prv_176_upper).",
+      "reward_hacking_resistance": "Effort/smoothness MUST use the COMMANDED action (realised pump speed is reset by native STATUS rules); a hard 20-psi term is ill-posed; an F4-style 0-psi threshold never fires yet reports 'safe'.",
+      "ppo_continuous_action_compatibility": "All candidates are finite and (for the dense F1/F3 forms) smooth/differentiable; F2/F4-style large penalties give high-variance returns (F2 pooled reward std ~42 vs F1 ~0.17).",
+      "step9_safety_layer_compatibility": "No candidate enforces a pressure bound; the leak optimum sits on the PRV lower corner, so a STEP-9 state-dependent clamp is required regardless of the reward chosen. C-D's negative-node gate is complementary to, not a substitute for, STEP-9.",
+      "reproducibility_no_leakage": "All constants are fixed (measured once, frozen), not per-episode running statistics; reference reproduces the frozen baseline exactly (leak_ref abs diff 0.0, per-timestep vs accounting 0.0).",
+      "baseline_relatability": "C-C is zero-centred at the native controller (baseline-relative); C-A/C-B/C-D are absolute-cost forms whose values are read relative to the measured reference."
+    },
+    "measured_grounding": {
+      "leak_vs_dsr_corr": 0.7497,
+      "leak_vs_deficit_corr": -0.7735,
+      "leak_vs_n_below20_corr": -0.7419,
+      "dsr_vs_deficit_corr": -0.9653,
+      "chronic_baseline_metrics": {
+        "n_node_timesteps_below_20psi": 386,
+        "n_node_timesteps_negative": 0,
+        "frac_ts_any_node_below_20psi": 1.0,
+        "frac_ts_any_node_negative": 0.0,
+        "min_service_psi_over_horizon": 4.16452169418335
+      },
+      "leak_only_optimum": "prv_all_lower: leak 84.73->81.38 GPM, dsr 0.98334->0.91940 (boundary-seeking at PRV lower corner)",
+      "scale_imbalance_ratio": 7.145793,
+      "leak_term_dynamic_range": 0.10788834247085066
+    }
+  },
+  "uncertainties": [
+    "Realised actuator-movement distribution is unknown (static runs = 0 movement); effort scale is analytic -> HYPOTHESIS until a policy trajectory exists.",
+    "Leakage is a VALIDATION instrument, not field-calibrated; only RELATIVE response is meaningful.",
+    "Joint 5-D in-box safety is characterised at a single lower corner only; interior/mixed corners are a STEP-9/STEP-12 job.",
+    "Reward weights / LAMBDA / thresholds set leakage<->service exchange rates that are value judgements for the researcher, not measured quantities.",
+    "Pump power is HYDRAULIC only (no efficiency curve); energy term optional."
+  ],
+  "reproducibility": {
+    "working_inp_sha256": "53015ba9212e46bec731d190971819996233996b498bc269e828f992830a20a9",
+    "step8_artefact_used": "p6_s8_reward_scale_analysis.json",
+    "deterministic": "EPANET deterministic; no RNG; no seed",
+    "reference_reproduces_frozen_baseline": {
+      "reference_leak_mean_gpm": 84.72988433677985,
+      "frozen_leak_ref_gpm": 84.72988433677985,
+      "leak_ref_abs_diff": 0.0,
+      "req_ref_abs_diff": 0.0,
+      "reference_dsr_mean": 0.9833370137001072,
+      "reference_n_node_ts_below_20psi": 386,
+      "reference_n_node_ts_negative": 0,
+      "per_timestep_vs_validated_accounting_max_abs_diff": 0.0
+    },
+    "no_topology_or_native_rule_change": true,
+    "no_future_information_used": true,
+    "native_controls_count": 5,
+    "all_reward_values_finite": true,
+    "generator": "src/validation/p6_s8_reward_formulation_comparison.py",
+    "component_extractor": "src/validation/p6_s8_reward_scale_analysis.py"
+  },
+  "researcher_selection": null,
+  "self_checks": {
+    "status_is_proposed": true,
+    "researcher_selection_is_null": true,
+    "n_candidates_is_4": true,
+    "all_candidates_not_approved": true,
+    "candidate_numbers_match_brief": true,
+    "no_forbidden_key_tokens": true,
+    "action_dim_7": true,
+    "observation_dim_139": true,
+    "service_mask_121_5": true,
+    "constants_match_brief": true,
+    "all_values_finite": true,
+    "n_formulation_families_4": true
+  }
+}

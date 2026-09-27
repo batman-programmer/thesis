@@ -552,4 +552,60 @@ RESEARCH ASSUMPTION · HYPOTHESIS TO TEST · DECISION REQUIRED.
 - **Next action:** researcher completes the decision block (selects ONE formulation + parameters);
   then STEP 9 safety clamp; reward function is STEP 11. DO NOT start PPO (§16).
 
+---
+
+## WU-12 — STEP 8: D-P6-005 researcher-facing decision presentation (this session)
+
+- **Objective:** Transform the already-persisted D-P6-005 evidence (WU-9/10/11) into a
+  concise, researcher-facing decision presentation so the researcher can make an explicit
+  D-P6-005 decision. DOCUMENTATION / DATA-EXTRACTION ONLY — measures nothing new, selects
+  no formulation, chooses no weights, adds no STEP-9 clamp, implements no reward.py, starts
+  no PPO. D-P6-005 stays PROPOSED; researcher_selection stays null.
+- **Starting state:** HEAD `1ad6392`; STEP 8 measurement (WU-9) + comparison (WU-10) +
+  decision brief (WU-11) COMPLETE; D-P6-004 APPROVED & FROZEN; D-P6-005 PROPOSED; action
+  space frozen. No researcher-summary files existed.
+- **Evidence inspected:** `results/phase6/p6_d_p6_005_decision_brief.json` (WU-11, the sole
+  numeric source), and — for provenance references only — `p6_s8_reward_scale_analysis.json`
+  (WU-9) and `p6_s8_reward_formulation_comparison.json` (WU-10). No EPANET, no re-run:
+  Git HEAD + working tree verified consistent, so no genuine inconsistency was found and no
+  experiment was repeated.
+- **Action taken:** Wrote a PURE re-shaping generator `src/validation/p6_d_p6_005_researcher_summary.py`
+  that RE-LOADS the WU-11 brief, copies every equation/constant/weight verbatim (anti-drift),
+  authors ONLY plain-language Persian interpretation + short descriptive dimension notes, keeps
+  `researcher_selection=null`, and runs 12 internal self-checks (incl. a forbidden-key-token scan
+  for winner/rank/tier/score/best/superior/optimal/preferred/recommend). Emitted
+  `results/phase6/p6_d_p6_005_researcher_summary.json` (deterministic; re-running byte-reproduces
+  it). Authored `docs/PHASE6_D_P6_005_RESEARCHER_SUMMARY.md` (§A current state; §B exact C-A/C-B/C-C/C-D
+  definitions verbatim; §C plain-language Persian per candidate; §D OBSERVED/INFERRED/UNRESOLVED;
+  §E the 12 decision dimensions descriptive-only; §F the central trade-off + reward-vs-STEP-9
+  two-layer separation; §G the BLANK 7-field researcher decision form; §H provenance). Added the
+  21-test battery `tests/test_researcher_summary.py`.
+- **Result:** Presentation on disk. Two DISTINCT `unserved_ref` values preserved exactly (F3
+  accounting 14.98483697365873 vs C-C DSR-implied 15.103309701248634 — NOT conflated). All four
+  candidates labelled "PROVISIONAL CANDIDATE — NOT APPROVED"; no ranking/winner/score keys; frozen
+  constants, action_dim 7, observation_dim 139, service mask 121/5 all unchanged; researcher_selection
+  null; 12 self_checks all true.
+- **Decision:** D-P6-005 **remains PROPOSED / DECISION PENDING RESEARCHER** — WU-12 only presents;
+  nothing selected/scored/ranked/recommended; scientific state unchanged.
+- **Decision class:** DECISION REQUIRED (researcher selection) + VALIDATED FACT (re-used measured evidence).
+- **Files changed:** src/validation/p6_d_p6_005_researcher_summary.py (new);
+  results/phase6/p6_d_p6_005_researcher_summary.json (new); docs/PHASE6_D_P6_005_RESEARCHER_SUMMARY.md (new);
+  tests/test_researcher_summary.py (new); PROJECT_STATE.yaml; docs/PHASE6_EVIDENCE_INDEX.md;
+  docs/RECOVERY.md; docs/PHASE6_EXECUTION_LOG.md. NO action-space/observation file reopened; NO
+  STEP-11 env reward code; NO STEP-9 clamp; NO PPO; NO evidence artefact modified.
+- **Tests:** `.venv/Scripts/python.exe -m unittest discover -s tests -v` → **84 ok**
+  (21 researcher-summary + 19 decision-brief + 23 comparison + 12 STEP 8 + 9 STEP 7): summary loads,
+  decision_id D-P6-005, status PROPOSED, researcher_selection null, four exact candidate ids all NOT
+  APPROVED, candidate numbers match the WU-11 brief, C-C unserved_ref==15.103309701248634 distinct from
+  F3 accounting 14.98483697365873, frozen constants match brief, no forbidden key tokens, action space
+  unchanged, obs dim 139, service 121/5, families F1–F4, plain_language_fa four questions, no
+  topology/native-rule change, all finite, self_checks all true, deterministic byte-reproduce,
+  evidence_references present.
+- **Risks/caveats:** presentation faithfully mirrors WU-11 — it inherits, does not resolve, the open
+  D-P6-005 selection; leak instrument uncalibrated → RELATIVE only (R3); effort scale analytic
+  (HYPOTHESIS); joint 5-D box safety single-corner only (R1b → STEP-9/12); PPO deps missing (R4).
+  Nothing frozen; D-P6-005 open.
+- **Next action:** researcher completes the §G decision form (selects ONE formulation + parameters,
+  resolves D-P6-005); then STEP 9 safety clamp; reward function is STEP 11. DO NOT start PPO (§16).
+
 

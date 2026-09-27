@@ -206,12 +206,34 @@ no RNG, no new measurement.
 | Deterministic regeneration | (test) test_17 | rebuilt JSON byte-reproduces the on-disk artefact | reproducible; no RNG / running stats |
 | Test battery | tests/test_decision_brief.py | 19 decision-brief ok; full battery 63/63 | status/null-selection/no-ranking/finite/constants/action-order/obs-dim/service-mask/candidates/reproducibility/integrity |
 
+## STEP 8 — D-P6-005 researcher summary (WU-12, D-P6-005 PROPOSED / DECISION PENDING RESEARCHER)
+
+Doc: `docs/PHASE6_D_P6_005_RESEARCHER_SUMMARY.md` (§A–§H; researcher §G decision form BLANK).
+State: `PROJECT_STATE.yaml :: reward.researcher_summary` and `session_checkpoint`. Raw artefact:
+`results/phase6/p6_d_p6_005_researcher_summary.json` (**researcher_selection=null**); generator
+`src/validation/p6_d_p6_005_researcher_summary.py`; tests `tests/test_researcher_summary.py`.
+**Presentation only — no formulation selected/scored/ranked/recommended, no weights, no STEP-9
+clamp, no reward.py, no PPO.** PURE re-shaping of the WU-11 brief: no EPANET, no PPO, no RNG, no
+new measurement; every equation/constant/weight copied verbatim (only Persian/English prose authored).
+
+| Claim | Section/Key | Result | Interpretation |
+|---|---|---|---|
+| Summary keeps D-P6-005 PROPOSED, no selection | current_status / researcher_selection | current_status "PROPOSED / DECISION PENDING RESEARCHER" (== brief status); researcher_selection null; no winner/rank/tier/score keys | AI presents the gate; the researcher makes the scientific decision |
+| Four candidates copied verbatim, all NOT APPROVED | candidate_formulations[] | ids C-A/C-B/C-C/C-D; each status "PROVISIONAL CANDIDATE - NOT APPROVED"; equation/constants/weights/base_formulation == WU-11 brief | anti-drift: numeric fields re-loaded from the brief, not re-authored |
+| Two DISTINCT unserved_ref values preserved | candidate_parameters."C-C…".normalization_constants / formulation_families F3.baseline_constants | C-C DSR-implied 15.103309701248634 vs F3 accounting 14.98483697365873 (NOT conflated) | each reported exactly as in the brief |
+| Frozen constants unchanged | normalization_constants_frozen | leak_ref 84.72988433677985, movement_L2sq_max 28.0 (== brief) | reward presentation does NOT reopen STEP 8 constants |
+| Frozen constraints unchanged | frozen_constraints_snapshot | action_dim 7 + excluded {174,179,180}; observation_dim 139; service mask 121/5 | does NOT reopen D-P6-001/002/003 or D-P6-004 |
+| Plain-language Persian per candidate | candidate_formulations[].plain_language_fa | four questions q1_encourages / q2_leak_down_service_down / q3_pressure_up / q4_action_moves_a_lot (C-C/C-D q4 = NOT SPECIFIED IN SOURCE) | descriptive, no recommendation |
+| No forbidden key tokens | self_checks.no_forbidden_key_tokens | true (scan for winner/rank/tier/score/best/superior/optimal/preferred/recommend) | no ranking/winner language anywhere |
+| Deterministic regeneration | (test) test_20 | rebuilt JSON byte-reproduces the on-disk artefact | reproducible; no RNG / running stats |
+| Test battery | tests/test_researcher_summary.py | 21 researcher-summary ok; full battery 84/84 | load/decision-id/status/null-selection/candidate-ids/not-approved/numbers-match-brief/unserved-ref-distinct/frozen-constants/no-forbidden-tokens/action-space/obs-dim/service-mask/families/plain-language/no-topology-change/finite/self-checks/byte-reproduce/evidence-refs |
+
 ## Still-missing evidence (drives next action)
 
 | Needed claim | Why missing | How to obtain |
 |---|---|---|
 | Joint 5-D action-box safety (mixed corners/interior/pump+demand) | only single lower-corner tested (R1b) | STEP 9 safety layer + STEP 12 automated joint tests |
-| Reward formulation + weights (D-P6-005 selection) | STEP 8 MEASURES scales/pathologies (WU-9), COMPARES F1–F4 under provisional params (WU-10), and PREPARES a decision brief with 4 provisional NOT-APPROVED candidates (WU-11); no formulation selected, no weights chosen | researcher completes the decision block in `docs/PHASE6_D_P6_005_DECISION_BRIEF.md` (selects ONE formulation + parameters, resolves D-P6-005); STEP 11 implements `src/env/reward.py` |
+| Reward formulation + weights (D-P6-005 selection) | STEP 8 MEASURES scales/pathologies (WU-9), COMPARES F1–F4 under provisional params (WU-10), PREPARES a decision brief with 4 provisional NOT-APPROVED candidates (WU-11), and RE-SHAPES it into a researcher-facing presentation (WU-12); no formulation selected, no weights chosen | researcher completes the §G decision form in `docs/PHASE6_D_P6_005_RESEARCHER_SUMMARY.md` (or the block in `docs/PHASE6_D_P6_005_DECISION_BRIEF.md`) — selects ONE formulation + parameters, resolves D-P6-005; STEP 11 implements `src/env/reward.py` |
 | Realised actuator-movement distribution | static runs = 0 movement; effort scale is analytic (R5-effort, HYPOTHESIS) | measured at training time once a policy trajectory exists |
 | Leak calibration | instrument uncalibrated (R3) | out of Phase 6 scope; relative response only |
 | Observation/state design | DELIVERABLES PRODUCED; D-P6-004 PROPOSED — awaiting researcher approval (not frozen) | researcher sign-off on the 5 review points → freeze 139-dim layout |
