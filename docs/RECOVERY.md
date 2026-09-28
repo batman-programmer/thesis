@@ -333,6 +333,26 @@ result is written to `results/phase6/` as JSON (raw + summary + interpretation).
   block, do NOT set researcher_selection, do NOT implement the STEP-9 production wrapper or
   `src/env/reward.py` (STEP 11), and do NOT start PPO — those await the researcher's STEP-9 selection
   (a NEW D-P6-006). STEP-9 stays PROPOSED / PENDING RESEARCHER; project NOT PPO-ready.
+- **DO NOT** re-run or rewrite the STEP 9 FINAL SAFETY-ARCHITECTURE DECISION REVIEW
+  (`src/validation/p6_s9_final_decision_review.py` WU-18) or `docs/PHASE6_STEP9_FINAL_DECISION_REVIEW.md`
+  — it is on disk (WU-18, 2026-09-28: `results/phase6/p6_s9_final_decision_review.json` with
+  **researcher_selection=null**, 31 self-checks, full battery 199 OK). It is a PURE aggregator of
+  WU-14/15/16/17 + the WU-11 reward brief (no EPANET/PPO/RNG; no generated_utc; deterministic regeneration
+  byte-reproduces the JSON), so re-running changes nothing unless those upstream artefacts change. It is the
+  FINAL review before the production wrapper: it JUDGES readiness (verdict **DECISION-READY**,
+  `verdict_is_not_a_selection=true`) and PACKAGES the <=3 final PROVISIONAL designs F1 (arch D backstop+relative),
+  F2 (arch B rolling absolute look-ahead subsuming A), F3 (arch C aggregate-deficit) — all `PROVISIONAL - NOT
+  APPROVED`, in DEFINITIONAL order only (`not_ordered_by_quality=true`) — WITHOUT selecting a
+  mechanism/threshold/look-ahead horizon/H1-H2-H3. Do NOT treat DECISION-READY as approval, do NOT rank/score
+  F1/F2/F3, do NOT fill in the §18 D-P6-006 form (A-G BLANK), do NOT set researcher_selection, do NOT add any
+  winner/rank/tier/score/best/superior/optimal/preferred/recommend key, do NOT implement the STEP-9 production
+  wrapper or `src/env/reward.py` (STEP 11), and do NOT start PPO — those await the researcher's STEP-9 selection
+  (a NEW D-P6-006). **CORRECTION carried by WU-18 (TRUST DISK):** the WU-17 statement that the well-posed
+  absolute-floor crossover horizon between H=8 (4h) and full (96h) is "UNTESTED" is SUPERSEDED — WU-16 PERSISTS
+  the θ_p=5 crossover at report index 13 (6.5h) via `first_report_index_below_theta_p`; the smallest sufficient
+  absolute-floor horizon for θ_p=5 on the severe corner is a KNOWN ≥13 control steps. A useful absolute 20-psi
+  floor remains "THRESHOLD NOT YET EMPIRICALLY JUSTIFIED"; only the N_neg==0 negative gate is EVIDENCE-SUPPORTED.
+  STEP-9 stays PROPOSED / PENDING RESEARCHER; project NOT PPO-ready; no D-P6-006 minted.
 - **DO NOT** start scientific PPO training. A tiny smoke test is allowed ONLY after
   the env is implemented and validated, and only to prove the loop runs.
 - **DO NOT** auto-install gymnasium / stable_baselines3 / torch.

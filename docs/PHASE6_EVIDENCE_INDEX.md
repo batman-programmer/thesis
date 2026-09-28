@@ -344,3 +344,30 @@ RESEARCHER; project NOT PPO-ready. No wrapper, no reward.py, no PPO.
 | Chronic-baseline ill-posedness carried | baseline_compatibility / chronic_baseline_anchors | 386 sub-20 node-ts; worst 4.16452 psi; 0 negative | a hard absolute-20 reject penalises the native controller itself |
 | Determinism | self_checks / test_deterministic_rebuild_matches_persisted_bytes | in-memory rebuild byte-equals the persisted artefact; all 32 self-checks true; all numbers finite | reproducible aggregation; no RNG, no timestamp |
 | Test battery | tests/test_step9_decision_brief.py | 26 new; full battery 171 OK | required-keys/null-selection/no-forbidden-tokens/frozen-invariants/verbatim-rules/anchors/rebuild-equals-bytes |
+
+## STEP 9 — FINAL SAFETY-ARCHITECTURE DECISION REVIEW: readiness judgement + final-design packaging (WU-18, 2026-09-28)
+
+Doc: `docs/PHASE6_STEP9_FINAL_DECISION_REVIEW.md` (18 sections; §18 researcher decision form D-P6-006 BLANK). Raw
+artefact: `results/phase6/p6_s9_final_decision_review.json` (16 top-level keys; researcher_selection=null); generator
+`src/validation/p6_s9_final_decision_review.py`; tests `tests/test_step9_final_decision_review.py` (28). Committed
+2291cce (+ checkpoint). **FINAL REVIEW before production wrapper — JUDGES decision-readiness and PACKAGES the <=3
+final PROVISIONAL designs WITHOUT selecting a mechanism/threshold/horizon/handling policy (nothing selected/ranked/
+scored/recommended; researcher_selection=null; BLANK D-P6-006 form).** PURE AGGREGATOR: re-loads the frozen WU-14 +
+WU-15 + WU-16 + WU-17 + WU-11 artefacts, copies evidence sub-trees verbatim, re-checks the 5 frozen normalisation
+constants + cross-artefact anchors; runs NO EPANET/PPO/RNG; carries NO `generated_utc`; byte-reproduces on re-run
+(verified by test). STEP-9 stays PROPOSED / PENDING RESEARCHER; project NOT PPO-ready; no D-P6-006 minted. No wrapper,
+no reward.py, no PPO.
+
+| Claim | Section/Key | Result | Interpretation |
+|---|---|---|---|
+| Decision is READY, not made | decision_readiness | readiness_verdict `DECISION-READY`; `verdict_is_not_a_selection:true`; status reaffirms STEP-9 PROPOSED | the four decisions are fully framed with reproducible evidence; remaining unknowns are researcher value judgements or accepted STEP-12 limits |
+| Three final designs, unordered, unapproved | final_provisional_designs.designs[] | F1 (arch D backstop+relative), F2 (arch B rolling absolute look-ahead subsuming A), F3 (arch C aggregate-deficit), each `status:"PROVISIONAL - NOT APPROVED"` | `not_ordered_by_quality:true`, `order_is_definitional_not_quality:true` — definitional order carries NO quality judgement |
+| No selection language anywhere | self_checks / no_forbidden_key_tokens | KEY scan for winner/rank/tier/score/best/superior/optimal/preferred/recommend = [] | the review cannot smuggle a recommendation; researcher_selection=null |
+| WU-17 crossover slip CORRECTED (TRUST DISK) | horizon_analysis.crossover_onset_correction | supersedes `wu17.horizon_analysis.crossover_interval_untested`; θ_p=5 onset PERSISTED at report index 13 (6.5h); control_steps 13 | the delayed-collapse onset is a KNOWN quantity from `first_report_index_below_theta_p`, not "untested" |
+| Smallest sufficient absolute-floor horizon carried on F2 | final_provisional_designs.designs (F2) | `smallest_sufficient_H_for_theta_p_5_report_index:13` | an absolute θ_p=5 floor on the severe corner needs H ≥ 13 control steps (6.5h) |
+| Useful absolute-20 floor NOT justified | threshold_analysis.absolute_floor_theta_p_psi | `useful_20psi_floor_status:"THRESHOLD NOT YET EMPIRICALLY JUSTIFIED"`; negative gate `EVIDENCE-SUPPORTED` | only N_neg==0 is an evidence-supported hard threshold; a useful 20-psi floor flags the chronic baseline |
+| Central collapse anchors reproduced | evidence.central_anchors | baseline worst 4.16452169418335 psi; severe decision-instant 5.527866840362549 psi; full-horizon 1.2946763038635254 psi; max_N_neg 0 | full-horizon worst < decision-instant worst — the delayed collapse an immediate rule is blind to |
+| Frozen invariants unchanged | frozen_invariants | action_dim 7 + ordered bounds; observation_dim 139; reward weights w_L/w_U/w_P/w_A/w_E + 5 constants byte-identical | STEP-9 is an admissibility layer; changes nothing frozen |
+| Researcher form BLANK | researcher_action_required.decision_form_blank | 7 fields A_architecture..G_rationale all null | completing + approving it mints D-P6-006; this review does NOT fill it |
+| Determinism | self_checks / test_deterministic_rebuild_matches_persisted_bytes | in-memory rebuild byte-equals the persisted artefact; all 31 self-checks true; all numbers finite | reproducible aggregation; no RNG, no timestamp |
+| Test battery | tests/test_step9_final_decision_review.py | 28 new; full battery 199 OK | required-keys(16)/null-selection/no-forbidden-tokens/frozen-invariants/verbatim-rules/anchors/crossover-correction/blank-form/rebuild-equals-object+bytes |
