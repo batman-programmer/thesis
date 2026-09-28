@@ -15,7 +15,9 @@ The reward formulation + weights are now FROZEN (WU-13). The reward function
 mechanism) is at EVIDENCE stage: DESIGN ANALYSIS done (WU-14, 0086a0a — S1–S4 candidates,
 NOT ranked), EMPIRICAL characterisation done (WU-15, e09264c — S1–S4 + H1–H3 measured), and
 TEMPORAL characterisation done (WU-16, 6bf4820 — single-step vs full-96h-horizon behaviour
-TS1–TS4 across look-ahead horizons H=1/2/4/8/full). All three are EVIDENCE ONLY
+TS1–TS4 across look-ahead horizons H=1/2/4/8/full), and a SAFETY DECISION BRIEF prepared (WU-17,
+58e1790 — a researcher-facing decision gate that aggregates WU-14/15/16 + the WU-11 reward brief and
+FRAMES the four STEP-9 decisions WITHOUT making any). All four are EVIDENCE ONLY / decision-gate prep
 (researcher_selection=null); no mechanism, handling policy, threshold, or look-ahead HORIZON
 is selected — that is a PENDING researcher decision. WU-16 measured that on the tested severe
 corner a short look-ahead (≤4h) understates a collapse that only fully materialises at 96h
@@ -211,7 +213,7 @@ Source `results/phase5/g3_pump_speed.json`:
   can still be scientifically wrong" analysis, and the reward-vs-STEP-9 layer separation; no
   winner/rank/score keys anywhere. NEXT: researcher completes the §G decision form (resolves
   D-P6-005). Do NOT choose final weights, do NOT start PPO.
-- **STEP 9 safety layer — EVIDENCE STAGE (WU-14 design + WU-15 empirical + WU-16 temporal, all done).**
+- **STEP 9 safety layer — EVIDENCE STAGE (WU-14 design + WU-15 empirical + WU-16 temporal + WU-17 decision brief, all done).**
   State-dependent safety mechanism, DISTINCT from the frozen action-space bounds. **WU-14 (0086a0a):**
   characterises 4 candidate admissibility mechanisms (S1 absolute worst-node threshold; S2 min-pressure
   degradation vs current state; S3 pressure-deficit increase; S4 negative-pressure hard backstop) —
@@ -221,16 +223,24 @@ Source `results/phase5/g3_pump_speed.json`:
   the worst-node p_min reads ~5.53 psi at the decision instant and stays 5.15–5.46 psi for H≤8 (≤4h)
   but collapses to ~1.29 psi at report index 192 (96.0h), so a short look-ahead keyed to θ_p=5 does NOT
   activate (single-step non-activation followed by delayed deterioration), while a relative TS2 guard
-  reacts even at H=1 and TS4 never fires. **All three EVIDENCE ONLY (researcher_selection=null); no
+  reacts even at H=1 and TS4 never fires. **WU-17 (58e1790):** aggregates WU-14/15/16 + the WU-11
+  reward brief into a researcher-facing DECISION BRIEF (`docs/PHASE6_STEP9_DECISION_BRIEF.md` 17
+  sections + `results/phase6/p6_s9_decision_brief.json` researcher_selection=null) that FRAMES the four
+  STEP-9 decisions (A metric/rule; B threshold; C look-ahead horizon; D action-handling policy) WITHOUT
+  making any — four candidate configs K1–K4 all NOT APPROVED, decision_matrix NOT ordered/scored/marked;
+  pure aggregator (no EPANET/PPO/RNG, no generated_utc, byte-reproducible; 26 tests). **All four EVIDENCE
+  ONLY / decision-gate prep (researcher_selection=null); no
   mechanism/policy/threshold/look-ahead HORIZON selected — PENDING researcher decision. No production
   wrapper implemented.** Key design constraint: a naive `if min_pressure<20: reject` is ILL-POSED
   (native baseline has 386 chronic sub-20 node-ts, min svc 4.16452 psi, 0 negative); leakage-driven
   behaviour pushes min svc to ~1.295 psi, so a state-dependent clamp is required. Artefacts:
   `docs/PHASE6_STEP9_SAFETY_DESIGN.md` (§1-9 WU-14, §10 WU-15, §11 WU-16),
+  `docs/PHASE6_STEP9_DECISION_BRIEF.md` (WU-17),
   `results/phase6/p6_s9_safety_design_analysis.json`, `results/phase6/p6_s9_safety_mechanism_characterization.json`,
-  `results/phase6/p6_s9_temporal_safety_characterization.json`, and the three matching generators +
-  test batteries under `src/validation/` and `tests/`. STEP-9 must hard-clamp to the approved bounds
-  and (if 179 ever controlled) VALVE-179 ≤ 44.7 psi. STEP 10 demand uncertainty/splits: NOT STARTED.
+  `results/phase6/p6_s9_temporal_safety_characterization.json`, `results/phase6/p6_s9_decision_brief.json`,
+  and the four matching generators + test batteries under `src/validation/` and `tests/`. STEP-9 must hard-clamp
+  to the approved bounds and (if 179 ever controlled) VALVE-179 ≤ 44.7 psi. The researcher's eventual STEP-9
+  selection becomes a NEW D-P6-006. STEP 10 demand uncertainty/splits: NOT STARTED.
 - STEP 11 `src/env/` (8 modules) + STEP 12 `tests/` (16 tests) + STEP 13 SB3
   smoke test: BLOCKED — deps missing.
 
@@ -307,6 +317,22 @@ result is written to `results/phase6/` as JSON (raw + summary + interpretation).
   tuned. Do NOT fill in the researcher's §G decision form, do NOT set researcher_selection, do
   NOT implement `src/env/reward.py` (STEP 11) or a STEP-9 clamp, and do NOT start PPO — those
   await the researcher's D-P6-005 selection.
+- **DO NOT** re-run the STEP 9 safety-mechanism evidence chain
+  (`src/validation/p6_s9_safety_design_analysis.py` WU-14,
+  `src/validation/p6_s9_safety_mechanism_characterization.py` WU-15,
+  `src/validation/p6_s9_temporal_safety_characterization.py` WU-16) or the STEP 9 decision-brief
+  aggregator (`src/validation/p6_s9_decision_brief.py` WU-17) or rewrite
+  `docs/PHASE6_STEP9_SAFETY_DESIGN.md` / `docs/PHASE6_STEP9_DECISION_BRIEF.md` — all four are on disk
+  (WU-17, 2026-09-28: `results/phase6/p6_s9_decision_brief.json` with **researcher_selection=null**,
+  full battery 171 OK). WU-17 is a PURE aggregator of WU-14/15/16 + the WU-11 reward brief (no
+  EPANET/PPO/RNG; no generated_utc; deterministic regeneration byte-reproduces the JSON), so re-running
+  changes nothing unless those upstream artefacts change. The four candidate configurations K1–K4 are
+  "PROVISIONAL CANDIDATE — NOT APPROVED" — do NOT treat any as chosen; the decision_matrix is NOT
+  ordered/scored/marked. The brief PREPARES the STEP-9 gate but does NOT resolve it: no
+  mechanism/threshold/look-ahead horizon/H1-H2-H3 selected. Do NOT fill in the §17 researcher decision
+  block, do NOT set researcher_selection, do NOT implement the STEP-9 production wrapper or
+  `src/env/reward.py` (STEP 11), and do NOT start PPO — those await the researcher's STEP-9 selection
+  (a NEW D-P6-006). STEP-9 stays PROPOSED / PENDING RESEARCHER; project NOT PPO-ready.
 - **DO NOT** start scientific PPO training. A tiny smoke test is allowed ONLY after
   the env is implemented and validated, and only to prove the loop runs.
 - **DO NOT** auto-install gymnasium / stable_baselines3 / torch.

@@ -319,3 +319,28 @@ reward.py, no PPO.
 | WU-15 anchors reproduced | wu15_delayed_collapse_reproduction | 5.5279 / 1.2947 psi, abs diff 0.0; normalized action [-1]×7 exact | deterministic reproduction from persisted data |
 | Frozen invariants unchanged | experiment_metadata | action_dim 7; observation_dim 139; service mask 121/5; 193 instants; ts 1800s; n_native 5 | temporal layer; no topology/native-rule change |
 | Test battery | tests/test_temporal_safety_characterization.py | 20 new; full battery 145 OK | keys/finite/no-forbidden-tokens/researcher_selection-null/frozen-dims/WU-15-repro/central-finding |
+
+## STEP 9 — SAFETY DECISION BRIEF: framing the four STEP-9 decisions (WU-17, 2026-09-28)
+
+Doc: `docs/PHASE6_STEP9_DECISION_BRIEF.md` (17 sections; §17 researcher decision block BLANK). Raw
+artefact: `results/phase6/p6_s9_decision_brief.json` (researcher_selection=null); generator
+`src/validation/p6_s9_decision_brief.py`; tests `tests/test_step9_decision_brief.py` (26). Committed
+58e1790 (+ checkpoint). **DECISION-GATE PREP — FRAMES the four STEP-9 decisions (A metric/rule;
+B threshold; C look-ahead horizon; D action-handling policy) WITHOUT making any (nothing selected/
+ranked/scored/recommended; researcher_selection=null).** PURE AGGREGATOR: re-loads the four frozen JSON
+artefacts (WU-14 + WU-15 + WU-16 + WU-11 reward brief), copies evidence sub-trees verbatim, re-checks
+the 5 frozen normalisation constants + cross-artefact anchors; runs NO EPANET/PPO/RNG; carries NO
+`generated_utc`; byte-reproduces on re-run (verified by test). STEP-9 stays PROPOSED / PENDING
+RESEARCHER; project NOT PPO-ready. No wrapper, no reward.py, no PPO.
+
+| Claim | Section/Key | Result | Interpretation |
+|---|---|---|---|
+| Four decisions framed, none made | the_four_decisions / researcher_selection | A/B/C/D each `selection:null`; top-level `researcher_selection:null` | decision gate prepared, not resolved |
+| Four candidate configurations, all unapproved | candidate_configurations[] | K1 (D backstop+relative), K2 (C aggregate-deficit), K3 (A immediate absolute), K4 (B rolling absolute look-ahead), each `status:"PROVISIONAL CANDIDATE - NOT APPROVED"` | populate the decision space; NOT a shortlist |
+| Decision matrix is neutral | decision_matrix | 4 rows A-D; note "rows are NOT ordered or marked"; no metric aggregated to a single figure | no winner/rank/score |
+| No selection language anywhere | self_checks.no_forbidden_key_tokens | KEY scan for winner/rank/tier/score/best/superior/optimal/preferred/recommend = [] | brief cannot smuggle a recommendation |
+| Frozen invariants unchanged | frozen_constraints / frozen_reward_D_P6_005 / normalization_constants_frozen | action_dim 7; observation_dim 139; service 121/5; reward weights w_L/w_U/w_P/w_A/w_E; 5 constants byte-identical | STEP-9 is an admissibility layer; changes nothing frozen |
+| Central delayed-collapse evidence carried | source_artifact_integrity.wu16_anchor_reproduction | 5.527866840362549 psi at decision instant → 1.2946763038635254 psi over full horizon; max_N_neg 0 | metric (A) and horizon (C) decisions are coupled |
+| Chronic-baseline ill-posedness carried | baseline_compatibility / chronic_baseline_anchors | 386 sub-20 node-ts; worst 4.16452 psi; 0 negative | a hard absolute-20 reject penalises the native controller itself |
+| Determinism | self_checks / test_deterministic_rebuild_matches_persisted_bytes | in-memory rebuild byte-equals the persisted artefact; all 32 self-checks true; all numbers finite | reproducible aggregation; no RNG, no timestamp |
+| Test battery | tests/test_step9_decision_brief.py | 26 new; full battery 171 OK | required-keys/null-selection/no-forbidden-tokens/frozen-invariants/verbatim-rules/anchors/rebuild-equals-bytes |

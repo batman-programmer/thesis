@@ -787,3 +787,54 @@ RESEARCH ASSUMPTION · HYPOTHESIS TO TEST · DECISION REQUIRED.
   (deps-blocked). No PPO.
 
 
+## WU-17 — STEP 9 state-dependent safety-mechanism DECISION BRIEF (evidence synthesis / decision-gate prep) — 2026-09-28
+
+- **Situation:** WU-14 (design), WU-15 (empirical), and WU-16 (temporal) had each MEASURED the STEP-9
+  candidate evidence, but the four coupled STEP-9 decisions (A safety metric/rule; B threshold/tolerance;
+  C look-ahead horizon; D action-handling policy) were scattered across three artefacts. The researcher
+  needs ONE decision-ready brief that consolidates the evidence and makes the four decisions explicit
+  WITHOUT making any of them.
+- **Starting state:** WU-16 (6bf4820 + checkpoint 287b1b2) done; reward D-P6-005 APPROVED & FROZEN;
+  observation D-P6-004 and action space D-P6-001/002/003 APPROVED & FROZEN. No decision brief existed.
+- **Action taken:** Wrote `src/validation/p6_s9_decision_brief.py` as a PURE AGGREGATOR (matching the
+  WU-11 pattern) — imports only `json/math/pathlib`; re-loads the four frozen JSON artefacts
+  (`p6_s9_safety_design_analysis.json` WU-14, `p6_s9_safety_mechanism_characterization.json` WU-15,
+  `p6_s9_temporal_safety_characterization.json` WU-16, `p6_d_p6_005_decision_brief.json` WU-11); copies
+  their evidence sub-trees verbatim; re-checks the 5 frozen normalisation constants and the
+  cross-artefact baseline/collapse anchors; writes `researcher_selection=null`; runs 32 self-checks
+  (SystemExit on any failure). Runs NO EPANET/PPO/RNG, carries NO `generated_utc`, and byte-reproduces
+  on re-run. Emitted `results/phase6/p6_s9_decision_brief.json` (32 top-level keys), wrote the
+  17-section `docs/PHASE6_STEP9_DECISION_BRIEF.md` (§17 researcher decision block A-G left BLANK), and
+  added `tests/test_step9_decision_brief.py` (26 tests, incl. a deterministic
+  rebuild-equals-persisted-bytes integrity check).
+- **Result:** The brief FRAMES the four decisions and makes none. Four candidate configurations —
+  K1 (arch D backstop+relative), K2 (arch C aggregate-deficit look-ahead), K3 (arch A immediate
+  well-posed absolute), K4 (arch B rolling absolute look-ahead) — are ALL `PROVISIONAL CANDIDATE - NOT
+  APPROVED`; the `decision_matrix` (4 rows A-D) is explicitly NOT ordered/scored/marked; no forbidden
+  key token (winner/rank/tier/score/best/superior/optimal/preferred/recommend) appears in any KEY;
+  every threshold is a swept provisional grid value or an evidence-supported gate (none invented). The
+  WU-16 central finding is carried verbatim: severe `prv_lower_pump_lower` reads 5.527866840362549 psi
+  worst-node at the decision instant but collapses to 1.2946763038635254 psi at report index 192 (96h);
+  TS1 θ_p=5 does NOT activate for H≤8 yet DOES at full; TS2 rel ε_p=0 fires from H=1; TS4 negative
+  backstop never fires (max_N_neg=0); a naive absolute-20 reject is ill-posed on the chronic baseline
+  (386 sub-20 node-ts, worst 4.16452 psi). Committed 58e1790 (deliverable) + checkpoint. Full battery
+  171 OK (145 prior + 26 new WU-17).
+- **Decision class:** DECISION-GATE PREPARATION (evidence synthesis only; nothing selected/ranked/scored/
+  recommended; researcher_selection=null). STEP-9 stays PROPOSED / PENDING RESEARCHER; project NOT
+  PPO-ready.
+- **Files changed:** src/validation/p6_s9_decision_brief.py (new);
+  results/phase6/p6_s9_decision_brief.json (new); tests/test_step9_decision_brief.py (new);
+  docs/PHASE6_STEP9_DECISION_BRIEF.md (new); PROJECT_STATE.yaml; docs/PHASE6_EVIDENCE_INDEX.md;
+  docs/RECOVERY.md; docs/PHASE6_EXECUTION_LOG.md.
+- **Risks/caveats:** the brief inherits every WU-14/15/16 coverage limit — no validated safe/unsafe
+  oracle (activation counts are descriptive, NOT FP/FN rates); single lower-corner coverage only (R1b);
+  the well-posed absolute-floor crossover horizon between H=8 (4h) and full (96h) is UNTESTED (no new
+  experiment mandated); thresholds encode a value judgement that is the researcher's, not a measured
+  quantity; the effort-term-under-intervention (proposed vs executed action) is an open training-
+  integration question coupled to decision D. Aggregation faithfulness is guaranteed by the
+  rebuild-equals-persisted-bytes test, not by manual inspection.
+- **Next action:** researcher completes the §17 decision block (A-G), records the selection as a NEW
+  D-P6-006 in docs/PHASE6_DECISION_REGISTER.md, updates PROJECT_STATE.yaml, and only then proceeds to
+  the STEP-9 wrapper implementation and PPO readiness. No wrapper, no reward.py, no PPO until then.
+
+
