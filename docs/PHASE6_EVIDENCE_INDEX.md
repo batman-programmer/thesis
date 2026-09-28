@@ -276,3 +276,46 @@ no PPO.** Pure aggregator: RE-LOADS measured evidence (no new EPANET / PPO / RNG
 | Frozen invariants unchanged | frozen_constraints_snapshot | action_dim 7; observation_dim 139; service mask 121/5; bounds/ordering/native rules/leak instrument | STEP-9 is an external layer; no topology/native-rule change |
 | Determinism | self_checks / (test) byte-reproduce | rebuilt JSON byte-reproduces the artefact; all values finite; no forbidden key tokens | reproducible; no RNG |
 | Test battery | tests/test_safety_design_analysis.py | STEP-9 tests + prior 84 full battery | schema/finite/no-ranking/D-P6-005-consistency/frozen-invariants/byte-reproduce |
+
+## STEP 9 — empirical characterisation of candidate mechanisms & handling policies (WU-15, 2026-09-28)
+
+Doc: `docs/PHASE6_STEP9_SAFETY_DESIGN.md` §10.1-10.9. Raw artefact:
+`results/phase6/p6_s9_safety_mechanism_characterization.json`; generator
+`src/validation/p6_s9_safety_mechanism_characterization.py`; tests
+`tests/test_safety_mechanism_characterization.py` (26). Committed e09264c/0ed1c9e.
+**EVIDENCE ONLY — nothing selected/ranked/scored/recommended (researcher_selection=null).** Reuses the
+WU-8 instrument unchanged (10 EPANET solves); descriptive activation only (no FP/FN — no oracle); JSON
+carries `generated_utc` (NOT byte-reproduced; EPANET-deterministic values do reproduce).
+
+| Claim | Section/Key | Result | Interpretation |
+|---|---|---|---|
+| Decision-instant vs sustained gap | single_step_vs_trajectory (severe) | worst-node ~5.53 psi at shared-initial vs ~1.29 psi sustained | a single-step look-ahead understates sustained danger |
+| Only S2@ε=0 separates severe from intermediate | most_important_question | razor-thin ~0.01 psi margin at one instant | not claimed to generalise |
+| S4 never fires on measured evidence | safety_rule_outputs / S4 | 0 negative-pressure nodes in every swept config | negative backstop gives no 20-psi protection standalone |
+| Chronic-baseline ill-posedness on identity hold | baseline_compatibility | S1@20 activates 1.0; S2/S3/S4 activate 0.0 | hard absolute-20 penalises the baseline; relative/negative gates compatible |
+
+## STEP 9 — TEMPORAL characterisation: single-step vs trajectory-aware safety (WU-16, 2026-09-28)
+
+Doc: `docs/PHASE6_STEP9_SAFETY_DESIGN.md` §11. Raw artefact:
+`results/phase6/p6_s9_temporal_safety_characterization.json`; generator
+`src/validation/p6_s9_temporal_safety_characterization.py`; tests
+`tests/test_temporal_safety_characterization.py` (20). Committed 6bf4820 (+ checkpoint).
+**EVIDENCE ONLY — no mechanism, handling policy, or look-ahead HORIZON selected/ranked/scored/
+recommended (researcher_selection=null).** Reuses the WU-8 instrument + WU-15 module unchanged (3 full
+96h EPS solves); reproduces the WU-15 5.53/1.29 anchors from persisted data (abs diff 0.0); JSON carries
+`generated_utc` (NOT byte-reproduced; EPANET-deterministic values do reproduce). No wrapper, no
+reward.py, no PPO.
+
+| Claim | Section/Key | Result | Interpretation |
+|---|---|---|---|
+| Severe collapse is late in the horizon | trajectory_metrics.prv_lower_pump_lower | p_min_horizon 1.2947 psi at report index 192 = 96.0h (END); decision instant 5.5279 psi; understatement 4.23 psi | any finite look-ahead shorter than full understates it |
+| Short look-ahead misses it (central finding) | temporal_rule_outputs / TS1 θ_p=5 | worst p_min H=1/2/4/8 = 5.4615/5.4045/5.3083/5.1472; activates false for H≤8, true only at full | single-step non-activation followed by delayed deterioration (NOT false negative) |
+| First sub-θ_p=5 instant beyond short horizons | horizon_pmin_sweep (severe) | first index below θ_p=5 at report index 13 = 6.5h | > H=8 (4h): a ≤4h look-ahead keyed to 5 psi stays quiet |
+| Relative worst-node guard more temporally sensitive | temporal_rule_outputs / TS2 ε_p=0 | activates at every horizon incl. H=1 (worst Δp_min −0.097 → −4.30) | reported as measured behaviour, not a virtue |
+| Negative backstop never fires | temporal_rule_outputs / TS4 | max_N_neg 0 at every horizon, every config | no 20-psi protection standalone |
+| Chronic ill-posedness over the horizon | temporal_rule_outputs / baseline_identity_hold | TS1@20 activates (worst 4.16452 psi); TS2@0 never | hard absolute-20 window gate penalises baseline; relative compatible |
+| Tank drawdown coincident with collapse | tank_state_evolution.prv_lower_pump_lower | TANK-130 −9.79 ft, TANK-131 −12.74 ft by t_pmin | coincident, NO causal overclaim |
+| Native pump-rule events | native_rule_events | 0 (severe) vs 14 (reference / prv_all_lower) | severe pumps held at reduced fixed speed, never toggle |
+| WU-15 anchors reproduced | wu15_delayed_collapse_reproduction | 5.5279 / 1.2947 psi, abs diff 0.0; normalized action [-1]×7 exact | deterministic reproduction from persisted data |
+| Frozen invariants unchanged | experiment_metadata | action_dim 7; observation_dim 139; service mask 121/5; 193 instants; ts 1800s; n_native 5 | temporal layer; no topology/native-rule change |
+| Test battery | tests/test_temporal_safety_characterization.py | 20 new; full battery 145 OK | keys/finite/no-forbidden-tokens/researcher_selection-null/frozen-dims/WU-15-repro/central-finding |

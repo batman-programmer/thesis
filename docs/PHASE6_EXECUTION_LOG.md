@@ -715,3 +715,75 @@ RESEARCH ASSUMPTION · HYPOTHESIS TO TEST · DECISION REQUIRED.
   reward.py are STEP 11 (deps-blocked). No PPO.
 
 
+---
+
+## WU-15 — STEP 9 empirical characterisation of candidate mechanisms & handling policies — 2026-09-28
+
+- **Objective:** Empirically MEASURE candidate safety mechanisms S1-S4 and action-handling policies
+  H1-H3 on the frozen network so the researcher can make the STEP-9 decision later. **EVIDENCE ONLY —
+  nothing selected/ranked/scored/recommended (researcher_selection=null).** No wrapper, no reward.py,
+  no PPO.
+- **Action taken:** Wrote `src/validation/p6_s9_safety_mechanism_characterization.py` reusing the
+  validated WU-8 instrument unchanged (10 EPANET solves, ~8s, no RNG); measured per rule × provisional
+  threshold the descriptive activation fields (no FP/FN — no oracle) and per policy the executed action;
+  reported TWO look-ahead views per transition (strict single-step shared_initial vs sustained 96h
+  horizon), surfacing the tank-divergence caveat (severe `prv_lower_pump_lower` ~5.53 psi worst-node at
+  shared-initial vs ~1.29 psi sustained). Emitted
+  `results/phase6/p6_s9_safety_mechanism_characterization.json` (carries `generated_utc`, NOT
+  byte-reproduced), appended sections 10.1-10.9 to `docs/PHASE6_STEP9_SAFETY_DESIGN.md` (WU-14
+  sections 1-9 preserved), added `tests/test_safety_mechanism_characterization.py` (26 tests).
+- **Result:** committed as e09264c (deliverable) + 0ed1c9e (checkpoint). Full battery 125 OK.
+- **Decision class:** EMPIRICAL EVIDENCE (characterisation only; nothing selected).
+- **Next action:** WU-16 — TEMPORAL characterisation (single-step vs trajectory-aware safety).
+
+---
+
+## WU-16 — STEP 9 TEMPORAL characterisation (single-step vs trajectory-aware safety) — 2026-09-28
+
+- **Objective:** Determine empirically whether a purely SINGLE-STEP (or short few-step) post-action
+  safety check can MISS delayed hydraulic deterioration that emerges over the sustained 96h horizon as
+  tank states evolve — the central single-step-vs-trajectory-aware comparison. Motivated by the WU-15
+  finding that `prv_lower_pump_lower` reads ~5.53 psi worst-node at the decision instant but ~1.29 psi
+  sustained. **EVIDENCE ONLY — no mechanism, handling policy, or look-ahead HORIZON is
+  selected/ranked/scored/recommended (researcher_selection=null).** No wrapper, no reward.py, no PPO.
+- **Starting state:** WU-14 (0086a0a) + WU-15 (e09264c) done. Reward D-P6-005 APPROVED; observation
+  and action space FROZEN. No temporal artefact existed.
+- **Action taken:** Wrote `src/validation/p6_s9_temporal_safety_characterization.py` reusing the WU-8
+  instrument (p6_s8) and the WU-15 module (p6_s9 safety_mechanism_characterization) unchanged — same
+  working INP (sha256 53015ba9…20a9), same 121/5 mask, `n_native_controls=5` read from disk. Ran 3 full
+  96h EPS solves (reference_nominal, prv_lower_pump_lower, prv_all_lower); read the WU-15 commands and
+  5.53/1.29 anchors from persisted data and reproduced them exactly (abs diff 0.0, normalized action
+  [-1]×7 exact). Measured per-config trajectory metrics (p_min_horizon, t_pmin index+hours, D_max/D_cum,
+  DSR_min, Q_unserved_max, Q_leak stats, any_negative/sub20 descriptive), VIEW A (single-step decision
+  instant) vs VIEW B (full-horizon trajectory), temporal rules TS1-TS4 across look-ahead horizons
+  H=1/2/4/8/full, tank/pump/native-rule evolution, computational cost, and PPO compatibility per
+  horizon. Emitted `results/phase6/p6_s9_temporal_safety_characterization.json` (carries
+  `generated_utc`, NOT byte-reproduced), appended section 11 to `docs/PHASE6_STEP9_SAFETY_DESIGN.md`
+  (WU-14 §1-9 and WU-15 §10.1-10.9 preserved), added `tests/test_temporal_safety_characterization.py`
+  (20 tests).
+- **Result:** Central finding on the tested corner — severe worst-node p_min sits at ~5.53 psi at the
+  decision instant, ~5.15-5.46 psi over horizons H=1/2/4/8 (0.5-4h), then collapses to ~1.29 psi at
+  report index 192 (96.0h, the horizon END; understatement 4.23 psi). It first drops below θ_p=5 psi at
+  index 13 (6.5h) — beyond H=8 (4h) — so TS1@θ=5 does NOT activate for H≤8 yet DOES over the full
+  horizon: single-step non-activation followed by delayed deterioration (NOT "false negative"; no
+  oracle → no FP/FN). Relative TS2@ε=0 reacts even at H=1 (worst Δp_min −0.097→−4.30); negative backstop
+  TS4 never fires (max_N_neg=0 everywhere); identity hold reproduces the chronic absolute-20
+  ill-posedness (TS1@20 activates on baseline worst 4.16452 psi, TS2 never). Tank drawdown
+  (TANK-130 −9.79 ft, TANK-131 −12.74 ft by t_pmin) is coincident with the collapse (no causal
+  overclaim); native pump-rule events 0 (severe) vs 14 (reference/prv_all_lower). Committed as 6bf4820
+  (deliverable) + checkpoint. Full battery 145 OK (125 prior + 20 new).
+- **Decision class:** EMPIRICAL EVIDENCE (temporal characterisation only; nothing selected).
+- **Files changed:** src/validation/p6_s9_temporal_safety_characterization.py (new);
+  results/phase6/p6_s9_temporal_safety_characterization.json (new);
+  tests/test_temporal_safety_characterization.py (new);
+  docs/PHASE6_STEP9_SAFETY_DESIGN.md (appended §11); PROJECT_STATE.yaml;
+  docs/PHASE6_EVIDENCE_INDEX.md; docs/RECOVERY.md; docs/PHASE6_EXECUTION_LOG.md.
+- **Risks/caveats:** finite look-ahead ≠ long-term safety guarantee, and even the full-horizon check is
+  bounded by the 96h EPS; coverage is 3 operating points only (R1b — do NOT claim the 7-D box globally
+  safe); no oracle → no FP/FN; apply-once-then-revert not simulated (would change n_native_controls);
+  detection ≠ enforcement/guarantee; PPO deps still missing (R4).
+- **Next action:** researcher selects a STEP-9 mechanism + threshold + clip-vs-reject handling + look
+  ahead horizon (all PENDING, not auto-made); production wrapper and reward.py are STEP 11
+  (deps-blocked). No PPO.
+
+

@@ -5,15 +5,21 @@ first, then `PROJECT_STATE.yaml`, then the three Phase 6 docs listed below. You
 should be able to reconstruct the whole project state from disk WITHOUT the old
 chat.**
 
-Last updated: 2026-09-27 (UTC) by Claude Opus 4.8. **Action space APPROVED & FROZEN
+Last updated: 2026-09-28 (UTC) by Claude Opus 4.8. **Action space APPROVED & FROZEN
 2026-09-27 (D-P6-001/002/003); STEP 7 observation design APPROVED & FROZEN 2026-09-27
 (D-P6-004, observation_dim=139); STEP 8 reward design D-P6-005 = APPROVED 2026-09-27 —
 researcher selected `C-A_F1_balanced_dense` (F1 normalized weighted sum; weights
 w_L=1.0, w_U=1.0, w_P=1.0, w_A=0.1, w_E=0.0; 5 frozen normalisation constants unchanged).
 The reward formulation + weights are now FROZEN (WU-13). The reward function
 `src/env/reward.py` is STEP 11 and is NOT implemented. STEP 9 (state-dependent safety
-mechanism) DESIGN ANALYSIS is IN PROGRESS (WU-14, characterisation only — S1–S4 candidates,
-NOT ranked, no production wrapper). The WU-11/WU-12 decision-preparation JSON snapshots +
+mechanism) is at EVIDENCE stage: DESIGN ANALYSIS done (WU-14, 0086a0a — S1–S4 candidates,
+NOT ranked), EMPIRICAL characterisation done (WU-15, e09264c — S1–S4 + H1–H3 measured), and
+TEMPORAL characterisation done (WU-16, 6bf4820 — single-step vs full-96h-horizon behaviour
+TS1–TS4 across look-ahead horizons H=1/2/4/8/full). All three are EVIDENCE ONLY
+(researcher_selection=null); no mechanism, handling policy, threshold, or look-ahead HORIZON
+is selected — that is a PENDING researcher decision. WU-16 measured that on the tested severe
+corner a short look-ahead (≤4h) understates a collapse that only fully materialises at 96h
+(5.53→1.29 psi at report index 192). The WU-11/WU-12 decision-preparation JSON snapshots +
 their generators + byte-reproduction tests are RETAINED UNCHANGED (still status PROPOSED /
 researcher_selection=null) as frozen pre-decision evidence; the authoritative APPROVAL record
 is `PROJECT_STATE.yaml` (`reward.approved`) + `docs/PHASE6_DECISION_REGISTER.md`
@@ -205,17 +211,26 @@ Source `results/phase5/g3_pump_speed.json`:
   can still be scientifically wrong" analysis, and the reward-vs-STEP-9 layer separation; no
   winner/rank/score keys anywhere. NEXT: researcher completes the §G decision form (resolves
   D-P6-005). Do NOT choose final weights, do NOT start PPO.
-- **STEP 9 safety layer — DESIGN ANALYSIS IN PROGRESS 2026-09-27 (WU-14).** State-dependent
-  safety mechanism, DISTINCT from the frozen action-space bounds. Characterises 4 candidate
-  admissibility mechanisms (S1 absolute worst-node threshold; S2 min-pressure degradation vs
-  current state; S3 pressure-deficit increase; S4 negative-pressure hard backstop) on measured
-  evidence — **NOT ranked**, **no production wrapper implemented yet**. Key design constraint: a
-  naive `if min_pressure<20: reject` is ILL-POSED (native baseline has 386 chronic sub-20 node-ts,
-  min svc 4.16452 psi, 0 negative); leakage-driven behaviour pushes min svc to ~1.295 psi, so a
-  state-dependent clamp is required. Artefacts: `docs/PHASE6_STEP9_SAFETY_DESIGN.md`,
-  `results/phase6/p6_s9_safety_design_analysis.json`, `src/validation/p6_s9_safety_design_analysis.py`,
-  `tests/test_safety_design_analysis.py`. STEP-9 must hard-clamp to the approved bounds and (if 179
-  ever controlled) VALVE-179 ≤ 44.7 psi. STEP 10 demand uncertainty/splits: NOT STARTED.
+- **STEP 9 safety layer — EVIDENCE STAGE (WU-14 design + WU-15 empirical + WU-16 temporal, all done).**
+  State-dependent safety mechanism, DISTINCT from the frozen action-space bounds. **WU-14 (0086a0a):**
+  characterises 4 candidate admissibility mechanisms (S1 absolute worst-node threshold; S2 min-pressure
+  degradation vs current state; S3 pressure-deficit increase; S4 negative-pressure hard backstop) —
+  **NOT ranked**. **WU-15 (e09264c):** measures S1–S4 activation + handling policies H1–H3 as evidence
+  (26 tests). **WU-16 (6bf4820):** measures the TEMPORAL behaviour TS1–TS4 over the full 96h horizon
+  across look-ahead horizons H=1/2/4/8/full (20 tests) — central finding: on the tested severe corner
+  the worst-node p_min reads ~5.53 psi at the decision instant and stays 5.15–5.46 psi for H≤8 (≤4h)
+  but collapses to ~1.29 psi at report index 192 (96.0h), so a short look-ahead keyed to θ_p=5 does NOT
+  activate (single-step non-activation followed by delayed deterioration), while a relative TS2 guard
+  reacts even at H=1 and TS4 never fires. **All three EVIDENCE ONLY (researcher_selection=null); no
+  mechanism/policy/threshold/look-ahead HORIZON selected — PENDING researcher decision. No production
+  wrapper implemented.** Key design constraint: a naive `if min_pressure<20: reject` is ILL-POSED
+  (native baseline has 386 chronic sub-20 node-ts, min svc 4.16452 psi, 0 negative); leakage-driven
+  behaviour pushes min svc to ~1.295 psi, so a state-dependent clamp is required. Artefacts:
+  `docs/PHASE6_STEP9_SAFETY_DESIGN.md` (§1-9 WU-14, §10 WU-15, §11 WU-16),
+  `results/phase6/p6_s9_safety_design_analysis.json`, `results/phase6/p6_s9_safety_mechanism_characterization.json`,
+  `results/phase6/p6_s9_temporal_safety_characterization.json`, and the three matching generators +
+  test batteries under `src/validation/` and `tests/`. STEP-9 must hard-clamp to the approved bounds
+  and (if 179 ever controlled) VALVE-179 ≤ 44.7 psi. STEP 10 demand uncertainty/splits: NOT STARTED.
 - STEP 11 `src/env/` (8 modules) + STEP 12 `tests/` (16 tests) + STEP 13 SB3
   smoke test: BLOCKED — deps missing.
 
