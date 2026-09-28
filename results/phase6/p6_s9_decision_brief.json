@@ -1,0 +1,4054 @@
+{
+  "decision_id": "STEP9_SAFETY_MECHANISM",
+  "status": "PROPOSED / PENDING RESEARCHER",
+  "title": "STEP-9 state-dependent safety mechanism - decision brief (WU-17)",
+  "generated_by": "src/validation/p6_s9_decision_brief.py (WU-17)",
+  "measures_nothing_new": true,
+  "no_epanet_no_ppo_no_selection": true,
+  "no_production_wrapper_implemented": true,
+  "purpose": "Aggregate WU-14/WU-15/WU-16 evidence into a decision-ready brief that FRAMES the four STEP-9 decisions (metric/rule, threshold, look-ahead horizon, action-handling) WITHOUT making them. The researcher makes the final STEP-9 selection.",
+  "the_four_decisions": {
+    "A_safety_metric_rule": {
+      "question": "Which admissibility signal/rule governs whether a proposed action is executed?",
+      "evidence_candidates": [
+        "S1/TS1 absolute worst-node floor",
+        "S2/TS2 worst-node degradation vs current/baseline",
+        "S3/TS3 aggregate-deficit increase",
+        "S4/TS4 negative-pressure hard backstop"
+      ],
+      "evidence_sources": [
+        "wu14_design_analysis",
+        "wu15_empirical_characterization",
+        "wu16_temporal_characterization"
+      ],
+      "selection": null
+    },
+    "B_threshold_tolerance": {
+      "question": "Which numeric threshold (theta_p / eps_p / eps_D) or gate is used?",
+      "provisional_grids_swept_not_selected": {
+        "S1_TS1_theta_p_psi": [
+          0.0,
+          5.0,
+          10.0,
+          15.0,
+          20.0
+        ],
+        "S2_TS2_eps_p_psi": [
+          0.0,
+          2.0,
+          5.0
+        ],
+        "S3_TS3_eps_D_psi_nodesum": [
+          0.0,
+          2.0,
+          5.0
+        ]
+      },
+      "well_posedness_constraint": "An ABSOLUTE worst-node floor is well-posed only for theta_p strictly below the chronic-baseline worst node (~4.16452 psi); at theta_p >= ~4.16 it flags the native baseline itself. The only well-posed HARD absolute gate is negative pressure (baseline count 0).",
+      "selection": null
+    },
+    "C_look_ahead_horizon": {
+      "question": "Over how many forward control steps is the rule evaluated (H)?",
+      "horizons_characterised_control_steps": [
+        1,
+        2,
+        4,
+        8,
+        192
+      ],
+      "horizons_characterised_hours": [
+        0.5,
+        1.0,
+        2.0,
+        4.0,
+        96.0
+      ],
+      "selection": null
+    },
+    "D_action_handling_policy": {
+      "question": "On an inadmissible action, reject to previous, clip toward previous, or fall back?",
+      "evidence_candidates": [
+        "H1 reject -> previous action a_prev",
+        "H2 clip toward previous (alpha grid)",
+        "H3 fallback reference action"
+      ],
+      "selection": null
+    }
+  },
+  "evidence_artifacts": {
+    "wu14_design_analysis": "results/phase6/p6_s9_safety_design_analysis.json",
+    "wu15_empirical_characterization": "results/phase6/p6_s9_safety_mechanism_characterization.json",
+    "wu16_temporal_characterization": "results/phase6/p6_s9_temporal_safety_characterization.json",
+    "reward_brief_wu11": "results/phase6/p6_d_p6_005_decision_brief.json",
+    "decision_register": "docs/PHASE6_DECISION_REGISTER.md",
+    "step9_safety_design_doc": "docs/PHASE6_STEP9_SAFETY_DESIGN.md",
+    "step9_decision_brief_doc": "docs/PHASE6_STEP9_DECISION_BRIEF.md"
+  },
+  "source_artifact_integrity": {
+    "normalization_constants": {
+      "constants_checked": [
+        "leak_ref_gpm",
+        "req_ref_gpm",
+        "deficit_ref_psi_nodesum",
+        "power_ref_kw",
+        "movement_L2sq_max"
+      ],
+      "match_wu14_vs_wu11": {
+        "leak_ref_gpm": true,
+        "req_ref_gpm": true,
+        "deficit_ref_psi_nodesum": true,
+        "power_ref_kw": true,
+        "movement_L2sq_max": true
+      },
+      "all_match": true,
+      "value": {
+        "leak_ref_gpm": 84.72988433677985,
+        "req_ref_gpm": 906.3987348621764,
+        "deficit_ref_psi_nodesum": 28.671793365478514,
+        "power_ref_kw": 88.10062475649187,
+        "movement_L2sq_max": 28.0
+      },
+      "wu15_reward_reference": "D-P6-005 C-A_F1_balanced_dense (NOT modified here)",
+      "wu16_reward_reference": "D-P6-005 C-A_F1_balanced_dense (NOT modified here)"
+    },
+    "chronic_baseline_anchors": {
+      "n_node_timesteps_below_20psi": 386,
+      "n_node_timesteps_negative": 0,
+      "frac_ts_any_node_below_20psi": 1.0,
+      "frac_ts_any_node_negative": 0.0,
+      "baseline_worst_node_psi": 4.16452169418335,
+      "leak_only_argmax_config": "prv_lower_pump_lower",
+      "leak_only_argmax_on_action_bound": true,
+      "leak_only_argmax_worst_node_psi": 1.2946763038635254
+    },
+    "wu16_anchor_reproduction": {
+      "severe_p_min_at_decision_instant_psi": 5.527866840362549,
+      "severe_p_min_over_full_horizon_psi": 1.2946763038635254,
+      "t_pmin_report_index": 192,
+      "t_pmin_hours": 96.0,
+      "max_N_neg_over_horizon": 0
+    },
+    "note": "All numbers copied verbatim from the frozen STEP-9 artefacts; no value is recomputed."
+  },
+  "frozen_constraints": {
+    "action_space": {
+      "decision": "D-P6-001/002/003 APPROVED & FROZEN",
+      "action_dim": 7,
+      "encoding": "ABSOLUTE a_i in [-1,1]; physical = lower + ((a+1)/2)*(upper-lower)",
+      "ordered_bounds": [
+        {
+          "index": 0,
+          "actuator": "VALVE-173",
+          "lower": 54.5,
+          "upper": 100.0,
+          "unit": "psi"
+        },
+        {
+          "index": 1,
+          "actuator": "VALVE-175",
+          "lower": 21.5,
+          "upper": 110.0,
+          "unit": "psi"
+        },
+        {
+          "index": 2,
+          "actuator": "VALVE-176",
+          "lower": 20.0,
+          "upper": 59.524,
+          "unit": "psi"
+        },
+        {
+          "index": 3,
+          "actuator": "VALVE-177",
+          "lower": 20.0,
+          "upper": 90.0,
+          "unit": "psi"
+        },
+        {
+          "index": 4,
+          "actuator": "VALVE-178",
+          "lower": 20.0,
+          "upper": 74.0,
+          "unit": "psi"
+        },
+        {
+          "index": 5,
+          "actuator": "PUMP-170",
+          "lower": 0.82,
+          "upper": 1.1,
+          "unit": "rel_speed"
+        },
+        {
+          "index": 6,
+          "actuator": "PUMP-172",
+          "lower": 0.77,
+          "upper": 1.1,
+          "unit": "rel_speed"
+        }
+      ],
+      "excluded_valves_kept_in_model": [
+        "VALVE-174",
+        "VALVE-179",
+        "VALVE-180"
+      ],
+      "pump_strategy": "SPEED only, re-issued each step; native STATUS rules intact"
+    },
+    "observation": {
+      "decision": "D-P6-004 APPROVED & FROZEN",
+      "observation_dim": 139,
+      "dtype": "float32",
+      "reward_must_not_modify_state": true
+    },
+    "service_node_policy": {
+      "n_service_junctions": 121,
+      "n_connector_junctions_excluded": 5,
+      "connector_nodes": [
+        "JUNCTION-105",
+        "JUNCTION-106",
+        "JUNCTION-109",
+        "JUNCTION-110",
+        "JUNCTION-128"
+      ]
+    },
+    "solver_policy": {
+      "accuracy": 1e-05,
+      "trials": 2000,
+      "rule_timestep_s": 180,
+      "report_timestep_s": 1800,
+      "pda_required_psi": 20.0,
+      "pda_minimum_psi": 0.0,
+      "pda_exponent": 0.5,
+      "asserted_after_every_load": true
+    }
+  },
+  "frozen_reward_D_P6_005": {
+    "status": "APPROVED & FROZEN (D-P6-005 RESOLUTION 2026-09-27)",
+    "formulation": "C-A_F1_balanced_dense (normalized weighted sum)",
+    "weights": {
+      "w_L": 1.0,
+      "w_U": 1.0,
+      "w_P": 1.0,
+      "w_A": 0.1,
+      "w_E": 0.0
+    },
+    "step9_must_not_modify": "STEP-9 is an EXECUTION-LEVEL admissibility layer and MUST NOT silently change the reward, observation, or action bounds. Effort term ||da||^2 is defined on the COMMANDED action; under an intervention the executed action differs (see training_execution_implications)."
+  },
+  "normalization_constants_frozen": {
+    "leak_ref_gpm": 84.72988433677985,
+    "req_ref_gpm": 906.3987348621764,
+    "deficit_ref_psi_nodesum": 28.671793365478514,
+    "power_ref_kw": 88.10062475649187,
+    "movement_L2sq_max": 28.0,
+    "note": "FIXED constants measured once (baseline reference run / this analysis) and frozen; NOT per-episode running statistics -> no train/eval leakage. deficit_ref guards against a ~0 baseline deficit by taking max(baseline mean, pooled p95)."
+  },
+  "metric_definitions": {
+    "p_i": {
+      "math": "service pressure at node i",
+      "unit": "psi",
+      "interpretation": "121 service-junction pressures"
+    },
+    "p_min": {
+      "math": "min_i p_i(t)",
+      "unit": "psi",
+      "interpretation": "worst-node service pressure"
+    },
+    "dp_min": {
+      "math": "p_min(post) - p_min(current)",
+      "unit": "psi",
+      "interpretation": "worst-node change (post-action)"
+    },
+    "D": {
+      "math": "sum_i max(0, 20 - p_i)",
+      "unit": "psi_nodesum",
+      "interpretation": "aggregate pressure deficit vs 20 psi"
+    },
+    "dD": {
+      "math": "D(post) - D(current)",
+      "unit": "psi_nodesum",
+      "interpretation": "aggregate deficit change"
+    },
+    "N_neg": {
+      "math": "sum_i I[p_i < 0]",
+      "unit": "count",
+      "interpretation": "negative-pressure service nodes"
+    },
+    "N_20": {
+      "math": "sum_i I[p_i < 20]",
+      "unit": "count",
+      "interpretation": "DESCRIPTIVE sub-20-psi count (not an oracle)"
+    },
+    "Q_req": {
+      "math": "sum requested demand",
+      "unit": "gpm",
+      "interpretation": "requested demand"
+    },
+    "Q_served": {
+      "math": "sum served demand (PDA)",
+      "unit": "gpm",
+      "interpretation": "PDA-served demand"
+    },
+    "Q_unserved": {
+      "math": "max(0, Q_req - Q_served)",
+      "unit": "gpm",
+      "interpretation": "clipped unserved demand"
+    },
+    "DSR": {
+      "math": "Q_served / Q_req",
+      "unit": "ratio",
+      "interpretation": "demand satisfaction ratio"
+    },
+    "Q_leak": {
+      "math": "sum_j sign(p_j) C_j |p_j|^0.5",
+      "unit": "gpm",
+      "interpretation": "emitter leakage (NOT calibrated)"
+    },
+    "dQ_leak": {
+      "math": "Q_leak(post) - Q_leak(current)",
+      "unit": "gpm",
+      "interpretation": "leakage change"
+    },
+    "dDSR": {
+      "math": "DSR(post) - DSR(current)",
+      "unit": "ratio",
+      "interpretation": "DSR change"
+    },
+    "dQ_unserved": {
+      "math": "Q_unserved(post) - Q_unserved(current)",
+      "unit": "gpm",
+      "interpretation": "unserved change"
+    },
+    "movement_L2sq": {
+      "math": "||da_t||^2 on COMMANDED action",
+      "unit": "-",
+      "interpretation": "reward effort term input (frozen)"
+    },
+    "action_deviation_L2": {
+      "math": "||a_exec - a_prop||",
+      "unit": "-",
+      "interpretation": "executed-vs-proposed gap"
+    },
+    "I_modified": {
+      "math": "I[||a_exec - a_prop|| > tol]",
+      "unit": "bool",
+      "interpretation": "executed != proposed (tol 1e-09)"
+    },
+    "I_reject": {
+      "math": "I[action rejected to a_prev/fallback]",
+      "unit": "bool",
+      "interpretation": "hard rejection flag"
+    }
+  },
+  "wu14_design_analysis": {
+    "safety_candidates": [
+      {
+        "candidate_id": "S1",
+        "name": "absolute_worst_node_pressure_threshold",
+        "mechanism_class": "absolute state threshold on worst-node service pressure",
+        "exact_rule": "Intervene (clip toward a safer action, or reject) when the worst-node service pressure of the candidate action falls below an absolute threshold T_abs: min_i p_i(a_t) < T_abs. The natural target is T_abs = 20 psi (the PDA required pressure).",
+        "information_required": "Post-action minimum service pressure over the 121 service junctions, i.e. a hydraulic evaluation of the candidate action.",
+        "compute_cost": "One extra EPANET hydraulic solve per control step to obtain min_i p_i(a_t) (a one-step look-ahead), then an O(121) min-reduction; roughly 1x the step's own solve cost.",
+        "baseline_compatibility": "INCOMPATIBLE at T_abs=20 psi: the frozen native baseline holds min service pressure ~4.16 psi and frac_ts_any_node_below_20psi = 1.0 (386 node-timesteps < 20 psi), so a hard 20-psi rule flags the baseline itself at every timestep. Only compatible if T_abs is set strictly below the baseline worst-node (~4.16 psi), which then no longer enforces 20 psi.",
+        "false_positive_risk": "HIGH at T_abs=20 psi: rejects physically-normal, baseline-like states the native controller already produces. Decreases as T_abs -> baseline worst-node.",
+        "false_negative_risk": "LOW at T_abs=20 psi (little escapes a strict absolute floor); rises as T_abs is lowered toward 0.",
+        "ppo_compatibility": "Clip variant projects the commanded action into a state-dependent safe set and keeps a valid continuous action; executed != commanded, and since the approved reward's effort term uses the COMMANDED da, that term is unaffected, but the policy sees a train/execute gap. Reject/resample perturbs the action->transition map and is harder for PPO.",
+        "interval_30min_compatibility": "Compatible: evaluated once per 1800 s (30-min) control decision.",
+        "requires_look_ahead": "YES when enforced on the post-action state (needs a candidate-action solve); avoidable only by reacting one step late on the realised state.",
+        "preserves_determinism": "YES - EPANET is deterministic; no RNG."
+      },
+      {
+        "candidate_id": "S2",
+        "name": "min_pressure_degradation_vs_current",
+        "mechanism_class": "relative worst-node degradation vs current state",
+        "exact_rule": "Intervene when the candidate action degrades the worst-node service pressure relative to the CURRENT (pre-action) state beyond a tolerance: min_i p_i(a_t) < min_i p_i(current) - tol. A stricter variant demands non-degradation (tol=0) or a minimum improvement.",
+        "information_required": "Current-state worst-node pressure (already derivable from the observation pressures) AND the candidate-action worst-node pressure (look-ahead).",
+        "compute_cost": "One look-ahead solve for the candidate action; current-state pressures are reused from the last solve. O(121) reduction.",
+        "baseline_compatibility": "COMPATIBLE in principle: being relative, it does not reject the chronically sub-20 baseline outright, and never fires on a hold that leaves pressures unchanged. Behaviour depends on the reference ('current' state) and the tolerance, which must be defined.",
+        "false_positive_risk": "MODERATE: benign transient dips or demand-driven drops can trip a tol=0 rule even when the commanded action is sound; sensitive to tol.",
+        "false_negative_risk": "MODERATE-HIGH: a state already far below 20 psi that stays flat (no further degradation) is NOT flagged, so this rule does not enforce any absolute floor.",
+        "ppo_compatibility": "Same clip-vs-reject trade-off as S1; the relative signal is smooth in the pressures, so a clip projection is PPO-friendly.",
+        "interval_30min_compatibility": "Compatible: one evaluation per 1800 s control decision.",
+        "requires_look_ahead": "YES for the candidate-action term; the current-state term needs no extra solve.",
+        "preserves_determinism": "YES - deterministic solver; no RNG."
+      },
+      {
+        "candidate_id": "S3",
+        "name": "total_pressure_deficit_increase",
+        "mechanism_class": "relative aggregate pressure-deficit increase vs current state",
+        "exact_rule": "Intervene when the candidate action increases the total nodal pressure deficit sum_i max(0, 20 - p_i) over service nodes relative to the current state beyond a tolerance: deficit(a_t) > deficit(current) + tol.",
+        "information_required": "Current and candidate-action pressure-deficit (nodesum over the 121 service nodes).",
+        "compute_cost": "One look-ahead solve; deficit is an O(121) sum. deficit_ref (~28.67) is available for normalisation.",
+        "baseline_compatibility": "COMPATIBLE: relative and aggregate; it does not reject the baseline. Measured deficit<->leak correlation is -0.7735, so leak-reducing (pressure-lowering) actions tend to RAISE deficit; S3 therefore directly opposes the approved reward's leak term as an aggregate guard (not a worst-node guarantee).",
+        "false_positive_risk": "MODERATE: an action that improves the worst node but slightly raises aggregate deficit elsewhere is flagged.",
+        "false_negative_risk": "HIGH for localised failures: aggregate deficit can stay flat while a single critical node collapses (aggregation masks the worst node).",
+        "ppo_compatibility": "Smooth aggregate signal; clip projection PPO-friendly. Same clip-vs-reject train/execute considerations as S1/S2.",
+        "interval_30min_compatibility": "Compatible: one evaluation per 1800 s control decision.",
+        "requires_look_ahead": "YES for the candidate-action deficit; current-state deficit reused.",
+        "preserves_determinism": "YES - deterministic solver; no RNG."
+      },
+      {
+        "candidate_id": "S4",
+        "name": "negative_pressure_hard_backstop",
+        "mechanism_class": "absolute hard gate on non-positive pressure (feasibility backstop)",
+        "exact_rule": "Intervene (hard) only when any service node goes non-positive: min_i p_i(a_t) <= 0 (equivalently n_negative(a_t) > 0). This is the only HARD absolute gate that is well-posed on this network.",
+        "information_required": "Candidate-action minimum service pressure / count of negative-pressure nodes.",
+        "compute_cost": "One look-ahead solve and an O(121) check; the same solve can also feed S1-S3.",
+        "baseline_compatibility": "FULLY COMPATIBLE: the baseline has 0 negative-pressure node-timesteps (frac_ts_any_node_negative = 0.0), and every in-bounds swept configuration - including the leak-only lower corner whose worst node is ~1.29 psi - had 0 negative nodes. So as a STANDALONE gate S4 never fires on the measured evidence and provides NO 20-psi service protection.",
+        "false_positive_risk": "VERY LOW: fires only on physically infeasible (non-positive) pressure.",
+        "false_negative_risk": "VERY HIGH w.r.t. the 20-psi service target: it permits the whole 0-20 psi band, including the ~1.29 psi leak-only corner. It is a feasibility backstop, not a service-level guarantee.",
+        "ppo_compatibility": "Rarely active, so it barely perturbs the action->transition map; usable as a hard clip of last resort. Complementary to (not a substitute for) a dense/relative guard.",
+        "interval_30min_compatibility": "Compatible: one evaluation per 1800 s control decision.",
+        "requires_look_ahead": "YES when enforced on the post-action state; a reactive variant acts one step late.",
+        "preserves_determinism": "YES - deterministic solver; no RNG."
+      }
+    ],
+    "baseline_compatibility_summary": {
+      "governing_conclusion": "No formulation can use a HARD 20-psi constraint without penalising the native baseline itself. Dense deficit / worst-node min-pressure / baseline-relative service signals are the defensible safety channels; any hard gate must key on NEGATIVE pressure (or on a threshold strictly below the baseline worst-node ~4.16 psi), and the enforced 20-psi guarantee belongs to the STEP-9 execution-level clamp, not to a reward-level hard term.",
+      "per_candidate_baseline_flag": {
+        "S1": "FLAGS the native baseline at every timestep when T_abs=20 psi (baseline worst node ~4.16 psi); compatible only when T_abs < baseline worst-node.",
+        "S2": "Does NOT flag the baseline (relative to the current state).",
+        "S3": "Does NOT flag the baseline (relative aggregate deficit).",
+        "S4": "Never fires on the baseline (0 negative-pressure node-timesteps)."
+      },
+      "naive_absolute_20psi_reject_is_ill_posed": true
+    },
+    "design_investigation": {
+      "distinct_from_action_bounds": "A STEP-9 state-dependent mechanism is SEPARATE from the frozen action bounds (D-P6-001/002/003): the bounds keep each actuator in a static box; the mechanism reacts to the resulting hydraulic STATE. Both differ from reward shaping (D-P6-005).",
+      "one_step_look_ahead": "Every post-action rule (S1-S4 evaluated on the resulting state) needs either (a) one extra EPANET solve of the candidate action before committing (a one-step look-ahead, ~1x solver cost per control step), or (b) reactive enforcement one step late on the realised state. EPANET is deterministic, so a look-ahead adds no stochasticity.",
+      "clip_vs_reject": "CLIP projects the commanded action into a state-dependent safe set and keeps a valid continuous action (executed != commanded; the approved reward's effort term uses the COMMANDED da, so it stays intact, but PPO must observe the train/execute gap). REJECT/RESAMPLE breaks the deterministic action->state map and raises return variance. Characterised, not selected.",
+      "fallback_when_no_feasible_action": "A guard needs a defined fallback when no in-box action satisfies it. Because the native baseline is itself sub-20 psi at every timestep, an absolute-20 guard has NO feasible fallback - reinforcing that an enforced 20-psi guarantee is ill-posed at both reward and naive-clamp level. A relative guard (S2/S3) or a negative-keyed hard gate (S4) always has the current state as a feasible fallback.",
+      "degradation_reference_choice": "The reference matters: 'current state' (S2/S3) vs 'native baseline' (F3/C-C accounting) vs a fixed absolute 20 psi (S1). Relative and baseline-referenced guards are well-posed here; the fixed-absolute-20 guard is not.",
+      "worst_node_vs_aggregate": "Worst-node signals (S1/S2) protect the single most critical junction; aggregate deficit (S3) can mask a localised collapse. A composite guard could combine them, but that is a design choice for the researcher, not made here.",
+      "negative_pressure_protection": "Negative pressure is the only absolute condition that never occurs in the baseline or in any swept in-bounds config (n_service_nodes_negative pooled mean/max = 0). A hard gate keyed on it (S4) is well-posed but, alone, guarantees only feasibility, not the 20-psi service target."
+    },
+    "action_space_coverage": {
+      "characterised_region": "Only the single lower corner (prv_lower_pump_lower / prv_all_lower) has measured worst-node service pressure (~1.29 psi at the leak-only argmax; ~4.19 psi for the all-lower PRV corner) and a measured negative-node count (0). This is the R1b single-corner coverage.",
+      "unverified_region": "Interior points, mixed PRV corners, pump-speed extremes combined with PRV extremes, and the joint (action x uncertain-demand) space are NOT characterised here.",
+      "claim_limit": "Do NOT claim the 7-D action box is globally safe. Exhaustive joint in-box safety is a STEP-9 (mechanism) + STEP-12 (test) responsibility; this analysis characterises candidate mechanisms, it does not certify the action space."
+    }
+  },
+  "wu15_empirical_characterization": {
+    "candidates": {
+      "S1": {
+        "exact_rule": "SAFE iff p_min(post) >= theta_p",
+        "signal": "absolute_worst_node_pressure",
+        "information_required": "post-action worst-node pressure (look-ahead)",
+        "requires_look_ahead": true,
+        "requires_extra_solve": true,
+        "baseline_relation": "absolute",
+        "note": "theta_p provisional; theta_p=20 psi vs chronic baseline (worst node ~4.16 psi) examined empirically below"
+      },
+      "S2": {
+        "exact_rule": "SAFE iff p_min(post) - p_min(current) >= -eps_p",
+        "signal": "worst_node_degradation_vs_current",
+        "information_required": "current + post worst-node pressure",
+        "requires_look_ahead": true,
+        "requires_extra_solve": true,
+        "baseline_relation": "relative",
+        "note": "eps_p provisional; relative, gives no absolute-min guarantee"
+      },
+      "S3": {
+        "exact_rule": "SAFE iff D(post) - D(current) <= eps_D",
+        "signal": "aggregate_deficit_increase",
+        "information_required": "current + post deficit nodesum",
+        "requires_look_ahead": true,
+        "requires_extra_solve": true,
+        "baseline_relation": "relative_aggregate",
+        "note": "eps_D provisional; aggregate can mask localised collapse"
+      },
+      "S4": {
+        "exact_rule": "SAFE iff N_neg(post) == 0",
+        "signal": "negative_pressure_hard_backstop",
+        "information_required": "post negative-node count",
+        "requires_look_ahead": true,
+        "requires_extra_solve": true,
+        "baseline_relation": "absolute_negative_only",
+        "note": "only well-posed HARD absolute gate; not a 20-psi guarantee"
+      }
+    },
+    "provisional_thresholds": {
+      "S1_theta_p_psi": [
+        0.0,
+        5.0,
+        10.0,
+        15.0,
+        20.0
+      ],
+      "S2_eps_p_psi": [
+        0.0,
+        2.0,
+        5.0
+      ],
+      "S3_eps_D_psi_nodesum": [
+        0.0,
+        2.0,
+        5.0
+      ],
+      "H2_alpha_grid": [
+        0.0,
+        0.25,
+        0.5,
+        0.75,
+        1.0
+      ],
+      "note": "PROVISIONAL documented sets; NOT selected or tuned to an objective"
+    },
+    "safety_rule_outputs": {
+      "T0_reference_to_reference": {
+        "S1": {
+          "theta_p_psi=0": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          },
+          "theta_p_psi=5": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.45077720207253885,
+            "n_activations_sustained": 87,
+            "n_instants": 193
+          },
+          "theta_p_psi=10": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "theta_p_psi=15": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "theta_p_psi=20": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          }
+        },
+        "S2": {
+          "eps_p_psi=0": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          },
+          "eps_p_psi=2": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          },
+          "eps_p_psi=5": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          }
+        },
+        "S3": {
+          "eps_D_psi_nodesum=0": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          },
+          "eps_D_psi_nodesum=2": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          },
+          "eps_D_psi_nodesum=5": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          }
+        },
+        "S4": {
+          "hard_backstop": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          }
+        }
+      },
+      "T1_reference_to_severe": {
+        "S1": {
+          "theta_p_psi=0": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          },
+          "theta_p_psi=5": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.9326424870466321,
+            "n_activations_sustained": 180,
+            "n_instants": 193
+          },
+          "theta_p_psi=10": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "theta_p_psi=15": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "theta_p_psi=20": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          }
+        },
+        "S2": {
+          "eps_p_psi=0": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 0.9792746113989638,
+            "n_activations_sustained": 189,
+            "n_instants": 193
+          },
+          "eps_p_psi=2": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.5803108808290155,
+            "n_activations_sustained": 112,
+            "n_instants": 193
+          },
+          "eps_p_psi=5": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          }
+        },
+        "S3": {
+          "eps_D_psi_nodesum=0": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "eps_D_psi_nodesum=2": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "eps_D_psi_nodesum=5": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          }
+        },
+        "S4": {
+          "hard_backstop": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          }
+        }
+      },
+      "T2_reference_to_intermediate": {
+        "S1": {
+          "theta_p_psi=0": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          },
+          "theta_p_psi=5": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.42487046632124353,
+            "n_activations_sustained": 82,
+            "n_instants": 193
+          },
+          "theta_p_psi=10": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "theta_p_psi=15": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "theta_p_psi=20": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          }
+        },
+        "S2": {
+          "eps_p_psi=0": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.3005181347150259,
+            "n_activations_sustained": 58,
+            "n_instants": 193
+          },
+          "eps_p_psi=2": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          },
+          "eps_p_psi=5": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          }
+        },
+        "S3": {
+          "eps_D_psi_nodesum=0": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "eps_D_psi_nodesum=2": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "eps_D_psi_nodesum=5": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          }
+        },
+        "S4": {
+          "hard_backstop": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          }
+        }
+      },
+      "T3_high_pressure_to_severe": {
+        "S1": {
+          "theta_p_psi=0": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          },
+          "theta_p_psi=5": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.9326424870466321,
+            "n_activations_sustained": 180,
+            "n_instants": 193
+          },
+          "theta_p_psi=10": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "theta_p_psi=15": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "theta_p_psi=20": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          }
+        },
+        "S2": {
+          "eps_p_psi=0": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 0.9740932642487047,
+            "n_activations_sustained": 188,
+            "n_instants": 193
+          },
+          "eps_p_psi=2": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.5854922279792746,
+            "n_activations_sustained": 113,
+            "n_instants": 193
+          },
+          "eps_p_psi=5": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          }
+        },
+        "S3": {
+          "eps_D_psi_nodesum=0": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "eps_D_psi_nodesum=2": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "eps_D_psi_nodesum=5": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          }
+        },
+        "S4": {
+          "hard_backstop": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          }
+        }
+      },
+      "T4_high_pressure_to_intermediate": {
+        "S1": {
+          "theta_p_psi=0": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          },
+          "theta_p_psi=5": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.42487046632124353,
+            "n_activations_sustained": 82,
+            "n_instants": 193
+          },
+          "theta_p_psi=10": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "theta_p_psi=15": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "theta_p_psi=20": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          }
+        },
+        "S2": {
+          "eps_p_psi=0": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.26424870466321243,
+            "n_activations_sustained": 51,
+            "n_instants": 193
+          },
+          "eps_p_psi=2": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          },
+          "eps_p_psi=5": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          }
+        },
+        "S3": {
+          "eps_D_psi_nodesum=0": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "eps_D_psi_nodesum=2": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "eps_D_psi_nodesum=5": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          }
+        },
+        "S4": {
+          "hard_backstop": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          }
+        }
+      }
+    },
+    "intervention_metrics": {
+      "reference_to_severe": {
+        "H1": {
+          "I_modified": true,
+          "I_reject": true,
+          "action_deviation_L2": 2.4050194704019527,
+          "action_deviation_L2sq": 5.78411865301249
+        },
+        "H3": {
+          "I_modified": true,
+          "I_reject": true,
+          "action_deviation_L2": 2.4050194704019527,
+          "action_deviation_L2sq": 5.78411865301249
+        },
+        "H2_per_rule_executed_alpha": {
+          "S1": {
+            "theta_p_psi=0": 1.0,
+            "theta_p_psi=5": 1.0,
+            "theta_p_psi=10": 0.0,
+            "theta_p_psi=15": 0.0,
+            "theta_p_psi=20": 0.0
+          },
+          "S2": {
+            "eps_p_psi=0": 0.0,
+            "eps_p_psi=2": 1.0,
+            "eps_p_psi=5": 1.0
+          },
+          "S3": {
+            "eps_D_psi_nodesum=0": 0.0,
+            "eps_D_psi_nodesum=2": 0.0,
+            "eps_D_psi_nodesum=5": 0.5
+          },
+          "S4": {
+            "hard_backstop": 1.0
+          }
+        }
+      },
+      "high_pressure_to_severe": {
+        "H1": {
+          "I_modified": true,
+          "I_reject": true,
+          "action_deviation_L2": 4.857584611560145,
+          "action_deviation_L2sq": 23.59612825846592
+        },
+        "H3": {
+          "I_modified": true,
+          "I_reject": true,
+          "action_deviation_L2": 2.4050194704019527,
+          "action_deviation_L2sq": 5.78411865301249
+        },
+        "H2_per_rule_executed_alpha": {
+          "S1": {
+            "theta_p_psi=0": 1.0,
+            "theta_p_psi=5": 1.0,
+            "theta_p_psi=10": 0.0,
+            "theta_p_psi=15": 0.0,
+            "theta_p_psi=20": 0.0
+          },
+          "S2": {
+            "eps_p_psi=0": 0.0,
+            "eps_p_psi=2": 1.0,
+            "eps_p_psi=5": 1.0
+          },
+          "S3": {
+            "eps_D_psi_nodesum=0": 0.0,
+            "eps_D_psi_nodesum=2": 0.5,
+            "eps_D_psi_nodesum=5": 0.75
+          },
+          "S4": {
+            "hard_backstop": 1.0
+          }
+        }
+      }
+    },
+    "baseline_compatibility": {
+      "identity_hold_rule_activation": {
+        "S1": {
+          "theta_p_psi=0": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          },
+          "theta_p_psi=5": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.45077720207253885,
+            "n_activations_sustained": 87,
+            "n_instants": 193
+          },
+          "theta_p_psi=10": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "theta_p_psi=15": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          },
+          "theta_p_psi=20": {
+            "rule_activates_at_shared_initial": true,
+            "activation_fraction_sustained": 1.0,
+            "n_activations_sustained": 193,
+            "n_instants": 193
+          }
+        },
+        "S2": {
+          "eps_p_psi=0": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          },
+          "eps_p_psi=2": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          },
+          "eps_p_psi=5": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          }
+        },
+        "S3": {
+          "eps_D_psi_nodesum=0": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          },
+          "eps_D_psi_nodesum=2": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          },
+          "eps_D_psi_nodesum=5": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          }
+        },
+        "S4": {
+          "hard_backstop": {
+            "rule_activates_at_shared_initial": false,
+            "activation_fraction_sustained": 0.0,
+            "n_activations_sustained": 0,
+            "n_instants": 193
+          }
+        }
+      },
+      "note": "S1 flags the chronic baseline for theta_p above the baseline worst node (~4.16 psi); S2/S3 never activate on an unchanged hold (dp_min=0, dD=0); S4 never activates (0 negative nodes)."
+    },
+    "severe_degradation_cases": {
+      "prv_lower_pump_lower": {
+        "test_case_class": "B_severe_degradation",
+        "validated_accounting": {
+          "leakage_mean_gpm": 80.61786635451655,
+          "served_demand_mean_gpm": 834.5507518427517,
+          "requested_demand_mean_gpm": 906.3987348621764,
+          "dsr_mean": 0.9193965586241878,
+          "dsr_min": 0.9141979346467793,
+          "n_node_timesteps_below_20psi": 386,
+          "n_node_timesteps_negative_pressure": 0,
+          "continuity_residual_rel_max": 4.014771946003748e-07
+        },
+        "sustained_worst_post_p_min": {
+          "report_index": 192,
+          "current_state_metrics": {
+            "p_min": 4.926605224609375,
+            "D": 18.362689971923828,
+            "N_neg": 0.0,
+            "N_20": 2.0,
+            "DSR": 0.9838070176347955,
+            "Q_unserved": 26.435037208742415,
+            "Q_leak": 84.56288017499259,
+            "Q_req": 1632.4995984399998,
+            "Q_served": 1606.0645612312574
+          },
+          "post_action_metrics": {
+            "p_min": 1.2946763038635254,
+            "D": 31.727617263793945,
+            "N_neg": 0.0,
+            "N_20": 2.0,
+            "DSR": 0.9227144699022674,
+            "Q_unserved": 126.16859684977112,
+            "Q_leak": 79.92559020664626,
+            "Q_req": 1632.4995984399998,
+            "Q_served": 1506.3310015902287
+          },
+          "delta_metrics": {
+            "dp_min": -3.6319289207458496,
+            "dD": 13.364927291870117,
+            "dQ_leak": -4.637289968346323,
+            "dDSR": -0.061092547732528146,
+            "dQ_unserved": 99.7335596410287
+          }
+        },
+        "reference_to_severe_rule_activation": {
+          "S1": {
+            "theta_p_psi=0": {
+              "rule_activates_at_shared_initial": false,
+              "activation_fraction_sustained": 0.0,
+              "n_activations_sustained": 0,
+              "n_instants": 193
+            },
+            "theta_p_psi=5": {
+              "rule_activates_at_shared_initial": false,
+              "activation_fraction_sustained": 0.9326424870466321,
+              "n_activations_sustained": 180,
+              "n_instants": 193
+            },
+            "theta_p_psi=10": {
+              "rule_activates_at_shared_initial": true,
+              "activation_fraction_sustained": 1.0,
+              "n_activations_sustained": 193,
+              "n_instants": 193
+            },
+            "theta_p_psi=15": {
+              "rule_activates_at_shared_initial": true,
+              "activation_fraction_sustained": 1.0,
+              "n_activations_sustained": 193,
+              "n_instants": 193
+            },
+            "theta_p_psi=20": {
+              "rule_activates_at_shared_initial": true,
+              "activation_fraction_sustained": 1.0,
+              "n_activations_sustained": 193,
+              "n_instants": 193
+            }
+          },
+          "S2": {
+            "eps_p_psi=0": {
+              "rule_activates_at_shared_initial": true,
+              "activation_fraction_sustained": 0.9792746113989638,
+              "n_activations_sustained": 189,
+              "n_instants": 193
+            },
+            "eps_p_psi=2": {
+              "rule_activates_at_shared_initial": false,
+              "activation_fraction_sustained": 0.5803108808290155,
+              "n_activations_sustained": 112,
+              "n_instants": 193
+            },
+            "eps_p_psi=5": {
+              "rule_activates_at_shared_initial": false,
+              "activation_fraction_sustained": 0.0,
+              "n_activations_sustained": 0,
+              "n_instants": 193
+            }
+          },
+          "S3": {
+            "eps_D_psi_nodesum=0": {
+              "rule_activates_at_shared_initial": true,
+              "activation_fraction_sustained": 1.0,
+              "n_activations_sustained": 193,
+              "n_instants": 193
+            },
+            "eps_D_psi_nodesum=2": {
+              "rule_activates_at_shared_initial": true,
+              "activation_fraction_sustained": 1.0,
+              "n_activations_sustained": 193,
+              "n_instants": 193
+            },
+            "eps_D_psi_nodesum=5": {
+              "rule_activates_at_shared_initial": true,
+              "activation_fraction_sustained": 1.0,
+              "n_activations_sustained": 193,
+              "n_instants": 193
+            }
+          },
+          "S4": {
+            "hard_backstop": {
+              "rule_activates_at_shared_initial": false,
+              "activation_fraction_sustained": 0.0,
+              "n_activations_sustained": 0,
+              "n_instants": 193
+            }
+          }
+        },
+        "high_pressure_to_severe_rule_activation": {
+          "S1": {
+            "theta_p_psi=0": {
+              "rule_activates_at_shared_initial": false,
+              "activation_fraction_sustained": 0.0,
+              "n_activations_sustained": 0,
+              "n_instants": 193
+            },
+            "theta_p_psi=5": {
+              "rule_activates_at_shared_initial": false,
+              "activation_fraction_sustained": 0.9326424870466321,
+              "n_activations_sustained": 180,
+              "n_instants": 193
+            },
+            "theta_p_psi=10": {
+              "rule_activates_at_shared_initial": true,
+              "activation_fraction_sustained": 1.0,
+              "n_activations_sustained": 193,
+              "n_instants": 193
+            },
+            "theta_p_psi=15": {
+              "rule_activates_at_shared_initial": true,
+              "activation_fraction_sustained": 1.0,
+              "n_activations_sustained": 193,
+              "n_instants": 193
+            },
+            "theta_p_psi=20": {
+              "rule_activates_at_shared_initial": true,
+              "activation_fraction_sustained": 1.0,
+              "n_activations_sustained": 193,
+              "n_instants": 193
+            }
+          },
+          "S2": {
+            "eps_p_psi=0": {
+              "rule_activates_at_shared_initial": true,
+              "activation_fraction_sustained": 0.9740932642487047,
+              "n_activations_sustained": 188,
+              "n_instants": 193
+            },
+            "eps_p_psi=2": {
+              "rule_activates_at_shared_initial": false,
+              "activation_fraction_sustained": 0.5854922279792746,
+              "n_activations_sustained": 113,
+              "n_instants": 193
+            },
+            "eps_p_psi=5": {
+              "rule_activates_at_shared_initial": false,
+              "activation_fraction_sustained": 0.0,
+              "n_activations_sustained": 0,
+              "n_instants": 193
+            }
+          },
+          "S3": {
+            "eps_D_psi_nodesum=0": {
+              "rule_activates_at_shared_initial": true,
+              "activation_fraction_sustained": 1.0,
+              "n_activations_sustained": 193,
+              "n_instants": 193
+            },
+            "eps_D_psi_nodesum=2": {
+              "rule_activates_at_shared_initial": true,
+              "activation_fraction_sustained": 1.0,
+              "n_activations_sustained": 193,
+              "n_instants": 193
+            },
+            "eps_D_psi_nodesum=5": {
+              "rule_activates_at_shared_initial": true,
+              "activation_fraction_sustained": 1.0,
+              "n_activations_sustained": 193,
+              "n_instants": 193
+            }
+          },
+          "S4": {
+            "hard_backstop": {
+              "rule_activates_at_shared_initial": false,
+              "activation_fraction_sustained": 0.0,
+              "n_activations_sustained": 0,
+              "n_instants": 193
+            }
+          }
+        }
+      }
+    },
+    "local_collapse_examples": {
+      "reference_to_severe": {
+        "current_label": "reference_nominal",
+        "proposed_label": "prv_lower_pump_lower",
+        "most_negative_dp_min_instant": {
+          "report_index": 177,
+          "dp_min": -4.30070948600769,
+          "dD": 14.057708740234375
+        },
+        "min_deficit_increase_among_negative_dp_min_instants": {
+          "report_index": 45,
+          "dp_min": -0.0056858062744140625,
+          "dD": 9.724376678466797
+        },
+        "n_negative_dp_min_instants": 189,
+        "n_instants": 193
+      },
+      "high_pressure_to_severe": {
+        "current_label": "prv_all_upper",
+        "proposed_label": "prv_lower_pump_lower",
+        "most_negative_dp_min_instant": {
+          "report_index": 177,
+          "dp_min": -4.2937538623809814,
+          "dD": 17.296781539916992
+        },
+        "min_deficit_increase_among_negative_dp_min_instants": {
+          "report_index": 44,
+          "dp_min": -0.003094196319580078,
+          "dD": 13.0209321975708
+        },
+        "n_negative_dp_min_instants": 188,
+        "n_instants": 193
+      }
+    },
+    "computational_cost": {
+      "n_epanet_solves_total": 10,
+      "n_operating_points_measured": 10,
+      "wall_clock_s_per_run": {
+        "reference_nominal": 0.8847463000001881,
+        "prv_all_lower": 0.8204855999997562,
+        "prv_all_upper": 0.7865568000001986,
+        "prv_lower_pump_lower": 0.7266758000000664,
+        "ref_sev_alpha0.25": 0.7275719999997818,
+        "ref_sev_alpha0.50": 0.7649812000004204,
+        "ref_sev_alpha0.75": 0.7548416999998153,
+        "hi_sev_alpha0.25": 0.8128530999997565,
+        "hi_sev_alpha0.50": 0.9354290000001129,
+        "hi_sev_alpha0.75": 0.9303270000000339
+      },
+      "wall_clock_s_total": 8.14446850000013,
+      "hydraulic_evals_per_proposed_action_look_ahead": 1,
+      "h2_alpha_grid_evals_per_transition": 5,
+      "determinism": "EPANET deterministic: re-running reproduces every value; JSON carries a generated_utc stamp so it is NOT byte-identical across runs",
+      "note": "each rule needs one post-action look-ahead solve per proposed action; H2 needs one solve per alpha-grid point inspected."
+    },
+    "PPO_compatibility": {
+      "S1": {
+        "deterministic": true,
+        "continuous_action_preserved_under_clip": true,
+        "differentiable": false,
+        "discontinuous_under_reject": true,
+        "requires_look_ahead": true,
+        "requires_extra_epanet_solve": true,
+        "compatible_30min_interval": true,
+        "introduces_proposed_vs_executed_mismatch_under_intervention": true,
+        "layer_need_not_be_differentiable": true
+      },
+      "S2": {
+        "deterministic": true,
+        "continuous_action_preserved_under_clip": true,
+        "differentiable": false,
+        "discontinuous_under_reject": true,
+        "requires_look_ahead": true,
+        "requires_extra_epanet_solve": true,
+        "compatible_30min_interval": true,
+        "introduces_proposed_vs_executed_mismatch_under_intervention": true,
+        "layer_need_not_be_differentiable": true
+      },
+      "S3": {
+        "deterministic": true,
+        "continuous_action_preserved_under_clip": true,
+        "differentiable": false,
+        "discontinuous_under_reject": true,
+        "requires_look_ahead": true,
+        "requires_extra_epanet_solve": true,
+        "compatible_30min_interval": true,
+        "introduces_proposed_vs_executed_mismatch_under_intervention": true,
+        "layer_need_not_be_differentiable": true
+      },
+      "S4": {
+        "deterministic": true,
+        "continuous_action_preserved_under_clip": true,
+        "differentiable": false,
+        "discontinuous_under_reject": true,
+        "requires_look_ahead": true,
+        "requires_extra_epanet_solve": true,
+        "compatible_30min_interval": true,
+        "introduces_proposed_vs_executed_mismatch_under_intervention": true,
+        "layer_need_not_be_differentiable": true
+      }
+    },
+    "limitations": [
+      "R1b: only the single lower corner (prv_lower / prv_lower_pump_lower) has measured near-collapse worst-node pressure; interior points, mixed PRV corners, and joint action x uncertain-demand space are NOT characterised.",
+      "No validated safe/unsafe oracle exists; activation counts are DESCRIPTIVE and are NOT false-positive/false-negative rates or classification accuracy.",
+      "sustained_horizon deltas include tank-trajectory divergence and are NOT a strict single-step look-ahead; only shared_initial_state (report index 0) is a pure command-effect one-step look-ahead.",
+      "H2 alpha grid is coarse (0, 0.25, 0.5, 0.75, 1.0) and is demonstrated only on the reference->severe transition; not an exhaustive alpha search.",
+      "Do NOT claim the 7-D action box is globally or jointly safe (STEP-9 mechanism + STEP-12 test job).",
+      "Leakage emitter instrument is NOT field-calibrated; leak values are internally consistent evidence, not calibrated predictions.",
+      "EVIDENCE ONLY: no mechanism/policy selected, ranked, scored, or recommended; no production wrapper, no reward.py, no PPO training."
+    ]
+  },
+  "wu16_temporal_characterization": {
+    "temporal_candidates": {
+      "TS1": {
+        "safe_condition": "min_[0..H] p_min(t) >= theta_p",
+        "type": "absolute horizon worst-node floor",
+        "provisional_theta_p_psi": [
+          0.0,
+          5.0,
+          10.0,
+          15.0,
+          20.0
+        ],
+        "note": "inherits the chronic-baseline ill-posedness at theta_p above ~4.16 psi"
+      },
+      "TS2": {
+        "safe_condition": "min_[0..H] (p_min_post(t) - p_min_base(t)) >= -eps_p",
+        "type": "relative worst-node degradation vs aligned baseline trajectory",
+        "provisional_eps_p_psi": [
+          0.0,
+          2.0,
+          5.0
+        ]
+      },
+      "TS3": {
+        "safe_condition": "max_[0..H] (D_post(t) - D_base(t)) <= eps_D",
+        "type": "relative aggregate-deficit increase vs aligned baseline trajectory",
+        "provisional_eps_D_psi_nodesum": [
+          0.0,
+          2.0,
+          5.0
+        ]
+      },
+      "TS4": {
+        "safe_condition": "N_neg_post(t) == 0 for all t in [0..H]",
+        "type": "negative-pressure hard backstop over the look-ahead horizon",
+        "note": "only well-posed HARD absolute gate on this chronically sub-20 network"
+      }
+    },
+    "horizons_tested": {
+      "control_steps": [
+        1,
+        2,
+        4,
+        8,
+        192
+      ],
+      "hours": [
+        0.5,
+        1.0,
+        2.0,
+        4.0,
+        96.0
+      ],
+      "note": "1 control step = one 30-min report instant; 'full' = 96 h horizon. Horizons are CHARACTERISED, not selected."
+    },
+    "single_step_vs_trajectory": {
+      "reference_nominal": {
+        "view_A_single_step_decision_instant": {
+          "report_index": 0,
+          "hours": 0.0,
+          "p_min_psi": 5.538022518157959,
+          "D_psi_nodesum": 17.751272201538086,
+          "N_neg": 0,
+          "N_20_descriptive": 2,
+          "DSR": 0.9838075930556937,
+          "Q_unserved_gpm": 26.43409783435709
+        },
+        "view_B_trajectory_over_full_horizon": {
+          "p_min_horizon_psi": 4.16452169418335,
+          "D_max_psi_nodesum": 19.182348251342773,
+          "DSR_min": 0.9818777132257851,
+          "max_N_neg": 0
+        }
+      },
+      "prv_lower_pump_lower": {
+        "view_A_single_step_decision_instant": {
+          "report_index": 0,
+          "hours": 0.0,
+          "p_min_psi": 5.527866840362549,
+          "D_psi_nodesum": 27.494426727294922,
+          "N_neg": 0,
+          "N_20_descriptive": 2,
+          "DSR": 0.9227158066978032,
+          "Q_unserved_gpm": 126.16641453159559
+        },
+        "view_B_trajectory_over_full_horizon": {
+          "p_min_horizon_psi": 1.2946763038635254,
+          "D_max_psi_nodesum": 31.727617263793945,
+          "DSR_min": 0.9141979346467793,
+          "max_N_neg": 0
+        }
+      },
+      "prv_all_lower": {
+        "view_A_single_step_decision_instant": {
+          "report_index": 0,
+          "hours": 0.0,
+          "p_min_psi": 5.538657188415527,
+          "D_psi_nodesum": 27.48363494873047,
+          "N_neg": 0,
+          "N_20_descriptive": 2,
+          "DSR": 0.9227162212741903,
+          "Q_unserved_gpm": 126.16573773581013
+        },
+        "view_B_trajectory_over_full_horizon": {
+          "p_min_horizon_psi": 4.189884185791016,
+          "D_max_psi_nodesum": 28.83759307861328,
+          "DSR_min": 0.9141988299525465,
+          "max_N_neg": 0
+        }
+      }
+    },
+    "trajectory_metrics": {
+      "reference_nominal": {
+        "p_min_horizon_psi": 4.16452169418335,
+        "t_pmin_report_index": 49,
+        "t_pmin_hours": 24.5,
+        "p_min_at_decision_instant_psi": 5.538022518157959,
+        "D_max_psi_nodesum": 19.182348251342773,
+        "D_cum_psi_nodesum_hours": 1750.6167640686035,
+        "D_cum_dt_hours": 0.5,
+        "any_negative": 0,
+        "max_N_neg": 0,
+        "any_sub20_descriptive": 1,
+        "max_N_20": 2,
+        "DSR_min": 0.9818777132257851,
+        "Q_unserved_max_gpm": 47.69468511950345,
+        "Q_leak_min_gpm": 84.32972762925336,
+        "Q_leak_mean_gpm": 84.72988433677985,
+        "Q_leak_max_gpm": 85.09742373105372
+      },
+      "prv_lower_pump_lower": {
+        "p_min_horizon_psi": 1.2946763038635254,
+        "t_pmin_report_index": 192,
+        "t_pmin_hours": 96.0,
+        "p_min_at_decision_instant_psi": 5.527866840362549,
+        "D_max_psi_nodesum": 31.727617263793945,
+        "D_cum_psi_nodesum_hours": 2891.588562965393,
+        "D_cum_dt_hours": 0.5,
+        "any_negative": 0,
+        "max_N_neg": 0,
+        "any_sub20_descriptive": 1,
+        "max_N_20": 2,
+        "DSR_min": 0.9141979346467793,
+        "Q_unserved_max_gpm": 221.79086443890174,
+        "Q_leak_min_gpm": 79.91541642179445,
+        "Q_leak_mean_gpm": 80.61786635451655,
+        "Q_leak_max_gpm": 81.43561491972075
+      },
+      "prv_all_lower": {
+        "p_min_horizon_psi": 4.189884185791016,
+        "t_pmin_report_index": 49,
+        "t_pmin_hours": 24.5,
+        "p_min_at_decision_instant_psi": 5.538657188415527,
+        "D_max_psi_nodesum": 28.83759307861328,
+        "D_cum_psi_nodesum_hours": 2688.5090656280518,
+        "D_cum_dt_hours": 0.5,
+        "any_negative": 0,
+        "max_N_neg": 0,
+        "any_sub20_descriptive": 1,
+        "max_N_20": 2,
+        "DSR_min": 0.9141988299525465,
+        "Q_unserved_max_gpm": 221.78951056609503,
+        "Q_leak_min_gpm": 80.92180509297009,
+        "Q_leak_mean_gpm": 81.38381870141156,
+        "Q_leak_max_gpm": 81.75021261883325
+      }
+    },
+    "temporal_rule_outputs": {
+      "prv_lower_pump_lower_vs_baseline": {
+        "TS1": {
+          "theta_p_psi=0.0": {
+            "H=1": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 5.461512565612793
+            },
+            "H=2": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 5.404520511627197
+            },
+            "H=4": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 5.308281421661377
+            },
+            "H=8": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 5.14722204208374
+            },
+            "full": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 1.2946763038635254
+            }
+          },
+          "theta_p_psi=5.0": {
+            "H=1": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 5.461512565612793
+            },
+            "H=2": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 5.404520511627197
+            },
+            "H=4": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 5.308281421661377
+            },
+            "H=8": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 5.14722204208374
+            },
+            "full": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 1.2946763038635254
+            }
+          },
+          "theta_p_psi=10.0": {
+            "H=1": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.461512565612793
+            },
+            "H=2": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.404520511627197
+            },
+            "H=4": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.308281421661377
+            },
+            "H=8": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.14722204208374
+            },
+            "full": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 1.2946763038635254
+            }
+          },
+          "theta_p_psi=15.0": {
+            "H=1": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.461512565612793
+            },
+            "H=2": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.404520511627197
+            },
+            "H=4": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.308281421661377
+            },
+            "H=8": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.14722204208374
+            },
+            "full": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 1.2946763038635254
+            }
+          },
+          "theta_p_psi=20.0": {
+            "H=1": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.461512565612793
+            },
+            "H=2": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.404520511627197
+            },
+            "H=4": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.308281421661377
+            },
+            "H=8": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.14722204208374
+            },
+            "full": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 1.2946763038635254
+            }
+          }
+        },
+        "TS2": {
+          "eps_p_psi=0.0": {
+            "H=1": {
+              "activates": true,
+              "worst_dp_min_over_window_psi": -0.09676790237426758
+            },
+            "H=2": {
+              "activates": true,
+              "worst_dp_min_over_window_psi": -0.18464946746826172
+            },
+            "H=4": {
+              "activates": true,
+              "worst_dp_min_over_window_psi": -0.45263242721557617
+            },
+            "H=8": {
+              "activates": true,
+              "worst_dp_min_over_window_psi": -0.6577520370483398
+            },
+            "full": {
+              "activates": true,
+              "worst_dp_min_over_window_psi": -4.30070948600769
+            }
+          },
+          "eps_p_psi=2.0": {
+            "H=1": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": -0.09676790237426758
+            },
+            "H=2": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": -0.18464946746826172
+            },
+            "H=4": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": -0.45263242721557617
+            },
+            "H=8": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": -0.6577520370483398
+            },
+            "full": {
+              "activates": true,
+              "worst_dp_min_over_window_psi": -4.30070948600769
+            }
+          },
+          "eps_p_psi=5.0": {
+            "H=1": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": -0.09676790237426758
+            },
+            "H=2": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": -0.18464946746826172
+            },
+            "H=4": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": -0.45263242721557617
+            },
+            "H=8": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": -0.6577520370483398
+            },
+            "full": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": -4.30070948600769
+            }
+          }
+        },
+        "TS3": {
+          "eps_D_psi_nodesum=0.0": {
+            "H=1": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 9.836233139038086
+            },
+            "H=2": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 9.929563522338867
+            },
+            "H=4": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 10.199884414672852
+            },
+            "H=8": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 10.40185546875
+            },
+            "full": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 14.057708740234375
+            }
+          },
+          "eps_D_psi_nodesum=2.0": {
+            "H=1": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 9.836233139038086
+            },
+            "H=2": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 9.929563522338867
+            },
+            "H=4": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 10.199884414672852
+            },
+            "H=8": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 10.40185546875
+            },
+            "full": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 14.057708740234375
+            }
+          },
+          "eps_D_psi_nodesum=5.0": {
+            "H=1": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 9.836233139038086
+            },
+            "H=2": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 9.929563522338867
+            },
+            "H=4": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 10.199884414672852
+            },
+            "H=8": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 10.40185546875
+            },
+            "full": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 14.057708740234375
+            }
+          }
+        },
+        "TS4": {
+          "hard_backstop": {
+            "H=1": {
+              "activates": false,
+              "max_N_neg_over_window": 0
+            },
+            "H=2": {
+              "activates": false,
+              "max_N_neg_over_window": 0
+            },
+            "H=4": {
+              "activates": false,
+              "max_N_neg_over_window": 0
+            },
+            "H=8": {
+              "activates": false,
+              "max_N_neg_over_window": 0
+            },
+            "full": {
+              "activates": false,
+              "max_N_neg_over_window": 0
+            }
+          }
+        }
+      },
+      "prv_all_lower_vs_baseline": {
+        "TS1": {
+          "theta_p_psi=0.0": {
+            "H=1": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 5.538657188415527
+            },
+            "H=2": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 5.538657188415527
+            },
+            "H=4": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 5.538657188415527
+            },
+            "H=8": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 5.538657188415527
+            },
+            "full": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 4.189884185791016
+            }
+          },
+          "theta_p_psi=5.0": {
+            "H=1": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 5.538657188415527
+            },
+            "H=2": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 5.538657188415527
+            },
+            "H=4": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 5.538657188415527
+            },
+            "H=8": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 5.538657188415527
+            },
+            "full": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 4.189884185791016
+            }
+          },
+          "theta_p_psi=10.0": {
+            "H=1": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.538657188415527
+            },
+            "H=2": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.538657188415527
+            },
+            "H=4": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.538657188415527
+            },
+            "H=8": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.538657188415527
+            },
+            "full": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 4.189884185791016
+            }
+          },
+          "theta_p_psi=15.0": {
+            "H=1": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.538657188415527
+            },
+            "H=2": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.538657188415527
+            },
+            "H=4": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.538657188415527
+            },
+            "H=8": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.538657188415527
+            },
+            "full": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 4.189884185791016
+            }
+          },
+          "theta_p_psi=20.0": {
+            "H=1": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.538657188415527
+            },
+            "H=2": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.538657188415527
+            },
+            "H=4": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.538657188415527
+            },
+            "H=8": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.538657188415527
+            },
+            "full": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 4.189884185791016
+            }
+          }
+        },
+        "TS2": {
+          "eps_p_psi=0.0": {
+            "H=1": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": 0.0006346702575683594
+            },
+            "H=2": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": 0.0006346702575683594
+            },
+            "H=4": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": 0.0006346702575683594
+            },
+            "H=8": {
+              "activates": true,
+              "worst_dp_min_over_window_psi": -0.013805389404296875
+            },
+            "full": {
+              "activates": true,
+              "worst_dp_min_over_window_psi": -0.044404029846191406
+            }
+          },
+          "eps_p_psi=2.0": {
+            "H=1": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": 0.0006346702575683594
+            },
+            "H=2": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": 0.0006346702575683594
+            },
+            "H=4": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": 0.0006346702575683594
+            },
+            "H=8": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": -0.013805389404296875
+            },
+            "full": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": -0.044404029846191406
+            }
+          },
+          "eps_p_psi=5.0": {
+            "H=1": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": 0.0006346702575683594
+            },
+            "H=2": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": 0.0006346702575683594
+            },
+            "H=4": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": 0.0006346702575683594
+            },
+            "H=8": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": -0.013805389404296875
+            },
+            "full": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": -0.044404029846191406
+            }
+          }
+        },
+        "TS3": {
+          "eps_D_psi_nodesum=0.0": {
+            "H=1": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 9.732362747192383
+            },
+            "H=2": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 9.732362747192383
+            },
+            "H=4": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 9.732362747192383
+            },
+            "H=8": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 9.765884399414062
+            },
+            "full": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 9.798467636108398
+            }
+          },
+          "eps_D_psi_nodesum=2.0": {
+            "H=1": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 9.732362747192383
+            },
+            "H=2": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 9.732362747192383
+            },
+            "H=4": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 9.732362747192383
+            },
+            "H=8": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 9.765884399414062
+            },
+            "full": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 9.798467636108398
+            }
+          },
+          "eps_D_psi_nodesum=5.0": {
+            "H=1": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 9.732362747192383
+            },
+            "H=2": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 9.732362747192383
+            },
+            "H=4": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 9.732362747192383
+            },
+            "H=8": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 9.765884399414062
+            },
+            "full": {
+              "activates": true,
+              "max_dD_over_window_psi_nodesum": 9.798467636108398
+            }
+          }
+        },
+        "TS4": {
+          "hard_backstop": {
+            "H=1": {
+              "activates": false,
+              "max_N_neg_over_window": 0
+            },
+            "H=2": {
+              "activates": false,
+              "max_N_neg_over_window": 0
+            },
+            "H=4": {
+              "activates": false,
+              "max_N_neg_over_window": 0
+            },
+            "H=8": {
+              "activates": false,
+              "max_N_neg_over_window": 0
+            },
+            "full": {
+              "activates": false,
+              "max_N_neg_over_window": 0
+            }
+          }
+        }
+      },
+      "baseline_identity_hold": {
+        "TS1": {
+          "theta_p_psi=0.0": {
+            "H=1": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 5.538022518157959
+            },
+            "H=2": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 5.538022518157959
+            },
+            "H=4": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 5.538022518157959
+            },
+            "H=8": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 5.538022518157959
+            },
+            "full": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 4.16452169418335
+            }
+          },
+          "theta_p_psi=5.0": {
+            "H=1": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 5.538022518157959
+            },
+            "H=2": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 5.538022518157959
+            },
+            "H=4": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 5.538022518157959
+            },
+            "H=8": {
+              "activates": false,
+              "worst_p_min_over_window_psi": 5.538022518157959
+            },
+            "full": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 4.16452169418335
+            }
+          },
+          "theta_p_psi=10.0": {
+            "H=1": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.538022518157959
+            },
+            "H=2": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.538022518157959
+            },
+            "H=4": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.538022518157959
+            },
+            "H=8": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.538022518157959
+            },
+            "full": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 4.16452169418335
+            }
+          },
+          "theta_p_psi=15.0": {
+            "H=1": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.538022518157959
+            },
+            "H=2": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.538022518157959
+            },
+            "H=4": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.538022518157959
+            },
+            "H=8": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.538022518157959
+            },
+            "full": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 4.16452169418335
+            }
+          },
+          "theta_p_psi=20.0": {
+            "H=1": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.538022518157959
+            },
+            "H=2": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.538022518157959
+            },
+            "H=4": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.538022518157959
+            },
+            "H=8": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 5.538022518157959
+            },
+            "full": {
+              "activates": true,
+              "worst_p_min_over_window_psi": 4.16452169418335
+            }
+          }
+        },
+        "TS2": {
+          "eps_p_psi=0.0": {
+            "H=1": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": 0.0
+            },
+            "H=2": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": 0.0
+            },
+            "H=4": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": 0.0
+            },
+            "H=8": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": 0.0
+            },
+            "full": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": 0.0
+            }
+          },
+          "eps_p_psi=2.0": {
+            "H=1": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": 0.0
+            },
+            "H=2": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": 0.0
+            },
+            "H=4": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": 0.0
+            },
+            "H=8": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": 0.0
+            },
+            "full": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": 0.0
+            }
+          },
+          "eps_p_psi=5.0": {
+            "H=1": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": 0.0
+            },
+            "H=2": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": 0.0
+            },
+            "H=4": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": 0.0
+            },
+            "H=8": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": 0.0
+            },
+            "full": {
+              "activates": false,
+              "worst_dp_min_over_window_psi": 0.0
+            }
+          }
+        },
+        "TS3": {
+          "eps_D_psi_nodesum=0.0": {
+            "H=1": {
+              "activates": false,
+              "max_dD_over_window_psi_nodesum": 0.0
+            },
+            "H=2": {
+              "activates": false,
+              "max_dD_over_window_psi_nodesum": 0.0
+            },
+            "H=4": {
+              "activates": false,
+              "max_dD_over_window_psi_nodesum": 0.0
+            },
+            "H=8": {
+              "activates": false,
+              "max_dD_over_window_psi_nodesum": 0.0
+            },
+            "full": {
+              "activates": false,
+              "max_dD_over_window_psi_nodesum": 0.0
+            }
+          },
+          "eps_D_psi_nodesum=2.0": {
+            "H=1": {
+              "activates": false,
+              "max_dD_over_window_psi_nodesum": 0.0
+            },
+            "H=2": {
+              "activates": false,
+              "max_dD_over_window_psi_nodesum": 0.0
+            },
+            "H=4": {
+              "activates": false,
+              "max_dD_over_window_psi_nodesum": 0.0
+            },
+            "H=8": {
+              "activates": false,
+              "max_dD_over_window_psi_nodesum": 0.0
+            },
+            "full": {
+              "activates": false,
+              "max_dD_over_window_psi_nodesum": 0.0
+            }
+          },
+          "eps_D_psi_nodesum=5.0": {
+            "H=1": {
+              "activates": false,
+              "max_dD_over_window_psi_nodesum": 0.0
+            },
+            "H=2": {
+              "activates": false,
+              "max_dD_over_window_psi_nodesum": 0.0
+            },
+            "H=4": {
+              "activates": false,
+              "max_dD_over_window_psi_nodesum": 0.0
+            },
+            "H=8": {
+              "activates": false,
+              "max_dD_over_window_psi_nodesum": 0.0
+            },
+            "full": {
+              "activates": false,
+              "max_dD_over_window_psi_nodesum": 0.0
+            }
+          }
+        },
+        "TS4": {
+          "hard_backstop": {
+            "H=1": {
+              "activates": false,
+              "max_N_neg_over_window": 0
+            },
+            "H=2": {
+              "activates": false,
+              "max_N_neg_over_window": 0
+            },
+            "H=4": {
+              "activates": false,
+              "max_N_neg_over_window": 0
+            },
+            "H=8": {
+              "activates": false,
+              "max_N_neg_over_window": 0
+            },
+            "full": {
+              "activates": false,
+              "max_N_neg_over_window": 0
+            }
+          }
+        }
+      }
+    },
+    "computational_cost": {
+      "measured_full_96h_run_wall_s": 0.2627559000002293,
+      "measured_report_instants": 193,
+      "est_wall_s_per_control_step_linear": 0.0013685203125011942,
+      "horizon_truncation_extra_solves": 0,
+      "per_horizon_lookahead_cost": {
+        "H=1": {
+          "control_steps_ahead": 1,
+          "hours_ahead": 0.5,
+          "forward_solves_per_decision": 1,
+          "est_wall_s_per_decision_linear": 0.0013685203125011942,
+          "relative_to_single_step": 1.0
+        },
+        "H=2": {
+          "control_steps_ahead": 2,
+          "hours_ahead": 1.0,
+          "forward_solves_per_decision": 2,
+          "est_wall_s_per_decision_linear": 0.0027370406250023884,
+          "relative_to_single_step": 2.0
+        },
+        "H=4": {
+          "control_steps_ahead": 4,
+          "hours_ahead": 2.0,
+          "forward_solves_per_decision": 4,
+          "est_wall_s_per_decision_linear": 0.005474081250004777,
+          "relative_to_single_step": 4.0
+        },
+        "H=8": {
+          "control_steps_ahead": 8,
+          "hours_ahead": 4.0,
+          "forward_solves_per_decision": 8,
+          "est_wall_s_per_decision_linear": 0.010948162500009554,
+          "relative_to_single_step": 8.0
+        },
+        "full": {
+          "control_steps_ahead": 192,
+          "hours_ahead": 96.0,
+          "forward_solves_per_decision": 192,
+          "est_wall_s_per_decision_linear": 0.2627559000002293,
+          "relative_to_single_step": 192.0
+        }
+      },
+      "note": "EPANET is deterministic; a look-ahead adds no stochasticity. Linear per-step split is an approximation, not a per-step benchmark."
+    },
+    "PPO_compatibility": {
+      "per_horizon": {
+        "H=1": {
+          "deterministic": true,
+          "extra_forward_solves_per_decision": 1,
+          "adds_action_latency": false,
+          "interval_30min_compatible": true,
+          "executed_may_differ_from_commanded": true,
+          "env_differentiability_required": false
+        },
+        "H=2": {
+          "deterministic": true,
+          "extra_forward_solves_per_decision": 2,
+          "adds_action_latency": true,
+          "interval_30min_compatible": true,
+          "executed_may_differ_from_commanded": true,
+          "env_differentiability_required": false
+        },
+        "H=4": {
+          "deterministic": true,
+          "extra_forward_solves_per_decision": 4,
+          "adds_action_latency": true,
+          "interval_30min_compatible": true,
+          "executed_may_differ_from_commanded": true,
+          "env_differentiability_required": false
+        },
+        "H=8": {
+          "deterministic": true,
+          "extra_forward_solves_per_decision": 8,
+          "adds_action_latency": true,
+          "interval_30min_compatible": true,
+          "executed_may_differ_from_commanded": true,
+          "env_differentiability_required": false
+        },
+        "full": {
+          "deterministic": true,
+          "extra_forward_solves_per_decision": 192,
+          "adds_action_latency": true,
+          "interval_30min_compatible": true,
+          "executed_may_differ_from_commanded": true,
+          "env_differentiability_required": false
+        }
+      },
+      "note": "PPO is model-free: the env need not be differentiable. A clip/reject guard makes executed != commanded, so the train/execute gap must be observable to the policy. Latency is wall-clock, not learning-theoretic."
+    },
+    "limitations": [
+      "Finite look-ahead is NOT a long-term / infinite-horizon safety guarantee: a horizon of H control steps only certifies behaviour within that window.",
+      "Detection capability != safety guarantee: a trajectory-aware rule may DETECT delayed deterioration without any mechanism yet being selected to ENFORCE a bound.",
+      "Applied-once (single-application then revert) is NOT separately simulated: it would require adding non-native time-based controls to the frozen instrument (changing the native control count). The re-issued/sustained case IS measured; the applied-once case is characterised via the near-term trajectory and the pump realized-speed evolution.",
+      "Coverage: only reference (baseline), the single severe corner (prv_lower_pump_lower), and one intermediate corner (prv_all_lower) are measured over the horizon. Interior points, mixed corners, and the joint (action x uncertain-demand) space are NOT covered.",
+      "No validated safe/unsafe oracle: single-step non-activation vs delayed deterioration is reported descriptively; NO false-positive/false-negative/accuracy is computed.",
+      "Provisional thresholds (theta_p, eps_p, eps_D) are swept to expose behaviour, NOT tuned or selected; horizons {1,2,4,8,full} are characterised, NOT selected.",
+      "Q_leak uses an uncalibrated emitter coefficient (relative use only)."
+    ]
+  },
+  "architectures": [
+    {
+      "schema_note": "Fixed schema per architecture: composition, decision_information, look_ahead_dependence, threshold_dependence, tank_state_dependence, baseline_compatibility, tested_severe_corner_behaviour, delayed_collapse_visibility, compute_cost_per_decision, intervention_type, proposed_vs_executed_mismatch, failure_modes, main_unresolved_issue. Descriptive only; NOT scored or ordered."
+    },
+    {
+      "architecture_id": "A",
+      "name": "Immediate Rule (post-action decision instant only)",
+      "composition": "Evaluate one of S1/S2/S3/S4 at the post-action decision instant (H=0); no forward window.",
+      "decision_information": "post-action state at the decision instant (one look-ahead solve).",
+      "look_ahead_dependence": "none beyond the single post-action instant.",
+      "threshold_dependence": "one of theta_p (S1) / eps_p (S2) / eps_D (S3) / negative-gate (S4).",
+      "tank_state_dependence": "uses the decision-instant tank state only; does not model tank drawdown.",
+      "baseline_compatibility": "S1 flags the chronic baseline at theta_p >= ~4.16 psi (ill-posed at 20 psi); S2/S3 relative rules do not flag the baseline; S4 never fires on the baseline (0 negatives).",
+      "tested_severe_corner_behaviour": "At the severe prv_lower_pump_lower decision instant p_min=5.527866840362549 psi, D=27.494426727294922, N_neg=0, DSR=0.9227158066978032 (WU-16 view A); an immediate absolute rule at theta_p=5 does NOT flag it, an absolute rule at theta_p>=10 does but also flags the baseline.",
+      "delayed_collapse_visibility": "CANNOT see the 96 h collapse to p_min=1.2946763038635254 psi: the decision instant reads 5.53 psi (WU-16 single_step_vs_trajectory).",
+      "compute_cost_per_decision": "1 forward EPANET solve (WU-15 hydraulic_evals_per_proposed_action_look_ahead=1).",
+      "intervention_type": "reject or clip at the decision instant (H1/H2/H3).",
+      "proposed_vs_executed_mismatch": "yes when it intervenes (WU-15 PPO_compatibility).",
+      "failure_modes": [
+        "misses delayed tank-drawdown collapse that only materialises later in the horizon;",
+        "an absolute floor is ill-posed above the baseline worst node (~4.16 psi)."
+      ],
+      "main_unresolved_issue": "blind to delayed deterioration; well-posed absolute floor sits below the useful range."
+    },
+    {
+      "architecture_id": "B",
+      "name": "Rolling Short-Horizon Look-Ahead (absolute floor over t+1..t+H)",
+      "composition": "Evaluate TS1 (absolute worst-node floor) over a finite forward window of H control steps.",
+      "decision_information": "worst-node pressure at each of H forward instants (H look-ahead solves).",
+      "look_ahead_dependence": "finite H; behaviour depends strongly on H (see horizon_analysis).",
+      "threshold_dependence": "theta_p (absolute).",
+      "tank_state_dependence": "captures tank drawdown only within the H-step window.",
+      "baseline_compatibility": "inherits S1 ill-posedness: theta_p >= ~4.16 psi flags the chronic baseline.",
+      "tested_severe_corner_behaviour": "TS1 theta_p=5 worst-over-window is 5.4615/5.4045/5.3083/5.1472 psi at H=1/2/4/8 (does NOT activate) and 1.2947 psi at full (activates) - WU-16 temporal_rule_outputs.",
+      "delayed_collapse_visibility": "sees the collapse only if H reaches the (untested) onset between H=8 (4 h) and full (96 h).",
+      "compute_cost_per_decision": "H forward solves (linear; full=192x single-step, WU-16 per_horizon_lookahead_cost).",
+      "intervention_type": "reject or clip when the window floor is breached.",
+      "proposed_vs_executed_mismatch": "yes when it intervenes.",
+      "failure_modes": [
+        "short H misses the delayed collapse; long H is costly and still absolute-threshold ill-posed;",
+        "the H at which the severe corner is caught under a well-posed theta_p is UNTESTED."
+      ],
+      "main_unresolved_issue": "horizon length vs cost vs absolute-threshold well-posedness are coupled and unresolved."
+    },
+    {
+      "architecture_id": "C",
+      "name": "Look-Ahead + State-Degradation (finite window + relative rule)",
+      "composition": "Evaluate TS2 (worst-node degradation) and/or TS3 (aggregate-deficit increase) over H steps vs the aligned baseline trajectory.",
+      "decision_information": "post-action AND aligned-baseline worst-node/deficit over H forward instants.",
+      "look_ahead_dependence": "finite H; the relative rule reacts even at H=1 on the tested corner.",
+      "threshold_dependence": "eps_p (TS2) and/or eps_D (TS3), relative.",
+      "tank_state_dependence": "compares post-action vs baseline tank trajectories over the window.",
+      "baseline_compatibility": "well-posed: relative rules do not flag the chronic baseline (identity hold -> no activation at eps=0).",
+      "tested_severe_corner_behaviour": "TS2 eps_p=0 activates at H=1 (worst dp_min ~ -0.0968 psi) through full (~ -4.3007 psi) - reacts at short horizon (WU-16); S3 aggregate can mask localised collapse (WU-14 note; deficit<->leak corr -0.7735).",
+      "delayed_collapse_visibility": "detects worsening-vs-baseline early, but a RELATIVE rule gives no ABSOLUTE min-pressure guarantee.",
+      "compute_cost_per_decision": "H forward solves for the action + aligned baseline trajectory (WU-16).",
+      "intervention_type": "reject or clip on relative degradation beyond tolerance.",
+      "proposed_vs_executed_mismatch": "yes when it intervenes.",
+      "failure_modes": [
+        "relative rule cannot enforce an absolute floor;",
+        "aggregate deficit (S3/TS3) can mask a localised worst-node collapse."
+      ],
+      "main_unresolved_issue": "provides no absolute guarantee; tolerance eps and horizon H are unset."
+    },
+    {
+      "architecture_id": "D",
+      "name": "Backstop + Temporal (negative-pressure gate LAYERED with temporal/degradation check)",
+      "composition": "Layer S4/TS4 immediate negative-pressure hard backstop WITH a temporal TS1/TS2/TS3 check over H.",
+      "decision_information": "post negative-node count (immediate) PLUS windowed worst-node/deficit over H.",
+      "look_ahead_dependence": "backstop is immediate (H=0); the temporal layer adds finite H.",
+      "threshold_dependence": "negative gate (fixed, evidence-supported) PLUS theta_p/eps_p/eps_D for the temporal layer.",
+      "tank_state_dependence": "temporal layer captures drawdown within H; backstop is instantaneous.",
+      "baseline_compatibility": "S4 backstop never fires on the baseline (0 negatives); temporal relative layer also baseline-safe.",
+      "tested_severe_corner_behaviour": "TS4 negative backstop NEVER activates on any tested corner (max_N_neg=0 including the 1.2947 psi collapse); the temporal layer supplies the non-negative protection.",
+      "delayed_collapse_visibility": "the temporal layer inherits its window's visibility; the backstop only catches sub-zero.",
+      "compute_cost_per_decision": "1 solve for the backstop PLUS H solves for the temporal layer.",
+      "intervention_type": "hard reject on negative pressure; reject/clip on temporal-layer breach.",
+      "proposed_vs_executed_mismatch": "yes when either layer intervenes.",
+      "failure_modes": [
+        "the negative backstop alone gives NO 20-psi protection (never fires above 0 psi);",
+        "overall protection depends entirely on the temporal layer's metric/threshold/horizon choices."
+      ],
+      "main_unresolved_issue": "the backstop is well-posed but inert in-range; the layered temporal rule still needs A/B/C/D decisions."
+    }
+  ],
+  "horizon_analysis": {
+    "tested_command": "prv_lower_pump_lower (severe lower-corner; R1b single characterised corner)",
+    "decision_instant_state": {
+      "report_index": 0,
+      "hours": 0.0,
+      "p_min_psi": 5.527866840362549,
+      "D_psi_nodesum": 27.494426727294922,
+      "N_neg": 0,
+      "N_20_descriptive": 2,
+      "DSR": 0.9227158066978032,
+      "Q_unserved_gpm": 126.16641453159559
+    },
+    "full_horizon_state": {
+      "p_min_horizon_psi": 1.2946763038635254,
+      "D_max_psi_nodesum": 31.727617263793945,
+      "DSR_min": 0.9141979346467793,
+      "max_N_neg": 0
+    },
+    "absolute_floor_TS1_theta_p_5psi_worst_over_window": {
+      "H=1": {
+        "activates": false,
+        "worst_p_min_over_window_psi": 5.461512565612793
+      },
+      "H=2": {
+        "activates": false,
+        "worst_p_min_over_window_psi": 5.404520511627197
+      },
+      "H=4": {
+        "activates": false,
+        "worst_p_min_over_window_psi": 5.308281421661377
+      },
+      "H=8": {
+        "activates": false,
+        "worst_p_min_over_window_psi": 5.14722204208374
+      },
+      "full": {
+        "activates": true,
+        "worst_p_min_over_window_psi": 1.2946763038635254
+      }
+    },
+    "relative_degradation_TS2_eps_p_0_over_window": {
+      "H=1": {
+        "activates": true,
+        "worst_dp_min_over_window_psi": -0.09676790237426758
+      },
+      "H=2": {
+        "activates": true,
+        "worst_dp_min_over_window_psi": -0.18464946746826172
+      },
+      "H=4": {
+        "activates": true,
+        "worst_dp_min_over_window_psi": -0.45263242721557617
+      },
+      "H=8": {
+        "activates": true,
+        "worst_dp_min_over_window_psi": -0.6577520370483398
+      },
+      "full": {
+        "activates": true,
+        "worst_dp_min_over_window_psi": -4.30070948600769
+      }
+    },
+    "observed_pattern": "The severe corner reads 5.527866840362549 psi worst-node at the decision instant and 5.461512565612793 / 5.404520511627197 / 5.308281421661377 / 5.147222042083740 psi over H=1/2/4/8 (0.5-4 h), then collapses to 1.2946763038635254 psi at report index 192 (96 h) as the tanks drain. An absolute floor TS1 at theta_p=5 therefore does NOT activate for any tested finite H<=8 but DOES activate over the full horizon; a relative-degradation rule TS2 at eps_p=0 activates from H=1 onward.",
+    "crossover_interval_untested": {
+      "statement": "Under a well-posed absolute floor, the horizon at which the severe collapse is first caught lies strictly between H=8 (4 h) and full (96 h). The exact onset index is NOT persisted as a per-index p_min series in the STEP-9 artefacts, so intermediate horizons (e.g. 16/24/48/96 control steps) are UNTESTED.",
+      "conditional_open_item": "Testing intermediate horizons is required ONLY IF the researcher selects an absolute-threshold look-ahead architecture (B) AND wants the smallest sufficient H. A relative-degradation architecture (C) already reacts at H=1 on this corner and needs no such test. This is a conditional design question, NOT a pending experiment mandated by this brief."
+    },
+    "cost_coupling": "Look-ahead cost is linear in H (H forward solves per decision; full = 192x the single-step cost, WU-16 per_horizon_lookahead_cost). Longer horizons buy delayed-collapse visibility at proportional per-decision cost.",
+    "interdependency": "Metric choice, threshold well-posedness, and required horizon are COUPLED: an absolute floor needs a long horizon to catch this corner but is ill-posed above ~4.16 psi; a relative rule reacts at short horizon but gives no absolute guarantee."
+  },
+  "handling_policies": {
+    "H1_reject_to_previous": {
+      "definition": "On an inadmissible action, execute the previous action a_prev instead.",
+      "continuity": "discontinuous (hard switch); introduces proposed != executed.",
+      "extra_hydraulic_evals": 0
+    },
+    "H2_clip_toward_previous": {
+      "definition": "Interpolate a_exec = a_prev + alpha*(a_prop - a_prev) toward previous by an admissible alpha.",
+      "alpha_grid_provisional": [
+        0.0,
+        0.25,
+        0.5,
+        0.75,
+        1.0
+      ],
+      "continuity": "continuous under clip (preserves a continuous action image).",
+      "extra_hydraulic_evals": "one solve per inspected alpha (WU-15 h2_alpha_grid_evals_per_transition=5)."
+    },
+    "H3_fallback_reference_action": {
+      "definition": "On an inadmissible action, execute a documented fallback (reference_nominal native PRV/pump setpoints).",
+      "continuity": "discontinuous; introduces proposed != executed.",
+      "extra_hydraulic_evals": 0
+    },
+    "measured_outputs_wu15": {
+      "reference_to_severe": {
+        "H1": {
+          "proposed_action": [
+            -1.0,
+            -1.0,
+            -1.0,
+            -1.0,
+            -1.0,
+            -1.0,
+            -1.0
+          ],
+          "executed_action": [
+            -0.31868131868131866,
+            -0.24293785310734461,
+            -0.5060216577269507,
+            -0.2857142857142857,
+            -0.37037037037037035,
+            0.28571428571428537,
+            0.3939393939393936
+          ],
+          "action_deviation_L2": 2.4050194704019527,
+          "action_deviation_L2sq": 5.78411865301249,
+          "I_modified": true,
+          "I_reject": true,
+          "post_intervention_shared_initial": {
+            "p_min": 5.538022518157959,
+            "D": 17.751272201538086,
+            "N_neg": 0.0,
+            "N_20": 2.0,
+            "DSR": 0.9838075930556937,
+            "Q_unserved": 26.43409783435709,
+            "Q_leak": 84.93913806623227
+          },
+          "executed_action_source": "previous_action_a_prev",
+          "n_extra_hydraulic_evals": 0
+        },
+        "H2": {
+          "policy": "clip_toward_previous",
+          "per_rule_admissible_alpha": {
+            "S1": {
+              "theta_p_psi=0": {
+                "proposed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "executed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "action_deviation_L2": 0.0,
+                "action_deviation_L2sq": 0.0,
+                "I_modified": false,
+                "I_reject": false,
+                "post_intervention_shared_initial": {
+                  "p_min": 5.527866840362549,
+                  "D": 27.494426727294922,
+                  "N_neg": 0.0,
+                  "N_20": 2.0,
+                  "DSR": 0.9227158066978032,
+                  "Q_unserved": 126.16641453159559,
+                  "Q_leak": 81.43561491972075
+                },
+                "executed_alpha": 1.0,
+                "n_extra_hydraulic_evals": 5
+              },
+              "theta_p_psi=5": {
+                "proposed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "executed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "action_deviation_L2": 0.0,
+                "action_deviation_L2sq": 0.0,
+                "I_modified": false,
+                "I_reject": false,
+                "post_intervention_shared_initial": {
+                  "p_min": 5.527866840362549,
+                  "D": 27.494426727294922,
+                  "N_neg": 0.0,
+                  "N_20": 2.0,
+                  "DSR": 0.9227158066978032,
+                  "Q_unserved": 126.16641453159559,
+                  "Q_leak": 81.43561491972075
+                },
+                "executed_alpha": 1.0,
+                "n_extra_hydraulic_evals": 5
+              },
+              "theta_p_psi=10": {
+                "proposed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "executed_action": [
+                  -0.31868131868131866,
+                  -0.24293785310734461,
+                  -0.5060216577269507,
+                  -0.2857142857142857,
+                  -0.37037037037037035,
+                  0.28571428571428537,
+                  0.3939393939393936
+                ],
+                "action_deviation_L2": 2.4050194704019527,
+                "action_deviation_L2sq": 5.78411865301249,
+                "I_modified": true,
+                "I_reject": true,
+                "post_intervention_shared_initial": {
+                  "p_min": 5.538022518157959,
+                  "D": 17.751272201538086,
+                  "N_neg": 0.0,
+                  "N_20": 2.0,
+                  "DSR": 0.9838075930556937,
+                  "Q_unserved": 26.43409783435709,
+                  "Q_leak": 84.93913806623227
+                },
+                "executed_alpha": 0.0,
+                "n_extra_hydraulic_evals": 5
+              },
+              "theta_p_psi=15": {
+                "proposed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "executed_action": [
+                  -0.31868131868131866,
+                  -0.24293785310734461,
+                  -0.5060216577269507,
+                  -0.2857142857142857,
+                  -0.37037037037037035,
+                  0.28571428571428537,
+                  0.3939393939393936
+                ],
+                "action_deviation_L2": 2.4050194704019527,
+                "action_deviation_L2sq": 5.78411865301249,
+                "I_modified": true,
+                "I_reject": true,
+                "post_intervention_shared_initial": {
+                  "p_min": 5.538022518157959,
+                  "D": 17.751272201538086,
+                  "N_neg": 0.0,
+                  "N_20": 2.0,
+                  "DSR": 0.9838075930556937,
+                  "Q_unserved": 26.43409783435709,
+                  "Q_leak": 84.93913806623227
+                },
+                "executed_alpha": 0.0,
+                "n_extra_hydraulic_evals": 5
+              },
+              "theta_p_psi=20": {
+                "proposed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "executed_action": [
+                  -0.31868131868131866,
+                  -0.24293785310734461,
+                  -0.5060216577269507,
+                  -0.2857142857142857,
+                  -0.37037037037037035,
+                  0.28571428571428537,
+                  0.3939393939393936
+                ],
+                "action_deviation_L2": 2.4050194704019527,
+                "action_deviation_L2sq": 5.78411865301249,
+                "I_modified": true,
+                "I_reject": true,
+                "post_intervention_shared_initial": {
+                  "p_min": 5.538022518157959,
+                  "D": 17.751272201538086,
+                  "N_neg": 0.0,
+                  "N_20": 2.0,
+                  "DSR": 0.9838075930556937,
+                  "Q_unserved": 26.43409783435709,
+                  "Q_leak": 84.93913806623227
+                },
+                "executed_alpha": 0.0,
+                "n_extra_hydraulic_evals": 5
+              }
+            },
+            "S2": {
+              "eps_p_psi=0": {
+                "proposed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "executed_action": [
+                  -0.31868131868131866,
+                  -0.24293785310734461,
+                  -0.5060216577269507,
+                  -0.2857142857142857,
+                  -0.37037037037037035,
+                  0.28571428571428537,
+                  0.3939393939393936
+                ],
+                "action_deviation_L2": 2.4050194704019527,
+                "action_deviation_L2sq": 5.78411865301249,
+                "I_modified": true,
+                "I_reject": true,
+                "post_intervention_shared_initial": {
+                  "p_min": 5.538022518157959,
+                  "D": 17.751272201538086,
+                  "N_neg": 0.0,
+                  "N_20": 2.0,
+                  "DSR": 0.9838075930556937,
+                  "Q_unserved": 26.43409783435709,
+                  "Q_leak": 84.93913806623227
+                },
+                "executed_alpha": 0.0,
+                "n_extra_hydraulic_evals": 5
+              },
+              "eps_p_psi=2": {
+                "proposed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "executed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "action_deviation_L2": 0.0,
+                "action_deviation_L2sq": 0.0,
+                "I_modified": false,
+                "I_reject": false,
+                "post_intervention_shared_initial": {
+                  "p_min": 5.527866840362549,
+                  "D": 27.494426727294922,
+                  "N_neg": 0.0,
+                  "N_20": 2.0,
+                  "DSR": 0.9227158066978032,
+                  "Q_unserved": 126.16641453159559,
+                  "Q_leak": 81.43561491972075
+                },
+                "executed_alpha": 1.0,
+                "n_extra_hydraulic_evals": 5
+              },
+              "eps_p_psi=5": {
+                "proposed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "executed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "action_deviation_L2": 0.0,
+                "action_deviation_L2sq": 0.0,
+                "I_modified": false,
+                "I_reject": false,
+                "post_intervention_shared_initial": {
+                  "p_min": 5.527866840362549,
+                  "D": 27.494426727294922,
+                  "N_neg": 0.0,
+                  "N_20": 2.0,
+                  "DSR": 0.9227158066978032,
+                  "Q_unserved": 126.16641453159559,
+                  "Q_leak": 81.43561491972075
+                },
+                "executed_alpha": 1.0,
+                "n_extra_hydraulic_evals": 5
+              }
+            },
+            "S3": {
+              "eps_D_psi_nodesum=0": {
+                "proposed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "executed_action": [
+                  -0.31868131868131866,
+                  -0.24293785310734461,
+                  -0.5060216577269507,
+                  -0.2857142857142857,
+                  -0.37037037037037035,
+                  0.28571428571428537,
+                  0.3939393939393936
+                ],
+                "action_deviation_L2": 2.4050194704019527,
+                "action_deviation_L2sq": 5.78411865301249,
+                "I_modified": true,
+                "I_reject": true,
+                "post_intervention_shared_initial": {
+                  "p_min": 5.538022518157959,
+                  "D": 17.751272201538086,
+                  "N_neg": 0.0,
+                  "N_20": 2.0,
+                  "DSR": 0.9838075930556937,
+                  "Q_unserved": 26.43409783435709,
+                  "Q_leak": 84.93913806623227
+                },
+                "executed_alpha": 0.0,
+                "n_extra_hydraulic_evals": 5
+              },
+              "eps_D_psi_nodesum=2": {
+                "proposed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "executed_action": [
+                  -0.31868131868131866,
+                  -0.24293785310734461,
+                  -0.5060216577269507,
+                  -0.2857142857142857,
+                  -0.37037037037037035,
+                  0.28571428571428537,
+                  0.3939393939393936
+                ],
+                "action_deviation_L2": 2.4050194704019527,
+                "action_deviation_L2sq": 5.78411865301249,
+                "I_modified": true,
+                "I_reject": true,
+                "post_intervention_shared_initial": {
+                  "p_min": 5.538022518157959,
+                  "D": 17.751272201538086,
+                  "N_neg": 0.0,
+                  "N_20": 2.0,
+                  "DSR": 0.9838075930556937,
+                  "Q_unserved": 26.43409783435709,
+                  "Q_leak": 84.93913806623227
+                },
+                "executed_alpha": 0.0,
+                "n_extra_hydraulic_evals": 5
+              },
+              "eps_D_psi_nodesum=5": {
+                "proposed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "executed_action": [
+                  -0.6593406593406593,
+                  -0.6214689265536724,
+                  -0.7530108288634754,
+                  -0.6428571428571428,
+                  -0.6851851851851851,
+                  -0.35714285714285765,
+                  -0.3030303030303032
+                ],
+                "action_deviation_L2": 1.2025097352009761,
+                "action_deviation_L2sq": 1.446029663253122,
+                "I_modified": true,
+                "I_reject": false,
+                "post_intervention_shared_initial": {
+                  "p_min": 5.536779403686523,
+                  "D": 22.619232177734375,
+                  "N_neg": 0.0,
+                  "N_20": 2.0,
+                  "DSR": 0.9565055106594446,
+                  "Q_unserved": 71.0047363828096,
+                  "Q_leak": 83.2926135287473
+                },
+                "executed_alpha": 0.5,
+                "n_extra_hydraulic_evals": 5
+              }
+            },
+            "S4": {
+              "hard_backstop": {
+                "proposed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "executed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "action_deviation_L2": 0.0,
+                "action_deviation_L2sq": 0.0,
+                "I_modified": false,
+                "I_reject": false,
+                "post_intervention_shared_initial": {
+                  "p_min": 5.527866840362549,
+                  "D": 27.494426727294922,
+                  "N_neg": 0.0,
+                  "N_20": 2.0,
+                  "DSR": 0.9227158066978032,
+                  "Q_unserved": 126.16641453159559,
+                  "Q_leak": 81.43561491972075
+                },
+                "executed_alpha": 1.0,
+                "n_extra_hydraulic_evals": 5
+              }
+            }
+          }
+        },
+        "H3": {
+          "proposed_action": [
+            -1.0,
+            -1.0,
+            -1.0,
+            -1.0,
+            -1.0,
+            -1.0,
+            -1.0
+          ],
+          "executed_action": [
+            -0.31868131868131866,
+            -0.24293785310734461,
+            -0.5060216577269507,
+            -0.2857142857142857,
+            -0.37037037037037035,
+            0.28571428571428537,
+            0.3939393939393936
+          ],
+          "action_deviation_L2": 2.4050194704019527,
+          "action_deviation_L2sq": 5.78411865301249,
+          "I_modified": true,
+          "I_reject": true,
+          "post_intervention_shared_initial": {
+            "p_min": 5.538022518157959,
+            "D": 17.751272201538086,
+            "N_neg": 0.0,
+            "N_20": 2.0,
+            "DSR": 0.9838075930556937,
+            "Q_unserved": 26.43409783435709,
+            "Q_leak": 84.93913806623227
+          },
+          "executed_action_source": "documented_fallback",
+          "fallback_definition": "reference_nominal native PRV/pump setpoints",
+          "n_extra_hydraulic_evals": 0
+        }
+      },
+      "high_pressure_to_severe": {
+        "H1": {
+          "proposed_action": [
+            -1.0,
+            -1.0,
+            -1.0,
+            -1.0,
+            -1.0,
+            -1.0,
+            -1.0
+          ],
+          "executed_action": [
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            1.0,
+            0.28571428571428537,
+            0.3939393939393936
+          ],
+          "action_deviation_L2": 4.857584611560145,
+          "action_deviation_L2sq": 23.59612825846592,
+          "I_modified": true,
+          "I_reject": true,
+          "post_intervention_shared_initial": {
+            "p_min": 5.537863731384277,
+            "D": 14.462136268615723,
+            "N_neg": 0.0,
+            "N_20": 1.0,
+            "DSR": 1.0000436393510699,
+            "Q_unserved": 0.0,
+            "Q_leak": 89.97090838377747
+          },
+          "executed_action_source": "previous_action_a_prev",
+          "n_extra_hydraulic_evals": 0
+        },
+        "H2": {
+          "policy": "clip_toward_previous",
+          "per_rule_admissible_alpha": {
+            "S1": {
+              "theta_p_psi=0": {
+                "proposed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "executed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "action_deviation_L2": 0.0,
+                "action_deviation_L2sq": 0.0,
+                "I_modified": false,
+                "I_reject": false,
+                "post_intervention_shared_initial": {
+                  "p_min": 5.527866840362549,
+                  "D": 27.494426727294922,
+                  "N_neg": 0.0,
+                  "N_20": 2.0,
+                  "DSR": 0.9227158066978032,
+                  "Q_unserved": 126.16641453159559,
+                  "Q_leak": 81.43561491972075
+                },
+                "executed_alpha": 1.0,
+                "n_extra_hydraulic_evals": 5
+              },
+              "theta_p_psi=5": {
+                "proposed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "executed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "action_deviation_L2": 0.0,
+                "action_deviation_L2sq": 0.0,
+                "I_modified": false,
+                "I_reject": false,
+                "post_intervention_shared_initial": {
+                  "p_min": 5.527866840362549,
+                  "D": 27.494426727294922,
+                  "N_neg": 0.0,
+                  "N_20": 2.0,
+                  "DSR": 0.9227158066978032,
+                  "Q_unserved": 126.16641453159559,
+                  "Q_leak": 81.43561491972075
+                },
+                "executed_alpha": 1.0,
+                "n_extra_hydraulic_evals": 5
+              },
+              "theta_p_psi=10": {
+                "proposed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "executed_action": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0,
+                  0.28571428571428537,
+                  0.3939393939393936
+                ],
+                "action_deviation_L2": 4.857584611560145,
+                "action_deviation_L2sq": 23.59612825846592,
+                "I_modified": true,
+                "I_reject": true,
+                "post_intervention_shared_initial": {
+                  "p_min": 5.537863731384277,
+                  "D": 14.462136268615723,
+                  "N_neg": 0.0,
+                  "N_20": 1.0,
+                  "DSR": 1.0000436393510699,
+                  "Q_unserved": 0.0,
+                  "Q_leak": 89.97090838377747
+                },
+                "executed_alpha": 0.0,
+                "n_extra_hydraulic_evals": 5
+              },
+              "theta_p_psi=15": {
+                "proposed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "executed_action": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0,
+                  0.28571428571428537,
+                  0.3939393939393936
+                ],
+                "action_deviation_L2": 4.857584611560145,
+                "action_deviation_L2sq": 23.59612825846592,
+                "I_modified": true,
+                "I_reject": true,
+                "post_intervention_shared_initial": {
+                  "p_min": 5.537863731384277,
+                  "D": 14.462136268615723,
+                  "N_neg": 0.0,
+                  "N_20": 1.0,
+                  "DSR": 1.0000436393510699,
+                  "Q_unserved": 0.0,
+                  "Q_leak": 89.97090838377747
+                },
+                "executed_alpha": 0.0,
+                "n_extra_hydraulic_evals": 5
+              },
+              "theta_p_psi=20": {
+                "proposed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "executed_action": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0,
+                  0.28571428571428537,
+                  0.3939393939393936
+                ],
+                "action_deviation_L2": 4.857584611560145,
+                "action_deviation_L2sq": 23.59612825846592,
+                "I_modified": true,
+                "I_reject": true,
+                "post_intervention_shared_initial": {
+                  "p_min": 5.537863731384277,
+                  "D": 14.462136268615723,
+                  "N_neg": 0.0,
+                  "N_20": 1.0,
+                  "DSR": 1.0000436393510699,
+                  "Q_unserved": 0.0,
+                  "Q_leak": 89.97090838377747
+                },
+                "executed_alpha": 0.0,
+                "n_extra_hydraulic_evals": 5
+              }
+            },
+            "S2": {
+              "eps_p_psi=0": {
+                "proposed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "executed_action": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0,
+                  0.28571428571428537,
+                  0.3939393939393936
+                ],
+                "action_deviation_L2": 4.857584611560145,
+                "action_deviation_L2sq": 23.59612825846592,
+                "I_modified": true,
+                "I_reject": true,
+                "post_intervention_shared_initial": {
+                  "p_min": 5.537863731384277,
+                  "D": 14.462136268615723,
+                  "N_neg": 0.0,
+                  "N_20": 1.0,
+                  "DSR": 1.0000436393510699,
+                  "Q_unserved": 0.0,
+                  "Q_leak": 89.97090838377747
+                },
+                "executed_alpha": 0.0,
+                "n_extra_hydraulic_evals": 5
+              },
+              "eps_p_psi=2": {
+                "proposed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "executed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "action_deviation_L2": 0.0,
+                "action_deviation_L2sq": 0.0,
+                "I_modified": false,
+                "I_reject": false,
+                "post_intervention_shared_initial": {
+                  "p_min": 5.527866840362549,
+                  "D": 27.494426727294922,
+                  "N_neg": 0.0,
+                  "N_20": 2.0,
+                  "DSR": 0.9227158066978032,
+                  "Q_unserved": 126.16641453159559,
+                  "Q_leak": 81.43561491972075
+                },
+                "executed_alpha": 1.0,
+                "n_extra_hydraulic_evals": 5
+              },
+              "eps_p_psi=5": {
+                "proposed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "executed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "action_deviation_L2": 0.0,
+                "action_deviation_L2sq": 0.0,
+                "I_modified": false,
+                "I_reject": false,
+                "post_intervention_shared_initial": {
+                  "p_min": 5.527866840362549,
+                  "D": 27.494426727294922,
+                  "N_neg": 0.0,
+                  "N_20": 2.0,
+                  "DSR": 0.9227158066978032,
+                  "Q_unserved": 126.16641453159559,
+                  "Q_leak": 81.43561491972075
+                },
+                "executed_alpha": 1.0,
+                "n_extra_hydraulic_evals": 5
+              }
+            },
+            "S3": {
+              "eps_D_psi_nodesum=0": {
+                "proposed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "executed_action": [
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0,
+                  1.0,
+                  0.28571428571428537,
+                  0.3939393939393936
+                ],
+                "action_deviation_L2": 4.857584611560145,
+                "action_deviation_L2sq": 23.59612825846592,
+                "I_modified": true,
+                "I_reject": true,
+                "post_intervention_shared_initial": {
+                  "p_min": 5.537863731384277,
+                  "D": 14.462136268615723,
+                  "N_neg": 0.0,
+                  "N_20": 1.0,
+                  "DSR": 1.0000436393510699,
+                  "Q_unserved": 0.0,
+                  "Q_leak": 89.97090838377747
+                },
+                "executed_alpha": 0.0,
+                "n_extra_hydraulic_evals": 5
+              },
+              "eps_D_psi_nodesum=2": {
+                "proposed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "executed_action": [
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  0.0,
+                  -0.35714285714285765,
+                  -0.3030303030303032
+                ],
+                "action_deviation_L2": 2.428792305780072,
+                "action_deviation_L2sq": 5.899032064616479,
+                "I_modified": true,
+                "I_reject": false,
+                "post_intervention_shared_initial": {
+                  "p_min": 5.536462306976318,
+                  "D": 14.463537216186523,
+                  "N_neg": 0.0,
+                  "N_20": 1.0,
+                  "DSR": 1.0000383215603872,
+                  "Q_unserved": 0.0,
+                  "Q_leak": 86.2349607686814
+                },
+                "executed_alpha": 0.5,
+                "n_extra_hydraulic_evals": 5
+              },
+              "eps_D_psi_nodesum=5": {
+                "proposed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "executed_action": [
+                  -0.5,
+                  -0.5,
+                  -0.5,
+                  -0.5,
+                  -0.5,
+                  -0.6785714285714284,
+                  -0.6515151515151516
+                ],
+                "action_deviation_L2": 1.2143961528900362,
+                "action_deviation_L2sq": 1.47475801615412,
+                "I_modified": true,
+                "I_reject": false,
+                "post_intervention_shared_initial": {
+                  "p_min": 5.5341877937316895,
+                  "D": 17.636442184448242,
+                  "N_neg": 0.0,
+                  "N_20": 2.0,
+                  "DSR": 0.9844179669895254,
+                  "Q_unserved": 25.437662632478578,
+                  "Q_leak": 84.04426536435383
+                },
+                "executed_alpha": 0.75,
+                "n_extra_hydraulic_evals": 5
+              }
+            },
+            "S4": {
+              "hard_backstop": {
+                "proposed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "executed_action": [
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0,
+                  -1.0
+                ],
+                "action_deviation_L2": 0.0,
+                "action_deviation_L2sq": 0.0,
+                "I_modified": false,
+                "I_reject": false,
+                "post_intervention_shared_initial": {
+                  "p_min": 5.527866840362549,
+                  "D": 27.494426727294922,
+                  "N_neg": 0.0,
+                  "N_20": 2.0,
+                  "DSR": 0.9227158066978032,
+                  "Q_unserved": 126.16641453159559,
+                  "Q_leak": 81.43561491972075
+                },
+                "executed_alpha": 1.0,
+                "n_extra_hydraulic_evals": 5
+              }
+            }
+          }
+        },
+        "H3": {
+          "proposed_action": [
+            -1.0,
+            -1.0,
+            -1.0,
+            -1.0,
+            -1.0,
+            -1.0,
+            -1.0
+          ],
+          "executed_action": [
+            -0.31868131868131866,
+            -0.24293785310734461,
+            -0.5060216577269507,
+            -0.2857142857142857,
+            -0.37037037037037035,
+            0.28571428571428537,
+            0.3939393939393936
+          ],
+          "action_deviation_L2": 2.4050194704019527,
+          "action_deviation_L2sq": 5.78411865301249,
+          "I_modified": true,
+          "I_reject": true,
+          "post_intervention_shared_initial": {
+            "p_min": 5.538022518157959,
+            "D": 17.751272201538086,
+            "N_neg": 0.0,
+            "N_20": 2.0,
+            "DSR": 0.9838075930556937,
+            "Q_unserved": 26.43409783435709,
+            "Q_leak": 84.93913806623227
+          },
+          "executed_action_source": "documented_fallback",
+          "fallback_definition": "reference_nominal native PRV/pump setpoints",
+          "n_extra_hydraulic_evals": 0
+        }
+      }
+    },
+    "note": "Handling outputs are copied verbatim from WU-15. On the reference->severe transition H1/H3 reject the full-lower proposal (action_deviation_L2=2.4050194704019527) to a_prev/fallback; H2 admissible alpha is per-rule. No policy is selected."
+  },
+  "baseline_compatibility": {
+    "governing_conclusion": "No formulation can use a HARD 20-psi constraint without penalising the native baseline itself. Dense deficit / worst-node min-pressure / baseline-relative service signals are the defensible safety channels; any hard gate must key on NEGATIVE pressure (or on a threshold strictly below the baseline worst-node ~4.16 psi), and the enforced 20-psi guarantee belongs to the STEP-9 execution-level clamp, not to a reward-level hard term.",
+    "per_candidate_baseline_flag": {
+      "S1": "FLAGS the native baseline at every timestep when T_abs=20 psi (baseline worst node ~4.16 psi); compatible only when T_abs < baseline worst-node.",
+      "S2": "Does NOT flag the baseline (relative to the current state).",
+      "S3": "Does NOT flag the baseline (relative aggregate deficit).",
+      "S4": "Never fires on the baseline (0 negative-pressure node-timesteps)."
+    },
+    "naive_absolute_20psi_reject_is_ill_posed": true,
+    "identity_hold_evidence": "WU-16 baseline_identity_hold reproduces the chronic ill-posedness: TS1 at theta_p=20 activates on the unchanged baseline, TS2 at eps_p=0 never activates. A hard absolute 20-psi gate penalises the native controller itself."
+  },
+  "delayed_collapse_analysis": {
+    "finding": "On the tested severe corner the worst-node pressure is 5.527866840362549 psi at the decision instant but collapses to 1.2946763038635254 psi at report index 192 (96 h) as the tanks drain. This is single-step non-activation followed by delayed deterioration - NOT a false negative (no safe/unsafe oracle exists).",
+    "no_negative_pressure": "max_N_neg=0 across the entire horizon including the 1.29 psi collapse, so a negative-pressure backstop (S4/TS4) NEVER fires on any tested command.",
+    "implication_for_the_four_decisions": "The metric (A) and horizon (C) decisions are coupled: an immediate or short-horizon absolute rule cannot see this collapse; a relative-degradation rule flags it early; a long absolute horizon can see it but is ill-posed above ~4.16 psi and costly.",
+    "tank_state_note": "Tank drawdown (WU-16 tank_state_evolution) is COINCIDENT with the collapse; no causal over-claim is made. Sustained deltas include tank-trajectory divergence (WU-15 limitation)."
+  },
+  "computational_cost": {
+    "single_step_look_ahead_wu15": {
+      "hydraulic_evals_per_proposed_action": 1,
+      "h2_alpha_grid_evals_per_transition": 5,
+      "n_epanet_solves_total": 10
+    },
+    "per_horizon_look_ahead_wu16": {
+      "H=1": {
+        "control_steps_ahead": 1,
+        "hours_ahead": 0.5,
+        "forward_solves_per_decision": 1,
+        "est_wall_s_per_decision_linear": 0.0013685203125011942,
+        "relative_to_single_step": 1.0
+      },
+      "H=2": {
+        "control_steps_ahead": 2,
+        "hours_ahead": 1.0,
+        "forward_solves_per_decision": 2,
+        "est_wall_s_per_decision_linear": 0.0027370406250023884,
+        "relative_to_single_step": 2.0
+      },
+      "H=4": {
+        "control_steps_ahead": 4,
+        "hours_ahead": 2.0,
+        "forward_solves_per_decision": 4,
+        "est_wall_s_per_decision_linear": 0.005474081250004777,
+        "relative_to_single_step": 4.0
+      },
+      "H=8": {
+        "control_steps_ahead": 8,
+        "hours_ahead": 4.0,
+        "forward_solves_per_decision": 8,
+        "est_wall_s_per_decision_linear": 0.010948162500009554,
+        "relative_to_single_step": 8.0
+      },
+      "full": {
+        "control_steps_ahead": 192,
+        "hours_ahead": 96.0,
+        "forward_solves_per_decision": 192,
+        "est_wall_s_per_decision_linear": 0.2627559000002293,
+        "relative_to_single_step": 192.0
+      }
+    },
+    "est_wall_s_per_control_step_linear": 0.0013685203125011942,
+    "reading": "Immediate (A): 1 solve/decision. Rolling/temporal (B/C/D temporal layer): H solves/decision, linear in H, full=192x. H2 clip adds one solve per inspected alpha. EPANET is deterministic; look-ahead adds no stochasticity. Linear split is an approximation (WU-16 note)."
+  },
+  "training_execution_implications": {
+    "ppo_compatibility_wu15": {
+      "S1": {
+        "deterministic": true,
+        "continuous_action_preserved_under_clip": true,
+        "differentiable": false,
+        "discontinuous_under_reject": true,
+        "requires_look_ahead": true,
+        "requires_extra_epanet_solve": true,
+        "compatible_30min_interval": true,
+        "introduces_proposed_vs_executed_mismatch_under_intervention": true,
+        "layer_need_not_be_differentiable": true
+      },
+      "S2": {
+        "deterministic": true,
+        "continuous_action_preserved_under_clip": true,
+        "differentiable": false,
+        "discontinuous_under_reject": true,
+        "requires_look_ahead": true,
+        "requires_extra_epanet_solve": true,
+        "compatible_30min_interval": true,
+        "introduces_proposed_vs_executed_mismatch_under_intervention": true,
+        "layer_need_not_be_differentiable": true
+      },
+      "S3": {
+        "deterministic": true,
+        "continuous_action_preserved_under_clip": true,
+        "differentiable": false,
+        "discontinuous_under_reject": true,
+        "requires_look_ahead": true,
+        "requires_extra_epanet_solve": true,
+        "compatible_30min_interval": true,
+        "introduces_proposed_vs_executed_mismatch_under_intervention": true,
+        "layer_need_not_be_differentiable": true
+      },
+      "S4": {
+        "deterministic": true,
+        "continuous_action_preserved_under_clip": true,
+        "differentiable": false,
+        "discontinuous_under_reject": true,
+        "requires_look_ahead": true,
+        "requires_extra_epanet_solve": true,
+        "compatible_30min_interval": true,
+        "introduces_proposed_vs_executed_mismatch_under_intervention": true,
+        "layer_need_not_be_differentiable": true
+      }
+    },
+    "ppo_compatibility_wu16": {
+      "per_horizon": {
+        "H=1": {
+          "deterministic": true,
+          "extra_forward_solves_per_decision": 1,
+          "adds_action_latency": false,
+          "interval_30min_compatible": true,
+          "executed_may_differ_from_commanded": true,
+          "env_differentiability_required": false
+        },
+        "H=2": {
+          "deterministic": true,
+          "extra_forward_solves_per_decision": 2,
+          "adds_action_latency": true,
+          "interval_30min_compatible": true,
+          "executed_may_differ_from_commanded": true,
+          "env_differentiability_required": false
+        },
+        "H=4": {
+          "deterministic": true,
+          "extra_forward_solves_per_decision": 4,
+          "adds_action_latency": true,
+          "interval_30min_compatible": true,
+          "executed_may_differ_from_commanded": true,
+          "env_differentiability_required": false
+        },
+        "H=8": {
+          "deterministic": true,
+          "extra_forward_solves_per_decision": 8,
+          "adds_action_latency": true,
+          "interval_30min_compatible": true,
+          "executed_may_differ_from_commanded": true,
+          "env_differentiability_required": false
+        },
+        "full": {
+          "deterministic": true,
+          "extra_forward_solves_per_decision": 192,
+          "adds_action_latency": true,
+          "interval_30min_compatible": true,
+          "executed_may_differ_from_commanded": true,
+          "env_differentiability_required": false
+        }
+      },
+      "note": "PPO is model-free: the env need not be differentiable. A clip/reject guard makes executed != commanded, so the train/execute gap must be observable to the policy. Latency is wall-clock, not learning-theoretic."
+    },
+    "proposed_vs_executed_mismatch": "Any intervention (reject H1 / clip H2 / fallback H3) makes the executed action differ from the policy's proposed action. WU-15 measures action_deviation_L2=2.4050194704019527 on the reference->severe reject.",
+    "effort_term_open_question": "The FROZEN reward effort term ||da||^2 is defined on the COMMANDED action. Under an intervention, commanded (proposed) != executed. Whether the effort term (and the env transition) uses the proposed or the executed action is a training-integration decision COUPLED to the handling policy; it is flagged here, NOT decided, and does not modify the frozen reward definition.",
+    "continuity": "Clip (H2) preserves a continuous action image (PPO-friendly); reject/fallback (H1/H3) are discontinuous. The safety layer need not be differentiable (WU-15 PPO_compatibility).",
+    "interval": "All candidates are compatible with the 30-min control interval (WU-15)."
+  },
+  "candidate_configurations": [
+    {
+      "config_id": "K1_backstop_plus_relative",
+      "status": "PROVISIONAL CANDIDATE - NOT APPROVED",
+      "architecture": "D (backstop + temporal)",
+      "metric_rule": "S4/TS4 negative-pressure hard backstop LAYERED with S2/TS2 worst-node degradation.",
+      "threshold": {
+        "negative_gate": "N_neg(post)==0 (EVIDENCE-SUPPORTED: baseline negative count 0; only well-posed hard absolute gate).",
+        "eps_p_psi": "provisional design value - swept, not selected (grid {0,2,5})"
+      },
+      "look_ahead_horizon": "provisional - short window swept {1,2,4,8} steps; TS2 reacts at H=1 on the tested corner.",
+      "handling_policy": "H2 clip toward previous (continuous) OR H1 reject to a_prev - not selected.",
+      "fallback_action": "previous action a_prev.",
+      "evidence_basis": "S4 well-posed and inert in-range (WU-14/15); TS2 eps_p=0 activates from H=1 (WU-16).",
+      "open_parameters": [
+        "eps_p",
+        "H",
+        "clip-vs-reject"
+      ]
+    },
+    {
+      "config_id": "K2_aggregate_deficit_lookahead",
+      "status": "PROVISIONAL CANDIDATE - NOT APPROVED",
+      "architecture": "C (look-ahead + state-degradation)",
+      "metric_rule": "S3/TS3 aggregate-deficit increase D(post)-D(base) <= eps_D over a finite window.",
+      "threshold": {
+        "eps_D_psi_nodesum": "provisional design value - swept, not selected (grid {0,2,5})"
+      },
+      "look_ahead_horizon": "provisional - swept {1,2,4,8} steps.",
+      "handling_policy": "H1 reject to a_prev - not selected.",
+      "fallback_action": "previous action a_prev.",
+      "evidence_basis": "relative aggregate is baseline-safe (WU-14) but can MASK localised collapse (deficit<->leak corr -0.7735).",
+      "open_parameters": [
+        "eps_D",
+        "H",
+        "aggregate-vs-worst-node masking risk"
+      ]
+    },
+    {
+      "config_id": "K3_immediate_well_posed_absolute",
+      "status": "PROVISIONAL CANDIDATE - NOT APPROVED",
+      "architecture": "A (immediate rule)",
+      "metric_rule": "S1 absolute worst-node floor p_min(post) >= theta_p at the decision instant.",
+      "threshold": {
+        "theta_p_psi": "constrained to be well-posed: theta_p must be STRICTLY BELOW the baseline worst node ~4.16452 psi, else it flags the chronic baseline; at theta_p=0 it degenerates to the negative-pressure gate (S4). Grid {0,5,10,15,20} swept, not selected."
+      },
+      "look_ahead_horizon": "H=0 (decision instant only); 1 solve.",
+      "handling_policy": "H3 fallback reference action - not selected.",
+      "fallback_action": "reference_nominal native PRV/pump setpoints.",
+      "evidence_basis": "cheapest (1 solve) but blind to the delayed 96 h collapse (decision instant reads 5.53 psi vs 1.29 psi at 96 h).",
+      "open_parameters": [
+        "theta_p (bounded < ~4.16 psi for well-posedness)",
+        "delayed-collapse blindness"
+      ]
+    },
+    {
+      "config_id": "K4_rolling_absolute_lookahead",
+      "status": "PROVISIONAL CANDIDATE - NOT APPROVED",
+      "architecture": "B (rolling short-horizon look-ahead)",
+      "metric_rule": "TS1 absolute worst-node floor min_[0..H] p_min >= theta_p over a rolling window.",
+      "threshold": {
+        "theta_p_psi": "provisional design value - swept, not selected (grid {0,5,10,15,20}); inherits absolute ill-posedness above ~4.16 psi."
+      },
+      "look_ahead_horizon": "provisional - must reach the UNTESTED onset between H=8 (4 h) and full (96 h) to catch the severe corner under a well-posed theta_p; cost linear in H (full=192x).",
+      "handling_policy": "H1 reject to a_prev OR H2 clip - not selected.",
+      "fallback_action": "previous action a_prev.",
+      "evidence_basis": "TS1 theta_p=5 misses the severe corner for H<=8 and fires at full (WU-16).",
+      "open_parameters": [
+        "theta_p",
+        "H (crossover untested)",
+        "clip-vs-reject"
+      ]
+    }
+  ],
+  "decision_matrix": {
+    "columns": [
+      "architecture",
+      "decision_information",
+      "look_ahead_dependence",
+      "threshold_dependence",
+      "tank_state_dependence",
+      "baseline_compatibility",
+      "delayed_collapse_visibility",
+      "compute_cost_per_decision",
+      "intervention_type",
+      "proposed_vs_executed_mismatch",
+      "main_unresolved_issue"
+    ],
+    "rows": [
+      {
+        "architecture": "A immediate rule",
+        "decision_information": "decision-instant post-action state",
+        "look_ahead_dependence": "none (H=0)",
+        "threshold_dependence": "one of theta_p/eps_p/eps_D/negative-gate",
+        "tank_state_dependence": "instant only",
+        "baseline_compatibility": "S1 ill-posed >=~4.16 psi; S2/S3/S4 baseline-safe",
+        "delayed_collapse_visibility": "none (reads 5.53 psi, misses 1.29 psi at 96 h)",
+        "compute_cost_per_decision": "1 solve",
+        "intervention_type": "reject/clip at instant",
+        "proposed_vs_executed_mismatch": "yes on intervention",
+        "main_unresolved_issue": "blind to delayed collapse"
+      },
+      {
+        "architecture": "B rolling absolute look-ahead",
+        "decision_information": "worst-node floor over H forward instants",
+        "look_ahead_dependence": "finite H (strong)",
+        "threshold_dependence": "theta_p (absolute)",
+        "tank_state_dependence": "within H-step window",
+        "baseline_compatibility": "ill-posed >=~4.16 psi (inherits S1)",
+        "delayed_collapse_visibility": "only if H reaches untested onset (8..192 steps)",
+        "compute_cost_per_decision": "H solves (full=192x)",
+        "intervention_type": "reject/clip on window floor breach",
+        "proposed_vs_executed_mismatch": "yes on intervention",
+        "main_unresolved_issue": "horizon vs cost vs absolute well-posedness coupled"
+      },
+      {
+        "architecture": "C look-ahead + degradation",
+        "decision_information": "post vs aligned-baseline worst-node/deficit over H",
+        "look_ahead_dependence": "finite H (reacts at H=1 on tested corner)",
+        "threshold_dependence": "eps_p/eps_D (relative)",
+        "tank_state_dependence": "post-vs-baseline trajectory over window",
+        "baseline_compatibility": "baseline-safe (relative)",
+        "delayed_collapse_visibility": "early relative signal; no absolute guarantee",
+        "compute_cost_per_decision": "H solves (action + baseline)",
+        "intervention_type": "reject/clip on relative degradation",
+        "proposed_vs_executed_mismatch": "yes on intervention",
+        "main_unresolved_issue": "no absolute floor; aggregate can mask local collapse"
+      },
+      {
+        "architecture": "D backstop + temporal",
+        "decision_information": "immediate negative count + windowed worst-node/deficit",
+        "look_ahead_dependence": "immediate backstop + finite H layer",
+        "threshold_dependence": "negative-gate + theta_p/eps_p/eps_D",
+        "tank_state_dependence": "instant backstop + windowed layer",
+        "baseline_compatibility": "backstop never fires on baseline; relative layer baseline-safe",
+        "delayed_collapse_visibility": "inherits temporal layer's window",
+        "compute_cost_per_decision": "1 + H solves",
+        "intervention_type": "hard reject on negative; reject/clip on layer breach",
+        "proposed_vs_executed_mismatch": "yes on intervention",
+        "main_unresolved_issue": "backstop inert in-range; layer still needs A/B/C/D choices"
+      }
+    ],
+    "note": "Descriptive comparison only; rows are NOT ordered or marked; no metric is aggregated into a single figure."
+  },
+  "uncertainties": [
+    "No validated safe/unsafe oracle exists: activation counts are DESCRIPTIVE, not false-positive/false-negative rates (WU-15/WU-16).",
+    "R1b: only the single lower corner (prv_lower_pump_lower) has measured near-collapse; interior points, mixed PRV corners, and joint action x uncertain-demand space are UNCHARACTERISED.",
+    "The exact delayed-collapse onset index is not persisted as a per-index series; the crossover horizon for a well-posed absolute floor lies between H=8 (4 h) and full (96 h) and is UNTESTED.",
+    "Sustained/horizon deltas include tank-trajectory divergence and are NOT a strict single-step look-ahead; only report index 0 is a pure command-effect one-step look-ahead (WU-15).",
+    "H2 alpha grid is coarse (0,0.25,0.5,0.75,1.0) and demonstrated on one transition only (WU-15).",
+    "The leakage emitter instrument is NOT field-calibrated; leak values are internally consistent evidence, not calibrated predictions.",
+    "Whether the frozen effort term uses the proposed or executed action under intervention is an open training-integration question coupled to the handling policy.",
+    "Thresholds theta_p/eps_p/eps_D are PROVISIONAL swept grids; the leakage<->service<->safety exchange rate they encode is a researcher value judgement, not a measured quantity."
+  ],
+  "coverage": {
+    "characterised_region": "Only the single lower corner (prv_lower_pump_lower / prv_all_lower) has measured worst-node service pressure (~1.29 psi at the leak-only argmax; ~4.19 psi for the all-lower PRV corner) and a measured negative-node count (0). This is the R1b single-corner coverage.",
+    "unverified_region": "Interior points, mixed PRV corners, pump-speed extremes combined with PRV extremes, and the joint (action x uncertain-demand) space are NOT characterised here.",
+    "claim_limit": "Do NOT claim the 7-D action box is globally safe. Exhaustive joint in-box safety is a STEP-9 (mechanism) + STEP-12 (test) responsibility; this analysis characterises candidate mechanisms, it does not certify the action space.",
+    "horizons_characterised_control_steps": [
+      1,
+      2,
+      4,
+      8,
+      192
+    ],
+    "intermediate_horizons_untested": [
+      16,
+      24,
+      48,
+      96
+    ],
+    "no_safe_unsafe_oracle": true,
+    "thresholds_swept_not_selected": true
+  },
+  "researcher_action_required": {
+    "instruction": "The researcher makes the STEP-9 selection: choose/compose the architecture (A/B/C/D), fix the metric/rule, the threshold, the look-ahead horizon, and the action-handling policy. This brief does NOT select any of them.",
+    "decision_form_blank": {
+      "A_architecture": null,
+      "B_metric_rule": null,
+      "C_threshold": null,
+      "D_look_ahead_horizon": null,
+      "E_action_handling_policy": null,
+      "F_effort_term_action_under_intervention": null,
+      "G_rationale": null
+    },
+    "status_after_this_brief": "STEP-9 remains PROPOSED / PENDING RESEARCHER; project is NOT PPO-ready."
+  },
+  "researcher_selection": null,
+  "self_checks": {
+    "status_is_proposed": true,
+    "researcher_selection_is_null": true,
+    "measures_nothing_new": true,
+    "no_epanet_no_ppo_no_selection": true,
+    "no_production_wrapper_implemented": true,
+    "four_decisions_all_unselected": true,
+    "decision_form_blank_all_none": true,
+    "no_verdict_key_top_level": true,
+    "no_forbidden_key_tokens": true,
+    "observation_dim_139": true,
+    "action_dim_7": true,
+    "action_ordering_unchanged": true,
+    "service_mask_121_5": true,
+    "frozen_reward_weights": true,
+    "all_candidates_not_approved": true,
+    "n_candidates_between_2_and_4": true,
+    "architectures_A_D_present": true,
+    "horizons_present": true,
+    "metric_definitions_present": true,
+    "constants_match_across_artifacts": true,
+    "leak_ref_frozen": true,
+    "req_ref_frozen": true,
+    "movement_L2sq_max_frozen": true,
+    "baseline_below20_count_386": true,
+    "baseline_negative_count_0": true,
+    "baseline_worst_node_reproduced": true,
+    "leak_argmax_worst_node_reproduced": true,
+    "wu16_decision_instant_5p53": true,
+    "wu16_full_horizon_1p29": true,
+    "wu16_max_N_neg_0": true,
+    "no_generated_utc_key": true,
+    "all_values_finite": true
+  }
+}
