@@ -353,6 +353,28 @@ result is written to `results/phase6/` as JSON (raw + summary + interpretation).
   absolute-floor horizon for θ_p=5 on the severe corner is a KNOWN ≥13 control steps. A useful absolute 20-psi
   floor remains "THRESHOLD NOT YET EMPIRICALLY JUSTIFIED"; only the N_neg==0 negative gate is EVIDENCE-SUPPORTED.
   STEP-9 stays PROPOSED / PENDING RESEARCHER; project NOT PPO-ready; no D-P6-006 minted.
+  **⚑ SUPERSEDED BY WU-19 (2026-10-01):** the "do NOT fill the §18 form / no D-P6-006 minted / STEP-9 stays PROPOSED"
+  instructions in this WU-18 bullet are now HISTORY — **D-P6-006 is FINALIZED** (see the next bullet). The WU-18 JSON and its
+  §18 BLANK form remain on disk UNCHANGED as the pre-decision snapshot (still do NOT re-run the WU-18 aggregator or rewrite its
+  JSON); the FILLED decision form lives in `docs/PHASE6_STEP9_FINAL_DECISION_REVIEW.md` §19.
+- **D-P6-006 is FINALIZED 2026-10-01 (WU-19, STAGE A+B, arch F1)** — the STEP-9 execution-safety / admissibility layer decision
+  IS NOW MADE. Authoritative record: `docs/PHASE6_DECISION_REGISTER.md` entry **D-P6-006** (Form A–G). Architecture F1 = hard
+  **N_neg==0 backstop** (S4/TS4) + **relative worst-node guard** (S2/TS2, base = **HOLD counterfactual**) over `[0..H]`;
+  **NO absolute floor**; S3 not a primary gate. Defaults (reconfigurable; STEP-12 sweep pre-registered): **ε_p=0.0 psi** {0,2,5};
+  **H=1 control step** {1,2,4,8}; backstop N_neg==0 FIXED. Handling: **H1 reject-to-hold** primary + **H3 reference-fallback** when
+  hold breaches the backstop (H2 clip documented). Admissibility checked BEFORE execution via a forward probe; the executed-branch
+  probe = the committed next state (no re-solve, no tank discontinuity). The movement/effort reward term uses the **EXECUTED
+  (post-safety = commanded) action** (REWARD_SPEC §8.12, A2) — D-P6-005 formula/weights/constants UNCHANGED (NOT a reward change;
+  no STAGE-I stop). Claim scope is **non-universal**: guarantees ONLY no negative service pressure + no worst-node degradation
+  > ε_p vs hold, over `[0..H]`, in the tested setting — NO 20-psi floor, NO protection beyond H, NO joint 5-D-box (R1b) /
+  stochastic-demand (STEP-10) safety, NO FP/FN rates. **DO:** proceed to STAGE C — implement `src/env/` (epanet_adapter,
+  action_mapper, safety, reward, metrics, demand_scenarios, bwsn_env) reusing `src/env/state_builder.py` + `phase5_common` + the R8
+  `run_config` instrument + the WU-16 forward-probe; gymnasium **optional-import**. **DO NOT** reopen D-P6-006 without new
+  contradictory evidence; **DO NOT** auto-install gymnasium / stable_baselines3 / torch (STAGE E PPO = hard STAGE-I stop pending
+  researcher-approved install); **DO NOT** start PPO training (a tiny smoke test is allowed ONLY after the env is implemented +
+  validated with real EPANET/WNTR). **PPO-readiness is a 5-step gate (A3):** 1 finalize (DONE) → 2 implement env (STAGE C) →
+  3 validate anchors (leak 84.72988433677985, 386 sub-20, 0 negative) → 4 integration tests with real EPANET/WNTR (STAGE D) →
+  5 ONLY THEN PPO-ready. The project is at step 1→2; **minting D-P6-006 did NOT make the project PPO-ready.**
 - **DO NOT** start scientific PPO training. A tiny smoke test is allowed ONLY after
   the env is implemented and validated, and only to prove the loop runs.
 - **DO NOT** auto-install gymnasium / stable_baselines3 / torch.

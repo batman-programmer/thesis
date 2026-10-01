@@ -371,3 +371,21 @@ no reward.py, no PPO.
 | Researcher form BLANK | researcher_action_required.decision_form_blank | 7 fields A_architecture..G_rationale all null | completing + approving it mints D-P6-006; this review does NOT fill it |
 | Determinism | self_checks / test_deterministic_rebuild_matches_persisted_bytes | in-memory rebuild byte-equals the persisted artefact; all 31 self-checks true; all numbers finite | reproducible aggregation; no RNG, no timestamp |
 | Test battery | tests/test_step9_final_decision_review.py | 28 new; full battery 199 OK | required-keys(16)/null-selection/no-forbidden-tokens/frozen-invariants/verbatim-rules/anchors/crossover-correction/blank-form/rebuild-equals-object+bytes |
+
+## STEP 9 — D-P6-006 FINALIZED: execution-safety / admissibility layer (WU-19, 2026-10-01)
+
+Authoritative record: `docs/PHASE6_DECISION_REGISTER.md` entry **D-P6-006 — FINALIZED 2026-10-01** (Form A–G).
+Supporting human-readable docs: `docs/PHASE6_STEP9_SAFETY_DESIGN.md` §12 (WU-19 finalization), `docs/PHASE6_STEP9_FINAL_DECISION_REVIEW.md` §19 (FILLED researcher decision form; §18 BLANK form preserved above it as the WU-18 pre-decision snapshot), `docs/PHASE6_REWARD_SPEC.md` §8.12 (A2 effort-term convention). **No new generator, no EPANET/PPO/RNG, no new raw artefact** — the WU-18 JSON `results/phase6/p6_s9_final_decision_review.json` and its §18 BLANK form are PRESERVED UNCHANGED; D-P6-006 is a human/register decision composed from the frozen WU-14→WU-18 evidence under the researcher's STAGE-B finalization directive. Deliverable commit `0dc1e8c`.
+
+| Claim | Section/Key | Result | Interpretation |
+|---|---|---|---|
+| D-P6-006 minted & finalized | DECISION_REGISTER / D-P6-006 | architecture **F1** = hard N_neg==0 backstop (S4/TS4) + relative worst-node guard (S2/TS2, base=HOLD) over [0..H]; NO absolute floor; S3 not primary | the STEP-9 execution-time admissibility layer is now a committed design, unblocking STAGE C |
+| Relative-rule base = HOLD counterfactual (A1) | DECISION_REGISTER D-P6-006 §A1 | forward-sim a_prev from identical current real state over [0..H]; compare proposed vs this hold | isolates the pure causal effect; identity hold ⇒ Δ≡0 ⇒ baseline-safe by construction at ε_p=0 |
+| Movement term uses EXECUTED action (A2) | REWARD_SPEC §8.12 | post-safety commanded action = D-P6-005's "commanded"; formula/weights/constants UNCHANGED | disambiguation, NOT a reward change; no STAGE-I stop; H1-reject da=0 is a benign monitor item |
+| PPO-readiness is a 5-step gate (A3) | DECISION_REGISTER D-P6-006 §A3 | 1 finalize → 2 implement env → 3 validate anchors → 4 real-EPANET/WNTR integration tests → 5 THEN PPO-ready; project at step 1→2 | minting D-P6-006 unblocks implementation (STAGE C), NOT PPO-readiness; corrects §18 wording |
+| Value knobs flagged, sweep mandated | DECISION_REGISTER D-P6-006 §C/§D | ε_p default 0.0 psi {0,2,5}; H default 1 step {1,2,4,8}; backstop N_neg==0 FIXED (evidence-supported) | the researcher-chosen knobs are reconfigurable; STEP-12 sweep pre-registered (CLAUDE.md §16/§21) |
+| Handling policy | DECISION_REGISTER D-P6-006 §E | H1 reject-to-hold primary + H3 reference fallback when hold breaches backstop; H2 clip documented | executed-branch probe = committed next state (no re-solve, no tank discontinuity; STAGE-I-safe) |
+| Claim scope is non-universal | DECISION_REGISTER D-P6-006 / claim scope | guarantees ONLY: no negative service pressure + no worst-node degradation > ε_p vs hold, over [0..H], in the tested setting | NO 20-psi floor; NO protection beyond H; NO joint 5-D-box (R1b) / stochastic-demand (STEP-10) safety; NO FP/FN rates |
+| No finite H is universally sufficient | DECISION_REGISTER D-P6-006 §D | worst 1.2946763038635254 psi @ idx192 (96h); θ_p=5 crossover @ idx13 (6.5h) beyond H=8 | per-step re-check is primary; the horizon knob cannot guarantee against the delayed 96h collapse |
+| Frozen invariants unchanged | DECISION_REGISTER D-P6-006 / preserved | D-P6-001/002/003 action (dim 7); D-P6-004 observation (dim 139); D-P6-005 reward (weights + 5 constants) byte-identical | STEP-9 is an admissibility wrapper; it changes nothing frozen |
+| Determinism preserved | tests/test_step9_final_decision_review.py | 28 OK after the finalization edits (verified) | the finalization lives in docs + the register; the WU-18 aggregator JSON + §18 blank form are untouched |
