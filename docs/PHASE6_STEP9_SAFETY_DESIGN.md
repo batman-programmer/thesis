@@ -446,3 +446,44 @@ and requires **no** environment differentiability. Reported **per horizon**, not
   simulated — near-term indices and realized-speed evolution are reported instead.
 - **Evidence only:** `researcher_selection = null`; mechanism/policy/**horizon** selection + production
   wrapper + `reward.py` + PPO are **out of scope** and deferred to the researcher (§9).
+
+---
+
+## 12. WU-19 finalization — D-P6-006 selected (2026-10-01)
+
+> **Status change.** §9 and §11.9 above report this STEP-9 work as *evidence only*, with
+> `researcher_selection = null`. On the researcher's explicit "STAGE B — FINALIZE D-P6-006"
+> directive (2026-10-01), the safety architecture is now **FINALIZED**. §1–§11 are preserved
+> UNCHANGED as the evidence they always were; this section records the selection built from
+> that evidence. The **authoritative** record is `docs/PHASE6_DECISION_REGISTER.md` → D-P6-006;
+> this section is the design-document companion.
+
+**Selected architecture (F1 = WU-18 architecture D), as an execution-time admissibility layer
+between the PPO policy's proposed action and the EPANET simulator:**
+
+- **Hard backstop (evidence-supported):** over the forward window `[0..H]`, reject any
+  proposed action whose probe shows `N_neg ≠ 0` (any service node at negative pressure). This
+  is the only well-posed hard absolute gate (the native baseline already has 0 negatives).
+- **Relative worst-node guard (A1 = HOLD counterfactual):** over `[0..H]`, require
+  `p_min(proposed_post) − p_min(hold_post) ≥ −ε_p`, where `hold_post` continues the previous
+  command `a_prev` from the **identical current real state**. Baseline-safe by construction
+  (identity hold ⇒ Δ ≡ 0). This is the production meaning of the §10/§11.5 "baseline-safe"
+  property and the general form of the WU-16 `base_state = reference_nominal` check (that was
+  the t=0 zero-drift special case).
+- **NO absolute pressure floor** (ill-posed on the chronic sub-20-psi baseline, §10); **S3
+  aggregate deficit NOT a primary gate** (masks localised worst-node collapse).
+- **Defaults (reconfigurable, pre-registered for STEP-12 sweep):** ε_p = 0.0 psi (sweep
+  {0, 2, 5}); H = 1 control step (sweep {1, 2, 4, 8}); per-step re-check is the primary temporal
+  protection. **No finite H < full episode is claimed sufficient** (§11.9 carried forward: the
+  severe corner's worst p_min = 1.2946763038635254 psi is the 96 h endpoint; θ_p=5 crossover at
+  report index 13 / 6.5 h).
+- **Handling:** H1 reject-to-hold primary; H3 reference-fallback when the hold itself breaches
+  the backstop; H2 clip-toward-previous documented as the PPO-friendlier alternative. The
+  executed-branch probe becomes the committed next state (no re-solve ⇒ no tank discontinuity).
+- **Reward interaction:** the movement term uses the **executed** (post-safety) action — exactly
+  D-P6-005's "commanded"; see `docs/PHASE6_REWARD_SPEC.md` §8.12. **D-P6-005 is UNCHANGED.**
+
+**Claim scope (binding, non-universal):** guarantees, within the tested setting and over `[0..H]`
+only, (i) no negative service pressure and (ii) no worst-node degradation beyond ε_p vs hold. It
+does **not** claim a 20-psi floor, protection beyond H, global 5-D-box safety, any stochastic-demand
+safety, or FP/FN rates. Detection ≠ guarantee (§11.7); finite look-ahead ≠ long-term safety (§11.9).

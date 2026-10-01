@@ -6,6 +6,16 @@
 **Companion artefact:** [`results/phase6/p6_s9_final_decision_review.json`](../results/phase6/p6_s9_final_decision_review.json)
 **Generator:** [`src/validation/p6_s9_final_decision_review.py`](../src/validation/p6_s9_final_decision_review.py)
 
+> **⚑ SUPERSEDED-BY-FINALIZATION BANNER (2026-10-01).** This WU-18 review and its
+> companion JSON were correctly `researcher_selection = null` and are **preserved
+> UNCHANGED** as the pre-decision snapshot (the byte-reproducible JSON is NOT edited; the
+> §18 blank form below is kept as history, per CLAUDE.md §14/§18). On the researcher's
+> explicit "STAGE B — FINALIZE D-P6-006" directive, the STEP-9 safety architecture has
+> since been **FINALIZED** → **D-P6-006** (architecture F1). The authoritative record is
+> [`docs/PHASE6_DECISION_REGISTER.md`](PHASE6_DECISION_REGISTER.md) → D-P6-006; the filled
+> form is reproduced in **§19** below. The header's "no D-P6-006 minted" / "PROPOSED"
+> wording describes the state **at WU-18** and is left intact for traceability.
+
 > This is the final scientific **review** immediately preceding production
 > safety-wrapper implementation. It judges whether the STEP-9 safety-architecture
 > decision is defensible and implementable, and packages the (≤3) final
@@ -347,6 +357,38 @@ project is **NOT PPO-ready**; **no D-P6-006 minted**.
 *Byte-reproducible companion: `results/phase6/p6_s9_final_decision_review.json`
 (31 self-check gates, all pass). This review makes no selection, ranks nothing,
 and approves nothing.*
+
+---
+
+## §19 — Researcher decision form (D-P6-006 — FILLED, 2026-10-01)
+
+> **This section supersedes the §18 blank form** (§18 is preserved above as the WU-18
+> history). D-P6-006 was **FINALIZED** on the researcher's explicit "STAGE B — FINALIZE
+> D-P6-006" directive, composed by the AI research partner from the evidence-forced
+> architecture; every value knob is flagged as reconfigurable with a mandated STEP-12
+> sweep. **Authoritative record:** [`docs/PHASE6_DECISION_REGISTER.md`](PHASE6_DECISION_REGISTER.md) → D-P6-006.
+
+| Field | Selection |
+|-------|-----------|
+| A — architecture | **F1** (= arch D): hard `N_neg==0` backstop (S4/TS4) **+** relative worst-node guard (S2/TS2) over `[0..H]`; **no** absolute floor; S3 not a primary gate |
+| B — metric / rule | ADMISSIBLE iff over `[0..H]`: `N_neg(proposed_post)==0` **AND** `p_min(proposed_post) − p_min(hold_post) ≥ −ε_p` |
+| C — threshold | backstop `N_neg==0` fixed; `ε_p` **default 0.0 psi** (sweep {0,2,5}); **no absolute θ_p** |
+| D — look-ahead horizon H | **default 1 control step** (sweep {1,2,4,8}); per-step re-check primary; **no finite H claimed universally sufficient** |
+| E — action-handling policy | **H1 reject-to-hold** primary + **H3 reference-fallback**; H2 clip documented as the PPO-friendlier alternative |
+| F — effort-term action under intervention | **executed** (= commanded; D-P6-005 "commanded"); see `PHASE6_REWARD_SPEC.md` §8.12; D-P6-005 UNCHANGED |
+| G — rationale | backstop = only well-posed hard gate (baseline 0 negatives); relative guard = baseline-safe by construction + most temporally sensitive; absolute floor ill-posed; aggregate masks localised collapse; non-universal claims only |
+
+**`base` semantics (A1):** `hold_post` = HOLD counterfactual (continue `a_prev` from the
+identical current real state over `[0..H]`); the WU-16 `reference_nominal` base is the t=0
+zero-drift special case. **Reward term (A2):** executed action. Full derivations in the
+register (D-P6-006 §A1) and `PHASE6_REWARD_SPEC.md` §8.12.
+
+**Status after finalization (A3 correction):** D-P6-006 is FINALIZED, but the project is
+**NOT yet PPO-ready**. Minting the decision is **step 1** of a 5-step gate
+(1 finalize → 2 implement env → 3 validate behaviour → 4 integration tests with real
+EPANET/WNTR → 5 **only then** PPO-ready). The §18 wording "completing and approving it …
+makes the project PPO-ready" is **corrected here**: finalization unblocks **implementation**
+(STAGE C), not PPO-readiness.
 
 
 

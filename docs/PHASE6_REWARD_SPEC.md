@@ -414,3 +414,53 @@ are chosen; no PPO is trained. **Evidence:**
 `results/phase6/p6_s8_reward_formulation_comparison.json`; generator
 `src/validation/p6_s8_reward_formulation_comparison.py`; tests
 `tests/test_reward_formulation_comparison.py`.
+
+> **Historical note (2026-09-27):** the "D-P6-005 remains PROPOSED" wording above is
+> the state at WU-10. D-P6-005 was subsequently **APPROVED** (C-A_F1_balanced_dense;
+> see `docs/PHASE6_DECISION_REGISTER.md`). The section is preserved as history.
+
+## 8.12 A2 resolution (2026-10-01) — movement-term action under safety intervention [D-P6-006 companion; D-P6-005 UNCHANGED]
+
+**Open question (WU-18 §14).** Under a STEP-9 safety intervention the *proposed*
+(pre-safety) action and the *executed* (post-safety) action differ. The frozen reward
+movement term `w_A·(‖da_t‖²/movement_L2sq_max)` must be computed from one of them. This
+section fixes which, as a **companion item to D-P6-006**. It **does not** modify the
+frozen D-P6-005 formula, weights (`w_A=0.1`), or `movement_L2sq_max=28.0`.
+
+**Resolution — the movement term uses the EXECUTED (post-safety) action, which is
+exactly what D-P6-005 already means by "COMMANDED":**
+
+1. **D-P6-005 wording.** D-P6-005 defines `da_t = commanded normalised action_t −
+   previous commanded normalised action`. "Commanded" = the normalised action actually
+   **issued to the actuators** that drives the EPANET transition = the **executed
+   (post-safety)** action. The only quantity D-P6-005 / §8.1 excluded was the **realised
+   pump speed** (reset to ~1.0/0 by native STATUS-IS rules per G12, hence gameable) —
+   **not** the proposed pre-safety action.
+2. **Reward-internal consistency.** Every other reward term (`leak`, `unserved⁺`,
+   `deficit`, `power`) is computed from the **executed** hydraulic state (the state the
+   executed action produced). The movement term must therefore also use the executed
+   action so the whole per-step reward measures the consequences of **what was actually
+   done**, not of a proposal that was overridden.
+3. **Physical meaning.** The actuators physically move by `a_exec,t − a_exec,t−1`.
+   Penalising `a_prop,t` would charge the policy for movement that never physically
+   occurred.
+4. **Observation consistency (D-P6-004).** The frozen observation's `prev_cmd_*` blocks
+   (`prev_cmd_prv_setpoint[123:128]`, `prev_cmd_pump_speed[133:135]`) store the previous
+   **executed** command. `da_t = a_exec,t − a_exec,t−1` is self-consistent with those
+   fields; using `a_prop` would reference a quantity the observation does not carry.
+
+**This is a disambiguation + documentation, NOT a change.** Formula, weights, and the
+five frozen normalisation constants are unchanged; D-P6-005 stays frozen.
+
+**Train/execute gap (monitor item, not a reward change).** On an intervened step with
+H1 reject-to-hold, `a_exec,t = a_prev`, so `da_t = a_prev − a_exec,t−1`; if the agent was
+already holding, this is `0` and the step incurs **no** movement cost. This is **benign**
+(no actuator moved ⇒ no movement cost) and **not** an exploitable incentive: the agent
+cannot *choose* to be rejected (rejection fires only on an unsafe proposal), and the
+dominant `leak`/`unserved`/`deficit` terms still reflect the held hydraulic state. The
+proposed-vs-executed gap is a **train/execute observability** concern handled at the PPO
+layer (log BOTH `a_prop` and `a_exec`), **not** by redefining the frozen reward.
+
+**Authoritative decision record:** `docs/PHASE6_DECISION_REGISTER.md` → **D-P6-006**
+(field F). **Status:** D-P6-005 UNCHANGED/frozen; this fixes the integration convention
+only.

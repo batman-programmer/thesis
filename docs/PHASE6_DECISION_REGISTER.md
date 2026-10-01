@@ -711,5 +711,184 @@ block blank. **D-P6-005 remains PROPOSED / DECISION PENDING RESEARCHER.**
   `docs/PHASE6_STEP9_SAFETY_DESIGN.md`). The reward function `src/env/reward.py` is STEP 11
   and is NOT implemented by this decision. No PPO training.
 
+---
+
+## D-P6-006 — STEP-9 execution-safety / admissibility layer — FINALIZED (2026-10-01)
+
+- **Level:** 3 (research-critical — a thesis-level methodological decision governing how
+  the agent's proposed actions are admitted to the simulator).
+- **Status:** **FINALIZED 2026-10-01**, on the researcher's explicit "STAGE B — FINALIZE
+  D-P6-006" directive. Composed by the AI research partner from the **evidence-forced**
+  architecture of WU-14…WU-18; every residual value judgement (ε_p, H, claim scope) is
+  flagged below as a reconfigurable parameter with a mandated STEP-12 sweep (CLAUDE.md
+  §16/§21: the researcher remains the final scientific authority and may re-set any
+  flagged knob).
+- **Provenance:** WU-14 design → WU-15 empirical grids
+  (`p6_s9_safety_mechanism_characterization`) → WU-16 temporal look-ahead
+  (`p6_s9_temporal_safety_characterization`) → WU-17 decision brief → WU-18 final review
+  (`p6_s9_final_decision_review`, all with `researcher_selection: null`, D-P6-006 form
+  BLANK) → **WU-19 finalization (this entry)**.
+- **Consistency:** consistent with ALL accepted evidence WU-13…WU-18; introduces NO new
+  measurement and NO global/universal safety claim; does NOT alter any frozen invariant
+  (D-P6-001/002/003 action, D-P6-004 observation, D-P6-005 reward).
+
+### Decision form (WU-18 §18 fields A–G, now filled)
+
+- **A — Architecture:** **F1** (= WU-18 architecture **D**): a **hard negative-pressure
+  backstop** (rule S4/TS4, `N_neg == 0`) **layered with** a **relative worst-node
+  degradation guard** (rule S2/TS2) over a short forward window `[0..H]`. **NO absolute
+  pressure floor** (S1/TS1 rejected — ill-posed on the chronic sub-20-psi baseline, §10).
+  Aggregate deficit (S3/TS3) is **NOT** a primary gate (it can mask a localised worst-node
+  collapse; WU-14 corr(D, p_min) ≈ −0.77).
+- **B — Metric / rule (an action is ADMISSIBLE iff BOTH hold over the probed window):**
+  - **Backstop (hard, evidence-supported):** for every probed instant k ∈ [0..H],
+    `N_neg(proposed_post, k) == 0` (no service node at negative pressure).
+  - **Relative guard (A1):** for every k ∈ [0..H],
+    `p_min(proposed_post, k) − p_min(hold_post, k) ≥ −ε_p`, where `hold_post` is the
+    **HOLD counterfactual** (continue the previous command `a_prev` from the identical
+    current real state). See **A1** below for the `base`-semantics derivation.
+- **C — Threshold(s):** backstop `N_neg == 0` is **fixed** (EVIDENCE-SUPPORTED; the only
+  well-posed hard absolute gate on this network). `ε_p` = relative worst-node tolerance;
+  **DEFAULT ε_p = 0.0 psi** (strict "no worst-node degradation vs hold"; the only value
+  shown to separate the severe transition at the decision instant in WU-15 §10.5 —
+  razor-thin, NOT claimed to generalise — and the conservative safety-first default).
+  **Mandated STEP-12 sweep ε_p ∈ {0, 2, 5} psi.** **NO absolute θ_p floor** (no useful
+  20-psi floor is baseline-compatible: "THRESHOLD NOT YET EMPIRICALLY JUSTIFIED").
+
+- **D — Look-ahead horizon H:** **DEFAULT H = 1 control step** (1800 s / 0.5 h look-ahead).
+  The **primary temporal protection is the per-step re-check** (the gate runs every
+  control step, so protection is renewed continuously). **Mandated STEP-12 sweep
+  H ∈ {1, 2, 4, 8} control steps.** **Explicit non-sufficiency statement (binding):** no
+  finite H < full episode guarantees against demand/tank-driven *delayed* deterioration
+  under a HELD command — the severe corner reaches its worst `p_min = 1.2946763038635254`
+  psi at the **96 h episode endpoint** (report index 192), and the first θ_p=5 crossover is
+  at report index 13 (6.5 h), already beyond H=8. D-P6-006 is **NOT** claimed to prevent
+  deterioration beyond H; within [0..H] it prevents negative pressure (backstop) and
+  worst-node degradation vs hold (relative guard).
+- **E — Unsafe-action handling:** **H1 reject-to-hold** (execute `a_prev` on breach) as the
+  primary rule, with **H3 reference-fallback** (execute the `reference_nominal` native PRV
+  setpoints / pump speeds) escalation when the HOLD itself breaches the backstop over the
+  window. **H2 clip-toward-previous** (`a_exec = a_prev + α(a_prop − a_prev)`, largest safe
+  α) is documented as the **PPO-friendlier continuous alternative** for a future ablation.
+  Implementation reuses the two probe solves (hold-probe + proposed-probe): the EXECUTED
+  branch's probe result **IS** the committed next state, so no re-solve is needed and no
+  tank-state discontinuity is introduced (STAGE-I-safe).
+- **F — Effort/movement term action under intervention:** **EXECUTED** (= commanded-to-
+  actuator = post-safety) action. This is exactly D-P6-005's "commanded" action. Full
+  derivation + the H1-reject `da=0` monitor note: `docs/PHASE6_REWARD_SPEC.md` §8.12.
+  **D-P6-005 formula / weights / constants are UNCHANGED** — this fixes an integration
+  convention only.
+- **G — Rationale:** evidence-forced composition. The backstop is the **only well-posed
+  hard absolute gate** (every service node ≥ 0 psi is unambiguous and baseline-satisfied:
+  the native baseline already has 0 negatives). The relative guard is **baseline-safe by
+  construction** (identity hold ⇒ Δ ≡ 0, no false intervention) and the **most temporally
+  sensitive** rule in WU-15/16 (TS2 at ε_p=0 reacts from H=1). The absolute floor is
+  **ill-posed** (386 baseline node-ts already < 20 psi). The aggregate-deficit rule **masks
+  localised collapse**. No value in the design licenses a universal/global safety claim.
+
+### A1 — relative-rule reference ("base") semantics [resolves WU-18 open question A1]
+
+The relative rules S2/TS2 (and F3's `max_{0..H}(D(post) − D(base)) ≤ ε_D`) require a
+precisely defined `base`. Three interpretations were evaluated:
+
+1. **base = current observed pre-advance state** (`p_min` as measured now). This is the
+   **H=0 instantaneous** descriptive metric used in WU-15 §10.2. **REJECTED** as the
+   production per-step gate: over a window it conflates the *action's* effect with the
+   demand/tank *evolution* (every action lowers p_min during a drawdown; a refilling tank
+   raises it regardless of the action), so it measures "the state got worse," not "this
+   action made it worse."
+2. **base = fixed native baseline trajectory** (`reference_nominal`, index-aligned). This
+   is the WU-16 characterization choice, **valid only at t=0** (shared initial state, zero
+   drift). **REJECTED** as the production per-step gate: once the agent's past actions have
+   drifted the tanks away from the native trajectory, it conflates harm-from-this-action
+   with accumulated-drift-from-past-actions.
+3. **base = HOLD counterfactual** — forward-simulate `a_prev` (continue the previous
+   executed command) from the **identical current real state** over `[0..H]`, and compare
+   the proposed trajectory against it. **SELECTED.** It isolates the **pure causal effect**
+   of the proposed action versus continuing the status quo from the same starting state
+   (treatment-vs-control at a common initial condition). Identity hold (`a_prop = a_prev`)
+   ⇒ `Δp_min ≡ 0` ⇒ no activation at ε_p=0 ⇒ the "baseline-safe by construction" property
+   (SAFETY_DESIGN §10 / §11.5) holds **exactly**.
+
+**Reconciliation (no contradiction with accepted evidence).** Interpretation (1) is the
+H=0 instantaneous limit of HOLD; interpretation (2) is the t=0 zero-drift special case of
+HOLD; both coincide with HOLD at their points of validity. WU-16's
+`base_state = reference_nominal` is therefore **reconciled as the zero-drift
+characterization special case**, NOT overturned, and the WU-16 `baseline_identity_hold`
+self-check (zero activation) is exactly the ε_p=0 identity-hold property above.
+
+**Cost & STAGE-I safety.** HOLD requires the hold-probe (H solves) in addition to the
+proposed-probe (H solves) = **2H forward solves per decision**. The EXECUTED branch's probe
+becomes the committed next state, so no solve is wasted and no tank-state discontinuity is
+introduced.
+
+**Residual limitation (documented, binding).** A relative-to-hold guard **cannot** catch
+slow demand/tank-driven deterioration under an *already-held* positive-but-low command
+(where Δ vs hold ≈ 0 yet absolute pressure drifts down over many steps). Only the
+`N_neg == 0` backstop catches an absolute negative collapse, and **no finite H guarantees**
+against the 96 h-endpoint deterioration. This honours the directive's "no horizon is
+universally sufficient."
+
+### A3 — PPO-readiness progression (wording correction) [resolves WU-18 open question A3]
+
+The accurate ordered gate (no step may be skipped; "PPO-ready" is **only** step 5):
+
+1. **Finalize the safety design** — D-P6-006 (this entry).
+2. **Implement** the environment modules (wrapper + EPANET adapter + action mapper +
+   safety layer + reward + metrics).
+3. **Validate environment behaviour** — reproduce the frozen anchors (baseline leak
+   `84.72988433677985` GPM, 386 node-ts < 20 psi, 0 negative; deterministic re-run).
+4. **Integration tests** with REAL EPANET/WNTR solves (not only mocks).
+5. **ONLY THEN** may the environment be described as **PPO-ready**.
+
+The project is currently at step 1 → 2. **No prior Phase-6 document claimed
+PPO-readiness**; the docs already state "NOT PPO-ready." A3 records the gate explicitly so
+the claim cannot be made prematurely.
+
+### Claim scope (non-universal — binding)
+
+D-P6-006 guarantees, **within the tested research setting** and **over the probed window
+[0..H] only**: (i) no service node at **negative** pressure, and (ii) no worst-node
+degradation greater than ε_p relative to holding the previous command. It does **NOT**
+claim: a 20-psi service floor (ill-posed on this network); protection **beyond** horizon H
+(delayed demand/tank-driven deterioration under a held command is explicitly out of
+guarantee); global/joint 5-D-action-box safety across mixed corners / interior / pump +
+stochastic demand (R1b, UNTESTED); any safety claim under **stochastic** demand (STEP 10,
+not yet designed); false-positive / false-negative rates (there is no validated safe/unsafe
+oracle — detection ≠ guarantee, SAFETY_DESIGN §11.7). Consistent with SAFETY_DESIGN §11.9
+and FINAL_DECISION_REVIEW §12/§17.
+
+### Evidence consistency (WU-13…WU-18 anchors, byte-exact)
+
+- Baseline worst-node `p_min = 4.16452169418335` psi (JUNCTION-29, 24.5 h); baseline leak
+  `84.72988433677985` GPM; 386 node-ts < 20 psi; **0 negative** → the backstop
+  `N_neg == 0` is **baseline-satisfied** and the absolute 20-psi floor is **ill-posed**.
+- Severe corner: decision-instant `p_min = 5.527866840362549`; full-horizon
+  `p_min = 1.2946763038635254` (96 h endpoint) → **delayed collapse**, motivating the
+  per-step re-check + the explicit no-universal-H statement.
+- θ_p=5 smallest-sufficient horizon persisted at report index 13 (6.5 h) → beyond default
+  H=1 and the swept H∈{1,2,4,8}; recorded, not claimed sufficient.
+- Reference→severe reject `action_deviation_L2 = 2.4050`; TS4 never fires (max N_neg = 0);
+  TS2 at ε_p=0 activates from H=1 → the relative guard is the active temporal signal.
+
+### Preserved / unchanged
+
+- Frozen invariants D-P6-001/002/003 (action), D-P6-004 (observation), D-P6-005 (reward)
+  are **UNCHANGED**. D-P6-006 is an **execution-time admissibility layer** between the
+  policy's proposed action and the simulator; it does not touch the reward math (A2/F fixes
+  only the executed-vs-proposed convention). **No STAGE-I stop condition is triggered.**
+- WU-14…WU-18 artefacts and their byte-reproduction tests are retained UNCHANGED as the
+  pre-decision snapshot (`researcher_selection: null`). This register entry is the
+  authoritative human-readable record; `PROJECT_STATE.yaml` is the authoritative
+  machine-readable record.
+- **Approval:** FINALIZED on researcher directive (2026-10-01); all flagged knobs (ε_p, H,
+  handling, claim scope) remain researcher-adjustable and are pre-registered for the
+  STEP-12 sweep.
+- **Next:** STAGE C — implement `src/env/` (epanet_adapter, action_mapper, safety, reward,
+  metrics, demand_scenarios, bwsn_env) reusing `state_builder.py`, `phase5_common`, the R8
+  `run_config` instrument, and the WU-16 forward-probe. gymnasium is an optional import
+  (R4); torch / stable_baselines3 remain MISSING and gate STAGE E (hard STAGE-I stop until
+  researcher-approved install). No PPO training by this decision.
+
 
 
