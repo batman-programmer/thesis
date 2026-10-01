@@ -389,3 +389,21 @@ Supporting human-readable docs: `docs/PHASE6_STEP9_SAFETY_DESIGN.md` §12 (WU-19
 | No finite H is universally sufficient | DECISION_REGISTER D-P6-006 §D | worst 1.2946763038635254 psi @ idx192 (96h); θ_p=5 crossover @ idx13 (6.5h) beyond H=8 | per-step re-check is primary; the horizon knob cannot guarantee against the delayed 96h collapse |
 | Frozen invariants unchanged | DECISION_REGISTER D-P6-006 / preserved | D-P6-001/002/003 action (dim 7); D-P6-004 observation (dim 139); D-P6-005 reward (weights + 5 constants) byte-identical | STEP-9 is an admissibility wrapper; it changes nothing frozen |
 | Determinism preserved | tests/test_step9_final_decision_review.py | 28 OK after the finalization edits (verified) | the finalization lives in docs + the register; the WU-18 aggregator JSON + §18 blank form are untouched |
+
+## STEP 11/12 — RL ENVIRONMENT IMPLEMENTATION + CORRECTNESS/INTEGRATION TEST BATTERY (WU-20, 2026-10-01)
+
+Modules (all new, reuse `state_builder.py`): `src/env/{action_mapper,metrics,reward,safety,epanet_adapter,bwsn_env,baselines}.py`. Tests (all new): `tests/{test_action_mapper,test_metrics_reward,test_safety,test_baselines,test_env_integration}.py`. Full new battery **38 OK in 40.2 s** (33 fast + 5 real-EPANET), exit 0, verified on disk this WU. This is IMPLEMENTATION of frozen D-P6-001/002/003/004/005/006 — no new research decision, no frozen invariant changed. `demand_scenarios.py` and the baseline evaluation PROTOCOL remain OPEN (STEP-10, Level-2). Deliverable commit recorded in PROJECT_STATE.yaml git block.
+
+| Claim | Section/File | Result | Interpretation |
+|---|---|---|---|
+| Native static hold reproduces the frozen leak anchor | test_env_integration.test_1 (REAL EPANET) | leak_mean ≈ 84.7294 GPM; rel < 5e-5 vs 84.72988433677985 | the implemented env is faithful to the Phase-5/6 monolithic leak anchor |
+| Horizon semantics correct | test_env_integration.test_2 | 192 steps; `terminated` never True; `truncated` at step 192 | time-limit episode, no absorbing state (D-P6 episode formulation) |
+| Observations in-spec | test_env_integration.test_3 | every obs shape (139,) float32 within the frozen [-20,300]-derived bounds | D-P6-004 139-dim layout honoured at every step |
+| Movement invariant (D-P6-005) | test_env_integration.test_4 | da==0 EXACTLY for steps 2..192; step-1 residual < 1e-12 | static hold ⇒ zero movement penalty; step-1 is a float32 reset-boundary artefact, not a bug |
+| Safety layer is a NO-OP on the native path (D-P6-006) | test_env_integration.test_5 | all 192 outcomes "accepted"; leak_mean byte-identical ON vs OFF, |Δ| < 1e-9 | the admissibility wrapper does not alter the admissible native trajectory |
+| ABSOLUTE affine map round-trips (D-P6-001/002/003) | test_action_mapper (7) | endpoints/midpoint exact; sampled normalize∘physical identity; native reconstruction; out-of-box clips | action encoding faithful; independent oracle (bounds RE-stated, not imported) |
+| Accounting law closed-form (g6_g7_g8) | test_metrics_reward TestMetrics (6) | signed emitter 23.0 / −12 hand-checks; served/unserved balance; unserved⁺ floors at 0; deficit service-only; power sum | metrics implement the frozen law exactly |
+| Reward algebra (D-P6-005 F1) | test_metrics_reward TestReward (6) | weights (1,1,1,0.1,0) + 5 refs; decomposition total −3.0; movement max l2sq 28→term 0.1; native anchor total −1.0 | reward matches the approved C-A_F1_balanced_dense; energy disabled but re-enablable |
+| Safety escalation ladder (D-P6-006) | test_safety (7, FakeDriver) | accepted→proposed; reject_to_hold via TS2 and via TS4; reference_fallback→native; diagnostics counts | all branches of the F1 ladder covered without hydraulics |
+| Baseline masks (STAGE F) | test_baselines (7) | native/prv_only/vsp_only/joint free-index masks; native pins round-trip to native physical; unknown mode raises | comparison-condition interface correct; eval PROTOCOL remains OPEN |
+| Determinism / no auto-deps | battery run | 38 OK exit 0; env gym-optional (headless); torch/SB3/gymnasium NOT imported | env usable without the PPO stack; R4 unchanged, NOT PPO-ready |

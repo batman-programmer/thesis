@@ -5,7 +5,7 @@ first, then `PROJECT_STATE.yaml`, then the three Phase 6 docs listed below. You
 should be able to reconstruct the whole project state from disk WITHOUT the old
 chat.**
 
-Last updated: 2026-09-28 (UTC) by Claude Opus 4.8. **Action space APPROVED & FROZEN
+Last updated: 2026-10-01 (UTC) by Claude Opus 4.8. **Action space APPROVED & FROZEN
 2026-09-27 (D-P6-001/002/003); STEP 7 observation design APPROVED & FROZEN 2026-09-27
 (D-P6-004, observation_dim=139); STEP 8 reward design D-P6-005 = APPROVED 2026-09-27 —
 researcher selected `C-A_F1_balanced_dense` (F1 normalized weighted sum; weights
@@ -26,6 +26,26 @@ their generators + byte-reproduction tests are RETAINED UNCHANGED (still status 
 researcher_selection=null) as frozen pre-decision evidence; the authoritative APPROVAL record
 is `PROJECT_STATE.yaml` (`reward.approved`) + `docs/PHASE6_DECISION_REGISTER.md`
 (D-P6-005 RESOLUTION). Do NOT choose final weights differently, do NOT start PPO.**
+
+**UPDATE 2026-10-01 (WU-19 → WU-20) — SUPERSEDES the STEP-9 "EVIDENCE stage" wording above.**
+STEP 9 is CLOSED: **D-P6-006 FINALIZED 2026-10-01** (architecture F1 = hard N_neg==0 backstop
++ relative worst-node-vs-HOLD guard over [0..H]; NO absolute floor; defaults ε_p=0.0 psi, H=1,
+reconfigurable with a pre-registered STEP-12 sweep). STEP 11/12 are then DONE: the production RL
+environment is now **IMPLEMENTED and behaviourally VALIDATED**. `src/env/` gained
+`action_mapper.py`, `metrics.py`, `reward.py`, `safety.py`, `epanet_adapter.py`, `bwsn_env.py`
+(gym-optional) and `baselines.py` (native/prv_only/vsp_only/joint masking), reusing the frozen
+`state_builder.py`. A 38-test battery
+(`tests/test_action_mapper|metrics_reward|safety|baselines|env_integration.py`) passes
+(**38 OK in 40.2 s**, 5 of them REAL EPANET): the native hold reproduces the leak anchor
+(≈84.7294 GPM, rel < 5e-5), observations stay 139-dim/in-bounds, the movement invariant holds
+(da==0 for steps 2..192; step-1 is a sub-eps float32 reset-boundary residual, root-caused, env
+UNCHANGED), and the D-P6-006 safety layer is a byte-exact NO-OP on the native path (all 192
+"accepted"; leak identical ON vs OFF). This IMPLEMENTS frozen D-P6-004/005/006 + the action
+space; **NO frozen value changed; NO STAGE-I stop triggered.** The env is **NOT YET PPO-ready** —
+torch / stable_baselines3 / gymnasium remain MISSING (R4); do NOT auto-install. `demand_scenarios.py`
+and the baseline evaluation PROTOCOL remain OPEN (STEP-10, Level-2). Do NOT re-implement these
+modules or restart earlier phases; next real step is the researcher gate on installing the PPO
+stack + the STEP-10 demand/eval-protocol design. See `PHASE6_EXECUTION_LOG.md` WU-20 for detail.
 
 ---
 

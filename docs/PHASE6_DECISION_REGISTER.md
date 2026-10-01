@@ -890,5 +890,39 @@ and FINAL_DECISION_REVIEW §12/§17.
   (R4); torch / stable_baselines3 remain MISSING and gate STAGE E (hard STAGE-I stop until
   researcher-approved install). No PPO training by this decision.
 
+---
+
+## IMPLEMENTATION STATUS — STEP 11/12 env modules (WU-20, 2026-10-01)
+
+This is an IMPLEMENTATION record, **not a new decision**. The frozen design decisions are now
+realised in code under `src/env/` and validated by a test battery; **no decision value was
+changed**, no frozen invariant altered, no STAGE-I stop triggered.
+
+- **D-P6-001/002/003 (action space)** → IMPLEMENTED in `src/env/action_mapper.py` (ABSOLUTE
+  affine map, 7-dim ordered bounds VALVE-173/175/176/177/178 + PUMP-170/172). Validated:
+  `tests/test_action_mapper.py` (7) + the real-EPANET round-trip in `test_env_integration`.
+- **D-P6-004 (observation, dim 139)** → already IMPLEMENTED in `state_builder.py`; exercised
+  end-to-end by `test_env_integration` (shape/dtype/bounds at every one of 192 steps).
+- **D-P6-005 (reward, C-A_F1_balanced_dense)** → IMPLEMENTED in `src/env/reward.py` +
+  `metrics.py`. Validated: `tests/test_metrics_reward.py` (12, closed-form) + the movement
+  invariant in `test_env_integration`. Formula / weights (1,1,1,0.1,0) / 5 normalisers
+  byte-identical to the approved spec; energy term disabled (w_E=0) but re-enablable.
+- **D-P6-006 (safety / admissibility layer, arch F1)** → IMPLEMENTED in `src/env/safety.py` +
+  `epanet_adapter.probe()` (non-committing forward look-ahead). Validated:
+  `tests/test_safety.py` (7, FakeDriver escalation ladder + TS2/TS4 predicates) + the
+  real-EPANET NO-OP-on-native-path check (`test_env_integration.test_5`: all 192 outcomes
+  "accepted", leak byte-identical safety ON vs OFF). The reject-to-hold (H1) /
+  reference-fallback (H3) branches are proven by unit tests; a real-EPANET **adversarial**
+  exercise (a command that genuinely trips the layer on live hydraulics) is a STEP-12 extension.
+- **STAGE F (baseline interfaces)** → IMPLEMENTED in `src/env/baselines.py` (pure masking:
+  native / prv_only / vsp_only / joint), NOT wired into `step()`. The evaluation PROTOCOL that
+  consumes these masks (metrics reported, demand scenario, train/eval split, seeds, conditions
+  run) remains an **OPEN Level-2 experiment-design decision** awaiting researcher approval.
+- **Status vs D-P6-006 §A3 gate:** the environment satisfies gate steps 1–4 (finalize →
+  implement → validate anchors → real-EPANET integration tests). **Step 5 (PPO-ready) remains
+  BLOCKED by R4** (torch / stable_baselines3 / gymnasium MISSING; do NOT auto-install, §20).
+  `demand_scenarios.py` stays DEFERRED (open STEP-10 decision). Deliverable commit recorded in
+  `PROJECT_STATE.yaml` git block.
+
 
 
