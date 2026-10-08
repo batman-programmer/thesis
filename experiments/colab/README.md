@@ -18,9 +18,13 @@ All pipeline code is path-portable (`experiments/ppo/*` derive the project root 
    ```
 2. **Get the repo** at the exact revision used locally (record the commit):
    ```bash
-   cd /content && git clone <REPO_URL> Thesis && cd Thesis && git checkout <COMMIT>
+   cd /content && git clone https://github.com/batman-programmer/thesis.git Thesis && cd Thesis && git checkout ef4189a
    ```
-   (or upload/sync the working tree; the benchmark INP must transfer intact.)
+   The repository is public over HTTPS, so no token is needed. **The pinned revision
+   must already exist on the remote** - verify locally with `git ls-remote origin | grep
+   <COMMIT>` before switching to Colab, otherwise the `git checkout` fails.
+   (Alternative: upload the working tree; the benchmark INP must transfer intact -
+   `verify_env --full` checks its SHA-256.)
 3. **Install deps on top of Colab's preinstalled CUDA torch** (do not reinstall torch):
    ```bash
    pip install -r experiments/colab/requirements-colab.txt
