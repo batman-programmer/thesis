@@ -376,9 +376,11 @@ dependencies:
 
 git:
   branch: "main"
-  head_commit: "e05c99f"
-  head_subject: "phase6: add portable local-dev + Colab-training PPO pipeline (WU-21)"
+  head_commit: "042764b"
+  head_subject: "phase6: fix mislabeled evaluation metric, expose true service-pressure diagnostics (WU-21a)"
   recent_commits:
+    - "042764b phase6: fix mislabeled evaluation metric, expose true service-pressure diagnostics (WU-21a)"
+    - "d9f62e9 phase6: record WU-21 colab pipeline commit hash (checkpoint)"
     - "e05c99f phase6: add portable local-dev + Colab-training PPO pipeline (WU-21)"
     - "808a619 phase6: record WU-20 env-implementation commit hash (checkpoint)"
     - "17cdda7 phase6: implement + verify production RL environment (STAGE C+D+F, WU-20)"
