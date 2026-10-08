@@ -1,0 +1,53 @@
+{
+  "fingerprint": {
+    "host": "Ali-Y",
+    "python": "3.13.15",
+    "platform": "Windows-11-10.0.26200-SP0",
+    "git_commit": "d9f62e9",
+    "working_inp_sha256": "53015ba9212e46bec731d190971819996233996b498bc269e828f992830a20a9",
+    "working_inp_sha256_expected": "53015ba9212e46bec731d190971819996233996b498bc269e828f992830a20a9",
+    "device": {
+      "preference": "auto",
+      "resolved": "cpu",
+      "cuda_available": false,
+      "gpu_name": null,
+      "torch_cuda_version": null
+    },
+    "versions": {
+      "torch": "NOT INSTALLED",
+      "stable-baselines3": "NOT INSTALLED",
+      "gymnasium": "NOT INSTALLED",
+      "numpy": "2.5.2",
+      "pandas": "3.0.5",
+      "scipy": "1.18.1",
+      "wntr": "1.5.0",
+      "epyt": "2.3.5.2"
+    },
+    "working_inp_sha256_match": true
+  },
+  "hydraulic_smoke": {
+    "obs_shape": [
+      139
+    ],
+    "obs_dtype": "float32",
+    "reset_in_bounds": true,
+    "reset_info": {
+      "sim_time_s": 0.0,
+      "step_index": -1,
+      "n_steps": 192
+    },
+    "steps_run": 4,
+    "seconds_total": 0.31,
+    "seconds_per_step": 0.077,
+    "obs_in_bounds_all_steps": true,
+    "terminated_any": false,
+    "truncated_at_step": null,
+    "leak_mean_gpm": 84.98207492262051,
+    "min_service_pressure_psi": 5.55830717086792,
+    "n_service_node_instants_negative": 0
+  },
+  "sb3_smoke": {
+    "available": false,
+    "skipped": true
+  }
+}
