@@ -167,6 +167,7 @@ class BWSNPressureControlEnv(_BASE):
     def step(self, action):
         """Apply one action: resolve admissibility, advance, reward, observe."""
         a = AM.as_float32(action)
+        prev_exec_norm = self._prev_exec_norm.copy()   # chronology baseline (pre-update)
         if self._enable_safety:
             dec = SF.resolve_action(
                 self._driver, a, self._prev_exec_norm,
@@ -178,7 +179,7 @@ class BWSNPressureControlEnv(_BASE):
             dec = None
         sr = self._driver.step(exec_prv, exec_pump)
         exec_norm = AM.command_to_normalized(exec_prv, exec_pump)
-        da = exec_norm - self._prev_exec_norm
+        da = exec_norm - prev_exec_norm              # D-P6-005: EXECUTED delta (unchanged)
         m = MX.step_metrics(sr, self._coeff, self._svc)
         rb = RW.compute_reward(m, da, self._reward_cfg)
 
@@ -192,7 +193,11 @@ class BWSNPressureControlEnv(_BASE):
             "safety": dec,
             "reward_breakdown": rb,
             "metrics": m,
-            "executed_action_norm": exec_norm,
+            # Phase-4 traceability (OBSERVABILITY ONLY -- these keys do not feed
+            # the observation, action, safety decision, or reward mathematics):
+            "proposed_action_norm": a,                 # what the policy emitted
+            "executed_action_norm": exec_norm,         # what the actuator received (post-safety)
+            "prev_executed_action_norm": prev_exec_norm,  # movement baseline a_exec_{t-1}
             "sim_time_s": sr.sim_time_s,
             "step_index": sr.step_index,
         }

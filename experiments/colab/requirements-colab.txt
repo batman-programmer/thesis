@@ -1,0 +1,22 @@
+# Colab training dependencies for the BWSN-1 PPO pipeline.
+#
+# INSTALL POLICY (see experiments/colab/README.md):
+#  * Colab GPU runtimes ship a CUDA-enabled torch already -- do NOT reinstall or
+#    upgrade torch unless SB3 reports an incompatibility, or you will risk
+#    breaking the CUDA build. Install SB3 + gymnasium + pyyaml on top of it.
+#  * wntr is PINNED to 1.5.0: the frozen hydraulic anchors were generated with
+#    WNTR 1.5.0 / EPANET 2.2 (engine 20200). Do NOT float this pin, and do NOT
+#    substitute EPyT/EPANET 2.3.x -- experiments/ppo/verify_env.py --full will
+#    reject any run whose native leak_mean drifts from 84.72988433677985 GPM
+#    (tol rel < 5e-5).
+#  * Exact resolved versions (incl. torch + CUDA) are RECORDED at runtime by
+#    verify_env.py into runs/_verify/fingerprint_<host>.json -- not hard-coded here.
+#
+# Minimal set actually required by the PPO stack on top of the validated hydraulics:
+stable-baselines3>=2.3        # pulls a compatible gymnasium; supports numpy 2 + py3.11-3.13
+gymnasium>=0.29               # Gymnasium API (reset/step 5-tuple, terminated/truncated)
+pyyaml>=6.0                   # config.yaml serialisation (JSON fallback if absent)
+wntr==1.5.0                   # FROZEN hydraulic engine (EPANET 2.2) -- comparability anchor
+
+# torch is intentionally NOT pinned here: on Colab use the preinstalled CUDA build;
+# off Colab, `pip install torch` yields the CPU build (verified on the dev laptop).

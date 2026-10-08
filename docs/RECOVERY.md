@@ -5,7 +5,22 @@ first, then `PROJECT_STATE.yaml`, then the three Phase 6 docs listed below. You
 should be able to reconstruct the whole project state from disk WITHOUT the old
 chat.**
 
-Last updated: 2026-10-01 (UTC) by Claude Opus 4.8. **Action space APPROVED & FROZEN
+Last updated: 2026-10-06 (UTC) by Claude Opus 4.8. **WU-21 (2026-10-06) — PORTABLE
+LOCAL-DEV + COLAB-TRAINING PPO PIPELINE added (architecture: the Windows laptop
+develops/validates; Google Colab GPU runs training/experiments). New: `experiments/ppo/`
+(`make_env`, `config`, `callbacks`, `train`, `evaluate`, `verify_env` — all project-root-
+from-`__file__`, no hard-coded paths, lazy torch/SB3 imports), `experiments/colab/`
+(`requirements-colab.txt`, `README.md`, `BWSN_PPO_Colab.ipynb` launcher), and
+`tests/test_ppo_traceability.py`. `src/env/bwsn_env.py` gained OBSERVABILITY-ONLY Phase-4
+`info` keys (`proposed_action_norm`, `executed_action_norm`, `prev_executed_action_norm`);
+verified a behavioural NO-OP — the 38-test battery still **38 OK**, plus **6/6** traceability
+and `verify_env --full` reproduces the native leak anchor (rel 5.29e-6). torch/SB3/gymnasium
+remain NOT installed locally BY DESIGN (training is Colab's job); the SB3 env-checker /
+PPO-construct / tiny-learn / checkpoint gates are Colab-executed (verify_env runs them there).
+STEP-10 (demand scenarios / splits / baseline protocol / ε_p–H sweep) still NOT STARTED — no
+robustness/OOD/superiority claims; any Colab PPO run is DEVELOPMENT evidence only. No frozen
+decision (D-P6-001..006) changed. See the WU-21 execution-log entry + experiments/colab/README.md.**
+**Action space APPROVED & FROZEN
 2026-09-27 (D-P6-001/002/003); STEP 7 observation design APPROVED & FROZEN 2026-09-27
 (D-P6-004, observation_dim=139); STEP 8 reward design D-P6-005 = APPROVED 2026-09-27 —
 researcher selected `C-A_F1_balanced_dense` (F1 normalized weighted sum; weights

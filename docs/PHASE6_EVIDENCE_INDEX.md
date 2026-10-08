@@ -407,3 +407,21 @@ Modules (all new, reuse `state_builder.py`): `src/env/{action_mapper,metrics,rew
 | Safety escalation ladder (D-P6-006) | test_safety (7, FakeDriver) | accepted→proposed; reject_to_hold via TS2 and via TS4; reference_fallback→native; diagnostics counts | all branches of the F1 ladder covered without hydraulics |
 | Baseline masks (STAGE F) | test_baselines (7) | native/prv_only/vsp_only/joint free-index masks; native pins round-trip to native physical; unknown mode raises | comparison-condition interface correct; eval PROTOCOL remains OPEN |
 | Determinism / no auto-deps | battery run | 38 OK exit 0; env gym-optional (headless); torch/SB3/gymnasium NOT imported | env usable without the PPO stack; R4 unchanged, NOT PPO-ready |
+
+## WU-21 — PORTABLE LOCAL-DEV + COLAB-TRAINING PPO PIPELINE (2026-10-06)
+
+Compute architecture: laptop develops/validates; **Colab GPU trains**. New code: `experiments/ppo/{make_env,config,callbacks,train,evaluate,verify_env}.py` (portable, project-root-from-`__file__`, lazy torch/SB3), `experiments/colab/{requirements-colab.txt,README.md,BWSN_PPO_Colab.ipynb}`, `tests/test_ppo_traceability.py`. `src/env/bwsn_env.py` gained observability-only Phase-4 `info` keys. ENGINEERING/INTEGRATION — no new research decision, no frozen invariant changed, STEP-10 still OPEN. Deliverable commit recorded in PROJECT_STATE.yaml git block.
+
+| Claim | Section/File | Result | Interpretation |
+|---|---|---|---|
+| Phase-4 edit is a behavioural NO-OP | 38-test battery (real EPANET) | 38 OK before AND after the edit (45.9 s / 92 s) | adding proposed/executed/prev `info` keys changed no obs/action/reward/safety value |
+| Proposed-vs-executed traceability | tests/test_ppo_traceability.py (6, real EPANET) | 6/6 OK (1.95 s): keys+shapes, chronology, movement=‖exec−prev_exec‖², safety-off identity, native accepted | reward movement uses the EXECUTED delta (D-P6-005 A2); chronology auditable |
+| Portable env factory | experiments/ppo/verify_env.py --full | ran via `-m`; project root from `__file__`; no hard-coded drive | same code runs at `/content/Thesis` on Colab |
+| Working-INP integrity | verify_env fingerprint | SHA256 `53015ba9…` == frozen expected (match=true) | catches file-transfer corruption to Colab |
+| Native leak anchor reproduced | verify_env hydraulic_smoke (REAL EPANET, 192 steps) | leak_mean 84.72943575; **rel 5.29e-6 < 5e-5**; horizon_ok | portable pipeline faithful to the frozen anchor |
+| Horizon/obs semantics | verify_env hydraulic_smoke | obs (139,) float32 in-bounds; terminated never; truncated@192 | D-P6-004 + episode formulation honoured through the pipeline |
+| Device detection (honest) | verify_env fingerprint | resolved `cpu`; cuda_available false; no GPU on laptop | CPU-only locally; GPU is Colab's; device recorded not assumed |
+| Per-step cost (safety OFF) | verify_env hydraulic_smoke | 0.088 s/step; 16.8 s/episode | informs PPO rollout sizing; safety-ON (~3× solves) to be measured on Colab |
+| SB3 contract/construct/learn/checkpoint | verify_env sb3_smoke | **NOT installed locally** (ModuleNotFoundError) — INCOMPLETE, by design | Colab-executed gate; laptop is not the training machine |
+| Reproducibility record | experiments/ppo/config.py | metadata.json captures live versions/device/git/SHA/frozen-spec ids per run | no hidden material defaults; no cross-machine bitwise claim |
+
