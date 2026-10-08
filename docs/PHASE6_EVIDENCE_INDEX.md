@@ -425,3 +425,15 @@ Compute architecture: laptop develops/validates; **Colab GPU trains**. New code:
 | SB3 contract/construct/learn/checkpoint | verify_env sb3_smoke | **NOT installed locally** (ModuleNotFoundError) — INCOMPLETE, by design | Colab-executed gate; laptop is not the training machine |
 | Reproducibility record | experiments/ppo/config.py | metadata.json captures live versions/device/git/SHA/frozen-spec ids per run | no hidden material defaults; no cross-machine bitwise claim |
 
+### WU-21a — mislabeled evaluation metric found by local self-test and fixed (2026-10-08)
+
+| Claim | Section/File | Result | Interpretation |
+|---|---|---|---|
+| Mislabeled metric CONFIRMED + fixed | experiments/ppo/evaluate.py | `min_pressure` had been read from `SafetyDecision.min_dp_min_psi` = the RELATIVE margin `p_min(proposed)−p_min(hold)`, not a pressure | would have reported a scientifically wrong "minimum pressure"; caught before any Colab run |
+| True diagnostics now exposed (observability-only) | src/env/bwsn_env.py | `min_service_pressure_psi`, `n_service_nodes_negative` at the endpoint over the frozen 121 service nodes | SAME min / `<0` conventions as the Phase-5/6 anchors — no new metric definition |
+| Additions are a behavioural NO-OP | 45-test battery (real EPANET) | **45 OK in 44.3 s** (38 WU-20 + 7 traceability) | obs/action/reward/safety values unchanged |
+| Min-service-pressure anchor reproduced | verify_env --full (REAL EPANET, 192 steps) | 4.163939952850342 vs frozen 4.16452169418335; **\|Δ\| 5.82e-4 psi** (tol 1e-2; matches documented WU-20 5.5e-4) | 192 post-action endpoints vs a 193-instant monolithic anchor ⇒ ~1e-4 psi difference expected, not identity |
+| Negative-pressure anchor reproduced EXACTLY | verify_env --full | **0** negative service-node instants (exact match) | the frozen "0 negative" reference state holds through the portable pipeline |
+| Colab drift guard strengthened | experiments/ppo/verify_env.py | gate now asserts 3 anchors (leak + min service pressure + zero negatives) and returns exit 0/1 | a Colab hydraulic divergence now fails the gate on more than leakage alone |
+| Safety margin reported under its real name | evaluate.py / callbacks.py | `safety_worst_relative_dp_min_psi` separated from pressure metrics | D-P6-006 guard margin kept distinct from service-pressure reporting |
+

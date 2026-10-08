@@ -183,6 +183,14 @@ class BWSNPressureControlEnv(_BASE):
         m = MX.step_metrics(sr, self._coeff, self._svc)
         rb = RW.compute_reward(m, da, self._reward_cfg)
 
+        # Endpoint service-pressure diagnostics (OBSERVABILITY ONLY -- not reward
+        # inputs). Same 121-service-node set and the same <0 / min conventions the
+        # frozen Phase-5/6 anchors use (min_service_pressure_psi 4.16452169418335,
+        # n_service_nodes_negative 0), so no new metric definition is introduced.
+        _p_svc = [sr.pressures_psi[j] for j in self._svc]
+        min_service_pressure_psi = float(min(_p_svc))
+        n_service_nodes_negative = int(sum(1 for v in _p_svc if v < 0.0))
+
         self._prev_exec_norm = exec_norm
         self._k += 1
         truncated = bool(self._driver.done)
@@ -198,6 +206,8 @@ class BWSNPressureControlEnv(_BASE):
             "proposed_action_norm": a,                 # what the policy emitted
             "executed_action_norm": exec_norm,         # what the actuator received (post-safety)
             "prev_executed_action_norm": prev_exec_norm,  # movement baseline a_exec_{t-1}
+            "min_service_pressure_psi": min_service_pressure_psi,
+            "n_service_nodes_negative": n_service_nodes_negative,
             "sim_time_s": sr.sim_time_s,
             "step_index": sr.step_index,
         }

@@ -99,6 +99,19 @@ class TestProposedExecutedTraceability(unittest.TestCase):
                 np.asarray(info["proposed_action_norm"], dtype=float),
                 np.asarray(info["executed_action_norm"], dtype=float), atol=1e-5))
 
+    def test_service_pressure_diagnostics(self):
+        # Observability-only endpoint diagnostics over the frozen 121 service nodes.
+        # On the native path the frozen reference state has ZERO negative-pressure
+        # instants, and the worst service node sits well below the 20 psi service
+        # threshold (chronic sub-20 baseline, min 4.16452169418335 psi) -- so the
+        # value must be positive and far under 300 psi, and the count exactly 0.
+        for _r, _t, _tr, info in self.on:
+            mp = info["min_service_pressure_psi"]
+            self.assertTrue(np.isfinite(mp))
+            self.assertGreater(mp, 0.0)
+            self.assertLess(mp, 300.0)
+            self.assertEqual(info["n_service_nodes_negative"], 0)
+
 
 if __name__ == "__main__":
     unittest.main(verbosity=2)

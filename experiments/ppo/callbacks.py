@@ -42,7 +42,7 @@ class ThesisLoggingCallback(BaseCallback):
         self._acc = {k: [] for k in (
             "leak_gpm", "dsr", "deficit", "min_pressure_psi", "n_neg",
             "r_leak", "r_unserved", "r_deficit", "r_movement",
-            "abs_proposed", "abs_executed", "movement_l2sq")}
+            "abs_proposed", "abs_executed", "movement_l2sq", "safety_dp_min")}
         self._outcomes = {"accepted": 0, "reject_to_hold": 0,
                           "reference_fallback": 0, "no_safety": 0}
 
@@ -54,8 +54,11 @@ class ThesisLoggingCallback(BaseCallback):
                 self._acc["leak_gpm"].append(m.leak_gpm)
                 self._acc["dsr"].append(m.dsr)
                 self._acc["deficit"].append(m.deficit_psi_nodesum)
-                # min service pressure is not in StepMetrics; derive from deficit? no.
-                # negative count also not in StepMetrics -> read from safety window if present.
+            # TRUE endpoint service-pressure diagnostics (frozen 121-node definitions).
+            if "min_service_pressure_psi" in info:
+                self._acc["min_pressure_psi"].append(info["min_service_pressure_psi"])
+            if "n_service_nodes_negative" in info:
+                self._acc["n_neg"].append(info["n_service_nodes_negative"])
             if rb is not None:
                 self._acc["r_leak"].append(rb.leak_term)
                 self._acc["r_unserved"].append(rb.unserved_term)
@@ -64,7 +67,9 @@ class ThesisLoggingCallback(BaseCallback):
                 self._acc["movement_l2sq"].append(rb.movement_l2sq)
             dec = info.get("safety")
             if dec is not None:
-                self._acc["n_neg"].append(getattr(dec, "n_neg_proposed", np.nan))
+                # RELATIVE guard margin p_min(proposed) - p_min(hold); not a pressure.
+                self._acc["safety_dp_min"].append(
+                    float(getattr(dec, "min_dp_min_psi", np.nan)))
             self._outcomes[info.get("outcome", "no_safety")] = \
                 self._outcomes.get(info.get("outcome", "no_safety"), 0) + 1
             p = info.get("proposed_action_norm")

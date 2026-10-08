@@ -44,6 +44,13 @@ from state_builder import observation_bounds  # noqa: E402
 
 LEAK_ANCHOR_GPM = 84.72988433677985
 LEAK_REL_TOL = 5e-5
+# Frozen Phase-5/6 reference-state anchors (PROJECT_STATE.yaml phase5.reference_state).
+# The env reports the 192 POST-ACTION control-step endpoints, while the monolithic
+# anchor spans all 193 instants, so the worst-node value is compared with the
+# documented stepped-vs-monolithic tolerance (|delta| 5.5e-4 psi in WU-20), rounded
+# up to 1e-2 psi; the negative-pressure count must match EXACTLY (0).
+MIN_SVC_PRESSURE_ANCHOR_PSI = 4.16452169418335
+MIN_SVC_PRESSURE_TOL_PSI = 1e-2
 NATIVE_NORM = AM.command_to_normalized(A.NATIVE_PRV_SETPOINT_PSI, A.NATIVE_PUMP_SPEED)
 
 
@@ -76,11 +83,14 @@ def hydraulic_smoke(full: bool) -> dict:
          "reset_info": {k: info[k] for k in ("sim_time_s", "step_index", "n_steps")}}
     n_target = 192 if full else 4
     leaks, terminated_any, trunc_step, in_bounds = [], False, None, True
+    p_mins, n_negs = [], []
     k = 0
     while k < n_target:
         obs, rew, terminated, truncated, info = env.step(NATIVE_NORM)
         k += 1
         leaks.append(info["metrics"].leak_gpm)
+        p_mins.append(info["min_service_pressure_psi"])
+        n_negs.append(info["n_service_nodes_negative"])
         in_bounds = in_bounds and bool(np.all(obs >= low - 1e-6) and np.all(obs <= high + 1e-6))
         assert np.isfinite(rew), "non-finite reward"
         terminated_any = terminated_any or terminated
@@ -96,11 +106,18 @@ def hydraulic_smoke(full: bool) -> dict:
         "obs_in_bounds_all_steps": in_bounds,
         "terminated_any": terminated_any, "truncated_at_step": trunc_step,
         "leak_mean_gpm": leak_mean,
+        "min_service_pressure_psi": float(np.min(p_mins)),
+        "n_service_node_instants_negative": int(np.sum(n_negs)),
     })
     if full:
         rel = abs(leak_mean - LEAK_ANCHOR_GPM) / LEAK_ANCHOR_GPM
+        dp = abs(float(np.min(p_mins)) - MIN_SVC_PRESSURE_ANCHOR_PSI)
         r.update({"leak_anchor_gpm": LEAK_ANCHOR_GPM, "leak_rel_err": rel,
                   "leak_anchor_match": bool(rel < LEAK_REL_TOL),
+                  "min_service_pressure_anchor_psi": MIN_SVC_PRESSURE_ANCHOR_PSI,
+                  "min_service_pressure_abs_err_psi": dp,
+                  "min_service_pressure_anchor_match": bool(dp < MIN_SVC_PRESSURE_TOL_PSI),
+                  "negative_pressure_anchor_match": bool(int(np.sum(n_negs)) == 0),
                   "horizon_ok": bool(k == 192 and trunc_step == 192 and not terminated_any)})
     return r
 
@@ -166,7 +183,9 @@ def main(argv=None) -> int:
     ok = (hs["reset_in_bounds"] and hs["obs_in_bounds_all_steps"]
           and report["fingerprint"]["working_inp_sha256_match"])
     if args.full:
-        ok = ok and hs.get("leak_anchor_match", False) and hs.get("horizon_ok", False)
+        ok = ok and hs.get("leak_anchor_match", False) and hs.get("horizon_ok", False) \
+            and hs.get("min_service_pressure_anchor_match", False) \
+            and hs.get("negative_pressure_anchor_match", False)
     return 0 if ok else 1
 
 

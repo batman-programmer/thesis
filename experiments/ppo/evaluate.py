@@ -40,7 +40,8 @@ def evaluate_model(model, env, n_episodes: int = 1) -> dict:
     for _ in range(n_episodes):
         obs, _info = env.reset()
         ep = {k: [] for k in ("leak", "dsr", "unserved_pos", "deficit",
-                              "min_pressure", "n_neg", "reward", "pump_speed_mean")}
+                              "min_service_pressure", "n_neg", "reward",
+                              "safety_dp_min")}
         outcomes = {}
         done = False
         while not done:
@@ -52,9 +53,13 @@ def evaluate_model(model, env, n_episodes: int = 1) -> dict:
             ep["unserved_pos"].append(m.unserved_pos_gpm)
             ep["deficit"].append(m.deficit_psi_nodesum)
             ep["reward"].append(r)
+            # TRUE endpoint service-pressure diagnostics (frozen 121-node definitions).
+            ep["min_service_pressure"].append(info["min_service_pressure_psi"])
+            ep["n_neg"].append(info["n_service_nodes_negative"])
             if dec is not None:
-                ep["n_neg"].append(int(getattr(dec, "n_neg_proposed", 0)))
-                ep["min_pressure"].append(float(getattr(dec, "min_dp_min_psi", np.nan)))
+                # NOTE: min_dp_min_psi is the RELATIVE guard margin
+                # p_min(proposed) - p_min(hold), NOT an absolute pressure.
+                ep["safety_dp_min"].append(float(getattr(dec, "min_dp_min_psi", np.nan)))
             outcomes[info["outcome"]] = outcomes.get(info["outcome"], 0) + 1
             done = terminated or truncated
         n = max(sum(outcomes.values()), 1)
@@ -64,10 +69,15 @@ def evaluate_model(model, env, n_episodes: int = 1) -> dict:
             "dsr_mean": float(np.nanmean(ep["dsr"])),
             "unserved_pos_mean_gpm": float(np.mean(ep["unserved_pos"])),
             "deficit_mean_psi_nodesum": float(np.mean(ep["deficit"])),
+            "min_service_pressure_psi_min": float(np.min(ep["min_service_pressure"])),
+            "min_service_pressure_psi_mean": float(np.mean(ep["min_service_pressure"])),
+            "n_service_node_instants_negative": int(np.sum(ep["n_neg"])),
             "cumulative_reward": float(np.sum(ep["reward"])),
             "mean_step_reward": float(np.mean(ep["reward"])),
             "safety_outcomes": outcomes,
             "safety_accept_rate": outcomes.get("accepted", 0) / n,
+            "safety_worst_relative_dp_min_psi":
+                (float(np.nanmin(ep["safety_dp_min"])) if ep["safety_dp_min"] else None),
         })
     return {"n_episodes": n_episodes, "episodes": episodes}
 
