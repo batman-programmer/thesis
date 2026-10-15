@@ -22,6 +22,7 @@ runtime values still come from the frozen ``src/env`` modules, never from here.
 
 from __future__ import annotations
 
+import hashlib
 import json
 import platform
 import subprocess
@@ -52,7 +53,15 @@ FROZEN_SPEC = {
         "D-P6-005": "reward C-A_F1_balanced_dense",
         "D-P6-006": "safety F1 execution-time admissibility (HOLD counterfactual)",
     },
+    # LINE-ENDING-INDEPENDENT anchor: SHA-256 of the INP with CRLF/CR normalized to
+    # LF in memory (see normalized_sha256). This equals the git blob's own hash, so
+    # it is identical on Windows (CRLF checkout) and Linux/Colab (LF checkout).
+    # The raw-byte digest of a CRLF Windows checkout is
+    # 53015ba9212e46bec731d190971819996233996b498bc269e828f992830a20a9 -- recorded
+    # for provenance only; the file content is identical modulo line endings.
     "working_inp_sha256_expected":
+        "f14db5930f5b8c648a2e81f56a3f1b560e94b7c83745ec4def4fab53f9583cea",
+    "working_inp_sha256_raw_crlf_windows":
         "53015ba9212e46bec731d190971819996233996b498bc269e828f992830a20a9",
     "hydraulic_stack_frozen": "WNTR 1.5.0 / EPANET 2.2 (engine 20200)",
 }
@@ -142,8 +151,32 @@ def _git_commit() -> str:
         return "UNKNOWN"
 
 
+def normalized_sha256(data: bytes) -> str:
+    """SHA-256 over content whose line endings are normalized to LF in memory.
+
+    The repository stores the benchmark INP with LF endings, but this checkout has
+    ``core.autocrlf=true``, so Windows working copies materialise CRLF while Linux
+    ones stay LF. Hashing the raw bytes therefore yields a platform-dependent
+    digest for BYTE-IDENTICAL content (verified on this repo: the CRLF worktree is
+    45063 B and hashes to 53015ba9...; normalizing removes exactly its 661 CRLF
+    pairs, giving 44402 B and f14db593..., which equals the git blob's own hash).
+
+    Normalization happens IN MEMORY ONLY -- the .inp file is never rewritten, and
+    no hydraulic parameter, solver setting or baseline value is involved.
+    """
+    return hashlib.sha256(
+        data.replace(b"\r\n", b"\n").replace(b"\r", b"\n")).hexdigest()
+
+
 def _working_inp_sha256() -> str:
-    import hashlib
+    """Line-ending-independent SHA-256 of the working INP (the comparison anchor)."""
+    if not WORKING_INP.exists():
+        return "MISSING"
+    return normalized_sha256(WORKING_INP.read_bytes())
+
+
+def _working_inp_sha256_raw() -> str:
+    """Raw-byte SHA-256 -- DIAGNOSTIC ONLY (platform-dependent; not an anchor)."""
     if not WORKING_INP.exists():
         return "MISSING"
     return hashlib.sha256(WORKING_INP.read_bytes()).hexdigest()
