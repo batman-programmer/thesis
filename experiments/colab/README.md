@@ -18,7 +18,7 @@ All pipeline code is path-portable (`experiments/ppo/*` derive the project root 
    ```
 2. **Get the repo** at the exact revision used locally (record the commit):
    ```bash
-   cd /content && git clone https://github.com/batman-programmer/thesis.git Thesis && cd Thesis && git checkout ef4189a
+   cd /content && git clone https://github.com/batman-programmer/thesis.git Thesis && cd Thesis && git checkout c7fb5cf451ca08156f0632fe343c31c7987c2f3a
    ```
    The repository is public over HTTPS, so no token is needed. **The pinned revision
    must already exist on the remote** - verify locally with `git ls-remote origin | grep
@@ -31,13 +31,19 @@ All pipeline code is path-portable (`experiments/ppo/*` derive the project root 
    ```
 4. **Verify environment + GPU + hydraulic anchor + SB3 contract** (authoritative gate):
    ```bash
-   python -m experiments.ppo.verify_env --full
+   python -m experiments.ppo.verify_env --full --require-ppo
    ```
+   `--require-ppo` makes an unavailable SB3/PPO installation a FAILED gate rather than a
+   silently skipped optional check, so run it on the training runtime.
    This prints versions + device (expects `cuda_available: true` on a GPU runtime),
-   confirms the working-INP SHA matches `53015ba9…`, asserts the native leak anchor
+   confirms the working-INP checksum matches the cross-platform normalized anchor
+   `f14db5930f5b8c648a2e81f56a3f1b560e94b7c83745ec4def4fab53f9583cea` (CRLF/CR normalized
+   to LF in memory; the raw Windows CRLF digest
+   `53015ba9212e46bec731d190971819996233996b498bc269e828f992830a20a9` is reported only as a
+   diagnostic/provenance value, not as the comparison anchor), asserts the native leak anchor
    `84.72988433677985` GPM at `rel < 5e-5`, and runs the SB3 env-checker + a PPO
    construct/predict/tiny-learn + checkpoint round-trip. **If the leak anchor or the
-   INP SHA fails, STOP** — investigate version/engine/transfer drift before training.
+   INP checksum fails, STOP** — investigate version/engine/transfer drift before training.
 5. **Cross-environment consistency:** compare the Colab
    `runs/_verify/fingerprint_<host>.json` against the laptop's
    `fingerprint_Ali-Y.json` (obs shape, leak anchor match, horizon). Materially
