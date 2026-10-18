@@ -926,3 +926,63 @@ changed**, no frozen invariant altered, no STAGE-I stop triggered.
 
 
 
+
+
+---
+
+## D-P6-007 — Demand uncertainty, scenario separation & evaluation protocol (STEP 10)  [PROPOSED 2026-10-15 — decision-ready brief prepared, NO selection made]
+
+- **Date:** 2026-10-15
+- **Topic:** How uncertain demand is generated, how train / validation / test / OOD
+  scenarios are separated, how seeds and scenario identities are assigned, and how
+  the comparison conditions are evaluated. **PROPOSED only** — this entry records a
+  decision-ready package; it selects nothing and implements nothing.
+- **Level:** 2–3 (research-impacting; defines the tested operating envelope and the
+  validity of every later generalisation claim).
+- **Brief:** `docs/PHASE6_STEP10_DESIGN_BRIEF.md` (§1–§11; §10 researcher decision
+  form is BLANK).
+- **Why now:** STEP 10 was the last design layer before scientific PPO training.
+  Disk evidence: `PROJECT_STATE.yaml phase6.steps.step10…` = NOT STARTED;
+  `src/env/demand_scenarios.py` absent; `src/env/baselines.py` is an action-mask
+  interface imported only by its unit test; `experiments/ppo/evaluate.py` evaluates
+  a single PPO model with no scenario or baseline support.
+- **Measured evidence carried (read-only, from the working INP):** PATTERN-0 has 96
+  multipliers at a 30-min pattern timestep (48 h) and is the default pattern for
+  ~124 of 126 junctions, so it repeats exactly twice per 96 h episode; its two 24 h
+  halves are NOT identical (46/48 slots differ, max |Δ| 1.17, day-1 mean 0.7327 vs
+  day-2 mean 1.0385); the frozen observation carries only 24 h sin/cos, so
+  same-hour states on different days are aliased. Classified as an existing
+  POMDP limitation (D-P6-004), NOT a defect and NOT grounds to change the
+  observation.
+- **Mechanical constraint recorded:** `SteppingHydraulicDriver.reset()` computes the
+  requested-demand series once via `expected_demand(wn_full)`, while each control
+  step rebuilds a fresh segment from the working copy. A scenario must therefore
+  perturb BOTH paths and must be a pure deterministic function of
+  (scenario_id, junction, absolute time), or DSR/unserved accounting silently drifts
+  and the demand sequence restarts at segment boundaries.
+- **Open decisions (all unresolved):** D1 temporal structure (U1 persistent /
+  U2 per-step / U3 diurnal-shape); D2 magnitude & distribution (M1 truncated normal
+  [0.7,1.3] — the only range with project-record precedent, Hu et al. 2023, a
+  precedent on Net3, NOT evidence for BWSN-1; M2 [0.8,1.2]; M3 uniform); D3 spatial
+  structure (S1 global / S2 per-junction i.i.d. / S3 spatially smooth); D4 split &
+  seed policy; D5 baseline/evaluation protocol; D6 handling of the 48 h/24 h
+  aliasing.
+- **Protocol invariants proposed (not parameter choices):** scenario identity +
+  seed derived from a master seed via `SeedSequence.spawn` so groups cannot collide;
+  train/validation/test deliberately share the SAME family and range (in-distribution
+  generalisation) and are separated by disjoint seeds; OOD reported separately and
+  never used for selection; test evaluated once, checkpoints selected on validation;
+  every condition evaluated on identical scenario IDs (paired); no composite score.
+- **Baseline semantic that must not be conflated:** `native` is the fixed frozen
+  hydraulic baseline requiring no training; `prv_only` / `vsp_only` / `joint` are
+  LEARNED conditions requiring separately trained policies. Applying an action mask
+  to a joint-trained policy is NOT the corresponding ablation condition.
+- **Scope conflict recorded (narrow):** the D-P6-006 register mandates the
+  ε_p ∈ {0,2,5} psi and H ∈ {1,2,4,8} sweep as a **STEP-12** activity, while the
+  `docs/RECOVERY.md` banner lists it under STEP-10. The register is authoritative;
+  the sweep is NOT part of STEP 10 and was not run.
+- **Status:** PROPOSED / DECISION PENDING RESEARCHER. No scenario module, no split,
+  no baseline harness and no evaluation driver were implemented. No frozen decision
+  changed. No PPO training performed.
+- **Next:** researcher completes §10 of the brief to resolve D-P6-007; only then
+  implement `src/env/demand_scenarios.py` and the baseline evaluation harness.

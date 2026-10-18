@@ -437,3 +437,17 @@ Compute architecture: laptop develops/validates; **Colab GPU trains**. New code:
 | Colab drift guard strengthened | experiments/ppo/verify_env.py | gate now asserts 3 anchors (leak + min service pressure + zero negatives) and returns exit 0/1 | a Colab hydraulic divergence now fails the gate on more than leakage alone |
 | Safety margin reported under its real name | evaluate.py / callbacks.py | `safety_worst_relative_dp_min_psi` separated from pressure metrics | D-P6-006 guard margin kept distinct from service-pressure reporting |
 
+
+## WU-22 — STEP 10 DESIGN BRIEF: demand uncertainty, splits & evaluation protocol (2026-10-18)
+
+DECISION-GATE PREP only — D-P6-007 PROPOSED, researcher_selection=null. Deliverable: `docs/PHASE6_STEP10_DESIGN_BRIEF.md` (§10 form BLANK). NO implementation, ZERO hydraulic simulations run in this WU. No frozen decision changed.
+
+| Claim | Section/File | Result | Interpretation |
+|---|---|---|---|
+| STEP 10 was genuinely not started | PROJECT_STATE step10/demand_uncertainty; `src/env/` listing | NOT STARTED; `demand_scenarios.py` absent | the design brief was the correct first STEP-10 artefact, not redundant work |
+| PATTERN-0 is 48 h and repeats twice per episode | working INP `[TIMES]` + `[PATTERNS]` (read-only) | 96 multipliers @ 0:30 pattern timestep; default for ~124/126 junctions | the episode is two UNEQUAL "days"; scenario design must respect the 48 h phase |
+| The two 24 h halves differ materially | same, computed | 46/48 slots differ; max abs diff 1.17; day means 0.7327 vs 1.0385 | same-hour observation states are aliased — existing POMDP limitation, documented not "fixed" |
+| Scenario must perturb BOTH solve paths | `epanet_adapter.reset()` vs `_build_segment()` | requested series from `expected_demand(wn_full)`; segments rebuilt from working copy | perturbing only segments would silently corrupt DSR/unserved accounting |
+| Demand-uncertainty magnitude precedent | docs/phase4_decision_report.md (Hu et al. 2023, Net3) | truncated normal [0.7, 1.3] | a design PRECEDENT from one paper on a different network — NOT evidence about BWSN-1 |
+| ε_p–H sweep is STEP-12, not STEP-10 | D-P6-006 register lines vs RECOVERY banner | register mandates "STEP-12 sweep"; banner said STEP-10 | register authoritative; sweep NOT run; RECOVERY wording corrected (banner only) |
+| Baseline semantics preserved | src/env/baselines.py + brief §5 | native = fixed reference (no training); prv_only/vsp_only/joint = LEARNED conditions | a mask on a joint-trained policy is NOT the corresponding ablation condition |

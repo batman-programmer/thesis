@@ -17,9 +17,17 @@ verified a behavioural NO-OP — the 38-test battery still **38 OK**, plus **6/6
 and `verify_env --full` reproduces the native leak anchor (rel 5.29e-6). torch/SB3/gymnasium
 remain NOT installed locally BY DESIGN (training is Colab's job); the SB3 env-checker /
 PPO-construct / tiny-learn / checkpoint gates are Colab-executed (verify_env runs them there).
-STEP-10 (demand scenarios / splits / baseline protocol / ε_p–H sweep) still NOT STARTED — no
-robustness/OOD/superiority claims; any Colab PPO run is DEVELOPMENT evidence only. No frozen
-decision (D-P6-001..006) changed. See the WU-21 execution-log entry + experiments/colab/README.md.**
+**UPDATE 2026-10-18 (WU-22):** the `c7fb5cf` harness fixes (normalized INP checksum,
+trained-policy checkpoint round-trip, required-failure exit propagation) and the `b17bae8`
+finalization (checkpoint + Colab pin/`--require-ppo`) are pushed to `origin/main`.
+STEP-10 is now **DESIGN-BRIEF-PREPARED, D-P6-007 PROPOSED, PENDING RESEARCHER**: read
+`docs/PHASE6_STEP10_DESIGN_BRIEF.md` (D1–D7 options; §10 decision form BLANK) + the
+D-P6-007 register entry. NO scenario code exists yet — the env remains deterministic until
+the researcher selects the uncertainty family/magnitude/spatial structure. Correction: the
+ε_p–H safety sweep is a **STEP-12** activity per the authoritative D-P6-006 register, NOT
+part of STEP-10. Still no robustness/OOD/superiority claims; any Colab PPO run remains
+DEVELOPMENT evidence only. No frozen decision (D-P6-001..006) changed. See the WU-22
+execution-log entry + docs/PHASE6_STEP10_DESIGN_BRIEF.md.**
 **Action space APPROVED & FROZEN
 2026-09-27 (D-P6-001/002/003); STEP 7 observation design APPROVED & FROZEN 2026-09-27
 (D-P6-004, observation_dim=139); STEP 8 reward design D-P6-005 = APPROVED 2026-09-27 —
