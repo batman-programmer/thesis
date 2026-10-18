@@ -376,11 +376,12 @@ dependencies:
 
 git:
   branch: "main"
-  head_commit: "c7fb5cf"
-  head_subject: "fix(ppo): correct validation checksum and checkpoint checks"
+  head_commit: "3c1b01e"
+  head_subject: "step10: prepare demand-uncertainty & evaluation-protocol design brief (WU-22)"
   recent_commits:
+    - "3c1b01e step10: prepare demand-uncertainty & evaluation-protocol design brief (WU-22)"
+    - "b17bae8 docs(colab): sync runtime gate to PPO validation fix"
     - "c7fb5cf fix(ppo): correct validation checksum and checkpoint checks"
-    - "042764b phase6: fix mislabeled evaluation metric, expose true service-pressure diagnostics (WU-21a)"
     - "d9f62e9 phase6: record WU-21 colab pipeline commit hash (checkpoint)"
     - "e05c99f phase6: add portable local-dev + Colab-training PPO pipeline (WU-21)"
     - "808a619 phase6: record WU-20 env-implementation commit hash (checkpoint)"
