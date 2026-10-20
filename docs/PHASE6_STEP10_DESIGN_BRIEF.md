@@ -3,7 +3,12 @@
 **Status: DECISION-READY — PROPOSED, NOT APPROVED. Nothing in this document is a
 scientific decision until the researcher completes §10.**
 Prepared 2026-10-15. Register ID: **D-P6-007** (next free ID after D-P6-000a/b,
-D-P6-001 … D-P6-006).
+D-P6-001 … D-P6-006). A focused methodology review (2026-10-19) added two clearly
+labelled **[RECOMMENDED for consideration]** addenda — evaluation-episode
+determinism (§5 D5) and training-scenario presentation (§5 D4) — plus one
+`D4_training_presentation` field in the §10 form. They are **recommendations
+awaiting researcher selection, not approvals**; every other line of this brief is
+unchanged.
 
 This brief exists because STEP 10 is the last *design* layer before scientific PPO
 training. Every value below marked **[PROPOSED]** is a candidate, not a decision.
@@ -178,6 +183,33 @@ Rules that make the split meaningful (these are protocol, not parameter choices)
 5. `env.reset(seed=...)` seeds **only** the scenario sampler; hydraulics remain
    deterministic. Seed → scenario is recorded in run metadata.
 
+> **Review addendum (2026-10-19, focused methodology review — RECOMMENDATION ONLY,
+> not a decision; D-P6-007 remains PROPOSED): training-scenario presentation.**
+> The T-train row above describes training on **eight fixed, enumerated demand
+> realisations**. Note the dimension of what is being sampled: under the proposed
+> U1 + S1 combination each realisation is **one persistent global scalar
+> multiplier** in [0.7, 1.3] held for 96 h, so eight enumerated training scenarios
+> sample a 1-D interval at 8 points and the policy cycles over the same eight
+> episodes for the entire run. Two coherent presentations exist, and the seeded
+> scenario generator (§9.2 acceptance criteria) is required by **both**, so the
+> marginal implementation cost of Option B is near zero:
+>
+> | | Option A — fixed enumerated training set | Option B — per-episode seeded sampling (eval sets stay fixed) |
+> |---|---|---|
+> | What it is | Train only on `train/0..7` (8 fixed draws), cycled | Each training episode draws a fresh U1+S1 multiplier from a seeded RNG stream; V / E / OOD remain the fixed, disjoint IDs above |
+> | Establishes | Exact replay of the precise training sequence; trivially auditable | Exposure to the continuous in-family distribution (standard domain-randomisation practice) |
+> | Does NOT establish | Distribution-level coverage during training; no guard against memorising 8 specific scalars | Replay of the exact draw *sequence* (rather than the family) depends on the recorded RNG stream |
+> | Principal risk | Overfitting to 8 specific multipliers; test-set drop attributable to narrow training coverage | Slightly weaker "which scenarios were seen" audit trail (mitigated by logging every drawn multiplier) |
+> | Added cost | Baseline | ≈ zero code delta (same module, same per-step compute); requires per-draw logging |
+>
+> **[RECOMMENDED for consideration]** Option B: the generator exists under either
+> option, the cost delta is near zero, and it converts the 8-point coverage risk
+> into standard in-family domain randomisation while the fixed, disjoint
+> validation / test / OOD IDs keep selection and reporting paired and reproducible.
+> Option A remains fully defensible if exact enumerated replay is valued above
+> coverage. **This is a recommendation awaiting researcher selection, not an
+> approval.**
+
 ### D5 — Baseline and evaluation protocol
 
 **Distinction that must be preserved** (it is the easiest thing to get wrong):
@@ -199,6 +231,35 @@ Proposed evaluation rules (**[PROPOSED]**):
   same seeds and the same episode length, so differences are attributable to control.
 * Deterministic rollouts; **K = 3** evaluation episodes per (condition, scenario) is
   the proposed minimum, reported per episode **and** aggregated per scenario.
+  > **Review addendum (2026-10-19 — determinism clarification, RECOMMENDATION ONLY):**
+  > as implemented, the environment contains **no stochastic element**: `reset(seed=...)`
+  > seeds nothing the dynamics consume, EPANET runs the same deterministic solve every
+  > time, and the evaluator uses `model.predict(deterministic=True)` (documented
+  > behaviour in `experiments/ppo/evaluate.py`). Therefore, once the scenario model is
+  > implemented per §9.2, a fixed `scenario_id` fully determines the demand series and
+  > thus the whole trajectory: **K > 1 episodes on the same (condition, scenario) would
+  > be deterministic duplicates** — same actions, same hydraulics, same metrics, exact
+  > re-runs. This is the intended determinism (acceptance criterion §9.2: "same seed +
+  > same config ⇒ byte-identical scenario data") — but it means the repetitions
+  > supply **no independent statistical evidence** in the deterministic-evaluation
+  > setting.
+  >
+  >  **What the repetition axes actually are:**
+  >
+  >  | Axis | Source of variation | Effect on results |
+  >  |---|---|---|
+  >  | Training seed | PPO initialisation + action-sampling noise during training | **Independent** trained policies → the genuine seed-to-seed variation axis |
+  >  | Scenario ID | Distinct multi-factor draw (family, magnitude, spatial) | **Independent demand conditions** → the generalisation axis |
+  >  | Evaluation episodes (K) | None, under deterministic rollouts on a fixed scenario | **Exact duplicates** — useful only as a determinism check |
+  >
+  > **[RECOMMENDED for consideration]:** treat **K = 1 deterministic episode per
+  > (condition, scenario)** as the default reporting unit, with K = 3 retained only as
+  > an **explicit determinism check** (report identical-metrics status, not
+  > mean ± spread); derive any mean ± spread across **scenarios** (and, if used,
+  > across training seeds), never across duplicated episodes. If the researcher later
+  > selects stochastic policy rollouts (`deterministic=False`) or a temporally
+  > stochastic demand family (U2/U3), K > 1 becomes genuinely informative and this
+  > recommendation should be revisited. No change to the paired-scenario design.
 * **Checkpoint selection on validation scenarios only**; the test set is evaluated once.
 * **No composite score.** Report separately: mean modelled leakage, DSR, unserved
   demand, minimum service pressure, negative-pressure instants, pressure deficit,
@@ -263,41 +324,50 @@ STEP 10 is complete only when **all** of the following hold:
    scenario IDs**, with metrics reported separately.
 9. No PPO scientific training is implied by any of the above.
 
-## 10. Researcher decision form — BLANK
+## 10. Researcher decision form — SELECTIONS RECORDED 2026-10-19
 
-Complete by replacing each `null`. **Until this form is filled, D-P6-007 remains
-PROPOSED and no scenario code will be written.**
+The selections below were communicated by the researcher in their 2026-10-19
+STEP-10 implementation directive (the directive that authorised implementing
+`src/env/demand_scenarios.py` and the integration). They are recorded here as
+received, with truthful provenance: the directive selected the parameters and
+instructed recording them; it is an implementation-authorising selection, not a
+separately signed "APPROVED & FROZEN" act in the sense of D-P6-001..006. The
+D-P6-007 register entry remains the authority on status.
 
 ```yaml
 D-P6-007:
-  researcher_selection: null
-  D1_temporal_structure: null        # "U1" | "U2" | "U3" | other
-  D2_distribution: null              # "M1" | "M2" | "M3" | other
-  D2_parameters:                     # only if M1/M2/M3 or a custom family
-    family: null                     # e.g. "truncated_normal"
-    lower: null
-    upper: null
-    mu: null
-    sigma: null
-  D3_spatial_structure: null         # "S1" | "S2" | "S3" | other
+  researcher_selection: "selected via 2026-10-19 implementation directive (see header note)"
+  D1_temporal_structure: "U1"         # one multiplier per 96 h episode (persistent)
+  D2_distribution: "M1"               # exact truncated normal (inverse-CDF), NOT clipped
+  D2_parameters:
+    family: "truncated_normal"
+    lower: 0.7
+    upper: 1.3
+    mu: 1.0
+    sigma: 0.1                        # a=-3, b=3 in sigma units; analytic std 0.0986578
+  D3_spatial_structure: "S1 (train + in-distribution eval); S2 (OOD only)"
   D4_policy:
-    scenarios_train: null            # count
-    scenarios_validation: null       # count
-    scenarios_test: null             # count
-    scenarios_ood: null              # count (0 = no OOD reporting)
-    ood_definition: null             # only if scenarios_ood > 0
-    master_seed: null
+    scenarios_train: "unbounded stream — NEW draw per episode reset (B), never a cycled fixed set"
+    scenarios_validation: 4           # val/0..3, U1+M1+S1, fixed reproducible
+    scenarios_test: 4                 # test/0..3, U1+M1+S1, fixed reproducible
+    scenarios_ood: 2                  # ood/0..1, U1+M1+S2 (independent per-junction factors)
+    ood_definition: "S2: per-junction i.i.d. truncated-normal factors over the 79 demand junctions (spatial heterogeneity unseen in training)"
+    master_seed: 20261019             # SpawnSequence keys: train=0, val=1, test=2, ood=3
     test_written_once: true
   D5_evaluation:
-    episodes_per_condition_per_scenario: null
+    episodes_per_condition_per_scenario: 1    # K=1 + explicit determinism check (deterministic rollouts make K>1 duplicates)
     checkpoint_selection_split: "validation"   # fixed by protocol; change only with reason
     primary_outcome: "mean_modelled_leakage"   # fixed by protocol; change only with reason
     paired_scenario_ids_across_conditions: true
-  D6_48h_24h_handling: null          # "accept_and_document" | "quantify_diagnostic" | other
-  D7_sweep_stage_confirmation: null  # "sweep is STEP-12 (register)" | other
-  rationale: null
-  decision_date: null
-  approved_by: null
+  D4_training_presentation: "B_seeded_per_episode_sampling"
+  D6_48h_24h_handling: "accept_and_document"
+  D7_sweep_stage_confirmation: "sweep is STEP-12 (register)"
+  additional_selections:
+    training_seeds: "3 seeds for the final Colab evaluation (planned; not part of the 2026-10-19 implementation)"
+    scenario_logging: "scenario id + multiplier logged EVERY training episode (env/scenario_id, env/scenario_multiplier)"
+  rationale: "Researcher directive of 2026-10-19: smallest uncertainty layer consistent with the approved scope — persistent global multipliers (U1+S1) for training and in-distribution evaluation, spatially heterogeneous S2 reserved for OOD reporting; exact truncated normal per the M1 range precedent; disjoint SeedSequence streams guarantee train/eval separation with no leakage."
+  decision_date: "2026-10-19 (selections communicated); implementation recorded same date"
+  approved_by: "researcher (selection + implementation authorisation via directive; register retains status authority)"
 ```
 
 ## 11. Provenance and non-claims

@@ -3,9 +3,10 @@
     "host": "Ali-Y",
     "python": "3.13.15",
     "platform": "Windows-11-10.0.26200-SP0",
-    "git_commit": "d9f62e9",
-    "working_inp_sha256": "53015ba9212e46bec731d190971819996233996b498bc269e828f992830a20a9",
-    "working_inp_sha256_expected": "53015ba9212e46bec731d190971819996233996b498bc269e828f992830a20a9",
+    "git_commit": "d5b6f24",
+    "working_inp_sha256": "f14db5930f5b8c648a2e81f56a3f1b560e94b7c83745ec4def4fab53f9583cea",
+    "working_inp_sha256_expected": "f14db5930f5b8c648a2e81f56a3f1b560e94b7c83745ec4def4fab53f9583cea",
+    "working_inp_sha256_raw_diagnostic": "53015ba9212e46bec731d190971819996233996b498bc269e828f992830a20a9",
     "device": {
       "preference": "auto",
       "resolved": "cpu",
@@ -36,18 +37,26 @@
       "step_index": -1,
       "n_steps": 192
     },
-    "steps_run": 4,
-    "seconds_total": 0.31,
-    "seconds_per_step": 0.077,
+    "steps_run": 192,
+    "seconds_total": 9.13,
+    "seconds_per_step": 0.048,
     "obs_in_bounds_all_steps": true,
     "terminated_any": false,
-    "truncated_at_step": null,
-    "leak_mean_gpm": 84.98207492262051,
-    "min_service_pressure_psi": 5.55830717086792,
-    "n_service_node_instants_negative": 0
+    "truncated_at_step": 192,
+    "leak_mean_gpm": 84.72943575468366,
+    "min_service_pressure_psi": 4.163939952850342,
+    "n_service_node_instants_negative": 0,
+    "leak_anchor_gpm": 84.72988433677985,
+    "leak_rel_err": 5.29426069319602e-06,
+    "leak_anchor_match": true,
+    "min_service_pressure_anchor_psi": 4.16452169418335,
+    "min_service_pressure_abs_err_psi": 0.0005817413330078125,
+    "min_service_pressure_anchor_match": true,
+    "negative_pressure_anchor_match": true,
+    "horizon_ok": true
   },
   "sb3_smoke": {
     "available": false,
-    "skipped": true
+    "reason": "ModuleNotFoundError: No module named 'stable_baselines3'"
   }
 }

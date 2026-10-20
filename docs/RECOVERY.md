@@ -17,17 +17,28 @@ verified a behavioural NO-OP — the 38-test battery still **38 OK**, plus **6/6
 and `verify_env --full` reproduces the native leak anchor (rel 5.29e-6). torch/SB3/gymnasium
 remain NOT installed locally BY DESIGN (training is Colab's job); the SB3 env-checker /
 PPO-construct / tiny-learn / checkpoint gates are Colab-executed (verify_env runs them there).
-**UPDATE 2026-10-18 (WU-22):** the `c7fb5cf` harness fixes (normalized INP checksum,
-trained-policy checkpoint round-trip, required-failure exit propagation) and the `b17bae8`
-finalization (checkpoint + Colab pin/`--require-ppo`) are pushed to `origin/main`.
-STEP-10 is now **DESIGN-BRIEF-PREPARED, D-P6-007 PROPOSED, PENDING RESEARCHER**: read
-`docs/PHASE6_STEP10_DESIGN_BRIEF.md` (D1–D7 options; §10 decision form BLANK) + the
-D-P6-007 register entry. NO scenario code exists yet — the env remains deterministic until
-the researcher selects the uncertainty family/magnitude/spatial structure. Correction: the
-ε_p–H safety sweep is a **STEP-12** activity per the authoritative D-P6-006 register, NOT
-part of STEP-10. Still no robustness/OOD/superiority claims; any Colab PPO run remains
-DEVELOPMENT evidence only. No frozen decision (D-P6-001..006) changed. See the WU-22
-execution-log entry + docs/PHASE6_STEP10_DESIGN_BRIEF.md.**
+*(History 2026-10-18, WU-22: the `c7fb5cf` harness fixes and `b17bae8` finalization are
+pushed to `origin/main`; the STEP-10 design brief + D-P6-007 PROPOSED entry date from
+that push. The ε_p–H safety sweep is a **STEP-12** activity per the authoritative
+D-P6-006 register, NOT part of STEP-10.)*
+**UPDATE 2026-10-19 (STEP-10 IMPLEMENTED):** D-P6-007 selections were received via the
+researcher's implementation directive (U1 one multiplier per 96 h episode; M1 exact
+truncated normal mu 1.0 sigma 0.1 [0.7, 1.3]; S1 global for train/in-distribution eval,
+S2 per-junction for OOD; master seed 20261019 with disjoint SeedSequence streams;
+per-episode training draws; fixed 4 val + 4 test + 2 OOD eval set; K=1 + explicit
+repeatability check; 48 h/24 h aliasing accepted and documented; eps_p–H sweep remains
+STEP-12). Recorded with truthful provenance in `docs/PHASE6_STEP10_DESIGN_BRIEF.md` §10 +
+register `D-P6-007` + `PROJECT_STATE.yaml` (an implementation-authorising selection, not a
+separately signed APPROVED & FROZEN act). IMPLEMENTED & locally verified:
+`src/env/demand_scenarios.py` + dual-path integration (segment solves AND full-horizon
+requested-demand accounting) + env scenario modes + `experiments/ppo` wiring (baseline mask
+wrappers, paired fixed-scenario evaluator incl. native baseline, train flags, scenario
+logging). Default `native` mode reproduces every frozen anchor (`verify_env --full` PASS;
+leak rel 5.29e-6, min svc |Δ| 5.82e-4 psi, 0 negative, INP SHA match); full test battery
+298 OK. NO scientific PPO training/evaluation has run, no STEP-12 sweep, no commit;
+torch/SB3/gymnasium remain NOT installed locally by design (Colab trains). Spec not yet
+frozen (STEP-14 not started) — no robustness/OOD/superiority claims. Next: Colab PPO smoke
+test under the scenario pipeline.
 **Action space APPROVED & FROZEN
 2026-09-27 (D-P6-001/002/003); STEP 7 observation design APPROVED & FROZEN 2026-09-27
 (D-P6-004, observation_dim=139); STEP 8 reward design D-P6-005 = APPROVED 2026-09-27 —

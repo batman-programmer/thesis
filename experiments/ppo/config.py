@@ -101,7 +101,15 @@ class PPOConfig:
     safety_eps_p_psi: float = 0.0        # frozen D-P6-006 default
     safety_horizon_steps: int = 1        # frozen D-P6-006 default
     network: str = "BWSN-1"
-    demand_scenario: str = "native_nominal"   # STEP-10 NOT frozen -> native pattern only
+    # STEP-10 (D-P6-007): "native" (frozen anchor path), "train" (per-episode
+    # stream draws), or a fixed evaluation id ("val/<i>" / "test/<i>" / "ood/<i>").
+    demand_scenario: str = "native"
+    # STEP-10 D5: baseline condition trained under ("joint" = full 7-dim action
+    # space, the default PPO condition; "prv_only"/"vsp_only" mask the non-free
+    # dims to native during TRAINING via baselines.apply_mask -- each is a
+    # SEPARATE trained policy, never a post-hoc mask of a joint policy).
+    baseline_mode: str = "joint"
+    scenario_master_seed: int = 20261019  # frozen D-P6-007 master seed
 
     # --- run management ---
     eval_freq: int = 0                   # 0 = no periodic eval during dev smoke

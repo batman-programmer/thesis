@@ -45,11 +45,21 @@ class ThesisLoggingCallback(BaseCallback):
             "abs_proposed", "abs_executed", "movement_l2sq", "safety_dp_min")}
         self._outcomes = {"accepted": 0, "reject_to_hold": 0,
                           "reference_fallback": 0, "no_safety": 0}
+        # STEP-10: active scenario per step (native -> None; train/val/test/ood
+        # -> the episode's demand multiplier). Logged as env/scenario_multiplier
+        # and, once per episode, env/scenario_id.
+        self._scenario_mults = []
+        self._last_scenario_id = None
 
     def _on_step(self) -> bool:
         for info in self.locals.get("infos", []):
             m = info.get("metrics")
             rb = info.get("reward_breakdown")
+            sc = info.get("demand_scenario")
+            if sc is not None:
+                self._last_scenario_id = sc.get("scenario_id")
+                if "multiplier" in sc:
+                    self._scenario_mults.append(float(sc["multiplier"]))
             if m is not None:
                 self._acc["leak_gpm"].append(m.leak_gpm)
                 self._acc["dsr"].append(m.dsr)
@@ -85,6 +95,10 @@ class ThesisLoggingCallback(BaseCallback):
         for k, v in self._acc.items():
             if v:
                 rec(f"env/{k}", float(np.nanmean(v)))
+        if self._scenario_mults:
+            rec("env/scenario_multiplier", float(np.mean(self._scenario_mults)))
+        if self._last_scenario_id is not None:
+            rec("env/scenario_id", self._last_scenario_id)
         total = sum(self._outcomes.values()) or 1
         for k, c in self._outcomes.items():
             rec(f"safety/{k}", c)

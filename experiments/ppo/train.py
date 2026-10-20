@@ -16,6 +16,14 @@ Examples
     python -m experiments.ppo.train --experiment-id dev_run_s0 \
         --total-timesteps 50000 --seed 0 --device auto
 
+    # Colab run under STEP-10 demand uncertainty (new U1+S1 draw per episode)
+    python -m experiments.ppo.train --experiment-id dev_run_s0_scen \
+        --total-timesteps 50000 --seed 0 --demand-scenario train
+
+    # masked training condition (a SEPARATE policy per mode)
+    python -m experiments.ppo.train --experiment-id dev_run_prv \
+        --total-timesteps 50000 --baseline-mode prv_only
+
     # resume from a checkpoint
     python -m experiments.ppo.train --experiment-id dev_run_s0 \
         --resume experiments/ppo/runs/dev_run_s0/checkpoints/ppo_20000_steps.zip \
@@ -61,6 +69,7 @@ def run(config: CFG.PPOConfig, resume: str | None = None,
     from stable_baselines3.common.callbacks import CheckpointCallback
     from stable_baselines3.common.env_checker import check_env
     from callbacks import ThesisLoggingCallback
+    from make_env import scenario_config_from
 
     if not config.minibatch_divides():
         raise ValueError(f"batch_size {config.batch_size} must divide "
@@ -70,14 +79,21 @@ def run(config: CFG.PPOConfig, resume: str | None = None,
     CFG.set_global_seeds(config.seed)
     device = CFG.resolve_device(config.device)
 
+    scenario_kwargs = dict(
+        demand_scenario=config.demand_scenario,
+        scenario_config=scenario_config_from(config.scenario_master_seed),
+    )
+
     # PHASE 2 gate: SB3 env checker on a RAW (unwrapped, unmonitored) instance.
     if run_check_env:
-        check_env(make_env(enable_safety=config.enable_safety),
+        check_env(make_env(enable_safety=config.enable_safety, **scenario_kwargs),
                   warn=True, skip_render_check=True)
 
     sf_cfg = _safety_config(config)
     env = make_env(enable_safety=config.enable_safety, safety_config=sf_cfg,
-                   monitor=True, monitor_path=layout.logs / "monitor.csv")
+                   baseline_mode=config.baseline_mode,
+                   monitor=True, monitor_path=layout.logs / "monitor.csv",
+                   **scenario_kwargs)
 
     if resume:
         from stable_baselines3 import PPO
@@ -124,6 +140,13 @@ def _parse(argv=None) -> argparse.Namespace:
     p.add_argument("--no-safety", action="store_true")
     p.add_argument("--resume", default=None)
     p.add_argument("--no-check-env", action="store_true")
+    p.add_argument("--demand-scenario", default=None,
+                   help="STEP-10 demand mode: native (default), train (new "
+                        "U1+S1 draw per episode), or a fixed evaluation id")
+    p.add_argument("--baseline-mode", default=None,
+                   choices=["joint", "prv_only", "vsp_only"],
+                   help="training condition: joint (default) or a masked "
+                        "condition (a SEPARATE policy must be trained per mode)")
     return p.parse_args(argv)
 
 
@@ -137,6 +160,8 @@ def _config_from_args(a: argparse.Namespace) -> CFG.PPOConfig:
     if a.learning_rate is not None: c.learning_rate = a.learning_rate
     if a.checkpoint_freq is not None: c.checkpoint_freq = a.checkpoint_freq
     if a.no_safety: c.enable_safety = False
+    if a.demand_scenario is not None: c.demand_scenario = a.demand_scenario
+    if a.baseline_mode is not None: c.baseline_mode = a.baseline_mode
     return c
 
 

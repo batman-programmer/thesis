@@ -930,7 +930,7 @@ changed**, no frozen invariant altered, no STAGE-I stop triggered.
 
 ---
 
-## D-P6-007 — Demand uncertainty, scenario separation & evaluation protocol (STEP 10)  [PROPOSED 2026-10-15 — decision-ready brief prepared, NO selection made]
+## D-P6-007 — Demand uncertainty, scenario separation & evaluation protocol (STEP 10)  [SELECTIONS RECEIVED 2026-10-19 via implementation directive; IMPLEMENTED + LOCALLY VERIFIED — status below]
 
 - **Date:** 2026-10-15
 - **Topic:** How uncertain demand is generated, how train / validation / test / OOD
@@ -984,5 +984,56 @@ changed**, no frozen invariant altered, no STAGE-I stop triggered.
 - **Status:** PROPOSED / DECISION PENDING RESEARCHER. No scenario module, no split,
   no baseline harness and no evaluation driver were implemented. No frozen decision
   changed. No PPO training performed.
-- **Next:** researcher completes §10 of the brief to resolve D-P6-007; only then
-  implement `src/env/demand_scenarios.py` and the baseline evaluation harness.
+- **Focused review addendum (2026-10-19, methodology review — recommendations only,
+  no approval implied):** two clearly labelled addenda were inserted into the brief:
+  (1) §5 D5 — under deterministic rollouts (`reset` seeds nothing stochastic;
+  `model.predict(deterministic=True)`) K>1 evaluation episodes per (condition,
+  scenario) are exact duplicates, so K=1 + an explicit determinism check is
+  RECOMMENDED, with mean ± spread taken across scenarios/training seeds instead;
+  (2) §5 D4 — training presentation (fixed 8-scenario enumerated set vs per-episode
+  seeded sampling over the same family, evaluation sets fixed either way):
+  per-episode seeded sampling is RECOMMENDED (near-zero cost delta). A
+  `D4_training_presentation` field was added to the §10 decision form. Both remain
+  researcher selections.
+- **Next (superseded 2026-10-19):** see the implementation record below.
+
+- **Selection + implementation record (2026-10-19).** The researcher's STEP-10
+  implementation directive (2026-10-19) communicated the D-P6-007 selections and
+  authorised implementation in the same act; they are recorded verbatim in the
+  brief's §10 form with truthful provenance (an implementation-authorising
+  selection, not a separately signed "APPROVED & FROZEN" act of the D-P6-001..006
+  kind — this register entry remains the status authority). Selections:
+  **U1** (one multiplier per 96 h episode) · **M1** exact truncated normal
+  (inverse-CDF, μ=1.0, σ=0.1, [0.7, 1.3], analytic std 0.0986578) · **S1** for
+  training + in-distribution eval, **S2** (independent per-junction factors, 79
+  demand junctions) for OOD · master seed **20261019** (SeedSequence spawn keys
+  train=0/val=1/test=2/ood=3, disjoint streams, no leakage) · training =
+  **B** per-episode seeded sampling (NEW multiplier at every reset, never a cycled
+  set; scenario id + multiplier logged every episode) · fixed evaluation set =
+  4 validation + 4 test (U1/M1/S1) + 2 OOD (U1/M1/S2), stable IDs · **K=1**
+  deterministic rollout per (condition, scenario) + one explicit repeatability
+  check (a duplicate rollout is a determinism check, not an independent sample) ·
+  3 training seeds planned for the final Colab evaluation (not part of this
+  implementation) · 48 h/24 h aliasing **accepted and documented** · ε_p–H sweep
+  confirmed **STEP-12** (unchanged). D-P6-001..006 were not reopened.
+- **Implemented & verified (2026-10-19, laptop only; no PPO training, no STEP-12
+  sweep, no commit):** `src/env/demand_scenarios.py` (scenario module) +
+  integration into `src/env/epanet_adapter.py` (scenario applied to BOTH the
+  1800 s segment solves and the full-horizon `expected_demand` accounting
+  path; mid-episode swap guard) and `src/env/bwsn_env.py` (modes native/train/
+  val/test/ood/instance, `set_demand_scenario`, scenario metadata in `info`
+  ONLY) + `experiments/ppo/` wiring (`make_env.py` baseline-mask wrappers,
+  `config.py` demand_scenario/baseline_mode/scenario_master_seed,
+  `evaluate.py` paired fixed-scenario protocol with native baseline via
+  `_NativePredictor`, `train.py` scenario + baseline-mode flags,
+  `callbacks.py` env/scenario_id + env/scenario_multiplier logging). Frozen
+  observation (139), action (7), reward, safety and every D-P6-001..006 value
+  UNCHANGED. Default `demand_scenario="native"` reproduces the frozen anchors:
+  `verify_env --full` PASS (leak 84.72943575468366, rel 5.29e-6 < 5e-5; min
+  service pressure 4.163939952850342, |Δ| 5.82e-4 psi < 1e-2; 0 negative
+  instants; horizon 192; working-INP SHA-256 match). Tests:
+  `tests/test_demand_scenarios.py` (19) + `tests/test_env_scenarios.py` (16,
+  real EPANET) all OK; full battery **298 tests OK in 40.8 s**. NOT exercised
+  locally: SB3/gymnasium-dependent subchecks (torch/SB3 intentionally not
+  installed on the laptop — Colab's job). No scientific training, no
+  performance claim.

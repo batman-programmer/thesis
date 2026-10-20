@@ -1,6 +1,6 @@
 ; Filename: D:\Thesis\data\networks\working\BWSN_Network_1_working.inp
 ; WNTR: 1.5.0
-; Created: 2026-09-02 23:18:38
+; Created: 2026-09-27 10:02:09
 [TITLE]
 
 [JUNCTIONS]
@@ -501,8 +501,8 @@ UNITS                GPM
 HEADLOSS             H-W                 
 SPECIFIC GRAVITY     1
 VISCOSITY            1.1e-05
-TRIALS               40
-ACCURACY             0.005
+TRIALS               2000
+ACCURACY             1e-05
 CHECKFREQ            2
 MAXCHECK             10
 UNBALANCED           STOP                

@@ -22,14 +22,20 @@ runs (``reset``/``step`` return plain numpy), so the STAGE C/D correctness tests
 need no RL stack. torch / stable-baselines3 are NOT imported here (they gate PPO
 training, STAGE E, not the environment).
 
-DEMAND SCENARIO (OPEN DECISION -- NOT frozen): this env runs the INP's NATIVE
-(nominal) demand pattern, which is what reproduces every frozen anchor. The
-proposal's "uncertain demand" is in scope, but the SPECIFIC stochastic demand
-model (perturbation family, magnitude, train/eval split, seeding) is a Level 2-3
-research decision that has not been minted as a D-P6 decision. It is therefore
-left as an explicit injection point (``demand_scenarios`` is intentionally NOT
-yet implemented) and surfaced to the researcher rather than improvised here
-(CLAUDE.md s.19 scope discipline, s.21 no silent scientific change).
+DEMAND SCENARIO (STEP 10 / D-P6-007, IMPLEMENTED): by default this env runs
+the INP's NATIVE (nominal) demand pattern, which is what reproduces every
+frozen anchor. ``demand_scenario=`` selects the STEP-10 demand-uncertainty
+mode (researcher selections of 2026-10-19, recorded in
+``docs/PHASE6_DECISION_REGISTER.md`` D-P6-007): "train" draws a NEW U1+S1
+truncated-normal global multiplier from a reproducible stream at every
+reset; "val/<i>" / "test/<i>" / "ood/<i>" install the FIXED, reproducible
+evaluation scenarios (S2 per-junction factors for ood, resolved against
+this INP's demand-junction list); a ``DemandScenario`` instance is installed
+verbatim. The perturbation reaches BOTH the segment solves and the
+full-horizon requested-demand accounting (driver-level, see
+``epanet_adapter``); the frozen 139-dim observation, 7-dim action, reward
+and safety layers are untouched, and scenario identity rides in ``info``
+only -- never in the observation vector.
 """
 
 from __future__ import annotations
@@ -52,6 +58,7 @@ import action_mapper as AM  # noqa: E402
 import metrics as MX  # noqa: E402
 import reward as RW  # noqa: E402
 import safety as SF  # noqa: E402
+import demand_scenarios as DS  # noqa: E402
 from state_builder import (  # noqa: E402
     ObservationConfig, RawState, build_observation, observation_bounds,
 )
@@ -101,13 +108,27 @@ class BWSNPressureControlEnv(_BASE):
         When False the proposed action is executed verbatim (no admissibility
         layer). Used by the STAGE-F clean baselines and by native-equivalence
         tests that must exercise pure hydraulics.
+    demand_scenario : str | DemandScenario, default "native"
+        STEP-10 (D-P6-007) episode demand mode. "native" keeps the frozen
+        nominal path (default, so pre-STEP-10 callers and every frozen anchor
+        are unchanged). "train" draws a NEW U1+S1 truncated-normal multiplier
+        from ``TrainingScenarioStream`` at every ``reset`` (reseeding with the
+        same seed reproduces the same sequence). "val/<i>", "test/<i>",
+        "ood/<i>" install the FIXED evaluation scenarios. A
+        ``DemandScenario`` instance is installed verbatim.
+    scenario_config : DS.ScenarioConfig, optional
+        Master seed + truncated-normal parameters; defaults to the frozen
+        D-P6-007 selection (master seed 20261019, mu 1.0, sigma 0.1,
+        [0.7, 1.3]).
     """
 
     metadata = {"render_modes": []}
 
     def __init__(self, reward_config: RW.RewardConfig | None = None,
                  safety_config: SF.SafetyConfig | None = None,
-                 enable_safety: bool = True):
+                 enable_safety: bool = True,
+                 demand_scenario="native",
+                 scenario_config: DS.ScenarioConfig | None = None):
         if _HAS_GYM:
             super().__init__()
         self._wn0 = S3.build(None, None)
@@ -126,10 +147,61 @@ class BWSNPressureControlEnv(_BASE):
         self._prev_exec_norm = self._native_norm.copy()
         self._k = 0
         self._low, self._high = observation_bounds(self._obs_cfg)
+        # STEP-10 demand-uncertainty mode (D-P6-007). Resolved once here; the
+        # S2 (ood) fixed scenarios need this INP's demand-junction list.
+        self._scenario_config = (scenario_config if scenario_config is not None
+                                 else DS.DEFAULT_CONFIG)
+        self._demand_junctions = DS.demand_junctions(self._wn0)
+        self._scenario = None            # active scenario, set in reset()
+        self._install_mode(demand_scenario)
         if _HAS_GYM:
             self.observation_space = spaces.Box(self._low, self._high, dtype=np.float32)
             self.action_space = spaces.Box(
                 low=-1.0, high=1.0, shape=(AM.ACTION_DIM,), dtype=np.float32)
+
+    # -- scenario mode management (STEP-10 D5) -------------------------------
+    def _install_mode(self, demand_scenario) -> None:
+        """Resolve a scenario-mode selection onto this env (before any reset).
+
+        Accepts "native", "train", "<group>/<index>", or a DemandScenario
+        instance. "train" arms the per-episode stream; every fixed selection is
+        resolved in ``reset`` from its identifier (deterministic). Validated
+        EAGERLY (including one probe resolution of a fixed id) so a typo fails
+        at construction, not 200 steps into an evaluation.
+        """
+        if isinstance(demand_scenario, DS.DemandScenario):
+            self._demand_mode = demand_scenario
+            self._scenario_stream = None
+            return
+        mode = str(demand_scenario)
+        if mode == "train":
+            self._demand_mode = mode
+            self._scenario_stream = DS.TrainingScenarioStream(self._scenario_config)
+            return
+        # Eager validation: resolve the identifier once against this INP.
+        DS.fixed_scenario(mode, config=self._scenario_config,
+                          demand_junctions_list=self._demand_junctions)
+        self._demand_mode = mode
+        self._scenario_stream = None
+
+    def set_demand_scenario(self, scenario) -> None:
+        """Switch the scenario mode AFTER construction (paired evaluation).
+
+        A wrapper/harness may re-parameterise the env between episodes (e.g.
+        the STEP-10 D5 paired evaluator iterates the fixed scenario IDs). The
+        change takes effect at the NEXT ``reset``; resetting mid-episode is
+        fine (the driver re-stamps its scenario of record at every reset).
+        """
+        self._install_mode(scenario)
+
+    @property
+    def demand_scenario(self) -> DS.DemandScenario:
+        """Active episode scenario (None before the first reset)."""
+        return self._scenario
+
+    @property
+    def scenario_config(self) -> DS.ScenarioConfig:
+        return self._scenario_config
 
     # -- observation assembly -------------------------------------------------
     def _observation(self, sr, prev_exec_norm: np.ndarray) -> np.ndarray:
@@ -153,15 +225,37 @@ class BWSNPressureControlEnv(_BASE):
 
     # -- gym API --------------------------------------------------------------
     def reset(self, *, seed=None, options=None):
-        """Return (obs, info) at the t=0 native pre-action snapshot."""
+        """Return (obs, info) at the t=0 native pre-action snapshot.
+
+        STEP-10: the active demand scenario is selected and installed on the
+        driver BEFORE ``driver.reset()`` so the t=0 segment AND the
+        full-horizon requested-demand accounting both see it. In "train" mode a
+        NEW multiplier is drawn from the reproducible stream every reset; an
+        explicit ``seed`` reseeds that stream (gym contract: same seed ->
+        same scenario sequence). In fixed mode the scenario is resolved from
+        its identifier, so every reset of the same ID is the SAME scenario.
+        Scenario metadata rides in ``info["demand_scenario"]`` only.
+        """
         if _HAS_GYM:
             super().reset(seed=seed)
+        if self._scenario_stream is not None:          # "train" mode
+            if seed is not None:
+                self._scenario_stream.reseed(int(seed))
+            self._scenario = self._scenario_stream.next()
+        elif isinstance(self._demand_mode, DS.DemandScenario):
+            self._scenario = self._demand_mode         # fixed instance, verbatim
+        else:                                          # fixed identifier: re-resolved
+            self._scenario = DS.fixed_scenario(        # (deterministic) each reset
+                self._demand_mode, config=self._scenario_config,
+                demand_junctions_list=self._demand_junctions)
+        self._driver.scenario = self._scenario
         sr0 = self._driver.reset()
         self._prev_exec_norm = self._native_norm.copy()
         self._k = 0
         obs = self._observation(sr0, self._prev_exec_norm)
         info = {"sim_time_s": sr0.sim_time_s, "step_index": sr0.step_index,
-                "n_steps": self._driver.cfg.n_steps}
+                "n_steps": self._driver.cfg.n_steps,
+                "demand_scenario": self._scenario.to_dict()}
         return obs, info
 
     def step(self, action):
@@ -210,6 +304,9 @@ class BWSNPressureControlEnv(_BASE):
             "n_service_nodes_negative": n_service_nodes_negative,
             "sim_time_s": sr.sim_time_s,
             "step_index": sr.step_index,
+            # STEP-10: the episode's scenario identity (constant within the
+            # episode by construction; OBSERVABILITY ONLY).
+            "demand_scenario": self._scenario.to_dict(),
         }
         return obs, rb.total, terminated, truncated, info
 

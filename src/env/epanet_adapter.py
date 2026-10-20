@@ -74,6 +74,7 @@ import phase5_common as C  # noqa: E402
 import g6_g7_g8_leak_pda as L  # noqa: E402
 import p6_s3_prv_finechar as S3  # noqa: E402
 import state_builder as SB  # noqa: E402
+import demand_scenarios as DS  # noqa: E402
 
 from wntr.network.base import LinkStatus  # noqa: E402
 import wntr as _wntr  # noqa: E402
@@ -184,11 +185,39 @@ class SteppingHydraulicDriver:
         self._pump_status: dict[str, LinkStatus] = {}
         self._req_gpm = None          # full-horizon requested-demand series (DataFrame)
         self._done = False
+        # STEP-10 (D-P6-007): episode-level demand scenario. Defaults to the
+        # native (identity) scenario so an unset scenario leaves the frozen
+        # anchor path byte-identical; the env installs the active scenario on
+        # this attribute BEFORE calling reset(). apply() reaches BOTH paths:
+        # every segment model built by _build_segment (step/probe/reset t=0)
+        # and the full-horizon accounting model in reset().
+        self._scenario: DS.DemandScenario = DS.NativeScenario()
+        self._episode_scenario: DS.DemandScenario | None = None
+
+    @property
+    def scenario(self) -> DS.DemandScenario:
+        """Active demand scenario (NativeScenario when unset)."""
+        return self._scenario
+
+    @scenario.setter
+    def scenario(self, scenario: DS.DemandScenario) -> None:
+        if not isinstance(scenario, DS.DemandScenario):
+            raise TypeError(
+                f"scenario must be a DemandScenario, got {type(scenario).__name__}")
+        self._scenario = scenario
+        self._scenario = scenario
 
     # -- segment construction -------------------------------------------------
     def _build_segment(self, duration_s: int, pattern_start_s: int):
-        """Fresh working-copy load configured for one segment, state restored."""
+        """Fresh working-copy load configured for one segment, state restored.
+
+        The active demand scenario is applied AFTER ``S3.build`` and BEFORE the
+        tank/pump restore, so every segment solve (step, probe, and reset's t=0
+        segment) sees the episode's perturbed demands while the native demand
+        pattern, its phase, PDA options and solver settings stay untouched.
+        """
         wn = S3.build(None, None)                       # solver + PDA policy
+        self._scenario.apply(wn)                        # STEP-10 demand perturbation
         wn.options.time.duration = int(duration_s)
         wn.options.time.report_timestep = int(self.cfg.rule_timestep_s)
         wn.options.time.pattern_start = int(pattern_start_s)
@@ -261,7 +290,15 @@ class SteppingHydraulicDriver:
         setpoints, pump speed 1.0). The requested-demand series is computed ONCE
         over the full horizon on the pattern_start=0 model (the same quantity the
         monolithic accounting uses), so DSR/unserved figures stay comparable.
+        The active demand scenario perturbs BOTH this full-horizon accounting
+        model and the t=0 segment built via ``_build_segment``; the ``base``
+        snapshot model needs no perturbation (it only reads tank init levels
+        and pump initial statuses, which are scenario-independent). ``reset``
+        stamps the scenario of record: a subsequent ``step`` refuses to run if
+        the scenario was swapped mid-episode (which would silently invalidate
+        the already-solved segments and the requested-demand accounting).
         """
+        self._episode_scenario = self._scenario
         base = S3.build(None, None)
         self._tank_levels_m = {t: float(base.get_node(t).init_level)
                                for t in base.tank_name_list}
@@ -271,6 +308,8 @@ class SteppingHydraulicDriver:
         self._done = False
 
         wn_full = S3.build(None, None)
+        self._scenario.apply(wn_full)      # DSR/unserved accounting sees the SAME
+        # perturbation as the segment solves (STEP-10 consistency requirement)
         wn_full.options.time.report_timestep = self.cfg.control_step_s
         req = C.m3s_to_gpm(_wntr.metrics.expected_demand(wn_full))
         req.index = [int(i) for i in req.index]
@@ -290,10 +329,18 @@ class SteppingHydraulicDriver:
         instant whose quantities feed D-P6-005's per-step reward and D-P6-004's
         observation), plus the 180 s intra-step trace used by the safety layer and
         for G12 pump-reset diagnostics. Carries tank levels and pump statuses to
-        the next step; advances the pattern phase by the control step.
+        the next step; advances the pattern phase by the control step. Refuses to
+        run if the demand scenario was swapped after this episode's ``reset``
+        (STEP-10 consistency guard).
         """
         if self._done:
             raise RuntimeError("episode finished; call reset() before stepping")
+        if (getattr(self, "_episode_scenario", None) is not None
+                and self._scenario is not self._episode_scenario):
+            raise RuntimeError(
+                "demand scenario changed after reset(): episode segments and "
+                "requested-demand accounting would become inconsistent; reset() "
+                "the episode under the new scenario instead")
         self._step_index += 1
         k = self._step_index
         pattern_start = self._t_elapsed
