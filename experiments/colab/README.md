@@ -45,9 +45,13 @@ All pipeline code is path-portable (`experiments/ppo/*` derive the project root 
    construct/predict/tiny-learn + checkpoint round-trip. **If the leak anchor or the
    INP checksum fails, STOP** — investigate version/engine/transfer drift before training.
 5. **Cross-environment consistency:** compare the Colab
-   `runs/_verify/fingerprint_<host>.json` against the laptop's
-   `fingerprint_Ali-Y.json` (obs shape, leak anchor match, horizon). Materially
-   different hydraulics ⇒ STOP.
+   `runs/_verify/fingerprint_<host>.json` against the laptop's tracked reference
+   `experiments/ppo/runs/_verify/fingerprint_Ali-Y.json` (obs shape, leak anchor
+   match, horizon). **NOTE (2026-10-21):** `experiments/ppo/runs/` is now in
+   `.gitignore`; this specific fingerprint file was committed earlier and stays
+   tracked (git keeps tracking an already-committed file). New fingerprints you
+   generate are NOT committed — that is intended. Materially different hydraulics
+   ⇒ STOP.
 6. **(optional) full env unit battery:**
    ```bash
    python -m unittest tests.test_action_mapper tests.test_metrics_reward \

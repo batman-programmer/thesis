@@ -1,0 +1,91 @@
+# =============================================================================
+# BWSN-1 DRL thesis — root .gitignore
+#
+# Scope: keep the repository free of generated, machine-specific, sensitive and
+# reproducible-from-source artifacts. Do NOT add blanket rules for JSON / YAML /
+# CSV / ZIP / .ipynb / .inp here — many of those are essential tracked research
+# inputs (benchmark network, frozen anchors, decision records, the Colab
+# notebook). Rules are as narrow as the artifact they target.
+# =============================================================================
+
+# --- Python bytecode & caches -------------------------------------------------
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.coverage
+.coverage.*
+htmlcov/
+coverage.xml
+.ipynb_checkpoints/
+
+# --- Virtual environments -----------------------------------------------------
+.venv/
+venv/
+env/
+ENV/
+.venv*/
+
+# --- Build / packaging artifacts ----------------------------------------------
+build/
+dist/
+*.egg-info/
+*.egg
+.eggs/
+
+# --- Local configuration & secrets --------------------------------------------
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+id_rsa
+id_rsa.pub
+.secrets/
+secrets/
+# Local tool / token stores (never commit credentials)
+*.token
+.credentials/
+
+# --- Editor / OS artifacts ------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+.idea/
+.vscode/
+*.sublime-*
+
+# --- PPO training & experiment outputs ------------------------------------------
+# Trained model checkpoints / saved policies (SB3 serialises to .zip). No tracked
+# source archive uses .zip, so this is safe. Keep intentional, versioned
+# reference artifacts out of this by committing them with `git add -f`.
+*.zip
+
+# TensorBoard / event logs
+events.out.tfevents.*
+*.tfevents.*
+
+# Local PPO run directories (checkpoints, logs, monitor.csv, eval JSON, models).
+# Generated on every run; reproduce via train.py. Small provenance that must be
+# kept lives in docs/ + results/, not under runs/.
+experiments/ppo/runs/
+
+# --- Hydraulic solver scratch (WNTR / EPANET) -----------------------------------
+# EPANET binary + report scratch emitted next to the working .inp during solves.
+# These are transient solver I/O, byte-reproducible from the .inp + config.
+results/phase5/_tmp/
+*.bin
+*.rpt
+# NOTE: *.inp is NOT ignored globally — data/networks/*.inp are required inputs.
+
+# --- Large / reproducible generated artifacts ------------------------------------
+# Generated figures / exports that can be regenerated from results + scripts.
+# (Kept narrow: do not blanket-ignore results/ — it holds frozen evidence.)
+*.tmp
+*.bak
+*.log

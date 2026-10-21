@@ -13,10 +13,12 @@
 #    verify_env.py into runs/_verify/fingerprint_<host>.json -- not hard-coded here.
 #
 # Minimal set actually required by the PPO stack on top of the validated hydraulics:
-stable-baselines3>=2.3        # pulls a compatible gymnasium; supports numpy 2 + py3.11-3.13
-gymnasium>=0.29               # Gymnasium API (reset/step 5-tuple, terminated/truncated)
-pyyaml>=6.0                   # config.yaml serialisation (JSON fallback if absent)
-wntr==1.5.0                   # FROZEN hydraulic engine (EPANET 2.2) -- comparability anchor
+# For a REPRODUCIBLE install use the exact pins in requirements-colab.lock.txt;
+# the minimum bounds below are kept for forward compatibility only.
+stable-baselines3==2.9.0    # pinned; pulls gymnasium<2.0,>=0.29.1; numpy 2 + py3.11-3.13
+gymnasium==1.4.0            # pinned; Gymnasium API (reset/step 5-tuple, terminated/truncated)
+pyyaml==6.0.3               # pinned; config.yaml serialisation (JSON fallback if absent)
+wntr==1.5.0                 # FROZEN hydraulic engine (EPANET 2.2) -- comparability anchor
 
 # torch is intentionally NOT pinned here: on Colab use the preinstalled CUDA build;
 # off Colab, `pip install torch` yields the CPU build (verified on the dev laptop).
