@@ -130,7 +130,7 @@ class StepResult:
     sim_time_s: float                          # ABSOLUTE clock at the step endpoint
     pressures_psi: dict[str, float]            # endpoint, every junction
     tank_levels_ft: dict[str, float]           # endpoint tank water level (head-elev)
-    pump_realized_speed: dict[str, float]      # endpoint pump setting (speed)
+    pump_realized_speed: dict[str, float]      # endpoint realized speed (0 = Closed)
     pump_status: dict[str, int]                # endpoint pump status code
     pump_power_kw: dict[str, float]            # endpoint pump hydraulic power
     prv_realized_setting_psi: dict[str, float] # endpoint PRV setting
@@ -245,6 +245,86 @@ class SteppingHydraulicDriver:
         L.apply_leak(wn, self.cfg.coeff_us)
         S3.assert_solver(wn, report_timestep_s=self.cfg.rule_timestep_s)
 
+    # -- F3 solve-validation (raise BEFORE any state commits) -------------------
+    def _validate_solve(self, wn, res, *, expected_index: int,
+                        expected_timestep_s: int, context: str) -> None:
+        """Refuse an incomplete/invalid EPANET result before it touches state.
+
+        A solve is unusable when the binary report is missing rows/columns or
+        holds non-finite endpoints: propagating it would corrupt the observation,
+        the reward, and (worse) the carried tank/pump state that the next
+        segment depends on. This raises a descriptive error so ``step``/``reset``
+        /``probe`` abort BEFORE any driver state mutates -- a numerical failure
+        is reported as such, never converted into a reward or an action outcome.
+        """
+        link = getattr(res, "link", None)
+        node = getattr(res, "node", None)
+        if node is None or link is None:
+            raise RuntimeError(
+                f"{context}: EPANET result missing node/link blocks "
+                f"(got node={type(node).__name__}, link={type(link).__name__})")
+        status = link.get("status")
+        setting = link.get("setting")
+        flow = link.get("flowrate")
+        pressure = node.get("pressure")
+        head = node.get("head")
+        missing = [k for k, v in (("link.status", status), ("link.setting", setting),
+                                ("link.flowrate", flow), ("node.pressure", pressure),
+                                ("node.head", head)) if v is None]
+        if missing:
+            raise RuntimeError(f"{context}: EPANET result missing {missing}")
+        # Every controlled actuator must appear as a column; every demand
+        # junction must appear in pressure/head.
+        for col in ("status", "setting", "flowrate"):
+            df = link[col]
+            absent = [a for a in list(PUMP_IDS) + list(PRV_IDS)
+                      if a not in df.columns]
+            if absent:
+                raise RuntimeError(
+                    f"{context}: link.{col} missing actuator columns {absent}")
+        for col in ("pressure", "head", "demand"):
+            df = node.get(col)
+            if df is None:
+                raise RuntimeError(f"{context}: EPANET result missing node.{col}")
+            absent = [j for j in wn.junction_name_list if j not in df.columns]
+            if absent:
+                raise RuntimeError(
+                    f"{context}: node.{col} missing junction columns "
+                    f"{absent[:5]}{'...' if len(absent) > 5 else ''}")
+        # EPANET returns exactly (expected_index + 1) report instants: the
+        # segment start (pattern_start) plus one instant per rule timestep.
+        # Fewer means the solve ended early / was truncated; more means an
+        # unexpected sub-step -- both are unusable for the frozen extraction.
+        n_expected = expected_index + 1
+        got = len(status.index)
+        if got != n_expected:
+            raise RuntimeError(
+                f"{context}: EPANET returned {got} report instants; expected "
+                f"{n_expected} (segment start + {expected_index} rule steps)")
+        times = np.asarray(status.index, dtype=float)
+        expected_times = np.arange(n_expected, dtype=float) * float(expected_timestep_s)
+        if (not np.all(np.isfinite(times))
+                or not np.allclose(times, expected_times, rtol=0.0, atol=1e-6)):
+            raise RuntimeError(
+                f"{context}: invalid report time grid {times.tolist()} expected "
+                f"{expected_times.tolist()}")
+        if not np.all(np.isfinite(pressure[wn.junction_name_list].to_numpy(dtype=float))):
+            raise RuntimeError(
+                f"{context}: non-finite service pressure trace")
+        # Endpoint finiteness over the quantities the env actually consumes.
+        checks = (("link.status", status, list(PRV_IDS) + list(PUMP_IDS)),
+                  ("link.setting", setting, list(PRV_IDS) + list(PUMP_IDS)),
+                  ("link.flowrate", flow, list(PRV_IDS) + list(PUMP_IDS)),
+                  ("node.pressure", pressure, wn.junction_name_list),
+                  ("node.demand", node["demand"], wn.junction_name_list),
+                  ("node.head", head, wn.tank_name_list))
+        for name, df, cols in checks:
+            vals = df[cols].iloc[-1].to_numpy(dtype=float)
+            if not np.all(np.isfinite(vals)):
+                bad = [c for c, v in zip(cols, vals) if not np.isfinite(v)]
+                raise RuntimeError(
+                    f"{context}: non-finite endpoint in {name} for {bad[:5]}")
+
     def _extract(self, wn, res, step_index: int, sim_time_s: float,
                  row: int) -> StepResult:
         """Build a StepResult from one solved segment; `row` selects the instant."""
@@ -271,7 +351,12 @@ class SteppingHydraulicDriver:
             pressures_psi={j: float(p_psi[j].iloc[row]) for j in junc},
             tank_levels_ft={t: float(C.m_to_ft(head[t].iloc[row] - wn.get_node(t).elevation))
                             for t in wn.tank_name_list},
-            pump_realized_speed={p: float(setting[p].iloc[row]) for p in PUMP_IDS},
+            # Realized speed = setting only while the link is Open; a Closed pump
+            # retains its last setting in the result file but moves no water, so
+            # the observation contract reports 0.0 (D-P6-004 "0 = closed").
+            pump_realized_speed={p: (0.0 if int(status[p].iloc[row]) == int(LinkStatus.Closed)
+                                     else float(setting[p].iloc[row]))
+                                 for p in PUMP_IDS},
             pump_status={p: int(status[p].iloc[row]) for p in PUMP_IDS},
             pump_power_kw=_pump_power_kw(wn, res),
             prv_realized_setting_psi={v: float(C.m_to_psi(setting[v].iloc[row])) for v in PRV_IDS},
@@ -283,20 +368,33 @@ class SteppingHydraulicDriver:
             intra_n_neg=intra_nneg,
         )
 
+    def _state_snapshot(self) -> tuple:
+        """Snapshot every mutable driver field a failed transition must preserve."""
+        return (self._step_index, self._t_elapsed, dict(self._tank_levels_m),
+                dict(self._pump_status), self._done, self._req_gpm,
+                self._scenario, self._episode_scenario)
+
+    def _state_restore(self, snapshot: tuple) -> None:
+        (self._step_index, self._t_elapsed, self._tank_levels_m,
+         self._pump_status, self._done, self._req_gpm,
+         self._scenario, self._episode_scenario) = snapshot
+
     def reset(self) -> StepResult:
+        """Reset transactionally: any failure restores the prior driver state."""
+        snapshot = self._state_snapshot()
+        try:
+            return self._reset_impl()
+        except Exception:
+            self._state_restore(snapshot)
+            raise
+
+    def _reset_impl(self) -> StepResult:
         """Initialise carried state from the INP and return the t=0 snapshot.
 
         prev-executed command at t=0 is the NATIVE operating point (PRV nominal
         setpoints, pump speed 1.0). The requested-demand series is computed ONCE
-        over the full horizon on the pattern_start=0 model (the same quantity the
-        monolithic accounting uses), so DSR/unserved figures stay comparable.
-        The active demand scenario perturbs BOTH this full-horizon accounting
-        model and the t=0 segment built via ``_build_segment``; the ``base``
-        snapshot model needs no perturbation (it only reads tank init levels
-        and pump initial statuses, which are scenario-independent). ``reset``
-        stamps the scenario of record: a subsequent ``step`` refuses to run if
-        the scenario was swapped mid-episode (which would silently invalidate
-        the already-solved segments and the requested-demand accounting).
+        over the full horizon on the pattern_start=0 model (the same quantity
+        the monolithic accounting uses), so DSR/unserved figures stay comparable.
         """
         self._episode_scenario = self._scenario
         base = S3.build(None, None)
@@ -318,6 +416,9 @@ class SteppingHydraulicDriver:
         wn = self._build_segment(self.cfg.rule_timestep_s, 0)
         self._apply_command(wn, NATIVE_PRV_SETPOINT_PSI, NATIVE_PUMP_SPEED)
         res, msgs, _ = L._run_with_retry(wn, "p6_env_reset")
+        self._validate_solve(wn, res, expected_index=1,
+                             expected_timestep_s=self.cfg.rule_timestep_s,
+                             context="reset")
         out = self._extract(wn, res, step_index=-1, sim_time_s=0.0, row=0)
         out.wntr_warnings = msgs
         return out
@@ -341,26 +442,42 @@ class SteppingHydraulicDriver:
                 "demand scenario changed after reset(): episode segments and "
                 "requested-demand accounting would become inconsistent; reset() "
                 "the episode under the new scenario instead")
-        self._step_index += 1
-        k = self._step_index
-        pattern_start = self._t_elapsed
-        wn = self._build_segment(self.cfg.control_step_s, pattern_start)
-        self._apply_command(wn, prv_setpoints_psi, pump_speeds)
-        res, msgs, used = L._run_with_retry(wn, f"p6_env_k{k}")
+        # F3: build/solve/validate/extract/carry into TEMPORARIES first; commit
+        # atomically at the end. Any failure (solve, retry-read, validation,
+        # extraction, carry-state build) leaves every driver field untouched, so
+        # a numerical failure can never become a transition, reward, observation.
+        snapshot = self._state_snapshot()
+        try:
+            k = self._step_index + 1
+            pattern_start = self._t_elapsed
+            wn = self._build_segment(self.cfg.control_step_s, pattern_start)
+            self._apply_command(wn, prv_setpoints_psi, pump_speeds)
+            res, msgs, used = L._run_with_retry(wn, f"p6_env_k{k}")
 
-        self._t_elapsed += self.cfg.control_step_s
-        out = self._extract(wn, res, step_index=k, sim_time_s=float(self._t_elapsed),
-                            row=-1)
-        out.wntr_warnings = msgs
-
-        # carry forward: final tank levels (as levels, not heads) and pump statuses
-        head = res.node["head"]
-        self._tank_levels_m = {t: float(head[t].iloc[-1] - wn.get_node(t).elevation)
-                               for t in wn.tank_name_list}
-        self._pump_status = {p: LinkStatus(int(res.link["status"][p].iloc[-1]))
-                             for p in PUMP_IDS}
-        if self._step_index + 1 >= self.cfg.n_steps:
-            self._done = True
+            n_instants = self.cfg.control_step_s // self.cfg.rule_timestep_s
+            self._validate_solve(wn, res, expected_index=n_instants,
+                                 expected_timestep_s=self.cfg.rule_timestep_s,
+                                 context=f"step k={k}")
+            next_time = self._t_elapsed + self.cfg.control_step_s
+            out = self._extract(wn, res, step_index=k, sim_time_s=float(next_time),
+                                row=-1)
+            out.wntr_warnings = msgs
+            # carry forward (temporaries): final tank levels + pump statuses
+            head = res.node["head"]
+            next_tanks = {t: float(head[t].iloc[-1] - wn.get_node(t).elevation)
+                          for t in wn.tank_name_list}
+            next_pumps = {p: LinkStatus(int(res.link["status"][p].iloc[-1]))
+                          for p in PUMP_IDS}
+            next_done = bool(k + 1 >= self.cfg.n_steps)
+        except Exception:
+            self._state_restore(snapshot)
+            raise
+        # atomic commit: nothing above touched driver state
+        self._step_index = k
+        self._t_elapsed = next_time
+        self._tank_levels_m = next_tanks
+        self._pump_status = next_pumps
+        self._done = next_done
         return out
 
     def probe(self, prv_setpoints_psi: dict, pump_speeds: dict,
@@ -381,8 +498,12 @@ class SteppingHydraulicDriver:
         H=1 solves the SAME segment from the SAME state as the subsequent
         ``step``, so the committed state equals the probed admissible state.
         """
-        snap = (dict(self._tank_levels_m), dict(self._pump_status),
-                self._t_elapsed, self._step_index, self._done)
+        # Probe works entirely on an in-method clone; the REAL state is restored
+        # in `finally`, so a failure anywhere (solve, validation, extraction,
+        # carry-state build) cannot leak into the driver. `_done` and the
+        # scenario fields are part of the snapshot because the clone may be
+        # advanced past the horizon.
+        snap = self._state_snapshot()
         results: list[StepResult] = []
         try:
             for _ in range(int(horizon_steps)):
@@ -392,20 +513,26 @@ class SteppingHydraulicDriver:
                 wn = self._build_segment(self.cfg.control_step_s, pattern_start)
                 self._apply_command(wn, prv_setpoints_psi, pump_speeds)
                 res, msgs, _ = L._run_with_retry(wn, f"p6_env_probe_k{k}")
-                self._t_elapsed += self.cfg.control_step_s
+                n_instants = self.cfg.control_step_s // self.cfg.rule_timestep_s
+                self._validate_solve(wn, res, expected_index=n_instants,
+                                     expected_timestep_s=self.cfg.rule_timestep_s,
+                                     context=f"probe k={k}")
+                next_time = self._t_elapsed + self.cfg.control_step_s
                 out = self._extract(wn, res, step_index=k,
-                                    sim_time_s=float(self._t_elapsed), row=-1)
+                                    sim_time_s=float(next_time), row=-1)
                 out.wntr_warnings = msgs
-                results.append(out)
-                # advance the CLONE for multi-step look-ahead (restored in finally)
+                # carry the CLONE forward for multi-step look-ahead
                 head = res.node["head"]
-                self._tank_levels_m = {t: float(head[t].iloc[-1] - wn.get_node(t).elevation)
-                                       for t in wn.tank_name_list}
-                self._pump_status = {p: LinkStatus(int(res.link["status"][p].iloc[-1]))
-                                     for p in PUMP_IDS}
+                next_tanks = {t: float(head[t].iloc[-1] - wn.get_node(t).elevation)
+                              for t in wn.tank_name_list}
+                next_pumps = {p: LinkStatus(int(res.link["status"][p].iloc[-1]))
+                              for p in PUMP_IDS}
+                results.append(out)
+                self._t_elapsed = next_time
+                self._tank_levels_m = next_tanks
+                self._pump_status = next_pumps
         finally:
-            (self._tank_levels_m, self._pump_status,
-             self._t_elapsed, self._step_index, self._done) = snap
+            self._state_restore(snap)
         return results
 
     @property

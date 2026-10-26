@@ -65,6 +65,20 @@ if _GymWrapper is not None:
         def step(self, action):
             return self.env.step(BL.apply_mask(np.asarray(action), self.mode))
 
+        # F5: explicit pass-through so evaluators can set/read the demand
+        # scenario on the wrapped env (gymnasium.Wrapper does not forward
+        # attribute SETS to the env; the headless twin __getattr__ already does).
+        def set_demand_scenario(self, scenario) -> None:
+            self.env.set_demand_scenario(scenario)
+
+        @property
+        def demand_scenario(self):
+            return self.env.demand_scenario
+
+        @property
+        def seed_provenance(self):
+            return self.env.seed_provenance
+
 else:
 
     class BaselineMaskWrapper:  # type: ignore[no-redef]
@@ -80,6 +94,19 @@ else:
 
         def step(self, action):
             return self.env.step(BL.apply_mask(np.asarray(action), self.mode))
+
+        # F5: explicit pass-through mirrors the gymnasium branch so both
+        # wrappers expose the same scenario API to evaluators.
+        def set_demand_scenario(self, scenario) -> None:
+            self.env.set_demand_scenario(scenario)
+
+        @property
+        def demand_scenario(self):
+            return self.env.demand_scenario
+
+        @property
+        def seed_provenance(self):
+            return self.env.seed_provenance
 
         def __getattr__(self, name):
             if name.startswith("__"):

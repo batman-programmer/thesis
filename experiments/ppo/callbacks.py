@@ -50,6 +50,7 @@ class ThesisLoggingCallback(BaseCallback):
         # and, once per episode, env/scenario_id.
         self._scenario_mults = []
         self._last_scenario_id = None
+        self._last_seed_provenance = None
 
     def _on_step(self) -> bool:
         for info in self.locals.get("infos", []):
@@ -58,6 +59,7 @@ class ThesisLoggingCallback(BaseCallback):
             sc = info.get("demand_scenario")
             if sc is not None:
                 self._last_scenario_id = sc.get("scenario_id")
+                self._last_seed_provenance = info.get("scenario_seed_provenance")
                 if "multiplier" in sc:
                     self._scenario_mults.append(float(sc["multiplier"]))
             if m is not None:
@@ -99,6 +101,15 @@ class ThesisLoggingCallback(BaseCallback):
             rec("env/scenario_multiplier", float(np.mean(self._scenario_mults)))
         if self._last_scenario_id is not None:
             rec("env/scenario_id", self._last_scenario_id)
+        if self._last_seed_provenance is not None:
+            # Provenance logging only; never affects training semantics. The
+            # fixed-scenario branch has no stream seed, so only the train
+            # branch emits these keys.
+            prov = self._last_seed_provenance
+            if prov.get("effective_stream_seed") is not None:
+                rec("env/scenario_stream_seed", prov["effective_stream_seed"])
+            if prov.get("draw_index") is not None:
+                rec("env/scenario_draw_index", prov["draw_index"])
         total = sum(self._outcomes.values()) or 1
         for k, c in self._outcomes.items():
             rec(f"safety/{k}", c)

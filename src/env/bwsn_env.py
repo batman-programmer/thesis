@@ -153,6 +153,7 @@ class BWSNPressureControlEnv(_BASE):
                                  else DS.DEFAULT_CONFIG)
         self._demand_junctions = DS.demand_junctions(self._wn0)
         self._scenario = None            # active scenario, set in reset()
+        self._seed_provenance = None     # F6: set in reset(), read by step()
         self._install_mode(demand_scenario)
         if _HAS_GYM:
             self.observation_space = spaces.Box(self._low, self._high, dtype=np.float32)
@@ -256,7 +257,38 @@ class BWSNPressureControlEnv(_BASE):
         info = {"sim_time_s": sr0.sim_time_s, "step_index": sr0.step_index,
                 "n_steps": self._driver.cfg.n_steps,
                 "demand_scenario": self._scenario.to_dict()}
+        # Seed provenance (OBSERVABILITY ONLY; changes nothing random). Records
+        # only values that ARE available at runtime, without conflating them:
+        #   train  -> the stream RNG is seeded by ``reset(seed=...)`` when given,
+        #             else by ``scenario_master_seed``; ``draw_index`` is the
+        #             stream's own counter for THIS episode.
+        #   fixed  -> the scenario is a pure function of
+        #             ``SeedSequence(entropy=scenario_master_seed,
+        #             spawn_key=(group_key, index))``; ``reset(seed=...)`` seeds
+        #             the gym RNG only and does NOT affect the scenario, so it is
+        #             recorded as ``reset_seed_arg_gym_only`` to prevent it being
+        #             misread as the scenario's seed.
+        prov = {"master_seed": int(self._scenario_config.master_seed),
+                "reset_seed_arg": None if seed is None else int(seed)}
+        if self._scenario_stream is not None:
+            prov["mode"] = "train"
+            prov["effective_stream_seed"] = (
+                int(seed) if seed is not None
+                else int(self._scenario_config.master_seed))
+            prov["draw_index"] = getattr(self._scenario, "draw_index", None)
+        else:
+            prov["mode"] = "fixed"
+            prov["scenario_id"] = self._scenario.to_dict()["scenario_id"]
+            prov["master_seed_role"] = "SeedSequence entropy"
+            prov["reset_seed_arg_gym_only"] = prov.pop("reset_seed_arg")
+        info["scenario_seed_provenance"] = prov
+        self._seed_provenance = prov
         return obs, info
+
+    @property
+    def seed_provenance(self) -> dict | None:
+        """Seed-provenance dict for the CURRENT episode (None before reset)."""
+        return getattr(self, "_seed_provenance", None)
 
     def step(self, action):
         """Apply one action: resolve admissibility, advance, reward, observe."""
@@ -307,6 +339,9 @@ class BWSNPressureControlEnv(_BASE):
             # STEP-10: the episode's scenario identity (constant within the
             # episode by construction; OBSERVABILITY ONLY).
             "demand_scenario": self._scenario.to_dict(),
+            # F6: seed provenance stamped at reset(); carried forward per step
+            # so evaluators can record it without re-deriving.
+            "scenario_seed_provenance": self._seed_provenance,
         }
         return obs, rb.total, terminated, truncated, info
 

@@ -171,6 +171,7 @@ def evaluate_on_fixed_scenarios(model, env, scenario_ids,
             rec = _roll_episode(model, env)
             rec["scenario_id"] = sid
             rec["scenario"] = env.demand_scenario.to_dict()
+            rec["seed_provenance"] = env.seed_provenance
             if sid == repeatability_scenario_id:
                 base_for_repeat = rec
             records.append(rec)
